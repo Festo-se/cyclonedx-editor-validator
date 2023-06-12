@@ -1,0 +1,11 @@
+documentation:
+- docs/**/*
+
+unittests:
+- tests/**/*
+
+settings_changes:
+- any: ['*', '!LICENSE', '!README.md'] 
+
+enhancement:
+- cdxev/**/*

@@ -1,0 +1,26 @@
+{
+    "properties": {
+        "group": {
+            "const": "com.acme.internal"
+        }
+    },
+    "required": ["group"],
+    "not": {
+        "properties": {
+            "properties": {
+                "contains": {
+                    "properties": {
+                        "name": {
+                            "const": "internal:public"
+                        },
+                        "value": {
+                            "const": "true"
+                        }
+                    },
+                    "required": ["name", "value"]
+                }
+            }
+        },
+        "required": ["properties"]
+    }
+}

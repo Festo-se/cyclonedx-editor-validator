@@ -1,0 +1,12 @@
+[flake8]
+max_line_length = 99
+
+ignore =
+	# Bare except
+	E722
+	# Whitespace before : (conflicting with black, see https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html)
+	E203
+	# Line break occurred before a binary operator (conflicting with black)
+    W503
+	# line break after binary operator (conflicting with black)
+    W504

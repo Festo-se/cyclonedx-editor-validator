@@ -1,0 +1,8 @@
+    {
+        "properties": {
+            "group": {
+                "const": "com.acme.internal"
+            }
+        },
+        "required": ["group"]
+    }

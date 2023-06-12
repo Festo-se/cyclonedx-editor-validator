@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "title": "Example schema to describe when a component is considered internal",
+    "properties": {
+      "group": {
+        "type": "string",
+        "enum": [
+            "com.company.internal"
+        ]
+      }
+    }
+}

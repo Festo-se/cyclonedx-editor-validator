@@ -1,0 +1,28 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.coverage
+.coverage.*
+.pytest_cache/
+
+# Build directories
+dist/
+
+# Virtualenvs
+.venv/
+venv/
+ENV/
+
+# IDE config
+.vscode/
+/*.pyproj
+/*.sln
+.idea
+
+# Backup files
+*.bak
+
+# CycloneDX json files except for those in the tests directory
+*.cdx.json
+!tests/auxiliary/test_*/*.cdx.json

@@ -1,0 +1,86 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.3",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2022-10-17T19:15:49",
+    "authors": [
+      {
+        "name": "automated"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "governing_program",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "name": "governing_program",
+      "version": "T5.0.3.96",
+      "licenses": [
+        {
+          "license": {
+            "name": "company internal"
+          }
+        }
+      ],
+      "copyright": "Company Legal 2022, all rights reserved"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "sub_program",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "name": "sub_program",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "T5.0.3.96"
+    },
+    {
+      "type": "library",
+      "bom-ref": "gp_first_component-copy",
+      "supplier": {
+        "name": "The first component Contributors"
+      },
+      "name": "gp_first_component",
+      "version": "2.24.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "governing_program",
+      "dependsOn": [
+        "sub_program",
+        "gp_first_component-copy"
+      ]
+    },
+    {
+      "ref": "sub_program",
+      "dependsOn": []
+    },
+    {
+      "ref": "gp_first_component-copy",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "sub_program",
+        "gp_first_component-copy"
+      ]
+    }
+  ]
+}

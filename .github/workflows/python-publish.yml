@@ -36,6 +36,6 @@ jobs:
       - name: Deploy pages
         run: |
           python -m pip install mkdocs
-          mkdocs gh-deploy --force
+          mkdocs gh-deploy --strict --force
       - name: Publish package
         run: poetry publish --build

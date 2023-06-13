@@ -41,4 +41,6 @@ jobs:
           title: Change version in pyproject.toml
           base: main
       - name: Publish package
-        run: poetry publish --build -r testpypi
+        run: |
+          poetry version --dry-run
+          poetry publish --build -r testpypi

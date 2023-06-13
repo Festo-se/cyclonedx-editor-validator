@@ -18,12 +18,14 @@ from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
+from cdxev.plausibility_check import plausibility_check
 
 logger: logging.Logger
 _STATUS_OK = 0
 _STATUS_APP_ERROR = 2
 _STATUS_USAGE_ERROR = 3
 _STATUS_VALIDATION_ERROR = 4
+_STATUS_plausibility_ERROR = 5
 
 
 def main() -> int:
@@ -152,6 +154,7 @@ def create_parser() -> argparse.ArgumentParser:
     create_validation_parser(subparsers)
     create_set_parser(subparsers)
     create_build_public_bom_parser(subparsers)
+    create_check_plausibility_parser(subparsers)
 
     return parser
 
@@ -445,6 +448,42 @@ def create_build_public_bom_parser(
     return parser
 
 
+# noinspection PyUnresolvedReferences,PyProtectedMember
+def create_check_plausibility_parser(
+    subparsers: argparse._SubParsersAction,
+) -> argparse.ArgumentParser:
+    parser = subparsers.add_parser(
+        "plausibility-check",
+        help="Check a sbom for plausibility. ",
+        description=(
+            "The sbom is checked for orphaned sboms, "
+            "components that depend on themself and "
+            "the full connectivity of the dependency tree."
+        ),
+    )
+    parser.add_argument(
+        "input",
+        metavar="<input>",
+        help="Path to the SBOM file to check.",
+        type=Path,
+    )
+    parser.add_argument(
+        "--report-format",
+        metavar="<format>",
+        help=(
+            "Write log output in a specified format. "
+            "If it's not specified, output is written to stdout."
+        ),
+        action="store",
+        type=str,
+        choices=["stdout", "warnings-ng"],
+        default="stdout",
+    )
+    add_output_argument(parser)
+    parser.set_defaults(cmd_handler=invoke_check_plausibility)
+    return parser
+
+
 def invoke_amend(args: argparse.Namespace) -> int:
     sbom, _ = read_sbom(args.input)
     amend(sbom)
@@ -608,6 +647,23 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
     output = build_public_bom(sbom, args.schema_path)
     write_sbom(output, args.output)
     return _STATUS_OK
+
+
+def invoke_check_plausibility(args: argparse.Namespace) -> int:
+    sbom, _ = read_sbom(args.input)
+    if args.output is None:
+        output = Path("./issues.json")
+    else:
+        output = args.output
+    report_format = args.report_format
+    return (
+        _STATUS_OK
+        if plausibility_check(
+            sbom=sbom, file=Path(args.input), report_format=report_format, output=output
+        )
+        == _STATUS_OK
+        else _STATUS_plausibility_ERROR
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover

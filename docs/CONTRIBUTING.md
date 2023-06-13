@@ -18,7 +18,7 @@ Feel free to assign issues to yourself and make changes to our tool. Please cons
 
 ### Prerequisites
 
-- For compatibility reasons, the code should be compliant to python3.8 or higher.
+- For compatibility reasons, the code should be compliant to python 3.9 or higher.
 - Make sure to use the latest code by performing a `git pull`.
 - For a major change it is recommended that you get in touch with us by [creating an issue](#create-issues) to discuss changes prior to dedicating time and resources.  This process allows us to better coordinate our efforts and prevent duplication of work.
 - Otherwise, feel free to directly [submit a pull request](#submitting-pull-requests).

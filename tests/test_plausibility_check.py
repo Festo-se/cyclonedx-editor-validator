@@ -5,9 +5,12 @@ from cdxev.plausibility_check import (
     check_for_orphaned_bom_refs,
     check_logic_of_dependencies,
     plausibility_check,
+    get_non_unique_bom_refs,
+    create_error_non_unique_bom_ref
 )
 import unittest.mock
 from pathlib import Path
+from cdxev.auxiliary.identity import ComponentIdentity
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_plausibility_check_sboms/"
 
@@ -79,24 +82,6 @@ class TestPlausibilityCheck(unittest.TestCase):
         self.assertEqual(search_for_word_issues("dependencies", issues), True)
         self.assertEqual(search_for_word_issues("new_reference", issues), True)
         self.assertEqual(search_for_word_issues("new_reference_2", issues), True)
-
-    def test_check_logic_of_dependencies_unconnected(self) -> None:
-        sbom = get_dependency_test_sbom()
-        sbom["dependencies"][1]["dependsOn"] = []
-        issues = plausibility_test(sbom, functionname="plausibility_check")
-        self.assertTrue(search_for_word_issues("not connected", issues))
-        self.assertTrue(search_for_word_issues("eight_component", issues))
-        self.assertTrue(search_for_word_issues("ninth_component", issues))
-
-    def test_check_logic_of_dependencies_unconnected_and_orphaned(self) -> None:
-        sbom = get_dependency_test_sbom()
-        sbom["dependencies"][1]["dependsOn"] = ["sp_seventh_component"]
-        sbom["dependencies"][3]["dependsOn"].append("new_reference")
-        issues = plausibility_test(sbom, functionname="plausibility_check")
-        self.assertTrue(search_for_word_issues("not connected", issues))
-        self.assertTrue(search_for_word_issues("eight_component", issues))
-        self.assertTrue(search_for_word_issues("orphaned", issues))
-        self.assertTrue(search_for_word_issues("new_reference", issues))
 
 
 class TestGetListOfUpostreamDependencies(unittest.TestCase):
@@ -195,28 +180,53 @@ class TestCheckLogicOfDependencies(unittest.TestCase):
         issues = check_logic_of_dependencies(sbom)
         self.assertEqual(issues, [])
 
-    def test_check_logic_of_dependencies_unconnected(self) -> None:
-        sbom = get_dependency_test_sbom()
-        sbom["dependencies"][1]["dependsOn"] = ["sp_seventh_component"]
-        issues = plausibility_test(sbom, functionname="check_logic_of_dependencies")
-        self.assertTrue(search_for_word_list_of_error_dicts("not connected", issues))
-
     def test_check_logic_of_dependencies_circular(self) -> None:
         sbom = get_dependency_test_sbom()
         sbom["dependencies"][8]["dependsOn"].append("sp_first_component")
         issues = plausibility_test(sbom, functionname="check_logic_of_dependencies")
         self.assertTrue(search_for_word_list_of_error_dicts("circular", issues))
 
-    def test_check_connceted_via_orphaned_bomref(self) -> None:
+
+class TestCheckUniquenessOfBomRefs(unittest.TestCase):
+    def test_a_valid_sbom(self) -> None:
         sbom = get_dependency_test_sbom()
-        sbom["dependencies"][1]["dependsOn"] = [
-            "sp_seventh_component",
-            "orphaned bom-ref",
-        ]
-        sbom["dependencies"].append(
-            {"ref": "orphaned bom-ref", "dependsOn": ["sp_eight_component"]}
-        )
-        issues = plausibility_test(sbom, functionname="check_logic_of_dependencies")
-        print(issues)
-        self.assertTrue(search_for_word_list_of_error_dicts("orphaned", issues))
-        self.assertTrue(search_for_word_list_of_error_dicts("connected", issues))
+        self.assertEqual(get_non_unique_bom_refs(sbom), [])
+
+    def test_non_unique_bomrefs_in_components(self) -> None:
+        sbom = get_dependency_test_sbom()
+        sbom["components"][0]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        self.assertEqual(get_non_unique_bom_refs(sbom), ["bom-ref_1"])
+
+    def test_non_unique_bomref_in_Metadata(self) -> None:
+        sbom = get_dependency_test_sbom()
+        sbom["metadata"]["component"]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        self.assertEqual(get_non_unique_bom_refs(sbom), ["bom-ref_1"])
+
+    def test_several_non_unique_bomref_in_Metadata(self) -> None:
+        sbom = get_dependency_test_sbom()
+        sbom["metadata"]["component"]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        sbom["components"][1]["bom-ref"] = "bom-ref_2"
+        sbom["components"][-2]["bom-ref"] = "bom-ref_2"
+        self.assertEqual(set(get_non_unique_bom_refs(sbom)), set(["bom-ref_2", "bom-ref_1"]))
+
+
+class TestCreateNonUniqueBomRefErrorr(unittest.TestCase):
+    def test_one_non_unique_sbom(self) -> None:
+        sbom = get_dependency_test_sbom()
+        sbom["components"][0]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        error = create_error_non_unique_bom_ref("bom-ref_1", sbom)
+        print(error)
+        id_1 = ComponentIdentity.create(sbom["components"][0], allow_unsafe=True)
+        id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
+        expected_error = {
+            "message": "Found non unique bom-ref",
+            "description": "The reference (bom-ref_1) is used in several components. Those are"
+            + f"({id_1})"
+            + f"({id_2})"
+
+        }
+        self.assertEqual(error, expected_error)

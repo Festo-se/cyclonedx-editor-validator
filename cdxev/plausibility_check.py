@@ -99,6 +99,9 @@ def check_for_orphaned_bom_refs(sbom: dict) -> list[dict]:
         for reference in composition.get("assemblies", []):
             if reference not in list_of_actual_bom_refs:
                 errors.append(create_error_orphaned_bom_ref(reference, "compositions"))
+        for reference in composition.get("dependencies", []):
+            if reference not in list_of_actual_bom_refs:
+                errors.append(create_error_orphaned_bom_ref(reference, "compositions"))
     # check vulnearabilities
     for vulnerability in sbom.get("vulnerabilities", []):
         for affected in vulnerability.get("affects", []):
@@ -116,15 +119,12 @@ def check_logic_of_dependencies(sbom: dict) -> list[dict]:
     """
     The function checks if the sbom contains circular dependencies,
     e.g. components, that depend on themself.
-    It also checks if the dependency tree is fully connected
-    (orphaned bom-refs are not considered in this check).
 
     :param dict sbom: the sbom
     :return: list with the notifications of found errors
     :rtype: list[dict]
     """
     errors = []
-    list_of_all_components = sbom.get("components", []).copy()
     list_of_actual_bom_refs = get_bom_refs_from_components(sbom.get("components", []))
     list_of_actual_bom_refs.append(
         sbom.get("metadata", {}).get("component", {}).get("bom-ref")
@@ -136,43 +136,6 @@ def check_logic_of_dependencies(sbom: dict) -> list[dict]:
         )
         if current_reference in list_of_upstream_references:
             errors.append(create_error_circular_reference(current_reference, sbom))
-
-        # check if the dependency tree is connected, i.e. that the product
-        # decribed by the sbom depends directly or indirectly on every component.
-        # also checks that every component is depended on
-        if current_reference == sbom.get("metadata", {}).get("component", {}).get(
-            "bom-ref"
-        ):
-            list_of_upstream_references.append(current_reference)
-            evaluate_if_components_are_not_connected(
-                list_of_upstream_references,
-                list_of_actual_bom_refs,
-                errors,
-                list_of_all_components,
-            )
-
-            # check for connections only established through orphaned bom-refs
-            dependencies_of_actuel_bomrefs = [
-                dependency
-                for dependency in sbom.get("dependencies", [])
-                if dependency.get("ref", "") in list_of_actual_bom_refs
-            ]
-            list_of_actual_upstream_references = get_upstream_dependency_bom_refs(
-                current_reference, dependencies_of_actuel_bomrefs
-            )
-            list_of_actual_upstream_references.append(current_reference)
-            if len(dependencies_of_actuel_bomrefs) < len(sbom.get("dependencies", [])):
-                evaluate_if_components_are_not_connected(
-                    list_of_actual_upstream_references,
-                    list_of_actual_bom_refs,
-                    errors,
-                    list_of_all_components,
-                    base_description=(
-                        "There are components in the sbom that are only connected "
-                        "to the dependency tree through the dependsOn "
-                        "of orphaned bom-refs: "
-                    ),
-                )
     return errors
 
 
@@ -246,25 +209,38 @@ def get_upstream_dependency_bom_refs(
     return list_with_dependencies
 
 
-def evaluate_if_components_are_not_connected(
-    list_of_upstream_references: list[str],
-    list_of_actual_bom_refs: list[str],
-    errors: list[dict],
-    list_of_all_components: list[dict],
-    base_description: str = "There are components the product does not depend on in the sbom: ",
-) -> None:
-    if not (set(list_of_upstream_references) == set(list_of_actual_bom_refs)):
-        unconnected_bom_refs = set(list_of_actual_bom_refs).difference(
-            set(list_of_upstream_references)
-        )
-        for bom_ref in unconnected_bom_refs:
-            component = get_component_by_ref(bom_ref, list_of_all_components)
-            id = ComponentIdentity.create(component, allow_unsafe=True)
-            appendix = f"bom_ref = ({bom_ref}) - component = ({id})"
-            description = base_description + appendix
-            errors.append(
-                {
-                    "message": "Dependency tree is not connected. ",
-                    "description": description,
-                }
+def get_non_unique_bom_refs(sbom: dict) -> list:
+    list_of_bomrefs = get_bom_refs_from_components(sbom.get("components", []))
+    list_of_bomrefs.append(sbom.get("metadata", {}).get("component", {}).get("bom-ref", ""))
+    non_unique_bom_refs = [
+        bom_ref for bom_ref in list_of_bomrefs if list_of_bomrefs.count(bom_ref) > 1
+    ]
+    return list(set(non_unique_bom_refs))
+
+
+def create_error_non_unique_bom_ref(reference: str, sbom: dict) -> dict:
+    """
+    Function to create an error dict for not unique bom-refs.
+
+    :param str reference: the not unique bom-ref
+    :param sbom         : the sbom the bom-ref originates from
+
+    :return: dict with error message and error description
+    """
+    list_of_all_components = sbom.get("components", []).copy()
+    list_of_all_components.append(sbom.get("metadata", {}).get("component", {}))
+    list_of_component_ids = []
+    for component in list_of_all_components:
+        if component.get("bom-ref", "") == reference:
+            list_of_component_ids.append(
+                ComponentIdentity.create(component, allow_unsafe=True)
             )
+    component_description_string = ""
+    for component_id in list_of_component_ids:
+        component_description_string += f"({component_id})"
+    error = {
+        "message": "Found non unique bom-ref",
+        "description": f"The reference ({reference}) is used in several components. Those are" +
+        component_description_string
+    }
+    return error

@@ -142,11 +142,11 @@ def create_error_non_unique_bom_ref(reference: str, sbom: dict) -> dict:
     component_description_string = ""
     for component_id in list_of_component_ids:
         component_description_string += f"({component_id})"
-    error = {
-        "message": "Found non unique bom-ref",
-        "description": f"The reference ({reference}) is used in several components. Those are" +
+    error = (
+        "SBOM has the mistake: found non unique bom-ref. " +
+        f"The reference ({reference}) is used in several components. Those are" +
         component_description_string
-    }
+    )
     return error
 
 

@@ -213,7 +213,7 @@ def get_non_unique_bom_refs(sbom: dict) -> list:
     return list(set(non_unique_bom_refs))
 
 
-def create_error_non_unique_bom_ref(reference: str, sbom: dict) -> dict:
+def create_error_non_unique_bom_ref(reference: str, sbom: dict) -> str:
     """
     Function to create an error dict for not unique bom-refs.
 

@@ -6,6 +6,12 @@ from unittest import mock
 
 from cdxev.error import AppError
 from cdxev.validator.validate import validate_sbom
+from cdxev.validator.helper import (
+    create_error_non_unique_bom_ref,
+    get_errors_for_non_unique_bomrefs
+
+)
+from cdxev.auxiliary.identity import ComponentIdentity
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_validate_sboms/"
 
@@ -483,3 +489,44 @@ class TestValidateUseSchemaType(unittest.TestCase):
             schema_type="default",
         )
         self.assertEqual(v, 0)
+
+
+class TestPlausabilityCheck(unittest.TestCase):
+    def test_not_unique_bom_ref(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["bom-ref"] = "some-ref"
+        sbom["components"][-1]["bom-ref"] = "some-ref"
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("non unique bom-ref", issues), True)
+
+
+class TestPlausabilityHelperFunctions(unittest.TestCase):
+    def test_one_non_unique_bom_ref(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        error = create_error_non_unique_bom_ref("bom-ref_1", sbom)
+        id_1 = ComponentIdentity.create(sbom["components"][0], allow_unsafe=True)
+        id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
+        expected_error = (
+            "SBOM has the mistake: found non unique bom-ref. "
+            "The reference (bom-ref_1) is used in several components. Those are" 
+            f"({id_1})"
+            f"({id_2})"
+        )
+        self.assertEqual(error, expected_error)
+
+    def test_get_errors_non_unique_sbom(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        error = get_errors_for_non_unique_bomrefs(sbom)
+        id_1 = ComponentIdentity.create(sbom["components"][0], allow_unsafe=True)
+        id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
+        expected_error = (
+            "SBOM has the mistake: found non unique bom-ref. "
+            "The reference (bom-ref_1) is used in several components. Those are"
+            f"({id_1})"
+            f"({id_2})"
+        )
+        self.assertEqual(error, [expected_error])

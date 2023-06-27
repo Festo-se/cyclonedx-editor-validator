@@ -3,6 +3,11 @@ import re
 from datetime import datetime
 from importlib import resources
 from pathlib import Path
+from cdxev.auxiliary.sbomFunctions import (
+    get_component_by_ref,
+    get_bom_refs_from_components,
+)
+from cdxev.auxiliary.identity import ComponentIdentity
 
 from cdxev.error import AppError
 
@@ -106,3 +111,48 @@ def get_external_schema(schema_path: Path) -> tuple[dict, Path]:
             "Could not load schema",
             ("Path to the provided schema does not exist"),
         )
+
+
+def get_non_unique_bom_refs(sbom: dict) -> list:
+    list_of_bomrefs = get_bom_refs_from_components(sbom.get("components", []))
+    list_of_bomrefs.append(sbom.get("metadata", {}).get("component", {}).get("bom-ref", ""))
+    non_unique_bom_refs = [
+        bom_ref for bom_ref in list_of_bomrefs if list_of_bomrefs.count(bom_ref) > 1
+    ]
+    return list(set(non_unique_bom_refs))
+
+
+def create_error_non_unique_bom_ref(reference: str, sbom: dict) -> dict:
+    """
+    Function to create an error dict for not unique bom-refs.
+
+    :param str reference: the not unique bom-ref
+    :param sbom         : the sbom the bom-ref originates from
+
+    :return: dict with error message and error description
+    """
+    list_of_all_components = sbom.get("components", []).copy()
+    list_of_all_components.append(sbom.get("metadata", {}).get("component", {}))
+    list_of_component_ids = []
+    for component in list_of_all_components:
+        if component.get("bom-ref", "") == reference:
+            list_of_component_ids.append(
+                ComponentIdentity.create(component, allow_unsafe=True)
+            )
+    component_description_string = ""
+    for component_id in list_of_component_ids:
+        component_description_string += f"({component_id})"
+    error = {
+        "message": "Found non unique bom-ref",
+        "description": f"The reference ({reference}) is used in several components. Those are" +
+        component_description_string
+    }
+    return error
+
+
+def get_errors_for_non_unique_bomrefs(sbom: dict) -> list:
+    list_of_non_unique_bomrefs = get_non_unique_bom_refs(sbom)
+    errors = []
+    for reference in list_of_non_unique_bomrefs:
+        errors.append(create_error_non_unique_bom_ref(reference, sbom))
+    return errors

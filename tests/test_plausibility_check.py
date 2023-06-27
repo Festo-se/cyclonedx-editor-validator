@@ -6,7 +6,8 @@ from cdxev.plausibility_check import (
     check_logic_of_dependencies,
     plausibility_check,
     get_non_unique_bom_refs,
-    create_error_non_unique_bom_ref
+    create_error_non_unique_bom_ref,
+    get_errors_for_non_unique_bomrefs
 )
 import unittest.mock
 from pathlib import Path
@@ -213,13 +214,12 @@ class TestCheckUniquenessOfBomRefs(unittest.TestCase):
         self.assertEqual(set(get_non_unique_bom_refs(sbom)), set(["bom-ref_2", "bom-ref_1"]))
 
 
-class TestCreateNonUniqueBomRefErrorr(unittest.TestCase):
+class TestCreateNonUniqueBomRefError(unittest.TestCase):
     def test_one_non_unique_sbom(self) -> None:
         sbom = get_dependency_test_sbom()
         sbom["components"][0]["bom-ref"] = "bom-ref_1"
         sbom["components"][-1]["bom-ref"] = "bom-ref_1"
         error = create_error_non_unique_bom_ref("bom-ref_1", sbom)
-        print(error)
         id_1 = ComponentIdentity.create(sbom["components"][0], allow_unsafe=True)
         id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
         expected_error = {
@@ -230,3 +230,19 @@ class TestCreateNonUniqueBomRefErrorr(unittest.TestCase):
 
         }
         self.assertEqual(error, expected_error)
+
+    def test_get_errors_non_unique_sbom(self) -> None:
+        sbom = get_dependency_test_sbom()
+        sbom["components"][0]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        error = get_errors_for_non_unique_bomrefs(sbom)
+        id_1 = ComponentIdentity.create(sbom["components"][0], allow_unsafe=True)
+        id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
+        expected_error = {
+            "message": "Found non unique bom-ref",
+            "description": "The reference (bom-ref_1) is used in several components. Those are"
+            + f"({id_1})"
+            + f"({id_2})"
+
+        }
+        self.assertEqual(error, [expected_error])

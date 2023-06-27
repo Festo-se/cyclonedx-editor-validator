@@ -6,7 +6,11 @@ from pathlib import Path
 from jsonschema import Draft7Validator, FormatChecker, validators
 
 from cdxev.log import LogMessage
-from cdxev.validator.helper import open_schema, validate_filename
+from cdxev.validator.helper import (
+    open_schema,
+    validate_filename,
+    get_errors_for_non_unique_bomrefs
+)
 from cdxev.validator.warningsngreport import WarningsNgReporter
 
 logger = logging.getLogger(__name__)
@@ -42,6 +46,9 @@ def validate_sbom(
                 "SBOM has the mistake: file name is not according to the given regex"
             )
             errors.append(message)
+        non_unique_bom_ref_errors = get_errors_for_non_unique_bomrefs(sbom)
+        for error in non_unique_bom_ref_errors:
+            errors.append(error)
         resolver = validators.RefResolver(
             base_uri=f"{used_schema_path.as_uri()}/",
             # according to documentation referrer has to be True, therefore ignore error from mypy

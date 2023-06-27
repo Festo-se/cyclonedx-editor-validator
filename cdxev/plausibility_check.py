@@ -17,15 +17,10 @@ def plausibility_check(
     sbom: dict, file: Path, report_format: str, output: Path
 ) -> Union[Literal[0], Literal[1]]:
     """
-    Check a sbom for pausability.
-    The sbom is checked for orphaned bom-refs,
-    components that depend on themself and
-    the full connectivity of the dependency tree.
+    Check a sbom for plausability.
+    The sbom is checked for orphaned bom-refs and
+    components that depend on themself.
 
-    Dependencies of orphaned bom-refs that are not connected
-    to the tree are ignored. If a component is only connected
-    to the tree via the dependency of an oprhaned bom-ref,
-    an error will be logged.
 
     :param dict sbom: the sbom.
 
@@ -239,8 +234,16 @@ def create_error_non_unique_bom_ref(reference: str, sbom: dict) -> dict:
     for component_id in list_of_component_ids:
         component_description_string += f"({component_id})"
     error = {
-        "message": "Found non unique bom-ref",
+        "message": "SBOM has the mistake: found non unique bom-ref",
         "description": f"The reference ({reference}) is used in several components. Those are" +
         component_description_string
     }
     return error
+
+
+def get_errors_for_non_unique_bomrefs(sbom: dict) -> list:
+    list_of_non_unique_bomrefs = get_non_unique_bom_refs(sbom)
+    errors = []
+    for reference in list_of_non_unique_bomrefs:
+        errors.append(create_error_non_unique_bom_ref(reference, sbom))
+    return errors

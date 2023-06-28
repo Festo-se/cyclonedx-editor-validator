@@ -1,10 +1,10 @@
 import json
 import unittest
 
-from cdxev import mergeVex
+from cdxev import merge_vex
 from tests.auxiliary.sbomFunctionsTests import compare_sboms
 
-path_to_folder_with_test_sboms = "tests/auxiliary/test_mergeVex_sboms/"
+path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_vex_sboms/"
 
 
 class TestMergeVexSboms(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestMergeVexSboms(unittest.TestCase):
             path_to_folder_with_test_sboms + "bom.json", "r", encoding="utf-8-sig"
         ) as my_file:
             sbom = json.load(my_file)
-        self.assertTrue(mergeVex.check_if_refs_are_in_sbom(vex, sbom), True)
+        self.assertTrue(merge_vex.check_if_refs_are_in_sbom(vex, sbom), True)
 
     def test_get_refs_from(self) -> None:
         with open(
@@ -29,7 +29,7 @@ class TestMergeVexSboms(unittest.TestCase):
         ) as my_file:
             sbom = json.load(my_file)
         self.assertEqual(
-            mergeVex.get_refs_from_sbom(sbom),
+            merge_vex.get_refs_from_sbom(sbom),
             [
                 "some program",
                 "11231231",
@@ -38,7 +38,7 @@ class TestMergeVexSboms(unittest.TestCase):
             ],
         )
         self.assertEqual(
-            mergeVex.get_refs_from_vex(vex),
+            merge_vex.get_refs_from_vex(vex),
             ["11231231", "ref_first_component@1.3.3"],
         )
 
@@ -55,7 +55,7 @@ class TestMergeVexSboms(unittest.TestCase):
             path_to_folder_with_test_sboms + "goal.json", "r", encoding="utf-8-sig"
         ) as my_file:
             goal = json.load(my_file)
-        self.assertTrue(compare_sboms(mergeVex.merge_vex(sbom, vex), goal))
+        self.assertTrue(compare_sboms(merge_vex.merge_vex(sbom, vex), goal))
 
     def test_merge_vex_sboms_same_vul(self) -> None:
         with open(
@@ -66,7 +66,7 @@ class TestMergeVexSboms(unittest.TestCase):
             path_to_folder_with_test_sboms + "goal.json", "r", encoding="utf-8-sig"
         ) as my_file:
             goal = json.load(my_file)
-        self.assertTrue(compare_sboms(mergeVex.merge_vex(goal, vex), goal))
+        self.assertTrue(compare_sboms(merge_vex.merge_vex(goal, vex), goal))
 
     def test_compare_sboms(self) -> None:
         with open(
@@ -77,7 +77,7 @@ class TestMergeVexSboms(unittest.TestCase):
             path_to_folder_with_test_sboms + "goal.json", "r", encoding="utf-8-sig"
         ) as my_file:
             goal = json.load(my_file)
-        self.assertTrue(compare_sboms(mergeVex.merge_vex(goal, vex), goal))
+        self.assertTrue(compare_sboms(merge_vex.merge_vex(goal, vex), goal))
 
     def test_merge_vex_sboms_merge(self) -> None:
         with open(
@@ -94,7 +94,7 @@ class TestMergeVexSboms(unittest.TestCase):
             path_to_folder_with_test_sboms + "goal.json", "r", encoding="utf-8-sig"
         ) as my_file:
             goal = json.load(my_file)
-        self.assertTrue(compare_sboms(mergeVex.merge_vex(sbom, vex), goal))
+        self.assertTrue(compare_sboms(merge_vex.merge_vex(sbom, vex), goal))
 
 
 if __name__ == "__main__":

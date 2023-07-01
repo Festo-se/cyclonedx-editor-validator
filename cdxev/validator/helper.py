@@ -115,14 +115,16 @@ def get_external_schema(schema_path: Path) -> tuple[dict, Path]:
 
 def get_non_unique_bom_refs(sbom: dict) -> list:
     list_of_bomrefs = get_bom_refs_from_components(sbom.get("components", []))
-    list_of_bomrefs.append(sbom.get("metadata", {}).get("component", {}).get("bom-ref", ""))
+    list_of_bomrefs.append(
+        sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")
+    )
     non_unique_bom_refs = [
         bom_ref for bom_ref in list_of_bomrefs if list_of_bomrefs.count(bom_ref) > 1
     ]
     return list(set(non_unique_bom_refs))
 
 
-def create_error_non_unique_bom_ref(reference: str, sbom: dict) -> dict:
+def create_error_non_unique_bom_ref(reference: str, sbom: dict) -> str:
     """
     Function to create an error dict for not unique bom-refs.
 
@@ -143,9 +145,9 @@ def create_error_non_unique_bom_ref(reference: str, sbom: dict) -> dict:
     for component_id in list_of_component_ids:
         component_description_string += f"({component_id})"
     error = (
-        "SBOM has the mistake: found non unique bom-ref. " +
-        f"The reference ({reference}) is used in several components. Those are" +
-        component_description_string
+        "SBOM has the mistake: found non unique bom-ref. "
+        + f"The reference ({reference}) is used in several components. Those are"
+        + component_description_string
     )
     return error
 
@@ -176,7 +178,7 @@ def plausibility_check(sbom: dict) -> list:
     return united_errors
 
 
-def check_for_orphaned_bom_refs(sbom: dict) -> list[dict]:
+def check_for_orphaned_bom_refs(sbom: dict) -> list[str]:
     """
     Check a sbom for orphaned bom-refs, references that do
     not correspond to any component from the sbom.
@@ -240,7 +242,7 @@ def check_for_orphaned_bom_refs(sbom: dict) -> list[dict]:
     return errors
 
 
-def check_logic_of_dependencies(sbom: dict) -> list[dict]:
+def check_logic_of_dependencies(sbom: dict) -> list[str]:
     """
     The function checks if the sbom contains circular dependencies,
     e.g. components, that depend on themself.
@@ -264,7 +266,7 @@ def check_logic_of_dependencies(sbom: dict) -> list[dict]:
     return errors
 
 
-def create_error_orphaned_bom_ref(reference: str, found_in: str) -> dict:
+def create_error_orphaned_bom_ref(reference: str, found_in: str) -> str:
     """
     Function to create an error dict if orphaned bom_refs were found.
 
@@ -275,13 +277,13 @@ def create_error_orphaned_bom_ref(reference: str, found_in: str) -> dict:
     """
     error = (
         f"{found_in} has the mistake: found orphaned bom-ref"
-        + f"The reference ({reference}) does not"
-        + " correspond to any component in the sbom."
+        f"The reference ({reference}) does not"
+        " correspond to any component in the sbom."
     )
     return error
 
 
-def create_error_circular_reference(reference: str, sbom: dict) -> dict:
+def create_error_circular_reference(reference: str, sbom: dict) -> str:
     """
     Function that creates an error dict if a selfdependend reference was found.
 
@@ -295,8 +297,8 @@ def create_error_circular_reference(reference: str, sbom: dict) -> dict:
     component = get_component_by_ref(reference, list_of_all_components)
     id = ComponentIdentity.create(component, allow_unsafe=True)
     error = (
-        "dependencies has the mistake: found circular reference (selfdependent component)",
-        + f"The component ({id}) depends on itself"
+        "dependencies has the mistake: found circular reference (selfdependent component)"
+        f"The component ({id}) depends on itself"
     )
     return error
 

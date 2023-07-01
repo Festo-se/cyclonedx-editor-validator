@@ -11,7 +11,7 @@ from cdxev.validator.helper import (
     get_errors_for_non_unique_bomrefs,
     plausibility_check,
     get_upstream_dependency_bom_refs,
-    check_for_orphaned_bom_refs
+    check_for_orphaned_bom_refs,
 )
 from cdxev.auxiliary.identity import ComponentIdentity
 
@@ -57,7 +57,7 @@ def validate_test(
     filename_regex: str = "",
     schema_type: str = "custom",
     schema_path: str = "",
-    plausability_check: str = "no"
+    plausability_check: str = "no",
 ) -> list:
     mock_logger.error.call_args_list = []
     errors_occurred = validate_sbom(
@@ -69,7 +69,7 @@ def validate_test(
         schema_type=schema_type,
         filename_regex=filename_regex,
         schema_path=schema_path,
-        plausability_check=plausability_check
+        plausability_check=plausability_check,
     )
     if not errors_occurred:
         return ["no issue"]
@@ -533,41 +533,31 @@ class TestPlausabilityCheck(unittest.TestCase):
 
     def test_plausibility_check_valid_sbom(self) -> None:
         sbom = get_test_sbom()
-        self.assertEqual(
-            plausibility_check(sbom), []
-        )
+        self.assertEqual(plausibility_check(sbom), [])
 
     def test_check_for_orphaned_bom_refs_dependencies(self) -> None:
         sbom = get_test_sbom(path_to_second_sbom)
         sbom["dependencies"][3]["ref"] = "new_reference"
         issues = plausibility_check(sbom)
-        self.assertEqual(
-            search_for_word_list_of_errors("dependencies", issues), True
-        )
+        self.assertEqual(search_for_word_list_of_errors("dependencies", issues), True)
 
     def test_check_for_orphaned_bom_refs_dependencies_dependson(self) -> None:
         sbom = get_test_sbom(path_to_second_sbom)
         sbom["dependencies"][3]["dependsOn"].append("new_reference")
         issues = plausibility_check(sbom)
-        self.assertEqual(
-            search_for_word_list_of_errors("dependencies", issues), True
-        )
+        self.assertEqual(search_for_word_list_of_errors("dependencies", issues), True)
 
     def test_check_for_orphaned_bom_refs_vulnerabilities(self) -> None:
         sbom = get_test_sbom(path_to_second_sbom)
         sbom["vulnerabilities"][1]["affects"][0]["ref"] = "new_reference"
         issues = plausibility_check(sbom)
-        self.assertEqual(
-            search_for_word_list_of_errors("vulnerabilitie", issues), True
-        )
+        self.assertEqual(search_for_word_list_of_errors("vulnerabilitie", issues), True)
 
     def test_check_for_orphaned_bom_refs_compositions(self) -> None:
         sbom = get_test_sbom(path_to_second_sbom)
         sbom["compositions"][0]["assemblies"].append("new_reference")
         issues = plausibility_check(sbom)
-        self.assertEqual(
-            search_for_word_list_of_errors("compositions", issues), True
-        )
+        self.assertEqual(search_for_word_list_of_errors("compositions", issues), True)
 
     def test_validate_active_plausibility_check(self) -> None:
         sbom = get_test_sbom()
@@ -613,9 +603,15 @@ class TestPlausabilityHelperFunctions(unittest.TestCase):
         sbom["dependencies"][3]["dependsOn"].append("new_reference")
         sbom["dependencies"][3]["dependsOn"].append("new_reference_2")
         list_of_errors = plausibility_check(sbom)
-        self.assertEqual(search_for_word_list_of_errors("dependencies", list_of_errors), True)
-        self.assertEqual(search_for_word_list_of_errors("new_reference", list_of_errors), True)
-        self.assertEqual(search_for_word_list_of_errors("new_reference_2", list_of_errors), True)
+        self.assertEqual(
+            search_for_word_list_of_errors("dependencies", list_of_errors), True
+        )
+        self.assertEqual(
+            search_for_word_list_of_errors("new_reference", list_of_errors), True
+        )
+        self.assertEqual(
+            search_for_word_list_of_errors("new_reference_2", list_of_errors), True
+        )
 
     def test_get_a_list_of_upstream_dependencies(self) -> None:
         sbom = get_test_sbom(path_to_second_sbom)

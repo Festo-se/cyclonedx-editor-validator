@@ -10,7 +10,7 @@ from cdxev.validator.helper import (
     open_schema,
     validate_filename,
     get_errors_for_non_unique_bomrefs,
-    plausibility_check
+    plausibility_check,
 )
 from cdxev.validator.warningsngreport import WarningsNgReporter
 
@@ -35,7 +35,7 @@ def validate_sbom(
     schema_type: str = "default",
     filename_regex: str = "",
     schema_path: str = "",
-    plausability_check: str = ""
+    plausability_check: str = "",
 ) -> int:
     errors = []
     if input_format == "json":

@@ -8,8 +8,10 @@ from cdxev.error import AppError
 from cdxev.validator.validate import validate_sbom
 from cdxev.validator.helper import (
     create_error_non_unique_bom_ref,
-    get_errors_for_non_unique_bomrefs
-
+    get_errors_for_non_unique_bomrefs,
+    plausibility_check,
+    get_upstream_dependency_bom_refs,
+    check_for_orphaned_bom_refs
 )
 from cdxev.auxiliary.identity import ComponentIdentity
 
@@ -17,6 +19,10 @@ path_to_folder_with_test_sboms = "tests/auxiliary/test_validate_sboms/"
 
 path_to_sbom = (
     path_to_folder_with_test_sboms + "Acme_Application_9.1.1_20220217T101458.cdx.json"
+)
+
+path_to_second_sbom = (
+    path_to_folder_with_test_sboms + "sub_programm_T5.0.3.96_20220217T101458_cdx.json"
 )
 
 path_to_modified_sbom = (
@@ -35,6 +41,14 @@ def search_for_word_issues(word: str, issue_list: list) -> bool:
     return is_valid
 
 
+def search_for_word_list_of_errors(word: str, issue_list: list) -> bool:
+    is_valid = False
+    for issue in issue_list:
+        if word.lower() in issue.lower():
+            is_valid = True
+    return is_valid
+
+
 @mock.patch("cdxev.validator.validate.logger")
 def validate_test(
     sbom: dict,
@@ -43,6 +57,7 @@ def validate_test(
     filename_regex: str = "",
     schema_type: str = "custom",
     schema_path: str = "",
+    plausability_check: str = "no"
 ) -> list:
     mock_logger.error.call_args_list = []
     errors_occurred = validate_sbom(
@@ -54,6 +69,7 @@ def validate_test(
         schema_type=schema_type,
         filename_regex=filename_regex,
         schema_path=schema_path,
+        plausability_check=plausability_check
     )
     if not errors_occurred:
         return ["no issue"]
@@ -499,6 +515,67 @@ class TestPlausabilityCheck(unittest.TestCase):
         issues = validate_test(sbom)
         self.assertEqual(search_for_word_issues("non unique bom-ref", issues), True)
 
+    def test_non_unique_bomref_in_Metadata(self) -> None:
+        sbom = get_test_sbom()
+        sbom["metadata"]["component"]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("non unique bom-ref", issues), True)
+
+    def test_several_non_unique_bomref_in_Metadata(self) -> None:
+        sbom = get_test_sbom()
+        sbom["metadata"]["component"]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        sbom["components"][1]["bom-ref"] = "bom-ref_2"
+        sbom["components"][-2]["bom-ref"] = "bom-ref_2"
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("non unique bom-ref", issues), True)
+
+    def test_plausibility_check_valid_sbom(self) -> None:
+        sbom = get_test_sbom()
+        self.assertEqual(
+            plausibility_check(sbom), []
+        )
+
+    def test_check_for_orphaned_bom_refs_dependencies(self) -> None:
+        sbom = get_test_sbom(path_to_second_sbom)
+        sbom["dependencies"][3]["ref"] = "new_reference"
+        issues = plausibility_check(sbom)
+        self.assertEqual(
+            search_for_word_list_of_errors("dependencies", issues), True
+        )
+
+    def test_check_for_orphaned_bom_refs_dependencies_dependson(self) -> None:
+        sbom = get_test_sbom(path_to_second_sbom)
+        sbom["dependencies"][3]["dependsOn"].append("new_reference")
+        issues = plausibility_check(sbom)
+        self.assertEqual(
+            search_for_word_list_of_errors("dependencies", issues), True
+        )
+
+    def test_check_for_orphaned_bom_refs_vulnerabilities(self) -> None:
+        sbom = get_test_sbom(path_to_second_sbom)
+        sbom["vulnerabilities"][1]["affects"][0]["ref"] = "new_reference"
+        issues = plausibility_check(sbom)
+        self.assertEqual(
+            search_for_word_list_of_errors("vulnerabilitie", issues), True
+        )
+
+    def test_check_for_orphaned_bom_refs_compositions(self) -> None:
+        sbom = get_test_sbom(path_to_second_sbom)
+        sbom["compositions"][0]["assemblies"].append("new_reference")
+        issues = plausibility_check(sbom)
+        self.assertEqual(
+            search_for_word_list_of_errors("compositions", issues), True
+        )
+
+    def test_validate_active_plausibility_check(self) -> None:
+        sbom = get_test_sbom()
+        sbom["compositions"][0]["assemblies"].append("new_ref")
+        issues = validate_test(sbom, plausability_check="yes")
+        print(issues)
+        self.assertEqual(search_for_word_issues("orphaned bom-ref", issues), True)
+
 
 class TestPlausabilityHelperFunctions(unittest.TestCase):
     def test_one_non_unique_bom_ref(self) -> None:
@@ -510,7 +587,7 @@ class TestPlausabilityHelperFunctions(unittest.TestCase):
         id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
         expected_error = (
             "SBOM has the mistake: found non unique bom-ref. "
-            "The reference (bom-ref_1) is used in several components. Those are" 
+            "The reference (bom-ref_1) is used in several components. Those are"
             f"({id_1})"
             f"({id_2})"
         )
@@ -530,3 +607,66 @@ class TestPlausabilityHelperFunctions(unittest.TestCase):
             f"({id_2})"
         )
         self.assertEqual(error, [expected_error])
+
+    def test_plausibility_two_orphaned_sbom(self) -> None:
+        sbom = get_test_sbom()
+        sbom["dependencies"][3]["dependsOn"].append("new_reference")
+        sbom["dependencies"][3]["dependsOn"].append("new_reference_2")
+        list_of_errors = plausibility_check(sbom)
+        self.assertEqual(search_for_word_list_of_errors("dependencies", list_of_errors), True)
+        self.assertEqual(search_for_word_list_of_errors("new_reference", list_of_errors), True)
+        self.assertEqual(search_for_word_list_of_errors("new_reference_2", list_of_errors), True)
+
+    def test_get_a_list_of_upstream_dependencies(self) -> None:
+        sbom = get_test_sbom(path_to_second_sbom)
+        list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
+            "sub_programm", sbom["dependencies"]
+        )
+        list_of_dependencies = [
+            "sp_first_component",
+            "sp_second_component",
+            "sp_fourth_component",
+            "sp_fifth_component",
+            "sp_sixth_component",
+            "sp_seventh_component",
+            "sp_eight_component",
+            "sp_ninth_component",
+            "sp_tenth_component",
+            "sp_eleventh_component",
+            "sp_twelfth_component",
+            "sp_thirteenth_component",
+            "sp_fourteenth_component",
+            "sp_sixteenth_component",
+            "sp_seventeenth_component",
+            "sp_fifteenth_component",
+        ]
+        self.assertEqual(set(list_of_upstream_dependencies), set(list_of_dependencies))
+        list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
+            "sp_seventeenth_component", sbom["dependencies"]
+        )
+        self.assertEqual(set(list_of_upstream_dependencies), set([]))
+        list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
+            "sp_fifth_component", sbom["dependencies"]
+        )
+        self.assertEqual(
+            set(list_of_upstream_dependencies), set(["sp_seventeenth_component"])
+        )
+        list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
+            "sp_seventh_component", sbom["dependencies"]
+        )
+        list_of_dependencies = [
+            "sp_ninth_component",
+            "sp_twelfth_component",
+            "sp_seventeenth_component",
+            "sp_thirteenth_component",
+            "sp_fourteenth_component",
+            "sp_fifteenth_component",
+            "sp_sixteenth_component",
+            "sp_eleventh_component",
+            "sp_tenth_component",
+        ]
+        self.assertEqual(set(list_of_upstream_dependencies), set(list_of_dependencies))
+
+    def test_check_for_orphaned_bom_refs_valid_sbom(self) -> None:
+        sbom = get_test_sbom(path_to_second_sbom)
+        self.assertEqual(check_for_orphaned_bom_refs(sbom), [])

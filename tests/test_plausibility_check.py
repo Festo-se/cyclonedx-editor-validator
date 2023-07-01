@@ -223,7 +223,7 @@ class TestCreateNonUniqueBomRefError(unittest.TestCase):
         id_1 = ComponentIdentity.create(sbom["components"][0], allow_unsafe=True)
         id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
         expected_error = {
-            "message": "Found non unique bom-ref",
+            "message": "SBOM has the mistake: found non unique bom-ref",
             "description": "The reference (bom-ref_1) is used in several components. Those are"
             + f"({id_1})"
             + f"({id_2})"
@@ -239,7 +239,7 @@ class TestCreateNonUniqueBomRefError(unittest.TestCase):
         id_1 = ComponentIdentity.create(sbom["components"][0], allow_unsafe=True)
         id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
         expected_error = {
-            "message": "Found non unique bom-ref",
+            "message": "SBOM has the mistake: found non unique bom-ref",
             "description": "The reference (bom-ref_1) is used in several components. Those are"
             + f"({id_1})"
             + f"({id_2})"

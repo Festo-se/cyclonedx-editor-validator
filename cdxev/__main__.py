@@ -300,6 +300,16 @@ def create_validation_parser(
         ),
         type=str,
     )
+    parser.add_argument(
+        "--plausability-check",
+        metavar="<plausability-check>",
+        choices=["yes", "y"],
+        help=(
+            "y/yes if the plausibility of the bom-refs in the"
+            "sbom should also be checked"
+        ),
+        type=str,
+    )
 
     add_output_argument(parser)
 
@@ -636,6 +646,7 @@ def invoke_validate(args: argparse.Namespace) -> int:
             schema_type=args.schema_type,
             filename_regex=args.filename_pattern,
             schema_path=args.schema_path,
+            plausability_check=args.plausability_check
         )
         == _STATUS_OK
         else _STATUS_VALIDATION_ERROR

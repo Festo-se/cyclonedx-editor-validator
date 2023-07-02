@@ -5,12 +5,11 @@ from importlib import resources
 from pathlib import Path
 
 from cdxev.auxiliary.identity import ComponentIdentity
-from cdxev.error import AppError
-
 from cdxev.auxiliary.sbomFunctions import (
     get_bom_refs_from_components,
     get_component_by_ref,
 )
+from cdxev.error import AppError
 
 
 def open_schema(

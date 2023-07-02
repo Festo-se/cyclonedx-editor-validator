@@ -11,7 +11,6 @@ from cdxev.validator.helper import (
     validate_filename,
 )
 
-
 schema_path = resources.files("cdxev.auxiliary") / "schema"
 with resources.as_file(schema_path) as path:
     # noinspection PyTypeChecker

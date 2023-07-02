@@ -14,7 +14,7 @@ from cdxev.auxiliary.identity import Key, KeyType
 from cdxev.auxiliary.output import write_sbom
 from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
-from cdxev.log import configure_logging, LogMessage
+from cdxev.log import LogMessage, configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom

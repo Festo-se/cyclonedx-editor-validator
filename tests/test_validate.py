@@ -472,11 +472,9 @@ class TestValidateUseSchemaType(unittest.TestCase):
     def test_default_schema(self) -> None:
         sbom = get_test_sbom()
         v = validate_sbom(
-            sbom,
-            "json",
-            Path(path_to_sbom),
-            "",
-            Path(""),
+            sbom=sbom,
+            input_format="json",
+            file=Path(path_to_sbom),
             schema_type="default",
         )
         self.assertEqual(v, 0)

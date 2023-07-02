@@ -477,7 +477,7 @@ class TestValidateUseSchemaType(unittest.TestCase):
             file=Path(path_to_sbom),
             schema_type="default",
         )
-        self.assertEqual(v, 0)
+        self.assertEqual(v, set())
 
 
 class TestPlausabilityCheck(unittest.TestCase):

@@ -3,13 +3,14 @@ import re
 from datetime import datetime
 from importlib import resources
 from pathlib import Path
-from cdxev.auxiliary.sbomFunctions import (
-    get_component_by_ref,
-    get_bom_refs_from_components,
-)
-from cdxev.auxiliary.identity import ComponentIdentity
 
+from cdxev.auxiliary.identity import ComponentIdentity
 from cdxev.error import AppError
+
+from cdxev.auxiliary.sbomFunctions import (
+    get_bom_refs_from_components,
+    get_component_by_ref,
+)
 
 
 def open_schema(

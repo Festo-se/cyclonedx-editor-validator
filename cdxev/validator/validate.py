@@ -7,10 +7,10 @@ from jsonschema import Draft7Validator, FormatChecker, validators
 
 from cdxev.log import LogMessage
 from cdxev.validator.helper import (
-    open_schema,
-    validate_filename,
     get_errors_for_non_unique_bomrefs,
+    open_schema,
     plausibility_check,
+    validate_filename,
 )
 from cdxev.validator.warningsngreport import WarningsNgReporter
 

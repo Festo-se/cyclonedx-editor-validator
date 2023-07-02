@@ -4,16 +4,16 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from cdxev.auxiliary.identity import ComponentIdentity
 from cdxev.error import AppError
-from cdxev.validator.validate import validate_sbom
 from cdxev.validator.helper import (
+    check_for_orphaned_bom_refs,
     create_error_non_unique_bom_ref,
     get_errors_for_non_unique_bomrefs,
-    plausibility_check,
     get_upstream_dependency_bom_refs,
-    check_for_orphaned_bom_refs,
+    plausibility_check,
 )
-from cdxev.auxiliary.identity import ComponentIdentity
+from cdxev.validator.validate import validate_sbom
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_validate_sboms/"
 

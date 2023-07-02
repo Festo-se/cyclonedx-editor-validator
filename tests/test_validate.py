@@ -2,7 +2,6 @@ import json
 import os
 import unittest
 from pathlib import Path
-from unittest import mock
 
 from cdxev.auxiliary.identity import ComponentIdentity
 from cdxev.error import AppError
@@ -33,15 +32,7 @@ path_to_modified_sbom = (
 list_of_specVersions = ["1.3", "1.4"]
 
 
-def search_for_word_issues(word: str, issue_list: list) -> bool:
-    is_valid = False
-    for issue in issue_list:
-        if word.lower() in str(issue[0][0]).lower():
-            is_valid = True
-    return is_valid
-
-
-def search_for_word_list_of_errors(word: str, issue_list: list) -> bool:
+def search_for_word_issues(word: str, issue_list: set) -> bool:
     is_valid = False
     for issue in issue_list:
         if word.lower() in issue.lower():
@@ -49,31 +40,24 @@ def search_for_word_list_of_errors(word: str, issue_list: list) -> bool:
     return is_valid
 
 
-@mock.patch("cdxev.validator.validate.logger")
 def validate_test(
     sbom: dict,
-    mock_logger: unittest.mock.Mock,
-    report_format: str = "stdout",
     filename_regex: str = "",
     schema_type: str = "custom",
     schema_path: str = "",
     plausability_check: str = "no",
 ) -> list:
-    mock_logger.error.call_args_list = []
-    errors_occurred = validate_sbom(
+    messages = validate_sbom(
         sbom=sbom,
         input_format="json",
         file=Path(path_to_sbom),
-        report_format=report_format,
-        output=Path(""),
         schema_type=schema_type,
         filename_regex=filename_regex,
         schema_path=schema_path,
         plausability_check=plausability_check,
     )
-    if not errors_occurred:
+    if not messages:
         return ["no issue"]
-    messages = mock_logger.error.call_args_list
     return messages
 
 
@@ -101,14 +85,6 @@ class TestValidateInit(unittest.TestCase):
         sbom = get_test_sbom()
         issues = validate_test(sbom, schema_type="default")
         self.assertEqual(issues, ["no issue"])
-
-    def test_warnings_ng_format(self) -> None:
-        sbom = get_test_sbom()
-        sbom["components"][0].pop("version")
-        issues = validate_test(sbom, report_format="warnings-ng")
-        self.assertTrue(
-            search_for_word_issues("'version' is a required property", issues)
-        )
 
 
 class TestValidateMetadata(unittest.TestCase):
@@ -336,6 +312,7 @@ class TestValidateComponents(unittest.TestCase):
                 }
             ]
             issues = validate_test(sbom)
+            print(issues)
             self.assertEqual(search_for_word_issues("additional", issues), True)
 
     def test_components_license_name_without_text(self) -> None:
@@ -461,14 +438,12 @@ class TestValidateUseOwnSchema(unittest.TestCase):
             sbom,
             "json",
             Path(path_to_sbom),
-            "",
-            Path(""),
             schema_path=(
                 str(Path(__file__).parent.resolve())
                 + "/auxiliary/test_validate_sboms/test_schema.json"
             ),
         )
-        self.assertEqual(v, 0)
+        self.assertEqual(v, set())
 
     def test_use_own_schema_path_does_not_exist(self) -> None:
         sbom = get_test_sbom()
@@ -539,31 +514,30 @@ class TestPlausabilityCheck(unittest.TestCase):
         sbom = get_test_sbom(path_to_second_sbom)
         sbom["dependencies"][3]["ref"] = "new_reference"
         issues = plausibility_check(sbom)
-        self.assertEqual(search_for_word_list_of_errors("dependencies", issues), True)
+        self.assertEqual(search_for_word_issues("dependencies", issues), True)
 
     def test_check_for_orphaned_bom_refs_dependencies_dependson(self) -> None:
         sbom = get_test_sbom(path_to_second_sbom)
         sbom["dependencies"][3]["dependsOn"].append("new_reference")
         issues = plausibility_check(sbom)
-        self.assertEqual(search_for_word_list_of_errors("dependencies", issues), True)
+        self.assertEqual(search_for_word_issues("dependencies", issues), True)
 
     def test_check_for_orphaned_bom_refs_vulnerabilities(self) -> None:
         sbom = get_test_sbom(path_to_second_sbom)
         sbom["vulnerabilities"][1]["affects"][0]["ref"] = "new_reference"
         issues = plausibility_check(sbom)
-        self.assertEqual(search_for_word_list_of_errors("vulnerabilitie", issues), True)
+        self.assertEqual(search_for_word_issues("vulnerabilitie", issues), True)
 
     def test_check_for_orphaned_bom_refs_compositions(self) -> None:
         sbom = get_test_sbom(path_to_second_sbom)
         sbom["compositions"][0]["assemblies"].append("new_reference")
         issues = plausibility_check(sbom)
-        self.assertEqual(search_for_word_list_of_errors("compositions", issues), True)
+        self.assertEqual(search_for_word_issues("compositions", issues), True)
 
     def test_validate_active_plausibility_check(self) -> None:
         sbom = get_test_sbom()
         sbom["compositions"][0]["assemblies"].append("new_ref")
         issues = validate_test(sbom, plausability_check="yes")
-        print(issues)
         self.assertEqual(search_for_word_issues("orphaned bom-ref", issues), True)
 
 
@@ -603,14 +577,10 @@ class TestPlausabilityHelperFunctions(unittest.TestCase):
         sbom["dependencies"][3]["dependsOn"].append("new_reference")
         sbom["dependencies"][3]["dependsOn"].append("new_reference_2")
         list_of_errors = plausibility_check(sbom)
+        self.assertEqual(search_for_word_issues("dependencies", list_of_errors), True)
+        self.assertEqual(search_for_word_issues("new_reference", list_of_errors), True)
         self.assertEqual(
-            search_for_word_list_of_errors("dependencies", list_of_errors), True
-        )
-        self.assertEqual(
-            search_for_word_list_of_errors("new_reference", list_of_errors), True
-        )
-        self.assertEqual(
-            search_for_word_list_of_errors("new_reference_2", list_of_errors), True
+            search_for_word_issues("new_reference_2", list_of_errors), True
         )
 
     def test_get_a_list_of_upstream_dependencies(self) -> None:

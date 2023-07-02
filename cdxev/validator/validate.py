@@ -1,20 +1,16 @@
-import logging
 import re
 from importlib import resources
 from pathlib import Path
 
 from jsonschema import Draft7Validator, FormatChecker, validators
 
-from cdxev.log import LogMessage
 from cdxev.validator.helper import (
     get_errors_for_non_unique_bomrefs,
     open_schema,
     plausibility_check,
     validate_filename,
 )
-from cdxev.validator.warningsngreport import WarningsNgReporter
 
-logger = logging.getLogger(__name__)
 
 schema_path = resources.files("cdxev.auxiliary") / "schema"
 with resources.as_file(schema_path) as path:
@@ -30,13 +26,11 @@ def validate_sbom(
     sbom: dict,
     input_format: str,
     file: Path,
-    report_format: str,
-    output: Path,
     schema_type: str = "default",
     filename_regex: str = "",
     schema_path: str = "",
     plausability_check: str = "",
-) -> int:
+) -> set[str]:
     errors = []
     if input_format == "json":
         sbom_schema, used_schema_path = open_schema(
@@ -158,21 +152,4 @@ def validate_sbom(
                 else:
                     errors.append(error_path + error.message)
     sorted_errors = set(sorted(errors))
-    if len(sorted_errors) == 0:
-        logger.info("SBOM is compliant to the provided specification schema")
-        return 0
-    else:
-        if report_format == "warnings-ng":
-            warnings_ng_handler = WarningsNgReporter(file, output)
-            logger.addHandler(warnings_ng_handler)
-        for error in sorted_errors:
-            logger.error(
-                LogMessage(
-                    message="Invalid SBOM",
-                    description=error.replace(
-                        error[0 : error.find("has the mistake")], ""
-                    ).replace("has the mistake: ", ""),
-                    module_name=error[0 : error.find("has the mistake") - 1],
-                )
-            )
-        return 1
+    return sorted_errors

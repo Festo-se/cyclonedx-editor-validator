@@ -14,10 +14,11 @@ from cdxev.auxiliary.identity import Key, KeyType
 from cdxev.auxiliary.output import write_sbom
 from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
-from cdxev.log import configure_logging
+from cdxev.log import configure_logging, LogMessage
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
+from cdxev.validator.warningsngreport import WarningsNgReporter
 
 logger: logging.Logger
 _STATUS_OK = 0
@@ -590,28 +591,40 @@ def invoke_set(args: argparse.Namespace) -> int:
 
 
 def invoke_validate(args: argparse.Namespace) -> int:
+    logger_validate = logging.getLogger(__name__)
     sbom, file_type = read_sbom(args.input)
     if args.output is None:
         output = Path("./issues.json")
     else:
         output = args.output
     report_format = args.report_format
-    return (
-        _STATUS_OK
-        if validate_sbom(
-            sbom=sbom,
-            input_format=file_type,
-            file=Path(args.input),
-            report_format=report_format,
-            output=output,
-            schema_type=args.schema_type,
-            filename_regex=args.filename_pattern,
-            schema_path=args.schema_path,
-            plausability_check=args.plausability_check,
-        )
-        == _STATUS_OK
-        else _STATUS_VALIDATION_ERROR
+    sorted_errors = validate_sbom(
+        sbom=sbom,
+        input_format=file_type,
+        file=Path(args.input),
+        schema_type=args.schema_type,
+        filename_regex=args.filename_pattern,
+        schema_path=args.schema_path,
+        plausability_check=args.plausability_check,
     )
+    if len(sorted_errors) == 0:
+        logger_validate.info("SBOM is compliant to the provided specification schema")
+        return 0
+    else:
+        if report_format == "warnings-ng":
+            warnings_ng_handler = WarningsNgReporter(Path(args.input), output)
+            logger_validate.addHandler(warnings_ng_handler)
+        for error in sorted_errors:
+            logger_validate.error(
+                LogMessage(
+                    message="Invalid SBOM",
+                    description=error.replace(
+                        error[0 : error.find("has the mistake")], ""
+                    ).replace("has the mistake: ", ""),
+                    module_name=error[0 : error.find("has the mistake") - 1],
+                )
+            )
+    return _STATUS_OK if sorted_errors == set() else _STATUS_VALIDATION_ERROR
 
 
 def invoke_build_public_bom(args: argparse.Namespace) -> int:

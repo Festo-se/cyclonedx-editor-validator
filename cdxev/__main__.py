@@ -300,13 +300,11 @@ def create_validation_parser(
     )
     parser.add_argument(
         "--plausability-check",
-        metavar="<plausability-check>",
-        choices=["yes", "y"],
         help=(
-            "y/yes if the plausibility of the bom-refs in the"
-            "sbom should also be checked"
+            "If this flag is set, the plausibility of the bom-refs in the"
+            "sbom will also be checked"
         ),
-        type=str,
+        action='store_true'
     )
 
     add_output_argument(parser)

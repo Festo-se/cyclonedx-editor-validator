@@ -28,7 +28,7 @@ def validate_sbom(
     schema_type: str = "default",
     filename_regex: str = "",
     schema_path: str = "",
-    plausability_check: str = "",
+    plausability_check: bool = False,
 ) -> set[str]:
     errors = []
     if input_format == "json":
@@ -42,7 +42,7 @@ def validate_sbom(
             )
             errors.append(message)
         non_unique_bom_ref_errors = get_errors_for_non_unique_bomrefs(sbom)
-        if plausability_check == "yes" or plausability_check == "y":
+        if plausability_check:
             plausability_errors = plausibility_check(sbom)
             for error in plausability_errors:
                 errors.append(error)

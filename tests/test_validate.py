@@ -45,7 +45,7 @@ def validate_test(
     filename_regex: str = "",
     schema_type: str = "custom",
     schema_path: str = "",
-    plausability_check: str = "no",
+    plausability_check: bool = False,
 ) -> list:
     messages = validate_sbom(
         sbom=sbom,
@@ -535,7 +535,7 @@ class TestPlausabilityCheck(unittest.TestCase):
     def test_validate_active_plausibility_check(self) -> None:
         sbom = get_test_sbom()
         sbom["compositions"][0]["assemblies"].append("new_ref")
-        issues = validate_test(sbom, plausability_check="yes")
+        issues = validate_test(sbom, plausability_check=True)
         self.assertEqual(search_for_word_issues("orphaned bom-ref", issues), True)
 
 

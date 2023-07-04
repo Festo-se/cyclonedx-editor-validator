@@ -236,7 +236,7 @@ def check_for_orphaned_bom_refs(sbom: dict) -> list[str]:
                 errors.append(
                     create_error_orphaned_bom_ref(
                         affected.get("ref", ""),
-                        "vulnerabilitie " + vulnerability.get("id", ""),
+                        "vulnerability " + vulnerability.get("id", ""),
                     )
                 )
     return errors

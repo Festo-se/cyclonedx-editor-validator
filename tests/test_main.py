@@ -401,7 +401,6 @@ class TestValidateCommand(unittest.TestCase):
     def test_get_validate(
         self, mock_validate: unittest.mock.Mock, mock_read: unittest.mock.Mock
     ) -> None:
-        error_return = {"error"}
         valid_return = set()
         with unittest.mock.patch("sys.argv", ["", "validate", "fake_bom.cdx.json"]):
             mock_validate.return_value = valid_return
@@ -409,7 +408,7 @@ class TestValidateCommand(unittest.TestCase):
             result = main()
             self.assertEqual(result, _STATUS_OK)
         with unittest.mock.patch("sys.argv", ["", "validate", "fake_bom.cdx.json"]):
-            mock_validate.return_value = error_return
+            mock_validate.return_value = {"error"}
             mock_read.return_value = ({}, "json")
             result = main()
             self.assertEqual(result, _STATUS_VALIDATION_ERROR)

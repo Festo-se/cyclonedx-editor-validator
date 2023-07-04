@@ -304,7 +304,7 @@ def create_validation_parser(
             "If this flag is set, the plausibility of the bom-refs in the"
             "sbom will also be checked"
         ),
-        action='store_true'
+        action="store_true",
     )
 
     add_output_argument(parser)
@@ -589,7 +589,7 @@ def invoke_set(args: argparse.Namespace) -> int:
 
 
 def invoke_validate(args: argparse.Namespace) -> int:
-    logger_validate = logging.getLogger(__name__)
+    global logger
     sbom, file_type = read_sbom(args.input)
     if args.output is None:
         output = Path("./issues.json")
@@ -606,14 +606,14 @@ def invoke_validate(args: argparse.Namespace) -> int:
         plausability_check=args.plausability_check,
     )
     if len(sorted_errors) == 0:
-        logger_validate.info("SBOM is compliant to the provided specification schema")
+        logger.info("SBOM is compliant to the provided specification schema")
         return 0
     else:
         if report_format == "warnings-ng":
             warnings_ng_handler = WarningsNgReporter(Path(args.input), output)
-            logger_validate.addHandler(warnings_ng_handler)
+            logger.addHandler(warnings_ng_handler)
         for error in sorted_errors:
-            logger_validate.error(
+            logger.error(
                 LogMessage(
                     message="Invalid SBOM",
                     description=error.replace(

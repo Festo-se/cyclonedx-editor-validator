@@ -20,10 +20,6 @@ path_to_sbom = (
     path_to_folder_with_test_sboms + "Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
-path_to_second_sbom = (
-    path_to_folder_with_test_sboms + "sub_programm_T5.0.3.96_20220217T101458_cdx.json"
-)
-
 path_to_modified_sbom = (
     path_to_folder_with_test_sboms + "modified_sbom/"
     "Acme_Application_9.1.1_20220217T101458.cdx.json"
@@ -312,7 +308,6 @@ class TestValidateComponents(unittest.TestCase):
                 }
             ]
             issues = validate_test(sbom)
-            print(issues)
             self.assertEqual(search_for_word_issues("additional", issues), True)
 
     def test_components_license_name_without_text(self) -> None:
@@ -509,25 +504,51 @@ class TestPlausabilityCheck(unittest.TestCase):
         self.assertEqual(plausibility_check(sbom), [])
 
     def test_check_for_orphaned_bom_refs_dependencies(self) -> None:
-        sbom = get_test_sbom(path_to_second_sbom)
+        sbom = get_test_sbom()
         sbom["dependencies"][3]["ref"] = "new_reference"
         issues = plausibility_check(sbom)
         self.assertEqual(search_for_word_issues("dependencies", issues), True)
 
     def test_check_for_orphaned_bom_refs_dependencies_dependson(self) -> None:
-        sbom = get_test_sbom(path_to_second_sbom)
+        sbom = get_test_sbom()
         sbom["dependencies"][3]["dependsOn"].append("new_reference")
         issues = plausibility_check(sbom)
         self.assertEqual(search_for_word_issues("dependencies", issues), True)
 
     def test_check_for_orphaned_bom_refs_vulnerabilities(self) -> None:
-        sbom = get_test_sbom(path_to_second_sbom)
-        sbom["vulnerabilities"][1]["affects"][0]["ref"] = "new_reference"
+        sbom = get_test_sbom()
+        sbom["vulnerabilities"] = [
+            {
+                "description": (
+                    "The application is vulnerable to remote SQL"
+                    " injection and shell upload"
+                ),
+                "id": "Vul 1",
+                "ratings": [
+                    {
+                        "score": 9.8,
+                        "severity": "critical",
+                        "method": "CVSSv31",
+                        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                    },
+                    {
+                        "score": 7.5,
+                        "severity": "high",
+                        "method": "CVSSv2",
+                        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P",
+                    },
+                ],
+                "affects": [
+                    {"ref": "sp_eight_component"},
+                    {"ref": "sp_eleventh_component"},
+                ],
+            }
+        ]
         issues = plausibility_check(sbom)
-        self.assertEqual(search_for_word_issues("vulnerabilitie", issues), True)
+        self.assertEqual(search_for_word_issues("vulnerability", issues), True)
 
     def test_check_for_orphaned_bom_refs_compositions(self) -> None:
-        sbom = get_test_sbom(path_to_second_sbom)
+        sbom = get_test_sbom()
         sbom["compositions"][0]["assemblies"].append("new_reference")
         issues = plausibility_check(sbom)
         self.assertEqual(search_for_word_issues("compositions", issues), True)
@@ -582,9 +603,71 @@ class TestPlausabilityHelperFunctions(unittest.TestCase):
         )
 
     def test_get_a_list_of_upstream_dependencies(self) -> None:
-        sbom = get_test_sbom(path_to_second_sbom)
+        dependencies = [
+            {
+                "ref": "sub_programm",
+                "dependsOn": [
+                    "sp_first_component",
+                    "sp_second_component",
+                    "sp_fourth_component",
+                    "sp_fifth_component",
+                    "sp_sixth_component",
+                ],
+            },
+            {
+                "ref": "sp_first_component",
+                "dependsOn": ["sp_seventh_component", "sp_eight_component"],
+            },
+            {"ref": "sp_second_component", "dependsOn": ["sp_seventeenth_component"]},
+            {"ref": "sp_fourth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {"ref": "sp_fifth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {"ref": "sp_sixth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {
+                "ref": "sp_seventh_component",
+                "dependsOn": ["sp_ninth_component", "sp_twelfth_component"],
+            },
+            {
+                "ref": "sp_eight_component",
+                "dependsOn": [
+                    "sp_tenth_component",
+                    "sp_twelfth_component",
+                    "sp_thirteenth_component",
+                ],
+            },
+            {"ref": "sp_ninth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {"ref": "sp_tenth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {
+                "ref": "sp_eleventh_component",
+                "dependsOn": ["sp_seventeenth_component", "sp_tenth_component"],
+            },
+            {
+                "ref": "sp_twelfth_component",
+                "dependsOn": [
+                    "sp_thirteenth_component",
+                    "sp_fourteenth_component",
+                    "sp_fifteenth_component",
+                ],
+            },
+            {
+                "ref": "sp_thirteenth_component",
+                "dependsOn": ["sp_seventeenth_component"],
+            },
+            {
+                "ref": "sp_fourteenth_component",
+                "dependsOn": ["sp_sixteenth_component", "sp_seventeenth_component"],
+            },
+            {
+                "ref": "sp_sixteenth_component",
+                "dependsOn": ["sp_seventeenth_component"],
+            },
+            {"ref": "sp_seventeenth_component", "dependsOn": []},
+            {
+                "ref": "sp_fifteenth_component",
+                "dependsOn": ["sp_eleventh_component", "sp_seventeenth_component"],
+            },
+        ]
         list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
-            "sub_programm", sbom["dependencies"]
+            "sub_programm", dependencies
         )
         list_of_dependencies = [
             "sp_first_component",
@@ -606,17 +689,17 @@ class TestPlausabilityHelperFunctions(unittest.TestCase):
         ]
         self.assertEqual(set(list_of_upstream_dependencies), set(list_of_dependencies))
         list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
-            "sp_seventeenth_component", sbom["dependencies"]
+            "sp_seventeenth_component", dependencies
         )
         self.assertEqual(set(list_of_upstream_dependencies), set([]))
         list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
-            "sp_fifth_component", sbom["dependencies"]
+            "sp_fifth_component", dependencies
         )
         self.assertEqual(
             set(list_of_upstream_dependencies), set(["sp_seventeenth_component"])
         )
         list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
-            "sp_seventh_component", sbom["dependencies"]
+            "sp_seventh_component", dependencies
         )
         list_of_dependencies = [
             "sp_ninth_component",
@@ -632,5 +715,5 @@ class TestPlausabilityHelperFunctions(unittest.TestCase):
         self.assertEqual(set(list_of_upstream_dependencies), set(list_of_dependencies))
 
     def test_check_for_orphaned_bom_refs_valid_sbom(self) -> None:
-        sbom = get_test_sbom(path_to_second_sbom)
+        sbom = get_test_sbom()
         self.assertEqual(check_for_orphaned_bom_refs(sbom), [])

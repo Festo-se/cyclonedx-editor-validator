@@ -277,7 +277,7 @@ def create_error_orphaned_bom_ref(reference: str, found_in: str) -> str:
     """
     error = (
         f"{found_in} has the mistake: found orphaned bom-ref"
-        f"The reference ({reference}) does not"
+        f" The reference ({reference}) does not"
         " correspond to any component in the sbom."
     )
     return error

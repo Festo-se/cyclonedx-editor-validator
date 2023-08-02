@@ -4,7 +4,6 @@ from importlib import resources
 from pathlib import Path
 
 from jsonschema import Draft7Validator, FormatChecker, validators
-
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 

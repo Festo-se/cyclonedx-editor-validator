@@ -5,6 +5,9 @@ from pathlib import Path
 
 from jsonschema import Draft7Validator, FormatChecker, validators
 
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT202012
+
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
 from cdxev.validator.helper import open_schema, validate_filename
@@ -42,13 +45,16 @@ def validate_sbom(
                 "SBOM has the mistake: file name is not according to the given regex"
             )
             errors.append(message)
-        resolver = validators.RefResolver(
-            base_uri=f"{used_schema_path.as_uri()}/",
-            # according to documentation referrer has to be True, therefore ignore error from mypy
-            referrer=True,  # type: ignore
+        schema = Resource(sbom_schema, specification=DRAFT202012)
+        schema_spdx = Resource(load_spdx_schema(), specification=DRAFT202012)
+        registry = Registry().with_resources(
+            [
+                (f"{used_schema_path.as_uri()}/", schema),
+                ("spdx.schema.json", schema_spdx),
+            ]
         )
         v = Draft7Validator(
-            schema=sbom_schema, resolver=resolver, format_checker=FormatChecker()
+            schema=sbom_schema, registry=registry, format_checker=FormatChecker()
         )
         for error in sorted(v.iter_errors(sbom), key=str):
             try:

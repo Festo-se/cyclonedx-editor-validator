@@ -44,17 +44,24 @@ def validate_sbom(
                 "SBOM has the mistake: file name is not according to the given regex"
             )
             errors.append(message)
-        schema = Resource(sbom_schema, specification=DRAFT202012)
-        schema_spdx = Resource(load_spdx_schema(), specification=DRAFT202012)
+        # Code according to documentation
+        #  (https://python-jsonschema.readthedocs.io/en/latest/referencing/)
+        # section "Introduction to the referencing API"
+        schema = Resource(
+            sbom_schema, specification=DRAFT202012
+        )  # type: ignore[call-arg, var-annotated]
+        schema_spdx = Resource(
+            load_spdx_schema(), specification=DRAFT202012
+        )  # type: ignore[call-arg, var-annotated]
         registry = Registry().with_resources(
             [
                 (f"{used_schema_path.as_uri()}/", schema),
                 ("spdx.schema.json", schema_spdx),
             ]
-        )
+        )  # type: ignore[var-annotated]
         v = Draft7Validator(
             schema=sbom_schema, registry=registry, format_checker=FormatChecker()
-        )
+        )  # type: ignore[call-arg]
         for error in sorted(v.iter_errors(sbom), key=str):
             try:
                 if len(error.absolute_path) > 3:

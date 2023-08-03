@@ -24,7 +24,7 @@ def find_license_id(license_name: str, license_namelist: Sequence[dict]) -> str:
         Id of the given string
     """
     license_id = ""
-    if type(license_name) == str:
+    if isinstance(license_name, str):
         for dicts in license_namelist:
             if license_name.lower() == dicts.get("exp", "").lower():
                 license_id = dicts.get("exp", "")

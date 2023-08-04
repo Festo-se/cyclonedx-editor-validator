@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://festo-se.github.io/cyclonedx-editor-validator/CONTRIBUTING/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Contributing - CycloneDX Editor Validator Tool</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../css/festo-web-essentials.css" rel="stylesheet" />
+        <link href="https://www.festo.com/fonts/fonts.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Contributing";
+        var mkdocs_page_input_path = "CONTRIBUTING.md";
+        var mkdocs_page_url = "/cyclonedx-editor-validator/CONTRIBUTING/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> CycloneDX Editor Validator Tool
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">First Steps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../available_commands/">Available commands</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known_limitations/">Known Limitations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Further Information</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../maintainers/">Maintainers</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Contributing</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#issues">Issues</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#create-issues">Create Issues</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#solve-issue">Solve Issue</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#make-changes-to-cyclonedx-editor-validator">Make changes to CycloneDX Editor Validator</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#write-new-commands-options-or-arguments">Write new commands, options or arguments</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#submitting-pull-requests">Submitting Pull Requests</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">CycloneDX Editor Validator Tool</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+          <li>Further Information &raquo;</li>
+      <li class="breadcrumb-item active">Contributing</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Festo-se/cyclonedx-editor-validator/blob/main/docs/CONTRIBUTING.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="welcome-to-festo-cyclonedx-editor-validator-contributing-guide">Welcome to Festo CycloneDX Editor Validator contributing guide</h1>
+<p>Thank you for investing your time in contributing to our project! To get an overview of the project, read the <a href="../">documentation</a>.</p>
+<h2 id="issues">Issues</h2>
+<h3 id="create-issues">Create Issues</h3>
+<p>Before submitting, please ensure that you are using the latests code by performing a <code>git pull</code>. Also, please ensure that an issue does not already exists.</p>
+<p>Always include your python version number (<code>python --version</code>) and the tool version (<code>cdx-ev --version</code>).</p>
+<h3 id="solve-issue">Solve Issue</h3>
+<p>Feel free to assign issues to yourself and make changes to our tool. Please consider the points mentioned <a href="#make-changes-to-cyclonedx-editor-validator">here</a>.</p>
+<h2 id="make-changes-to-cyclonedx-editor-validator">Make changes to CycloneDX Editor Validator</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+<li>For compatibility reasons, the code should be compliant to python 3.9 or higher.</li>
+<li>Make sure to use the latest code by performing a <code>git pull</code>.</li>
+<li>For a major change it is recommended that you get in touch with us by <a href="#create-issues">creating an issue</a> to discuss changes prior to dedicating time and resources.  This process allows us to better coordinate our efforts and prevent duplication of work.</li>
+<li>Otherwise, feel free to directly <a href="#submitting-pull-requests">submit a pull request</a>.</li>
+</ul>
+<h3 id="write-new-commands-options-or-arguments">Write new commands, options or arguments</h3>
+<p>Please consider the following rules for commands, options and arguments:</p>
+<table>
+<thead>
+<tr>
+<th>Argument type</th>
+<th>Style</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Subcommand</td>
+<td>kebab-case<sup>1</sup></td>
+<td><code>cdx-ev merge-vex</code></td>
+</tr>
+<tr>
+<td>Option</td>
+<td>kebab-case</td>
+<td><code>cdx-ev --issues-file</code></td>
+</tr>
+<tr>
+<td>Option value</td>
+<td>&lt;kebab-case&gt;<sup>1</sup></td>
+<td><code>cdx-ev --issues-file &lt;file&gt;</code></td>
+</tr>
+<tr>
+<td>Positional argument</td>
+<td>&lt;snake-case&gt;</td>
+<td><code>cdx-ev merge-vex &lt;sbom_file&gt; &lt;vex_file&gt;</code></td>
+</tr>
+<tr>
+<td>Optional position argument</td>
+<td>[&lt;kebab-case&gt;]</td>
+<td>No good examples, yet.</td>
+</tr>
+</tbody>
+</table>
+<p>Footnotes:</p>
+<ol>
+<li>Avoid more than one word.</li>
+</ol>
+<h3 id="submitting-pull-requests">Submitting Pull Requests</h3>
+<p>The following things are to consider before submitting a pull request.</p>
+<ol>
+<li>
+<p>All <a href="https://github.com/Festo-se/cyclonedx-editor-validator/tree/main/tests">tests</a> should be passing.</p>
+</li>
+<li>
+<p>If you provide a new feature also include tests for it.</p>
+</li>
+<li>
+<p>Please ensure that types are correct according to <a href="https://www.mypy-lang.org/"><strong>mypy</strong></a>.</p>
+</li>
+<li>
+<p>All submitted code should conform to <a href="https://www.python.org/dev/peps/pep-0008/"><strong>PEP8</strong></a> and <a href="https://black.readthedocs.io/en/stable/index.html"><strong>Black</strong></a>.</p>
+</li>
+<li>
+<p>The code should be python 3.9 compliant.</p>
+</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../maintainers/" class="btn btn-neutral float-left" title="Maintainers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright 2023, Copyright (c) Festo SE & Co. KG</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Festo-se/cyclonedx-editor-validator/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../maintainers/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

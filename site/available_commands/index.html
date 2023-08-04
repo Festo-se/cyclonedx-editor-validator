@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://festo-se.github.io/cyclonedx-editor-validator/available_commands/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Available commands - CycloneDX Editor Validator Tool</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../css/festo-web-essentials.css" rel="stylesheet" />
+        <link href="https://www.festo.com/fonts/fonts.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Available commands";
+        var mkdocs_page_input_path = "available_commands.md";
+        var mkdocs_page_url = "/cyclonedx-editor-validator/available_commands/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> CycloneDX Editor Validator Tool
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="..">First Steps</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Available commands</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#amend">amend</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#merge">merge</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#merge-vex">merge-vex</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#set">set</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#target-components">Target components</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#protected-fields">Protected fields</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#values">Values</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#conflicts">Conflicts</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#set-list-file-format">Set list file format</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#validate">validate</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#use-of-different-schemas">Use of different schemas</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#validation-of-file-name">Validation of file name</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#logging">Logging</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#build-public">build-public</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dependency-resolution">Dependency-resolution</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known_limitations/">Known Limitations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Further Information</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../maintainers/">Maintainers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING/">Contributing</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">CycloneDX Editor Validator Tool</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+          <li>Documentation &raquo;</li>
+      <li class="breadcrumb-item active">Available commands</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Festo-se/cyclonedx-editor-validator/blob/main/docs/available_commands.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="available-commands">Available commands</h1>
+<p>This section only covers the commands where further information is required. For all commands use</p>
+<pre><code>cdx-ev --help              # Lists commands and options
+</code></pre>
+<p>Before use, please consider the <a href="https://festo-se.github.io/cyclonedx-editor-validator/known_limitations/">known limitations</a> of the tool.</p>
+<h2 id="amend">amend</h2>
+<p>This command accepts a single input file and will add any missing fields to it which can be automatically inferred.</p>
+<p>Currently, the command adds or modifies the following pieces of information:</p>
+<ul>
+<li>If the SBOM metadata doesn't specify an <em>author</em> from the SBOM, it will be set to <code>{"name": "automated"}</code>.</li>
+<li>The <em>compositions</em> array will be overwritten with a new one which specifies a single <em>incomplete</em> aggregate. This aggregate contains all components, including the metadata component.</li>
+<li>If a component does not have an <em>author</em>, <em>publisher</em> or <em>supplier</em>, the tool will try to infer the supplier from (in order of precedence):</li>
+<li><em>externalReferences</em> of type <em>website</em></li>
+<li><em>externalReferences</em> of type <em>issue-tracker</em></li>
+<li><em>externalReferences</em> of type <em>vcs</em></li>
+<li>Generates a <em>bom-ref</em> for components which don't have one, yet. The <em>bom-ref</em> will be a GUID.</li>
+</ul>
+<h2 id="merge">merge</h2>
+<p>This command requires at least two input files, but can accept an arbitrary number.</p>
+<p>Alternatively only one file can be submitted and the command <code>--from-folder</code> must be used to provide the path to a folder.
+This command reads the contents of the provided folder and loads <em>all files</em> with "*.cdx.json" or the name "bom.json", according to the naming convention described in the <a href="https://cyclonedx.org/specification/overview/#recognized-file-patterns">CycloneDX Specification</a>.
+If a file in the folder has the same name as the provided sbom to be merged in, it will be skipped.
+The files are then merged in alphabetical order into the regularly provided sbom in this order.</p>
+<p>The process runs iterative, merging two SBOMs in each step.
+In the first step, the second submitted SBOM is merged into the first.
+In the second step the third would be merged into the resulting SBOM from step one etc.</p>
+<p>The Resulting SBOM will contain the Metadata from the first SBOM submitted, with only the timestamp being updated.</p>
+<p>The components from the first SBOM submitted will be kept unchanged, if the SBOMs that are merged contain new components,
+those will be added to the list of components. Should a component be contained in several SBOMs, the one from the SBOM that was merged earlier will be taken without any consideration. If this happens and a component ist dropped during the merge, a warning will be shown.
+Uniqueness of the bom-refs will be ensured.</p>
+<p>The dependencies for new components are taken over.
+If components are contained in both SBOMs, then the dependsON lists
+for them will be merged so that no information will be lost.</p>
+<p>If a VEX section is contained, it will be merged as well, for details see merge-vex section</p>
+<h2 id="merge-vex">merge-vex</h2>
+<p>This command requires two input files, a SBOM and a VEX file that shell be merged.
+The VEX file needs to be compatible with the SBOM.</p>
+<p>If the SBOM does not contain a VEX file, the VEX file simply be added to the SBOM.</p>
+<p>If the SBOM already contains a VEX section, the two VEX files are merged uniquely.
+In the case of duplicate entries, the ratings will be merged. Should two ratings
+of the same method contain a different rating, the newer one will be kept.</p>
+<h2 id="set">set</h2>
+<p>This command sets properties on specified components to specified values. If a component in an SBOM is missing a particular property or the property is present but has a wrong value, this command can be used to modify just the affected properties without changing the rest of the SBOM.</p>
+<p>For this command to work, three bits of information must be provided by the user: The <strong>target</strong> component(s) to modify as well as the <strong>name</strong> and <strong>new value</strong> of each property to set on the target component.</p>
+<p>This data can either be passed directly on the command-line &mdash; in this case only a single update can be performed per invocation &mdash; or in a JSON file &mdash; this allows performing an unlimited number of updates in a single invocation.</p>
+<h3 id="target-components">Target components</h3>
+<p>The <em>target component</em> can be identified through any of the identifiable properties defined by CycloneDX, specifically: <em>cpe</em>, <em>purl</em>, <em>swid</em> or the combination of <em>name</em>, <em>group</em> and/or <em>version</em> (collectively called <em>coordinates</em>).</p>
+<p>If <em>coordinates</em> are used to identify the target, they must match the component fully. In other words, if <strong>only</strong> <em>name</em> is given, it will <strong>only match</strong> components with that name which do <strong>not</strong> contain <em>version</em> or <em>group</em> fields.</p>
+<h4 id="protected-fields">Protected fields</h4>
+<p>Some fields are protected and cannot be set by default. The full list of protected properties is:</p>
+<ul>
+<li><em>cpe</em></li>
+<li><em>purl</em></li>
+<li><em>swid</em></li>
+<li><em>name</em></li>
+<li><em>group</em></li>
+<li><em>version</em></li>
+<li><em>components</em></li>
+</ul>
+<p>To set any of these fields, use the <code>--allow-protected</code> command-line switch.</p>
+<h3 id="values">Values</h3>
+<p>The <em>value</em> must be given as a valid JSON value. That means command-line usage can be a little strange, when setting a simple string value. To be valid JSON, the string must be surrounded by double quotes. Since double quotes hold a special meaning in most shells, they will likely have to be escaped. An example for bash follows.</p>
+<pre><code># Set a simple string property, such as copyright in bash
+cdx-ev set --cpe &lt;target-cpe&gt; --key copyright --value '"2022 Acme Inc"'
+</code></pre>
+<h3 id="conflicts">Conflicts</h3>
+<p>Conflicts arise when a target component already has a value for the specified property. When this happens, the command follows the following rules to determine how to proceed:</p>
+<ol>
+<li>If the new value is <code>null</code>, delete the existing property. The tool assumes that a user who sets <code>null</code> is aware that the property exists and wants to delete it.</li>
+<li>If the property is an array, the new value is appended to the old value.</li>
+<li>If the <code>--force</code> command-line option is set, the old value is overwritten with the new.</li>
+<li>If the tool is running in an interactive terminal, the user is prompted to decide whether to overwrite the old value.</li>
+<li>If none of the above applies, an error is thrown.</li>
+</ol>
+<p>Hawk-eyed readers will have spotted a little stumbling block in these rules. What if an array should be overwritten? A little trickery is needed here. The property must first be explicitly deleted by setting it to <code>null</code>, then re-added with the new value.<br />
+On the command-line this can be done in two subsequent invocations:</p>
+<pre><code># Overwrite an array-valued property
+cdx-ev set --cpe &lt;target_cpe&gt; --key licenses --value null
+cdx-ev set --cpe &lt;target_cpe&gt; --key licenses --value '[{"license": {"id": "MIT"}}]'
+</code></pre>
+<p>When passing the set list in a file, two separate updates must be specified for the same target component.</p>
+<h3 id="set-list-file-format">Set list file format</h3>
+<p>When passing the targets, names and values in a file, the file must conform to this format:</p>
+<pre><code>[
+    {
+        "id": {
+            # Could be any one of the identifying properties in CycloneDX.
+            # Multiple identifiers are not allowed (with the special exception of name, 
+            # group and version which are only valid together)
+            "cpe": "CPE of target component goes here"
+        },
+        "set": {
+            # Sets a simple property
+            "copyright": "2022 Acme Inc",
+            # Deletes a property
+            "author": null,
+            # Sets an array array-valued property. If the property already exists on the target, 
+            # the new value will be appended to the existing one. 
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        }
+    },
+    ...
+]
+</code></pre>
+<h2 id="validate">validate</h2>
+<p>This command is used to validate the SBOM according to a specification.</p>
+<h3 id="use-of-different-schemas">Use of different schemas</h3>
+<p>The package is currently delivered with the specification for CycloneDX 1.3 and 1.4. Further, it is provided with a custom schema, which not only requires the minimum elements as defined by the <a href="https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf">NTIA</a> but also some further recommended fields, e.g. licenses and stating the known unknowns (through the <code>compositions</code>-field).
+You can control the usage of the specification with the flag <code>--schema-type</code>:</p>
+<pre><code>cdx-ev validate bom.json --schema-type=custom # use provided custom schema in package
+cdx-ev validate bom.json # default CycloneDX specification will be used
+</code></pre>
+<h3 id="validation-of-file-name">Validation of file name</h3>
+<p>According to the <a href="https://cyclonedx.org/specification/overview/#recognized-file-patterns">CycloneDX specification</a> there are commonly recognized file name patterns: <code>bom.json</code> and <code>*.cdx.json</code>.</p>
+<p>For unification this tool also validates the file name. Per default the following "regex" is validated:</p>
+<pre><code>^name_version_(hash|timestamp|hash_timestamp).cdx.json$ | ^bom.json$
+</code></pre>
+<p>Where name, version, hash and timestamp are information of the <code>metadata</code> from a SBOM.</p>
+<p>If it is desired to have a different Regex, this can be done via the flag <code>--filename-pattern</code>, i.e.:</p>
+<pre><code>cdx-ev validate mybom.json --filename-pattern=".*" # every character allowed
+cdx-ev validate mybom.json --filename-pattern="(^bom\.json$)" # only bom.json allowed
+</code></pre>
+<p>Please note the usage uf quotation marks in the <code>--filename-pattern</code>. This is required for the escaping of special characters.
+Otherwise, this may lead to undesired results as your input is not sanitized.</p>
+<h3 id="logging">Logging</h3>
+<p>Per default the command only writes to stdout. However, for supporting integration into CI/CD, other formats shall be supported, too. This can be controlled via the flag <code>--report-format</code>.</p>
+<p>Currently, only another format is supported: The <a href="https://github.com/jenkinsci/warnings-ng-plugin">warnings-ng-plugin</a>. It can be used as followed:</p>
+<pre><code>cdx-ev validate bom.json --report-format=warnings-ng" # writes issues to a file "issues.json" and stdout
+cdx-ev validate bom.json --report-format=warnings-ng --output=myfile.json" # write issues to a file "myfile.json" and stdout
+</code></pre>
+<h2 id="build-public">build-public</h2>
+<p>This command creates a reduced version of an SBOM fit for publication. It:</p>
+<ul>
+<li>deletes components matching a JSON schema provided by the user, and</li>
+<li>removes any <em>property</em> (i.e., item in the <code>properties</code> array of a component) whose name starts with <code>internal:</code> from all components.</li>
+</ul>
+<p>The actions are performed in this order, meaning that <em>internal</em> properties will be taken into account when matching the JSON schema.</p>
+<p>The JSON schema must be formulated according to the Draft 7 specification.</p>
+<h3 id="dependency-resolution">Dependency-resolution</h3>
+<p>Any components deleted by this command are equally removed from the dependency graph. Their dependencies are assigned as new dependencies to their dependents.</p>
+<p><img alt="Dependencies of deleted components are assigned to their dependents." src="../img/dependency-resolution.svg" /></p>
+<h3 id="examples">Examples</h3>
+<p>Here are some JSON schemata for common scenarios to get you started.</p>
+<p>When passed to the command, this schema will remove any component whose <code>group</code> is <code>com.acme.internal</code>.</p>
+<pre><code>{
+    "properties": {
+        "group": {
+            "const": "com.acme.internal"
+        }
+    },
+    "required": ["group"]
+}
+</code></pre>
+<p>An extension of the above, the next schema will delete any component with that <code>group</code>, <strong>unless</strong> it contains a property with the name <code>internal:public</code> and the value <code>true</code>.<br />
+<em>Note that the property itself will still be removed from the component, because its name starts with <code>internal:</code>.</em></p>
+<pre><code>{
+    "properties": {
+        "group": {
+            "const": "com.acme.internal"
+        }
+    },
+    "required": ["group"],
+    "not": {
+        "properties": {
+            "properties": {
+                "contains": {
+                    "properties": {
+                        "name": {
+                            "const": "internal:public"
+                        },
+                        "value": {
+                            "const": "true"
+                        }
+                    },
+                    "required": ["name", "value"]
+                }
+            }
+        },
+        "required": ["properties"]
+    }
+}
+</code></pre>
+<p>This schema will delete the three components with the names <code>AcmeSecret</code>, <code>AcmeNotPublic</code> and <code>AcmeSensitive</code>:</p>
+<pre><code>{
+    "properties": {
+        "name": {
+            "enum": ["AcmeSecret", "AcmeNotPublic", "AcmeSensitive"]
+        }
+    },
+    "required": ["name"]
+}
+</code></pre>
+<p>The following schema is a little more involved. It will delete any component whose license text contains the string <code>This must not be made public</code>.</p>
+<pre><code>{
+    "properties": {
+        "licenses": {
+            "contains": {
+                "properties": {
+                    "license": {
+                        "properties": {
+                            "text": {
+                                "properties": {
+                                    "content": {
+                                        "pattern": "This must not be made public"
+                                    }
+                                }
+                            }
+                        },
+                        "required": ["text"]
+                    }
+                },
+                "required": ["license"]
+            }
+        }
+    },
+    "required": ["licenses"] 
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="First Steps"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../known_limitations/" class="btn btn-neutral float-right" title="Known Limitations">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright 2023, Copyright (c) Festo SE & Co. KG</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Festo-se/cyclonedx-editor-validator/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../known_limitations/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

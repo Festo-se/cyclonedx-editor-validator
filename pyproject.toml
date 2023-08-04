@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cyclonedx-editor-validator"
-version = "0"
+version = "v0.7.0"
 description = "Tool for creating, modifying and validating CycloneDX SBOMs."
 authors = [
     "Aleg Vilinski <aleg.vilinski@festo.com>",

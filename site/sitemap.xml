@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://festo-se.github.io/cyclonedx-editor-validator/</loc>
+         <lastmod>2023-08-04</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://festo-se.github.io/cyclonedx-editor-validator/CONTRIBUTING/</loc>
+         <lastmod>2023-08-04</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://festo-se.github.io/cyclonedx-editor-validator/available_commands/</loc>
+         <lastmod>2023-08-04</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://festo-se.github.io/cyclonedx-editor-validator/known_limitations/</loc>
+         <lastmod>2023-08-04</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://festo-se.github.io/cyclonedx-editor-validator/maintainers/</loc>
+         <lastmod>2023-08-04</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>

@@ -20,6 +20,12 @@
             "name": "Acme_Application",
             "version": "9.1.1",
             "copyright": "Festo SE & Co. KG 2022, all rights reserved",
+            "hashes": [
+                {
+                    "alg": "MD5",
+                    "content": "ec7781220ec7781220ec778122012345"
+                }
+            ],
             "properties": [
                 {
                     "name": "internal:component:status",

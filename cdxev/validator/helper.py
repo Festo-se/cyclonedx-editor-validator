@@ -61,20 +61,46 @@ def validate_filename(sbom: dict, file: Path, filename_regex: str) -> bool:
         version_of_component = (
             sbom.get("metadata", {}).get("component", {}).get("version", "")
         )
+        hashes_of_component = (
+            sbom.get("metadata", {}).get("component", {}).get("hashes", [])
+        )
         if not name_of_component or not version_of_component:
             return False
+
+        component_hash = (
+            "([a-fA-F0-9]{32}|"
+            + "[a-fA-F0-9]{40}|"
+            + "[a-fA-F0-9]{64}|"
+            + "[a-fA-F0-9]{96}|"
+            + "[a-fA-F0-9]{128}"
+        )
+        if len(hashes_of_component) > 0:
+            filename_splitted = file.name.replace(".cdx.json", "").split("_")
+            for hash in hashes_of_component:
+                component_first_hash = [
+                    filename_part
+                    for filename_part in filename_splitted
+                    if hash["content"].startswith(filename_part)
+                ]
+            if component_first_hash:
+                component_hash = "(" + component_first_hash[0]
+            # if hash in file name is not one of the hashes in metadata, file name can not be valid
+            else:
+                return False
         valid_filename = re.search(
             "^"
             + re.escape(name_of_component)
             + "_"
             + re.escape(version_of_component)
-            + "_((([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|"
-            "[a-fA-F0-9]{96}|[a-fA-F0-9]{128})_"
+            + "_("
+            + component_hash
+            + ")_"
             + iso_timestamp
-            + ")|(([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|"
-            "[a-fA-F0-9]{96}|[a-fA-F0-9]{128})|"
+            + ")|"
+            + component_hash
+            + "|"
             + iso_timestamp
-            + "))(.cdx.json)$|^bom.json$",
+            + ")(.cdx.json)$|^bom.json$",
             file.name,
         )
     if valid_filename is not None:

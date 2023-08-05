@@ -6,6 +6,8 @@ from pathlib import Path
 
 from cdxev.error import AppError
 
+path_to_spd_schema = "cdxev/auxiliary/schema/spdx.schema.json"
+
 
 def open_schema(
     sbom: dict, file: Path, schema_type: str, schema_path: str
@@ -132,3 +134,8 @@ def get_external_schema(schema_path: Path) -> tuple[dict, Path]:
             "Could not load schema",
             ("Path to the provided schema does not exist"),
         )
+
+
+def load_spdx_schema() -> dict:
+    with open(path_to_spd_schema, "r") as f:
+        return json.load(f)

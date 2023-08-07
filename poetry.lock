@@ -463,13 +463,13 @@ files = [
 
 [[package]]
 name = "mypy-gitlab-code-quality"
-version = "0.0.15"
+version = "1.0.0"
 description = "Simple script to generate gitlab code quality report from output of mypy."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "mypy-gitlab-code-quality-0.0.15.tar.gz", hash = "sha256:0258b158c35b0dd183c7c496b1e01473554d8caa0fd4715201992e345fcddb60"},
-    {file = "mypy_gitlab_code_quality-0.0.15-py3-none-any.whl", hash = "sha256:601ecceffafc0f04b6ae89953333f03399d181ec668ae517a56c2e761042d8db"},
+    {file = "mypy-gitlab-code-quality-1.0.0.tar.gz", hash = "sha256:64b9a5ad340740b694ee3b04ee9691c58244413bafa485fbe7d9632f5b3dd654"},
+    {file = "mypy_gitlab_code_quality-1.0.0-py3-none-any.whl", hash = "sha256:3a8c55f8c83d95890cdf5e78b9d8a90629658bc63cba5df7ab56f63828a55538"},
 ]
 
 [[package]]
@@ -872,4 +872,4 @@ tests = ["pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9.0"
-content-hash = "0cc9fd1b7ce6851dd5a45e2dbf1b23f78af887a743a302131d1dddaef8c250aa"
+content-hash = "d92fba6c1e65a18ad361d188d416e62223e00c5c135da54441629dd6ff36326a"

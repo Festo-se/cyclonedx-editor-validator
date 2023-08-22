@@ -222,20 +222,20 @@ def create_merge_vex_parser(
 ) -> argparse.ArgumentParser:
     parser = subparsers.add_parser("merge-vex", help="Merges a VEX file into an SBOM.")
     parser.add_argument(
-        "sbom_file",
-        metavar="<sbom_file>",
+        "first_vex",
+        metavar="<first_vex>",
         help=(
-            "Path to SBOM file to merge."
-            "The first file is assumed to be the SBOM, the second the vex file"
+            "Path to a vex file to merge."
+            "Pth to the first vex file to be merged"
         ),
         type=Path,
     )
     parser.add_argument(
-        "vex_file",
-        metavar="<vex_file>",
+        "second_vex",
+        metavar="<second_vex>",
         help=(
             "Path to VEX file to merge."
-            "The first file is assumed to be the SBOM, the second the vex file"
+            "Path to the second vex file to be merged with the first"
         ),
         type=Path,
     )
@@ -492,11 +492,10 @@ def invoke_merge(args: argparse.Namespace) -> int:
 
 
 def invoke_merge_vex(args: argparse.Namespace) -> int:
-    sbom, _ = read_sbom(args.sbom_file)
-    vex, _ = read_sbom(args.vex_file)
-
-    output = merge_vex(sbom, vex)
-    write_sbom(output, args.output)
+    first_vex, _ = read_sbom(args.first_vex)
+    second_vex, _ = read_sbom(args.second_vex)
+    output = merge_vex(first_vex, second_vex)
+    write_sbom(output, args.output, update_metadata=False)
     return _STATUS_OK
 
 

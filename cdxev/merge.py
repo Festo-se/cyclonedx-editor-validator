@@ -248,12 +248,13 @@ def merge_vulnerabilities(
         List with the merged Vulnerabilities
     """
     # replace old bom-refs with the bom refs of the merged sbom
-    list_of_merged_vulnerabilities = []
+    list_of_merged_vulnerabilities = list_of_original_vulnerabilities.copy()
     for vulnerability in list_of_new_vulnerabilities:
-        affected = vulnerability.get("affects", [])
         is_in = False
         for original_vulnerability in list_of_original_vulnerabilities:
             if compare_vulnerabilities(vulnerability, original_vulnerability):
+                is_in = True
+                affected = vulnerability.get("affects", [])
                 time_flag = compare_time_flag_from_vulnerabilities(
                     original_vulnerability, vulnerability
                 )
@@ -261,7 +262,6 @@ def merge_vulnerabilities(
                     entry_of_merged_vulnerability = vulnerability.copy()
                 else:
                     entry_of_merged_vulnerability = original_vulnerability.copy()
-                is_in = True
                 merged_affects = original_vulnerability.get("affects", [])
                 for references in affected:
                     if references not in merged_affects:
@@ -283,7 +283,9 @@ def merge_vulnerabilities(
                     entry_of_merged_vulnerability["ratings"] = vulnerability.get(
                         "ratings", 2
                     )
-                list_of_merged_vulnerabilities.append(entry_of_merged_vulnerability)
+                list_of_merged_vulnerabilities[
+                    list_of_merged_vulnerabilities.index(original_vulnerability)
+                ] = entry_of_merged_vulnerability
         if not is_in:
             list_of_merged_vulnerabilities.append(vulnerability)
     return list_of_merged_vulnerabilities

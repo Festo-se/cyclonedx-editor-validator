@@ -7,41 +7,7 @@ from tests.auxiliary.sbomFunctionsTests import compare_sboms
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_vex_sboms/"
 
 
-class TestMergeVexSboms(unittest.TestCase):
-    def test_check_if_refs_are_in_sbom(self) -> None:
-        with open(
-            path_to_folder_with_test_sboms + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex = json.load(my_file)
-        with open(
-            path_to_folder_with_test_sboms + "bom.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            sbom = json.load(my_file)
-        self.assertTrue(merge_vex.check_if_refs_are_in_sbom(vex, sbom), True)
-
-    def test_get_refs_from(self) -> None:
-        with open(
-            path_to_folder_with_test_sboms + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex = json.load(my_file)
-        with open(
-            path_to_folder_with_test_sboms + "bom.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            sbom = json.load(my_file)
-        self.assertEqual(
-            merge_vex.get_refs_from_sbom(sbom),
-            [
-                "some program",
-                "11231231",
-                "first_component",
-                "ref_first_component@1.3.3",
-            ],
-        )
-        self.assertEqual(
-            merge_vex.get_refs_from_vex(vex),
-            ["11231231", "ref_first_component@1.3.3"],
-        )
-
+class TestMergeVex(unittest.TestCase):
     def test_merge_vex_sboms_no_vul(self) -> None:
         with open(
             path_to_folder_with_test_sboms + "vex.json", "r", encoding="utf-8-sig"
@@ -79,6 +45,40 @@ class TestMergeVexSboms(unittest.TestCase):
             goal = json.load(my_file)
         self.assertTrue(compare_sboms(merge_vex.merge_vex(goal, vex), goal))
 
+    def test_merge_affected(self) -> None:
+        with open(
+            path_to_folder_with_test_sboms + "auxiliar_vulnerability.json",
+            "r",
+            encoding="utf-8-sig"
+        ) as my_file:
+            auxiliar_file = json.load(my_file)
+        first_vex = auxiliar_file["vex_1"]
+        second_vex = auxiliar_file["vex_2"]
+        vex_merged = auxiliar_file["vex_3"]
+        self.assertTrue(
+            compare_sboms(
+                merge_vex.merge_vex(first_vex, second_vex),
+                vex_merged
+            )
+        )
+
+    def test_merge_different_vul(self) -> None:
+        with open(
+            path_to_folder_with_test_sboms + "auxiliar_vulnerability.json",
+            "r",
+            encoding="utf-8-sig"
+        ) as my_file:
+            auxiliar_file = json.load(my_file)
+        first_vex = auxiliar_file["vex_1"]
+        second_vex = auxiliar_file["vex_two_vul"]
+        vex_merged = auxiliar_file["vex_two_vul_merged_vex_1"]
+        self.assertTrue(
+            compare_sboms(
+                merge_vex.merge_vex(second_vex, first_vex),
+                vex_merged
+            )
+        )
+
     def test_merge_vex_sboms_merge(self) -> None:
         with open(
             path_to_folder_with_test_sboms + "vex.json", "r", encoding="utf-8-sig"
@@ -94,6 +94,8 @@ class TestMergeVexSboms(unittest.TestCase):
             path_to_folder_with_test_sboms + "goal.json", "r", encoding="utf-8-sig"
         ) as my_file:
             goal = json.load(my_file)
+        with open("debug.json", "w") as my_file:
+            json.dump(merge_vex.merge_vex(sbom, vex), my_file, indent=4)
         self.assertTrue(compare_sboms(merge_vex.merge_vex(sbom, vex), goal))
 
 

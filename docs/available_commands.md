@@ -43,18 +43,20 @@ The dependencies for new components are taken over.
 If components are contained in both SBOMs, then the dependsON lists
 for them will be merged so that no information will be lost.
 
-If a VEX section is contained, it will be merged as well, for details see merge-vex section
+If a VEX section is contained in the SBOMs, it will be merged as well, for details see merge-vex section.
+If a SBOM and a vex, instead of two SBOMs, are provided, the vex will be integrated into the sbom.
 
 ## merge-vex
 
-This command requires two input files, a SBOM and a VEX file that shell be merged.
-The VEX file needs to be compatible with the SBOM.
+This command requires two vex files as inputs, that shell be merged.
+The content of the `vulnerabilities` field of the second SBOM is merged into the first,
+other fields of the second SBOM are ignored.
+Fields besides `vulnerabilities` in the first vex submitted will remain unchanged in the result.
 
-If the SBOM does not contain a VEX file, the VEX file simply be added to the SBOM.
-
-If the SBOM already contains a VEX section, the two VEX files are merged uniquely.
+The two lists of vulnerabilities are merged uniquely.
 In the case of duplicate entries, the ratings will be merged. Should two ratings
 of the same method contain a different rating, the newer one will be kept.
+The entries of the `affects` field are uniquely combined.
 
 ## set
 

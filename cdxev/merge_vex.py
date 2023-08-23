@@ -32,8 +32,7 @@ def merge_vex(first_vex: dict, second_vex: dict) -> dict:
         merged_vex["vulnerabilities"] = new_vulnerabilities
     else:
         merged_vulnerabilities = merge.merge_vulnerabilities(
-            current_vulnerabilities,
-            new_vulnerabilities
+            current_vulnerabilities, new_vulnerabilities
         )
         merged_vex["vulnerabilities"] = merged_vulnerabilities
     return merged_vex

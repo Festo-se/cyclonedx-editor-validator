@@ -224,10 +224,7 @@ def create_merge_vex_parser(
     parser.add_argument(
         "first_vex",
         metavar="<first_vex>",
-        help=(
-            "Path to a vex file to merge."
-            "Pth to the first vex file to be merged"
-        ),
+        help=("Path to a vex file to merge." "Pth to the first vex file to be merged"),
         type=Path,
     )
     parser.add_argument(

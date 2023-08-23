@@ -49,34 +49,28 @@ class TestMergeVex(unittest.TestCase):
         with open(
             path_to_folder_with_test_sboms + "auxiliar_vulnerability.json",
             "r",
-            encoding="utf-8-sig"
+            encoding="utf-8-sig",
         ) as my_file:
             auxiliar_file = json.load(my_file)
         first_vex = auxiliar_file["vex_1"]
         second_vex = auxiliar_file["vex_2"]
         vex_merged = auxiliar_file["vex_3"]
         self.assertTrue(
-            compare_sboms(
-                merge_vex.merge_vex(first_vex, second_vex),
-                vex_merged
-            )
+            compare_sboms(merge_vex.merge_vex(first_vex, second_vex), vex_merged)
         )
 
     def test_merge_different_vul(self) -> None:
         with open(
             path_to_folder_with_test_sboms + "auxiliar_vulnerability.json",
             "r",
-            encoding="utf-8-sig"
+            encoding="utf-8-sig",
         ) as my_file:
             auxiliar_file = json.load(my_file)
         first_vex = auxiliar_file["vex_1"]
         second_vex = auxiliar_file["vex_two_vul"]
         vex_merged = auxiliar_file["vex_two_vul_merged_vex_1"]
         self.assertTrue(
-            compare_sboms(
-                merge_vex.merge_vex(second_vex, first_vex),
-                vex_merged
-            )
+            compare_sboms(merge_vex.merge_vex(second_vex, first_vex), vex_merged)
         )
 
     def test_merge_vex_sboms_merge(self) -> None:

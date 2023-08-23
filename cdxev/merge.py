@@ -229,8 +229,8 @@ def merge(sboms: t.Sequence[dict]) -> dict:
 
 
 def merge_vulnerabilities(
-    list_of_original_vulnerabilities: t.Sequence[dict],
-    list_of_new_vulnerabilities: t.Sequence[dict],
+    list_of_original_vulnerabilities: list[dict],
+    list_of_new_vulnerabilities: list[dict],
 ) -> t.Sequence[dict]:
     """
     Merges the vulnerabilities of two sboms

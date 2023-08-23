@@ -73,6 +73,27 @@ class TestMergeVex(unittest.TestCase):
             compare_sboms(merge_vex.merge_vex(second_vex, first_vex), vex_merged)
         )
 
+    def test_merge_not_unique_vul(self) -> None:
+        with open(
+            path_to_folder_with_test_sboms + "auxiliar_vulnerability.json",
+            "r",
+            encoding="utf-8-sig",
+        ) as my_file:
+            auxiliar_file = json.load(my_file)
+        first_vex_to_merge = {}
+        first_vex = auxiliar_file["vex_1"]
+        second_vex = auxiliar_file["vex_two_vul"]
+        vex_merged = auxiliar_file["vex_two_vul_merged_vex_1"]
+        first_vex_to_merge["vulnerabilities"] = [
+            first_vex["vulnerabilities"][0],
+            vex_merged["vulnerabilities"][1],
+        ]
+        self.assertTrue(
+            compare_sboms(
+                merge_vex.merge_vex(second_vex, first_vex_to_merge), vex_merged
+            )
+        )
+
     def test_merge_vex_sboms_merge(self) -> None:
         with open(
             path_to_folder_with_test_sboms + "vex.json", "r", encoding="utf-8-sig"
@@ -88,8 +109,6 @@ class TestMergeVex(unittest.TestCase):
             path_to_folder_with_test_sboms + "goal.json", "r", encoding="utf-8-sig"
         ) as my_file:
             goal = json.load(my_file)
-        with open("debug.json", "w") as my_file:
-            json.dump(merge_vex.merge_vex(sbom, vex), my_file, indent=4)
         self.assertTrue(compare_sboms(merge_vex.merge_vex(sbom, vex), goal))
 
 

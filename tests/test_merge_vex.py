@@ -111,6 +111,15 @@ class TestMergeVex(unittest.TestCase):
             goal = json.load(my_file)
         self.assertTrue(compare_sboms(merge_vex.merge_vex(sbom, vex), goal))
 
+    def test_no_vex(self) -> None:
+        with open(
+            path_to_folder_with_test_sboms + "goal_one_deleted.json",
+            "r",
+            encoding="utf-8-sig",
+        ) as my_file:
+            sbom = json.load(my_file)
+        self.assertTrue(compare_sboms(merge_vex.merge_vex(sbom, {}), sbom))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,7 +10,8 @@ from cdxev.validator.validate import validate_sbom
 path_to_folder_with_test_sboms = "tests/auxiliary/test_validate_sboms/"
 
 path_to_sbom = (
-    path_to_folder_with_test_sboms + "Acme_Application_9.1.1_20220217T101458.cdx.json"
+    path_to_folder_with_test_sboms
+    + "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json"
 )
 
 path_to_modified_sbom = (
@@ -72,6 +73,17 @@ class TestValidateInit(unittest.TestCase):
         filename_regex = "(myfancybom.json)"
         sbom = get_test_sbom()
         issues = validate_test(sbom, filename_regex=filename_regex)
+        self.assertTrue(search_for_word_issues("file name is not according to", issues))
+
+    def test_right_hash_filename(self) -> None:
+        sbom = get_test_sbom()
+        issues = validate_test(sbom)
+        self.assertEqual(issues, ["no issue"])
+
+    def test_wrong_hash_filename(self) -> None:
+        sbom = get_test_sbom()
+        sbom["metadata"]["component"]["hashes"][0]["content"] = "1337"
+        issues = validate_test(sbom)
         self.assertTrue(search_for_word_issues("file name is not according to", issues))
 
     @unittest.skipUnless("CI" in os.environ, "running only in CI")

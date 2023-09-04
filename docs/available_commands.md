@@ -89,7 +89,7 @@ To set any of these fields, use the `--allow-protected` command-line switch.
 The *value* must be given as a valid JSON value. That means command-line usage can be a little strange, when setting a simple string value. To be valid JSON, the string must be surrounded by double quotes. Since double quotes hold a special meaning in most shells, they will likely have to be escaped. An example for bash follows.
 
     # Set a simple string property, such as copyright in bash
-    cdx-ev set --cpe <target-cpe> --key copyright --value '"2022 Acme Inc"'
+    cdx-ev set bom.json --cpe <target-cpe> --key copyright --value '"2022 Acme Inc"'
 
 ### Conflicts
 
@@ -105,8 +105,8 @@ Hawk-eyed readers will have spotted a little stumbling block in these rules. Wha
 On the command-line this can be done in two subsequent invocations:
 
     # Overwrite an array-valued property
-    cdx-ev set --cpe <target_cpe> --key licenses --value null
-    cdx-ev set --cpe <target_cpe> --key licenses --value '[{"license": {"id": "MIT"}}]'
+    cdx-ev set bom.json --cpe <target_cpe> --key licenses --value null
+    cdx-ev set bom.json --cpe <target_cpe> --key licenses --value '[{"license": {"id": "MIT"}}]'
 
 When passing the set list in a file, two separate updates must be specified for the same target component.
 

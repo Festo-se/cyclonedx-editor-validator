@@ -165,8 +165,8 @@ Where name, version, hash and timestamp are information of the `metadata` from a
 
 If it is desired to have a different Regex, this can be done via the flag `--filename-pattern`, i.e.:
 
-    cdx-ev validate mybom.json --filename-pattern=".*" # every character allowed
-    cdx-ev validate mybom.json --filename-pattern="(^bom\.json$)" # only bom.json allowed
+    cdx-ev validate bom.json --filename-pattern=".*" # every character allowed
+    cdx-ev validate bom.json --filename-pattern="(^bom\.json$)" # only bom.json allowed
 
 Please note the usage uf quotation marks in the `--filename-pattern`. This is required for the escaping of special characters.
 Otherwise, this may lead to undesired results as your input is not sanitized.

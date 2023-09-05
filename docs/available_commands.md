@@ -36,7 +36,7 @@ In the second step the third would be merged into the resulting SBOM from step o
 The Resulting SBOM will contain the Metadata from the first SBOM submitted, with only the timestamp being updated.
 
 The components from the first SBOM submitted will be kept unchanged, if the SBOMs that are merged contain new components,
-those will be added to the list of components. Should a component be contained in several SBOMs, the one from the SBOM that was merged earlier will be taken without any consideration. If this happens and a component ist dropped during the merge, a warning will be shown.
+those will be added to the list of components. Should a component be contained in several SBOMs, the one from the SBOM that was merged earlier will be taken without any consideration. If this happens and a component is dropped during the merge, a warning will be shown.
 Uniqueness of the bom-refs will be ensured.
 
 The dependencies for new components are taken over.
@@ -165,8 +165,8 @@ Where name, version, hash and timestamp are information of the `metadata` from a
 
 If it is desired to have a different Regex, this can be done via the flag `--filename-pattern`, i.e.:
 
-    cdx-ev validate bom.json --filename-pattern=".*" # every character allowed
-    cdx-ev validate bom.json --filename-pattern="(^bom\.json$)" # only bom.json allowed
+    cdx-ev validate mybom.json --filename-pattern=".*" # every character allowed
+    cdx-ev validate mybom.json --filename-pattern="(^bom\.json$)" # only bom.json allowed
 
 Please note the usage uf quotation marks in the `--filename-pattern`. This is required for the escaping of special characters.
 Otherwise, this may lead to undesired results as your input is not sanitized.

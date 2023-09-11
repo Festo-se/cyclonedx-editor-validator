@@ -67,7 +67,7 @@ jobs:
         name: code-coverage-report
         path: reports/py-coverage.cobertura.xml
     - name: Coverage commit
-      if: ${{ success() && GITHUB.EVENT_NAME == 'pull_request' }}
+      if: ${{ success() && GITHUB.EVENT_NAME == 'pull_request' && !github.event.pull_request.head.repo.fork }}
       uses: MishaKav/pytest-coverage-comment@main
       with:
         junitxml-path: reports/unittest.xml

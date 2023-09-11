@@ -36,7 +36,7 @@ In the second step the third would be merged into the resulting SBOM from step o
 The Resulting SBOM will contain the Metadata from the first SBOM submitted, with only the timestamp being updated.
 
 The components from the first SBOM submitted will be kept unchanged, if the SBOMs that are merged contain new components,
-those will be added to the list of components. Should a component be contained in several SBOMs, the one from the SBOM that was merged earlier will be taken without any consideration. If this happens and a component ist dropped during the merge, a warning will be shown.
+those will be added to the list of components. Should a component be contained in several SBOMs, the one from the SBOM that was merged earlier will be taken without any consideration. If this happens and a component is dropped during the merge, a warning will be shown.
 Uniqueness of the bom-refs will be ensured.
 
 The dependencies for new components are taken over.
@@ -89,7 +89,7 @@ To set any of these fields, use the `--allow-protected` command-line switch.
 The *value* must be given as a valid JSON value. That means command-line usage can be a little strange, when setting a simple string value. To be valid JSON, the string must be surrounded by double quotes. Since double quotes hold a special meaning in most shells, they will likely have to be escaped. An example for bash follows.
 
     # Set a simple string property, such as copyright in bash
-    cdx-ev set --cpe <target-cpe> --key copyright --value '"2022 Acme Inc"'
+    cdx-ev set bom.json --cpe <target-cpe> --key copyright --value '"2022 Acme Inc"'
 
 ### Conflicts
 
@@ -105,8 +105,8 @@ Hawk-eyed readers will have spotted a little stumbling block in these rules. Wha
 On the command-line this can be done in two subsequent invocations:
 
     # Overwrite an array-valued property
-    cdx-ev set --cpe <target_cpe> --key licenses --value null
-    cdx-ev set --cpe <target_cpe> --key licenses --value '[{"license": {"id": "MIT"}}]'
+    cdx-ev set bom.json --cpe <target_cpe> --key licenses --value null
+    cdx-ev set bom.json --cpe <target_cpe> --key licenses --value '[{"license": {"id": "MIT"}}]'
 
 When passing the set list in a file, two separate updates must be specified for the same target component.
 

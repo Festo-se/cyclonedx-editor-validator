@@ -35,7 +35,7 @@ types-jsonschema = "4.19.0.0"
 pytest = "7.4.2"
 coverage = "7.3.1"
 toml = "0.10.2"
-typing-extensions = "4.7.1"
+typing-extensions = "4.8.0"
 bandit = "1.7.5"
 isort = "5.12.0"
 

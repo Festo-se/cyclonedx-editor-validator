@@ -2,9 +2,16 @@ import json
 import os
 import unittest
 from pathlib import Path
-from unittest import mock
 
+from cdxev.auxiliary.identity import ComponentIdentity
 from cdxev.error import AppError
+from cdxev.validator.helper import (
+    check_for_orphaned_bom_refs,
+    create_error_non_unique_bom_ref,
+    get_errors_for_non_unique_bomrefs,
+    get_upstream_dependency_bom_refs,
+    plausibility_check,
+)
 from cdxev.validator.validate import validate_sbom
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_validate_sboms/"
@@ -22,37 +29,32 @@ path_to_modified_sbom = (
 list_of_specVersions = ["1.3", "1.4"]
 
 
-def search_for_word_issues(word: str, issue_list: list) -> bool:
+def search_for_word_issues(word: str, issue_list: set) -> bool:
     is_valid = False
     for issue in issue_list:
-        if word.lower() in str(issue[0][0]).lower():
+        if word.lower() in issue.lower():
             is_valid = True
     return is_valid
 
 
-@mock.patch("cdxev.validator.validate.logger")
 def validate_test(
     sbom: dict,
-    mock_logger: unittest.mock.Mock,
-    report_format: str = "stdout",
     filename_regex: str = "",
     schema_type: str = "custom",
     schema_path: str = "",
+    plausability_check: bool = False,
 ) -> list:
-    mock_logger.error.call_args_list = []
-    errors_occurred = validate_sbom(
+    messages = validate_sbom(
         sbom=sbom,
         input_format="json",
         file=Path(path_to_sbom),
-        report_format=report_format,
-        output=Path(""),
         schema_type=schema_type,
         filename_regex=filename_regex,
         schema_path=schema_path,
+        plausability_check=plausability_check,
     )
-    if not errors_occurred:
+    if not messages:
         return ["no issue"]
-    messages = mock_logger.error.call_args_list
     return messages
 
 
@@ -91,14 +93,6 @@ class TestValidateInit(unittest.TestCase):
         sbom = get_test_sbom()
         issues = validate_test(sbom, schema_type="default")
         self.assertEqual(issues, ["no issue"])
-
-    def test_warnings_ng_format(self) -> None:
-        sbom = get_test_sbom()
-        sbom["components"][0].pop("version")
-        issues = validate_test(sbom, report_format="warnings-ng")
-        self.assertTrue(
-            search_for_word_issues("'version' is a required property", issues)
-        )
 
 
 class TestValidateMetadata(unittest.TestCase):
@@ -451,14 +445,12 @@ class TestValidateUseOwnSchema(unittest.TestCase):
             sbom,
             "json",
             Path(path_to_sbom),
-            "",
-            Path(""),
             schema_path=(
                 str(Path(__file__).parent.resolve())
                 + "/auxiliary/test_validate_sboms/test_schema.json"
             ),
         )
-        self.assertEqual(v, 0)
+        self.assertEqual(v, set())
 
     def test_use_own_schema_path_does_not_exist(self) -> None:
         sbom = get_test_sbom()
@@ -487,11 +479,253 @@ class TestValidateUseSchemaType(unittest.TestCase):
     def test_default_schema(self) -> None:
         sbom = get_test_sbom()
         v = validate_sbom(
-            sbom,
-            "json",
-            Path(path_to_sbom),
-            "",
-            Path(""),
+            sbom=sbom,
+            input_format="json",
+            file=Path(path_to_sbom),
             schema_type="default",
         )
-        self.assertEqual(v, 0)
+        self.assertEqual(v, set())
+
+
+class TestPlausabilityCheck(unittest.TestCase):
+    def test_not_unique_bom_ref(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["bom-ref"] = "some-ref"
+        sbom["components"][-1]["bom-ref"] = "some-ref"
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("non unique bom-ref", issues), True)
+
+    def test_non_unique_bomref_in_Metadata(self) -> None:
+        sbom = get_test_sbom()
+        sbom["metadata"]["component"]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("non unique bom-ref", issues), True)
+
+    def test_several_non_unique_bomref_in_Metadata(self) -> None:
+        sbom = get_test_sbom()
+        sbom["metadata"]["component"]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        sbom["components"][1]["bom-ref"] = "bom-ref_2"
+        sbom["components"][-2]["bom-ref"] = "bom-ref_2"
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("non unique bom-ref", issues), True)
+
+    def test_plausibility_check_valid_sbom(self) -> None:
+        sbom = get_test_sbom()
+        self.assertEqual(plausibility_check(sbom), [])
+
+    def test_check_for_orphaned_bom_refs_dependencies(self) -> None:
+        sbom = get_test_sbom()
+        sbom["dependencies"][3]["ref"] = "new_reference"
+        issues = plausibility_check(sbom)
+        self.assertEqual(search_for_word_issues("dependencies", issues), True)
+
+    def test_check_for_orphaned_bom_refs_dependencies_dependson(self) -> None:
+        sbom = get_test_sbom()
+        sbom["dependencies"][3]["dependsOn"].append("new_reference")
+        issues = plausibility_check(sbom)
+        self.assertEqual(search_for_word_issues("dependencies", issues), True)
+
+    def test_check_for_orphaned_bom_refs_vulnerabilities(self) -> None:
+        sbom = get_test_sbom()
+        sbom["vulnerabilities"] = [
+            {
+                "description": (
+                    "The application is vulnerable to remote SQL"
+                    " injection and shell upload"
+                ),
+                "id": "Vul 1",
+                "ratings": [
+                    {
+                        "score": 9.8,
+                        "severity": "critical",
+                        "method": "CVSSv31",
+                        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                    },
+                    {
+                        "score": 7.5,
+                        "severity": "high",
+                        "method": "CVSSv2",
+                        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P",
+                    },
+                ],
+                "affects": [
+                    {"ref": "sp_eight_component"},
+                    {"ref": "sp_eleventh_component"},
+                ],
+            }
+        ]
+        issues = plausibility_check(sbom)
+        self.assertEqual(search_for_word_issues("vulnerability", issues), True)
+
+    def test_check_for_orphaned_bom_refs_compositions(self) -> None:
+        sbom = get_test_sbom()
+        sbom["compositions"][0]["assemblies"].append("new_reference")
+        issues = plausibility_check(sbom)
+        self.assertEqual(search_for_word_issues("compositions", issues), True)
+
+    def test_validate_active_plausibility_check(self) -> None:
+        sbom = get_test_sbom()
+        sbom["compositions"][0]["assemblies"].append("new_ref")
+        issues = validate_test(sbom, plausability_check=True)
+        self.assertEqual(search_for_word_issues("orphaned bom-ref", issues), True)
+
+
+class TestPlausabilityHelperFunctions(unittest.TestCase):
+    def test_one_non_unique_bom_ref(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        error = create_error_non_unique_bom_ref("bom-ref_1", sbom)
+        id_1 = ComponentIdentity.create(sbom["components"][0], allow_unsafe=True)
+        id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
+        expected_error = (
+            "SBOM has the mistake: found non unique bom-ref. "
+            "The reference (bom-ref_1) is used in several components. Those are"
+            f"({id_1})"
+            f"({id_2})"
+        )
+        self.assertEqual(error, expected_error)
+
+    def test_get_errors_non_unique_sbom(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["bom-ref"] = "bom-ref_1"
+        sbom["components"][-1]["bom-ref"] = "bom-ref_1"
+        error = get_errors_for_non_unique_bomrefs(sbom)
+        id_1 = ComponentIdentity.create(sbom["components"][0], allow_unsafe=True)
+        id_2 = ComponentIdentity.create(sbom["components"][-1], allow_unsafe=True)
+        expected_error = (
+            "SBOM has the mistake: found non unique bom-ref. "
+            "The reference (bom-ref_1) is used in several components. Those are"
+            f"({id_1})"
+            f"({id_2})"
+        )
+        self.assertEqual(error, [expected_error])
+
+    def test_plausibility_two_orphaned_sbom(self) -> None:
+        sbom = get_test_sbom()
+        sbom["dependencies"][3]["dependsOn"].append("new_reference")
+        sbom["dependencies"][3]["dependsOn"].append("new_reference_2")
+        list_of_errors = plausibility_check(sbom)
+        self.assertEqual(search_for_word_issues("dependencies", list_of_errors), True)
+        self.assertEqual(search_for_word_issues("new_reference", list_of_errors), True)
+        self.assertEqual(
+            search_for_word_issues("new_reference_2", list_of_errors), True
+        )
+
+    def test_get_a_list_of_upstream_dependencies(self) -> None:
+        dependencies = [
+            {
+                "ref": "sub_programm",
+                "dependsOn": [
+                    "sp_first_component",
+                    "sp_second_component",
+                    "sp_fourth_component",
+                    "sp_fifth_component",
+                    "sp_sixth_component",
+                ],
+            },
+            {
+                "ref": "sp_first_component",
+                "dependsOn": ["sp_seventh_component", "sp_eight_component"],
+            },
+            {"ref": "sp_second_component", "dependsOn": ["sp_seventeenth_component"]},
+            {"ref": "sp_fourth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {"ref": "sp_fifth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {"ref": "sp_sixth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {
+                "ref": "sp_seventh_component",
+                "dependsOn": ["sp_ninth_component", "sp_twelfth_component"],
+            },
+            {
+                "ref": "sp_eight_component",
+                "dependsOn": [
+                    "sp_tenth_component",
+                    "sp_twelfth_component",
+                    "sp_thirteenth_component",
+                ],
+            },
+            {"ref": "sp_ninth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {"ref": "sp_tenth_component", "dependsOn": ["sp_seventeenth_component"]},
+            {
+                "ref": "sp_eleventh_component",
+                "dependsOn": ["sp_seventeenth_component", "sp_tenth_component"],
+            },
+            {
+                "ref": "sp_twelfth_component",
+                "dependsOn": [
+                    "sp_thirteenth_component",
+                    "sp_fourteenth_component",
+                    "sp_fifteenth_component",
+                ],
+            },
+            {
+                "ref": "sp_thirteenth_component",
+                "dependsOn": ["sp_seventeenth_component"],
+            },
+            {
+                "ref": "sp_fourteenth_component",
+                "dependsOn": ["sp_sixteenth_component", "sp_seventeenth_component"],
+            },
+            {
+                "ref": "sp_sixteenth_component",
+                "dependsOn": ["sp_seventeenth_component"],
+            },
+            {"ref": "sp_seventeenth_component", "dependsOn": []},
+            {
+                "ref": "sp_fifteenth_component",
+                "dependsOn": ["sp_eleventh_component", "sp_seventeenth_component"],
+            },
+        ]
+        list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
+            "sub_programm", dependencies
+        )
+        list_of_dependencies = [
+            "sp_first_component",
+            "sp_second_component",
+            "sp_fourth_component",
+            "sp_fifth_component",
+            "sp_sixth_component",
+            "sp_seventh_component",
+            "sp_eight_component",
+            "sp_ninth_component",
+            "sp_tenth_component",
+            "sp_eleventh_component",
+            "sp_twelfth_component",
+            "sp_thirteenth_component",
+            "sp_fourteenth_component",
+            "sp_sixteenth_component",
+            "sp_seventeenth_component",
+            "sp_fifteenth_component",
+        ]
+        self.assertEqual(set(list_of_upstream_dependencies), set(list_of_dependencies))
+        list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
+            "sp_seventeenth_component", dependencies
+        )
+        self.assertEqual(set(list_of_upstream_dependencies), set([]))
+        list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
+            "sp_fifth_component", dependencies
+        )
+        self.assertEqual(
+            set(list_of_upstream_dependencies), set(["sp_seventeenth_component"])
+        )
+        list_of_upstream_dependencies = get_upstream_dependency_bom_refs(
+            "sp_seventh_component", dependencies
+        )
+        list_of_dependencies = [
+            "sp_ninth_component",
+            "sp_twelfth_component",
+            "sp_seventeenth_component",
+            "sp_thirteenth_component",
+            "sp_fourteenth_component",
+            "sp_fifteenth_component",
+            "sp_sixteenth_component",
+            "sp_eleventh_component",
+            "sp_tenth_component",
+        ]
+        self.assertEqual(set(list_of_upstream_dependencies), set(list_of_dependencies))
+
+    def test_check_for_orphaned_bom_refs_valid_sbom(self) -> None:
+        sbom = get_test_sbom()
+        self.assertEqual(check_for_orphaned_bom_refs(sbom), [])

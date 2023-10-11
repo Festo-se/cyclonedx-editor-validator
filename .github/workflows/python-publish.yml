@@ -40,8 +40,3 @@ jobs:
           mkdocs gh-deploy --strict --force
       - name: Publish package
         run: poetry publish --build
-      - name: Create PR
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: Change version in pyproject.toml
-          base: main

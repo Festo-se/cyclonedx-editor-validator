@@ -145,13 +145,13 @@ def validate_sbom(
                 else:
                     errors.append(error_path + error.message)
     sorted_errors = set(sorted(errors))
+    if report_format == "warnings-ng":
+        warnings_ng_handler = WarningsNgReporter(file, output)
+        logger.addHandler(warnings_ng_handler)
     if len(sorted_errors) == 0:
         logger.info("SBOM is compliant to the provided specification schema")
         return 0
     else:
-        if report_format == "warnings-ng":
-            warnings_ng_handler = WarningsNgReporter(file, output)
-            logger.addHandler(warnings_ng_handler)
         for error in sorted_errors:
             logger.error(
                 LogMessage(

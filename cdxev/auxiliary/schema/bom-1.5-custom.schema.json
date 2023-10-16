@@ -1,19 +1,23 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "$id": "./bom-1.5-custom.schema.json",
   "type": "object",
   "title": "CycloneDX Software Bill of Materials Standard",
   "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
   "required": [
     "bomFormat",
-    "specVersion"
+    "specVersion",
+    "version",
+    "metadata",
+    "dependencies",
+    "compositions"
   ],
   "additionalProperties": false,
   "properties": {
     "$schema": {
       "type": "string",
       "enum": [
-        "http://cyclonedx.org/schema/bom-1.5.schema.json"
+        "./bom-1.5-custom.schema.json"
       ]
     },
     "bomFormat": {
@@ -123,6 +127,7 @@
     "refType": {
       "description": "Identifier for referable and therefore interlink-able elements.",
       "type": "string",
+      "additionalProperties": false,
       "minLength": 1,
       "$comment": "value SHOULD not start with the BOM-Link intro 'urn:cdx:'"
     },
@@ -278,7 +283,31 @@
           "type": "array",
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-          "items": {"$ref": "#/definitions/property"}
+          "items": {
+            "$ref": "#/definitions/property"
+          }
+        }
+      },
+      "required": [
+        "timestamp",
+        "authors",
+        "component"
+      ],
+      "if": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "object"
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "object",
+            "required": ["copyright", "group"]
+          }
         }
       }
     },
@@ -384,14 +413,19 @@
           "description": "The phone number of the contact.",
           "examples": ["800-555-1212"]
         }
-      }
+      },
+      "required": [
+        "name"
+      ]
     },
     "component": {
       "type": "object",
       "title": "Component Object",
       "required": [
         "type",
-        "name"
+        "name",
+        "version",
+        "bom-ref"
       ],
       "additionalProperties": false,
       "properties": {
@@ -452,6 +486,7 @@
         },
         "name": {
           "type": "string",
+          "minLength": 1,
           "title": "Component Name",
           "description": "The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery",
           "examples": ["tomcat-catalina"]
@@ -602,7 +637,72 @@
           "title": "Signature",
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
-      }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "required": [
+                "licenses"
+              ],
+              "properties": {
+                "licenses": {
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "required": [
+                "copyright"
+              ],
+              "properties": {
+                "copyright": {
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "anyOf": [
+            {
+              "required": [
+                "publisher"
+              ]
+            },
+            {
+              "required": [
+                "supplier"
+              ]
+            },
+            {
+              "required": [
+                "author"
+              ]
+            }
+          ]
+        },
+        {
+          "if": {
+            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["copyright"]
+          },
+          "then": {
+            "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
+            "required": ["group"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
+            "required": ["group"]
+          },
+          "then": {
+            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["copyright"]
+          }
+        }
+      ]
     },
     "swid": {
       "type": "object",
@@ -718,13 +818,15 @@
         "BLAKE2b-512",
         "BLAKE3"
       ],
-      "title": "Hash Algorithm"
+      "title": "Hash Algorithm",
+      "additionalProperties": false
     },
     "hash-content": {
       "type": "string",
       "title": "Hash Content (value)",
       "examples": ["3942447fac867ae5cdb3229b658f4d48"],
-      "pattern": "^([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{96}|[a-fA-F0-9]{128})$"
+      "pattern": "^([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{96}|[a-fA-F0-9]{128})$",
+      "additionalProperties": false
     },
     "license": {
       "type": "object",
@@ -753,6 +855,7 @@
         "name": {
           "type": "string",
           "title": "License Name",
+          "minLength": 1,
           "description": "If SPDX does not define the license used, this field may be used to provide the license name",
           "examples": ["Acme Software License"]
         },
@@ -903,7 +1006,8 @@
               "title": "Expiration",
               "description": "The timestamp indicating when the current license expires (if applicable)."
             }
-          }
+          },
+        "required": ["licenseTypes","licensor","license","expiration"]
         },
         "properties": {
           "type": "array",
@@ -911,6 +1015,9 @@
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
           "items": {"$ref": "#/definitions/property"}
         }
+      },
+      "dependencies": {
+        "name": ["text", "licensing"]
       }
     },
     "licenseChoice": {
@@ -1438,7 +1545,8 @@
         "unknown"
       ],
       "title": "Data flow direction",
-      "description": "Specifies the flow direction of the data. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known."
+      "description": "Specifies the flow direction of the data. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.",
+      "additionalProperties": false
     },
 
     "copyright": {
@@ -1641,7 +1749,8 @@
       "type": "object",
       "title": "Compositions",
       "required": [
-        "aggregate"
+        "aggregate",
+        "assemblies"
       ],
       "additionalProperties": false,
       "properties": {
@@ -1712,7 +1821,8 @@
         "incomplete_third_party_opensource_only",
         "unknown",
         "not_specified"
-      ]
+      ],
+      "additionalProperties": false
     },
     "property": {
       "type": "object",
@@ -1729,13 +1839,15 @@
           "title": "Value",
           "description": "The value of the property."
         }
-      }
+      },
+      "additionalProperties": false
     },
     "localeType": {
       "type": "string",
       "pattern": "^([a-z]{2})(-[A-Z]{2})?$",
       "title": "Locale",
-      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code MUST be lower case. If the country code is specified, the country code MUST be upper case. The language code and country code MUST be separated by a minus sign. Examples: en, en-US, fr, fr-CA"
+      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code MUST be lower case. If the country code is specified, the country code MUST be upper case. The language code and country code MUST be separated by a minus sign. Examples: en, en-US, fr, fr-CA",
+      "additionalProperties": false
     },
     "releaseType": {
       "type": "string",
@@ -1746,7 +1858,8 @@
         "pre-release",
         "internal"
       ],
-      "description": "The software versioning type. It is RECOMMENDED that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
+      "description": "The software versioning type. It is RECOMMENDED that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it.",
+      "additionalProperties": false
     },
     "note": {
       "type": "object",
@@ -1870,7 +1983,8 @@
       "type": "integer",
       "minimum": 1,
       "title": "CWE",
-      "description": "Integer representation of a Common Weaknesses Enumerations (CWE). For example 399 (of https://cwe.mitre.org/data/definitions/399.html)"
+      "description": "Integer representation of a Common Weaknesses Enumerations (CWE). For example 399 (of https://cwe.mitre.org/data/definitions/399.html)",
+      "additionalProperties": false
     },
     "severity": {
       "type": "string",
@@ -1884,7 +1998,8 @@
         "info",
         "none",
         "unknown"
-      ]
+      ],
+      "additionalProperties": false
     },
     "scoreMethod": {
       "type": "string",
@@ -1898,7 +2013,8 @@
         "OWASP",
         "SSVC",
         "other"
-      ]
+      ],
+      "additionalProperties": false
     },
     "impactAnalysisState": {
       "type": "string",
@@ -1927,7 +2043,8 @@
         "protected_at_runtime",
         "protected_at_perimeter",
         "protected_by_mitigating_control"
-      ]
+      ],
+      "additionalProperties": false
     },
     "rating": {
       "type": "object",
@@ -2317,19 +2434,22 @@
         "affected",
         "unaffected",
         "unknown"
-      ]
+      ],
+      "additionalProperties": false
     },
     "version": {
       "description": "A single version of a component or service.",
       "type": "string",
       "minLength": 1,
-      "maxLength": 1024
+      "maxLength": 1024,
+      "additionalProperties": false
     },
     "range": {
       "description": "A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/VERSION-RANGE-SPEC.rst",
       "type": "string",
       "minLength": 1,
-      "maxLength": 1024
+      "maxLength": 1024,
+      "additionalProperties": false
     },
     "annotations": {
       "type": "object",
@@ -3793,7 +3913,8 @@
     "signature": {
       "$ref": "jsf-0.82.schema.json#/definitions/signature",
       "title": "Signature",
-      "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+      "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html).",
+      "additionalProperties": false
     }
   }
 }

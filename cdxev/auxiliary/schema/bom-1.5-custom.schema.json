@@ -1016,7 +1016,8 @@
               "title": "Expiration",
               "description": "The timestamp indicating when the current license expires (if applicable)."
             }
-          }
+          },
+        "required": ["licenseTypes","licensor","license","expiration"]
         },
         "properties": {
           "type": "array",

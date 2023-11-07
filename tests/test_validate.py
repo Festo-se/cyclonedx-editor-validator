@@ -495,25 +495,13 @@ class TestValidateUseSchema15(unittest.TestCase):
                     "license": {
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {
-                            "content": "some text"
-                        },
+                        "text": {"content": "some text"},
                         "licensing": {
-                            "licenseTypes": [
-                                "other"
-                            ],
-                            "licensor": {
-                                "individual": {
-                                    "name": "Something"
-                                }
-                            },
-                            "licensee": {
-                                "organization": {
-                                    "name": "Acme.ing"
-                                }
-                            },
-                            "expiration": "2023-04-13T20:20:39+00:00"
-                        }
+                            "licenseTypes": ["other"],
+                            "licensor": {"individual": {"name": "Something"}},
+                            "licensee": {"organization": {"name": "Acme.ing"}},
+                            "expiration": "2023-04-13T20:20:39+00:00",
+                        },
                     }
                 }
             ]
@@ -529,27 +517,17 @@ class TestValidateUseSchema15(unittest.TestCase):
                     "license": {
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {
-                            "content": "some text"
-                        },
+                        "text": {"content": "some text"},
                         "licensing": {
-                            "licenseTypes": [
-                                "other"
-                            ],
-                            "licensee": {
-                                "organization": {
-                                    "name": "Acme.ing"
-                                }
-                            },
-                            "expiration": "2023-04-13T20:20:39+00:00"
-                        }
+                            "licenseTypes": ["other"],
+                            "licensee": {"organization": {"name": "Acme.ing"}},
+                            "expiration": "2023-04-13T20:20:39+00:00",
+                        },
                     }
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("licensor", issues), True
-            )
+            self.assertEqual(search_for_word_issues("licensor", issues), True)
 
     def test_no_licensee(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -560,27 +538,17 @@ class TestValidateUseSchema15(unittest.TestCase):
                     "license": {
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {
-                            "content": "some text"
-                        },
+                        "text": {"content": "some text"},
                         "licensing": {
-                            "licenseTypes": [
-                                "other"
-                            ],
-                            "licensor": {
-                                "individual": {
-                                    "name": "Something"
-                                }
-                            },
-                            "expiration": "2023-04-13T20:20:39+00:00"
-                        }
+                            "licenseTypes": ["other"],
+                            "licensor": {"individual": {"name": "Something"}},
+                            "expiration": "2023-04-13T20:20:39+00:00",
+                        },
                     }
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("licensee", issues), True
-            )
+            self.assertEqual(search_for_word_issues("licensee", issues), True)
 
     def test_no_expiration(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -591,31 +559,17 @@ class TestValidateUseSchema15(unittest.TestCase):
                     "license": {
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {
-                            "content": "some text"
-                        },
+                        "text": {"content": "some text"},
                         "licensing": {
-                            "licenseTypes": [
-                                "other"
-                            ],
-                            "licensor": {
-                                "individual": {
-                                    "name": "Something"
-                                }
-                            },
-                            "licensee": {
-                                "organization": {
-                                    "name": "Acme.ing"
-                                }
-                            },
-                        }
+                            "licenseTypes": ["other"],
+                            "licensor": {"individual": {"name": "Something"}},
+                            "licensee": {"organization": {"name": "Acme.ing"}},
+                        },
                     }
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("expiration", issues), True
-            )
+            self.assertEqual(search_for_word_issues("expiration", issues), True)
 
     def test_no_licenseTypes(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -626,29 +580,17 @@ class TestValidateUseSchema15(unittest.TestCase):
                     "license": {
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {
-                            "content": "some text"
-                        },
+                        "text": {"content": "some text"},
                         "licensing": {
-                            "licensor": {
-                                "individual": {
-                                    "name": "Something"
-                                }
-                            },
-                            "licensee": {
-                                "organization": {
-                                    "name": "Acme.ing"
-                                }
-                            },
-                            "expiration": "2023-04-13T20:20:39+00:00"
-                        }
+                            "licensor": {"individual": {"name": "Something"}},
+                            "licensee": {"organization": {"name": "Acme.ing"}},
+                            "expiration": "2023-04-13T20:20:39+00:00",
+                        },
                     }
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("licenseTypes", issues), True
-            )
+            self.assertEqual(search_for_word_issues("licenseTypes", issues), True)
 
     def test_no_licensing(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -659,16 +601,12 @@ class TestValidateUseSchema15(unittest.TestCase):
                     "license": {
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {
-                            "content": "some text"
-                        },
+                        "text": {"content": "some text"},
                     }
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("licensing", issues), True
-            )
+            self.assertEqual(search_for_word_issues("licensing", issues), True)
 
     def test_licensing_no_text(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -680,28 +618,16 @@ class TestValidateUseSchema15(unittest.TestCase):
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
                         "licensing": {
-                            "licenseTypes": [
-                                "other"
-                            ],
-                            "licensor": {
-                                "individual": {
-                                    "name": "Something"
-                                }
-                            },
-                            "licensee": {
-                                "organization": {
-                                    "name": "Acme.ing"
-                                }
-                            },
-                            "expiration": "2023-04-13T20:20:39+00:00"
-                        }
+                            "licenseTypes": ["other"],
+                            "licensor": {"individual": {"name": "Something"}},
+                            "licensee": {"organization": {"name": "Acme.ing"}},
+                            "expiration": "2023-04-13T20:20:39+00:00",
+                        },
                     }
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("text", issues), True
-            )
+            self.assertEqual(search_for_word_issues("text", issues), True)
 
     def test_not_allowed_licenseType(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -712,32 +638,18 @@ class TestValidateUseSchema15(unittest.TestCase):
                     "license": {
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {
-                            "content": "some text"
-                        },
+                        "text": {"content": "some text"},
                         "licensing": {
-                            "licenseTypes": [
-                                "something"
-                            ],
-                            "licensor": {
-                                "individual": {
-                                    "name": "Something"
-                                }
-                            },
-                            "licensee": {
-                                "organization": {
-                                    "name": "Acme.ing"
-                                }
-                            },
-                            "expiration": "2023-04-13T20:20:39+00:00"
-                        }
+                            "licenseTypes": ["something"],
+                            "licensor": {"individual": {"name": "Something"}},
+                            "licensee": {"organization": {"name": "Acme.ing"}},
+                            "expiration": "2023-04-13T20:20:39+00:00",
+                        },
                     }
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("something", issues), True
-            )
+            self.assertEqual(search_for_word_issues("something", issues), True)
 
     def test_licensing_neither_organization_nor_individual(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -748,32 +660,19 @@ class TestValidateUseSchema15(unittest.TestCase):
                     "license": {
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {
-                            "content": "some text"
-                        },
+                        "text": {"content": "some text"},
                         "licensing": {
-                            "licenseTypes": [
-                                "other"
-                            ],
-                            "licensor": {
-                            },
-                            "licensee": {
-                                "organization": {
-                                    "name": "Acme.ing"
-                                }
-                            },
-                            "expiration": "2023-04-13T20:20:39+00:00"
-                        }
+                            "licenseTypes": ["other"],
+                            "licensor": {},
+                            "licensee": {"organization": {"name": "Acme.ing"}},
+                            "expiration": "2023-04-13T20:20:39+00:00",
+                        },
                     }
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("individual", issues), True
-            )
-            self.assertEqual(
-                search_for_word_issues("organization", issues), True
-            )
+            self.assertEqual(search_for_word_issues("individual", issues), True)
+            self.assertEqual(search_for_word_issues("organization", issues), True)
 
     def test_licensing_additional_field(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -784,33 +683,19 @@ class TestValidateUseSchema15(unittest.TestCase):
                     "license": {
                         "name": "some_name",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {
-                            "content": "some text"
-                        },
+                        "text": {"content": "some text"},
                         "licensing": {
-                            "licenseTypes": [
-                                "other"
-                            ],
-                            "licensor": {
-                                "individual": {
-                                    "name": "Something"
-                                }
-                            },
-                            "licensee": {
-                                "organization": {
-                                    "name": "Acme.ing"
-                                }
-                            },
+                            "licenseTypes": ["other"],
+                            "licensor": {"individual": {"name": "Something"}},
+                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
-                            "additional_field": ""
-                        }
+                            "additional_field": "",
+                        },
                     }
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("additional", issues), True
-            )
+            self.assertEqual(search_for_word_issues("additional", issues), True)
 
 
 class TestValidateUseSchemaType(unittest.TestCase):

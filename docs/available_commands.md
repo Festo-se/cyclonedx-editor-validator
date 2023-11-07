@@ -155,6 +155,12 @@ You can control the usage of the specification with the flag `--schema-type`:
     cdx-ev validate bom.json --schema-type=custom # use provided custom schema in package
     cdx-ev validate bom.json # default CycloneDX specification will be used
 
+### Use of local schema
+
+With the `--schema-path` flag, users can supply their own schema to the validator.
+
+    cdx-ev validate bom.json --schema-path=C:\users\documents\sbom_schemas\example_schema.json  # uses a schema "example_schema.json" saved on the users computer to verify the sbom 
+
 ### Validation of file name
 
 According to the [CycloneDX specification](https://cyclonedx.org/specification/overview/#recognized-file-patterns) there are commonly recognized file name patterns: `bom.json` and `*.cdx.json`.

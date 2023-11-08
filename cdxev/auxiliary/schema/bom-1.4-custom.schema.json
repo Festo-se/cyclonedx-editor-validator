@@ -633,8 +633,8 @@
         },
         {
           "if": {
-            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["copyright"]
+            "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["author"]
           },
           "then": {
             "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
@@ -643,12 +643,115 @@
         },
         {
           "if": {
+            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
+            "required": ["supplier"]
+          },
+          "then": {
+            "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
+            "required": ["group"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["publisher"]
+          },
+          "then": {
+            "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
+            "required": ["group"]
+          }
+        },
+        { 
+          "if": {
             "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
             "required": ["group"]
           },
           "then": {
-            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["copyright"]
+            "if": {
+              "required": ["author"]
+            },
+            "then": {
+              "if": {
+                "not": {
+                  "anyOf":[
+                    {
+                      "properties": { "supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}}},
+                      "required": ["supplier"]
+                    },
+                    {
+                      "properties":   { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                      "required": ["publisher"]
+                    }
+                  ]
+                }
+              },
+              "then": {
+                "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                "required": ["author"]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
+            "required": ["group"]
+          },
+          "then": {
+              "if": {
+                "required": ["publisher"]
+              },
+              "then": {
+                "if": {
+                  "not": {
+                    "anyOf":[
+                      {
+                        "properties": { "supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}}},
+                        "required": ["supplier"]
+                      },
+                      {
+                        "properties":   { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                        "required": ["author"]
+                      }
+                    ]
+                  }
+                },
+                "then": {
+                  "properties": { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                  "required": ["publisher"]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
+              "required": ["group"]
+            },
+            "then": {
+            "if": {
+              "required": ["supplier"]
+            },
+            "then": {
+              "if": {
+                "not": {
+                  "anyOf":[
+                    {  
+                      "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                      "required": ["author"]
+                    },
+                    {
+                      "properties":   { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                      "required": ["publisher"]
+                    }
+                  ]
+                }
+              },
+              "then": {
+                "properties": { "supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}}},
+                "required": ["supplier"]
+              }
+            }
           }
         }
       ]

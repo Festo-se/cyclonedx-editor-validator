@@ -633,28 +633,20 @@
         },
         {
           "if": {
-            "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["author"]
-          },
-          "then": {
-            "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
-            "required": ["group"]
-          }
-        },
-        {
-          "if": {
-            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-            "required": ["supplier"]
-          },
-          "then": {
-            "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
-            "required": ["group"]
-          }
-        },
-        {
-          "if": {
-            "properties": { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["publisher"]
+            "anyOf": [
+              {
+                "properties": { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                "required": ["publisher"]
+              },
+              {
+                "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
+                "required": ["supplier"]
+              },
+              {
+                "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                "required": ["author"]
+              }
+            ]
           },
           "then": {
             "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },

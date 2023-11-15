@@ -91,6 +91,22 @@ class TestAmendCommand(unittest.TestCase):
             result = main()
             self.assertEqual(result, _STATUS_OK)
 
+    @unittest.mock.patch("cdxev.__main__.read_sbom")
+    def test_get_amend_license_from_folder(self, mock_read: unittest.mock.Mock) -> None:
+        path = pathlib.Path(__file__).parent.resolve()
+        with unittest.mock.patch(
+            "sys.argv",
+            [
+                "",
+                "amend",
+                "fake_bom.cdx.json",
+                str(("--license-path=" + path.as_posix() + "/auxiliary/licenses")),
+            ],
+        ):
+            mock_read.return_value = ({}, "json")
+            result = main()
+            self.assertEqual(result, _STATUS_OK)
+
 
 class TestMergeCommand(unittest.TestCase):
     @unittest.mock.patch("cdxev.__main__.read_sbom")

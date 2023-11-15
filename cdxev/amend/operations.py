@@ -128,7 +128,9 @@ class InferSupplier(Operation):
     scheme.
     """
 
-    def handle_component(self, component: dict) -> None:
+    def handle_component(
+        self, component: dict, path_to_license_folder: str = ""
+    ) -> None:
         if (
             ("supplier" in component)
             or ("publisher" in component)
@@ -178,10 +180,22 @@ class ReplaceLicenseNameWithId(Operation):
     )
     list_of_license_names = json.loads(list_of_license_names_string)
 
+    def __init__(self) -> None:
+        self.path_to_license_folder = ""
+
+    def change_path_to_license_folder(self, path_to_license_folder: str) -> None:
+        self.path_to_license_folder = path_to_license_folder
+
     def handle_metadata(self, metadata: dict) -> None:
         if "component" not in metadata:
             return
-        replace_license_name_with_id(metadata["component"], self.list_of_license_names)
+        replace_license_name_with_id(
+            metadata["component"],
+            self.list_of_license_names,
+            self.path_to_license_folder,
+        )
 
     def handle_component(self, component: dict) -> None:
-        replace_license_name_with_id(component, self.list_of_license_names)
+        replace_license_name_with_id(
+            component, self.list_of_license_names, self.path_to_license_folder
+        )

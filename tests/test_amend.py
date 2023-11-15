@@ -349,5 +349,14 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
         self.assertTrue(compare_sboms(sbom, sbom_with_id))
 
 
+class GetLicenseTextFromFile(unittest.TestCase):
+    def test_get_license_text_from_folder(self) -> None:
+        path_to_license_folder = "tests/auxiliary/licenses"
+        license_text = ntl.get_license_text_from_folder(
+            "license_name", path_to_license_folder
+        )
+        self.assertEqual(license_text, "The text describing a license.")
+
+
 if __name__ == "__main__":
     unittest.main()

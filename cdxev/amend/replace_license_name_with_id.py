@@ -4,6 +4,7 @@
 ##################################################
 
 from typing import Sequence
+import os
 
 
 def find_license_id(license_name: str, license_namelist: Sequence[dict]) -> str:
@@ -35,7 +36,9 @@ def find_license_id(license_name: str, license_namelist: Sequence[dict]) -> str:
     return license_id
 
 
-def replace_license_name_with_id(component: dict, license_name_id_list: list) -> dict:
+def replace_license_name_with_id(
+    component: dict, license_name_id_list: list, path_to_license_folder: str = ""
+) -> dict:
     """
     Adds the id of a license to a component and removes te name, if the name
     is in the list of licenses provided
@@ -70,4 +73,19 @@ def replace_license_name_with_id(component: dict, license_name_id_list: list) ->
         if id_found:
             current_license["id"] = id_found
             current_license.pop("name")
+        elif path_to_license_folder:
+            license_text = get_license_text_from_folder(
+                current_license.get("name", ""), path_to_license_folder
+            )
+            current_license["text"] = license_text
     return component
+
+
+def get_license_text_from_folder(license_name: str, path_to_license_folder: str) -> str:
+    file_name = license_name + ".txt"
+    for licenses_text_file in os.listdir(path_to_license_folder):
+        if licenses_text_file == file_name:
+            with open(os.path.join(path_to_license_folder, file_name)) as f:
+                license_text = f.read()
+            return license_text
+    return ""

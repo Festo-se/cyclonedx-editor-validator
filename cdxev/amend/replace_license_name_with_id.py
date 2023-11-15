@@ -3,8 +3,8 @@
 # given name is found in the reference list of possible names
 ##################################################
 
-from typing import Sequence
 import os
+from typing import Sequence
 
 
 def find_license_id(license_name: str, license_namelist: Sequence[dict]) -> str:

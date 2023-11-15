@@ -43,10 +43,10 @@ def replace_license_name_with_id(
     Adds the id of a license to a component and removes te name, if the name
     is in the list of licenses provided.
 
-    If the path to  a folder with txt files containing licenses texts with the
+    If the path to  a folder with txt files containing license descriptions with the
     naming convention 'license name'.txt is given and no id can be assigned,
-    the program searches for the file with a matching name
-    and copies its content in the field "text".
+    the program searches for a file with matching name
+    and, if found, copies its content in the field "text".
 
     Parameters
     ----------

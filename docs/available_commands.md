@@ -20,6 +20,20 @@ Currently, the command adds or modifies the following pieces of information:
   * *externalReferences* of type *vcs*
 * Generates a *bom-ref* for components which don't have one, yet. The *bom-ref* will be a GUID.
 
+### Copy license texts from files
+
+The programm can copy the text describing a license from specific file in the SBOM, if a license name is given and no id can be assigned.  
+
+This is done by submitting the path to a folder containing txt-files with the license text via the command `--license-path`.
+If a license with name X and no matching id is found, the program will search in the provided folder for the file X.txt and copy its context in the `text` field.
+The txt-files in the folder must follow the naming convention name.txt, for example MIT.txt.
+
+    cdx-ev amend bom.json" --license-path=C:\Documents\licenses
+
+If a `text` field already exists, its content will be replaced.
+
+
+
 ## merge
 
 This command requires at least two input files, but can accept an arbitrary number.

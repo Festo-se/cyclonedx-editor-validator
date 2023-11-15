@@ -32,8 +32,6 @@ The txt-files in the folder must follow the naming convention name.txt, for exam
 
 If a `text` field already exists, its content will be replaced.
 
-
-
 ## merge
 
 This command requires at least two input files, but can accept an arbitrary number.

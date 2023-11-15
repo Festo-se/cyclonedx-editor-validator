@@ -357,6 +357,74 @@ class GetLicenseTextFromFile(unittest.TestCase):
         )
         self.assertEqual(license_text, "The text describing a license.")
 
+    def test_replace_license_text(self) -> None:
+        path_to_license_folder = "tests/auxiliary/licenses"
+        with open(
+            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
+            "r",
+            encoding="utf-8-sig",
+        ) as my_file:
+            list_of_license_names = json.load(my_file)
+        component = {
+            "type": "library",
+            "bom-ref": "pkg:nuget/some name@1.3.3",
+            "publisher": "some publisher",
+            "name": "some name",
+            "version": "1.3.2",
+            "cpe": "",
+            "description": "some description",
+            "scope": "required",
+            "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
+            "licenses": [{"license": {"name": "license_name", "text": "other text"}}],
+            "copyright": "Copyright 2000-2021 some name Contributors",
+            "purl": "pkg:nuget/some name@1.3.2",
+        }
+        ntl.replace_license_name_with_id(
+            component, list_of_license_names, path_to_license_folder
+        )
+        print(component)
+        self.assertEqual(
+            component["licenses"][0]["license"]["text"],  # type: ignore
+            "The text describing a license.",
+        )
+
+    def test_add_license_text(self) -> None:
+        path_to_license_folder = "tests/auxiliary/licenses"
+        with open(
+            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
+            "r",
+            encoding="utf-8-sig",
+        ) as my_file:
+            list_of_license_names = json.load(my_file)
+        component = {
+            "type": "library",
+            "bom-ref": "pkg:nuget/some name@1.3.3",
+            "publisher": "some publisher",
+            "name": "some name",
+            "version": "1.3.2",
+            "cpe": "",
+            "description": "some description",
+            "scope": "required",
+            "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
+            "licenses": [
+                {
+                    "license": {
+                        "name": "license_name",
+                    }
+                }
+            ],
+            "copyright": "Copyright 2000-2021 some name Contributors",
+            "purl": "pkg:nuget/some name@1.3.2",
+        }
+        ntl.replace_license_name_with_id(
+            component, list_of_license_names, path_to_license_folder
+        )
+        print(component)
+        self.assertEqual(
+            component["licenses"][0]["license"]["text"],  # type: ignore
+            "The text describing a license.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -22,7 +22,7 @@ def run(sbom: dict, path_to_license_folder: str = "") -> None:
     Runs the amend command on an SBOM. The SBOM is modified in-place.
 
     :param dict sbom: The SBOM model.
-    :param str path_to_license_folder: Path to a folder with license texts
+    :param str path_to_license_folder: Path to a folder with license texts.
     """
     for operation in __operations:
         if type(operation) is ReplaceLicenseNameWithId:

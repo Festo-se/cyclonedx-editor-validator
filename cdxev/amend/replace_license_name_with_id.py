@@ -41,7 +41,12 @@ def replace_license_name_with_id(
 ) -> dict:
     """
     Adds the id of a license to a component and removes te name, if the name
-    is in the list of licenses provided
+    is in the list of licenses provided.
+
+    If the path to  a folder with txt files containing licenses texts with the
+    naming convention 'license name'.txt is given and no id can be assigned,
+    the program searches for the file with a matching name
+    and copies its content in the field "text".
 
     Parameters
     ----------
@@ -50,6 +55,8 @@ def replace_license_name_with_id(
     :license_name_id_map: list
         A list with possible license names and
         belonging to a license id
+    :path_to_license_folder: str (optional)
+        Path to a folder with txt files containing license texts
 
     Returns
     -------
@@ -82,6 +89,21 @@ def replace_license_name_with_id(
 
 
 def get_license_text_from_folder(license_name: str, path_to_license_folder: str) -> str:
+    """
+    Searches in given folder for a txt-file with the name of of a given licenses and
+    returns the files  content as a string.
+
+    Parameters
+    ----------
+    :license_name: str
+        Name of the license
+    :path_to_license_folder: str
+        path to a folder with txt-files containing license descriptions
+
+    Returns
+    -------
+    str : the content of the file.
+    """
     file_name = license_name + ".txt"
     for licenses_text_file in os.listdir(path_to_license_folder):
         if licenses_text_file == file_name:

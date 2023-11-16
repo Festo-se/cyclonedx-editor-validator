@@ -189,7 +189,7 @@ def create_amend_parser(
     parser.add_argument(
         "--license-path",
         metavar="<license-path>",
-        help="Path to the SBOM file.",
+        help="Path to a folder with txt-files containing license texts to be copied in the SBOM",
         type=str,
         default="",
     )
@@ -214,7 +214,7 @@ def create_merge_parser(
     parser.add_argument(
         "--from-folder",
         metavar="<from-folder>",
-        help="Path to a folder with txt-files containing license texts to be copied in the SBOM",
+        help="Path to a folder with SBOMs to be merged",
         type=Path,
     )
     add_output_argument(parser)

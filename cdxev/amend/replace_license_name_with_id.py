@@ -97,7 +97,8 @@ def replace_license_name_with_id(
                         "License text not found",
                         (
                             f"No text for the license ({current_license.get('name', '')}), "
-                            f"in component ({component_id}), was found."
+                            f"in component ({component_id}), was found. "
+                            "An empty string was added as text."
                         ),
                     )
                 )

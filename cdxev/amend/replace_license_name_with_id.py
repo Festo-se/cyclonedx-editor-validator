@@ -7,8 +7,10 @@ import os
 from typing import Sequence
 from cdxev.log import LogMessage
 import logging
+
 logger = logging.getLogger(__name__)
 from cdxev.auxiliary.identity import ComponentIdentity
+
 
 def find_license_id(license_name: str, license_namelist: Sequence[dict]) -> str:
     """
@@ -95,7 +97,7 @@ def replace_license_name_with_id(
                         (
                             f"No text for the license ({current_license.get('name', '')}), "
                             f"in component ({component_id}), was found."
-                        )
+                        ),
                     )
                 )
         else:

@@ -7,10 +7,10 @@ import logging
 import os
 from typing import Sequence
 
+from cdxev.auxiliary.identity import ComponentIdentity
 from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
-from cdxev.auxiliary.identity import ComponentIdentity
 
 
 def find_license_id(license_name: str, license_namelist: Sequence[dict]) -> str:

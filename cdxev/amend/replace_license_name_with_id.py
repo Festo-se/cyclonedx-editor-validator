@@ -101,7 +101,6 @@ def replace_license_name_with_id(
                         ),
                     )
                 )
-        else:
             current_license["text"] = license_text
 
     return component

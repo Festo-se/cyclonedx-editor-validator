@@ -3,10 +3,11 @@
 # given name is found in the reference list of possible names
 ##################################################
 
+import logging
 import os
 from typing import Sequence
+
 from cdxev.log import LogMessage
-import logging
 
 logger = logging.getLogger(__name__)
 from cdxev.auxiliary.identity import ComponentIdentity

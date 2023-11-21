@@ -214,7 +214,7 @@ def create_merge_parser(
     parser.add_argument(
         "--from-folder",
         metavar="<from-folder>",
-        help="Path to a folder with SBOMs to be merged",
+        help="Path to a folder with sboms to be merged",
         type=Path,
     )
     add_output_argument(parser)

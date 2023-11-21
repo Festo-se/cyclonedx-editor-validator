@@ -22,7 +22,7 @@ Currently, the command adds or modifies the following pieces of information:
 
 ### Copy license texts from files
 
-The programm can copy the text describing a license from specific file in the SBOM, if a license name is given and no id can be assigned.  
+The program can copy the text describing a license from a specific file into the SBOM, if a license name is given.  
 
 This is done by submitting the path to a folder containing txt-files with the license text via the command `--license-path`.
 If a license with name X and no matching id is found, the program will search in the provided folder for the file X.txt and copy its context in the `text` field.

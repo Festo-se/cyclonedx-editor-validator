@@ -3,7 +3,7 @@ import json
 import typing as t
 import unittest
 
-from cdxev.amend import replace_license_name_with_id as ntl
+from cdxev.amend import process_license as ntl
 from cdxev.amend.command import run as run_amend
 from cdxev.amend.operations import (
     AddBomRefOperation,
@@ -322,7 +322,7 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
         self.assertEqual(ntl.find_license_id("no license", list_of_license_names), "")
         self.assertEqual(ntl.find_license_id({}, list_of_license_names), "")  # type: ignore
 
-    def test_replace_license_name_with_id(self) -> None:
+    def test_process_license_replace_name_with_id(self) -> None:
         with open(
             (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
             "r",
@@ -341,11 +341,11 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
             encoding="utf-8-sig",
         ) as my_file:
             sbom_with_id = json.load(my_file)
-        ntl.replace_license_name_with_id(
+        ntl.process_license(
             sbom["metadata"]["component"], list_of_license_names
         )
         for component in sbom["components"]:
-            ntl.replace_license_name_with_id(component, list_of_license_names)
+            ntl.process_license(component, list_of_license_names)
         self.assertTrue(compare_sboms(sbom, sbom_with_id))
 
 
@@ -357,7 +357,7 @@ class GetLicenseTextFromFile(unittest.TestCase):
         )
         self.assertEqual(license_text, "The text describing a license.")
 
-    def test_replace_license_text(self) -> None:
+    def test_process_license_replace_license_text(self) -> None:
         path_to_license_folder = "tests/auxiliary/licenses"
         with open(
             (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
@@ -379,16 +379,15 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "copyright": "Copyright 2000-2021 some name Contributors",
             "purl": "pkg:nuget/some name@1.3.2",
         }
-        ntl.replace_license_name_with_id(
+        ntl.process_license(
             component, list_of_license_names, path_to_license_folder
         )
-        print(component)
         self.assertEqual(
             component["licenses"][0]["license"]["text"],  # type: ignore
             "The text describing a license.",
         )
 
-    def test_add_license_text(self) -> None:
+    def test_process_license_add_license_text(self) -> None:
         path_to_license_folder = "tests/auxiliary/licenses"
         with open(
             (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
@@ -416,10 +415,9 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "copyright": "Copyright 2000-2021 some name Contributors",
             "purl": "pkg:nuget/some name@1.3.2",
         }
-        ntl.replace_license_name_with_id(
+        ntl.process_license(
             component, list_of_license_names, path_to_license_folder
         )
-        print(component)
         self.assertEqual(
             component["licenses"][0]["license"]["text"],  # type: ignore
             "The text describing a license.",

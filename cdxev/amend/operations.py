@@ -7,7 +7,7 @@ import json
 import logging
 import uuid
 
-from cdxev.amend.replace_license_name_with_id import replace_license_name_with_id
+from cdxev.amend.process_license import process_license
 
 logger = logging.getLogger(__name__)
 
@@ -194,13 +194,13 @@ class ReplaceLicenseNameWithId(Operation):
     def handle_metadata(self, metadata: dict) -> None:
         if "component" not in metadata:
             return
-        replace_license_name_with_id(
+        process_license(
             metadata["component"],
             self.list_of_license_names,
             self.path_to_license_folder,
         )
 
     def handle_component(self, component: dict) -> None:
-        replace_license_name_with_id(
+        process_license(
             component, self.list_of_license_names, self.path_to_license_folder
         )

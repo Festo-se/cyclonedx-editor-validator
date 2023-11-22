@@ -5,13 +5,14 @@ import unittest
 
 from cdxev.amend import process_license as ntl
 from cdxev.amend.command import run as run_amend
+from cdxev.error import AppError
 from cdxev.amend.operations import (
     AddBomRefOperation,
     CompositionsOperation,
     DefaultAuthorOperation,
     InferSupplier,
     Operation,
-    ReplaceLicenseNameWithId,
+    ProcessLicense,
 )
 from tests.auxiliary.sbomFunctionsTests import compare_sboms
 
@@ -230,10 +231,10 @@ class AddBomRefTestCase(AmendTestCase):
         self.assertEqual("already-present", component["bom-ref"])
 
 
-class ReplaceLicenseNameWithIdTestCase(AmendTestCase):
+class ProcessLicenseTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = ReplaceLicenseNameWithId()
+        self.operation = ProcessLicense()
 
     def test_replace_name_with_id(self) -> None:
         self.sbom_fixture["metadata"]["component"]["licenses"] = [
@@ -421,6 +422,42 @@ class GetLicenseTextFromFile(unittest.TestCase):
         self.assertEqual(
             component["licenses"][0]["license"]["text"],  # type: ignore
             "The text describing a license.",
+        )
+
+    def test_process_license_add_license_text_with_space(self) -> None:
+        path_to_license_folder = "tests/auxiliary/licenses"
+        with open(
+            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
+            "r",
+            encoding="utf-8-sig",
+        ) as my_file:
+            list_of_license_names = json.load(my_file)
+        component = {
+            "type": "library",
+            "bom-ref": "pkg:nuget/some name@1.3.3",
+            "publisher": "some publisher",
+            "name": "some name",
+            "version": "1.3.2",
+            "cpe": "",
+            "description": "some description",
+            "scope": "required",
+            "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
+            "licenses": [
+                {
+                    "license": {
+                        "name": "another license",
+                    }
+                }
+            ],
+            "copyright": "Copyright 2000-2021 some name Contributors",
+            "purl": "pkg:nuget/some name@1.3.2",
+        }
+        ntl.process_license(
+            component, list_of_license_names, path_to_license_folder
+        )
+        self.assertEqual(
+            component["licenses"][0]["license"]["text"],  # type: ignore
+            "The text describing another license.",
         )
 
 

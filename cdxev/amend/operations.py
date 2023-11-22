@@ -165,15 +165,16 @@ class InferSupplier(Operation):
                     return
 
 
-class ReplaceLicenseNameWithId(Operation):
+class ProcessLicense(Operation):
     """
     If there are components in "metadata" or "components" containing
     licenses with the entry "name" instead of "id", this operation attempts
     to replace the name with an id, extracted from a provided list of possible license names
     with associated id.
 
-    If the path to  a folder with txt files containing license descriptions with the
-    naming convention 'license name'.txt is given and no id can be assigned,
+    If the license contains a name and
+    a path to a folder with txt files containing license descriptions with the
+    naming convention 'license name'.txt is provided,
     the program searches for a file with matching name
     and, if found, copies its content in the field "text".
     """

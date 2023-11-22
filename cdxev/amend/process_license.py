@@ -8,6 +8,7 @@ import os
 from typing import Sequence
 
 from cdxev.auxiliary.identity import ComponentIdentity
+from cdxev.error import AppError
 from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
@@ -86,9 +87,7 @@ def process_license(
 
         replace_license_name_with_id(current_license, license_name_id_list)
         add_text_from_folder_to_license_with_name(
-            current_license,
-            path_to_license_folder,
-            component_id
+            current_license, path_to_license_folder, component_id
         )
 
     return
@@ -116,9 +115,7 @@ def replace_license_name_with_id(license: dict, license_name_id_list: list) -> N
     if "id" in license:
         return
 
-    id_found = find_license_id(
-        license.get("name", ""), license_name_id_list
-    )
+    id_found = find_license_id(license.get("name", ""), license_name_id_list)
     if id_found:
         license["id"] = id_found
         license.pop("name")
@@ -126,9 +123,9 @@ def replace_license_name_with_id(license: dict, license_name_id_list: list) -> N
 
 
 def add_text_from_folder_to_license_with_name(
-        license: dict,
-        path_to_license_folder: str = "",
-        component_id: ComponentIdentity = ComponentIdentity.create({}, allow_unsafe=True)
+    license: dict,
+    path_to_license_folder: str = "",
+    component_id: ComponentIdentity = ComponentIdentity.create({}, allow_unsafe=True),
 ) -> None:
     """
     Adds the text describing a license,
@@ -194,10 +191,25 @@ def get_license_text_from_folder(license_name: str, path_to_license_folder: str)
     -------
     str : the content of the file.
     """
-    file_name = license_name + ".txt"
-    for licenses_text_file in os.listdir(path_to_license_folder):
-        if licenses_text_file == file_name:
-            with open(os.path.join(path_to_license_folder, file_name)) as f:
-                license_text = f.read()
-            return license_text
-    return ""
+    if os.path.isdir(path_to_license_folder):
+        file_name = license_name + ".txt"
+        for licenses_text_file in os.listdir(path_to_license_folder):
+            if licenses_text_file == file_name:
+                with open(os.path.join(path_to_license_folder, file_name)) as f:
+                    license_text = f.read()
+                return license_text
+        return ""
+    else:
+        if not os.path.exists(path_to_license_folder):
+            raise AppError(
+                "Invalid path to license folder",
+                (f"The submitted path ({path_to_license_folder})" " does not exist."),
+            )
+        else:
+            raise AppError(
+                "Invalid path to license folder",
+                (
+                    f"The submitted path ({path_to_license_folder})"
+                    " does not lead to a folder."
+                ),
+            )

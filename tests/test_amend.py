@@ -5,7 +5,6 @@ import unittest
 
 from cdxev.amend import process_license as ntl
 from cdxev.amend.command import run as run_amend
-from cdxev.error import AppError
 from cdxev.amend.operations import (
     AddBomRefOperation,
     CompositionsOperation,
@@ -14,6 +13,7 @@ from cdxev.amend.operations import (
     Operation,
     ProcessLicense,
 )
+from cdxev.error import AppError
 from tests.auxiliary.sbomFunctionsTests import compare_sboms
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_amend_sboms/"

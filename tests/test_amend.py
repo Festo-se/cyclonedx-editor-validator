@@ -342,9 +342,7 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
             encoding="utf-8-sig",
         ) as my_file:
             sbom_with_id = json.load(my_file)
-        ntl.process_license(
-            sbom["metadata"]["component"], list_of_license_names
-        )
+        ntl.process_license(sbom["metadata"]["component"], list_of_license_names)
         for component in sbom["components"]:
             ntl.process_license(component, list_of_license_names)
         self.assertTrue(compare_sboms(sbom, sbom_with_id))
@@ -380,9 +378,7 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "copyright": "Copyright 2000-2021 some name Contributors",
             "purl": "pkg:nuget/some name@1.3.2",
         }
-        ntl.process_license(
-            component, list_of_license_names, path_to_license_folder
-        )
+        ntl.process_license(component, list_of_license_names, path_to_license_folder)
         self.assertEqual(
             component["licenses"][0]["license"]["text"],  # type: ignore
             "The text describing a license.",
@@ -416,9 +412,7 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "copyright": "Copyright 2000-2021 some name Contributors",
             "purl": "pkg:nuget/some name@1.3.2",
         }
-        ntl.process_license(
-            component, list_of_license_names, path_to_license_folder
-        )
+        ntl.process_license(component, list_of_license_names, path_to_license_folder)
         self.assertEqual(
             component["licenses"][0]["license"]["text"],  # type: ignore
             "The text describing a license.",
@@ -452,9 +446,7 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "copyright": "Copyright 2000-2021 some name Contributors",
             "purl": "pkg:nuget/some name@1.3.2",
         }
-        ntl.process_license(
-            component, list_of_license_names, path_to_license_folder
-        )
+        ntl.process_license(component, list_of_license_names, path_to_license_folder)
         self.assertEqual(
             component["licenses"][0]["license"]["text"],  # type: ignore
             "The text describing another license.",

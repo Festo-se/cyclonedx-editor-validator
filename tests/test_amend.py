@@ -452,6 +452,24 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "The text describing another license.",
         )
 
+    def test_error_messages_does_not_exist(self) -> None:
+        path_to_license_folder = "thispathdoesnotexist"
+        with self.assertRaises(AppError) as ae:
+            ntl.get_license_text_from_folder("license_name", path_to_license_folder)
+            self.assertIn(
+                "The submitted path thispathdoesnotexist does not exist.",
+                ae.exception.details.description,
+            )
+
+    def test_error_messages_not_a_folder(self) -> None:
+        path_to_license_folder = "tests/test_amend.py"
+        with self.assertRaises(AppError) as ae:
+            ntl.get_license_text_from_folder("license_name", path_to_license_folder)
+            self.assertIn(
+                "The submitted path (tests/test_amend.py) does not lead to a folder.",
+                ae.exception.details.description,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

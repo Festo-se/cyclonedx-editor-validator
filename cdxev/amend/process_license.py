@@ -22,14 +22,14 @@ def find_license_id(license_name: str, license_namelist: Sequence[dict]) -> str:
     Parameters
     ----------
     license_name: str
-        Name of a license
+        Name of a license.
     license_namelist: list
-        Possible names of licenses and the SPDX-ID
+        Possible names of licenses and the SPDX-ID.
 
     Returns
     -------
     str:
-        SPDX-ID of the given string
+        SPDX-ID of the given string.
     """
     license_id = ""
     if isinstance(license_name, str):
@@ -60,12 +60,12 @@ def process_license(
     Parameters
     ----------
     :component: dict
-        A component
+        A component.
     :license_name_id_map: list
         A list with possible license names
-        belonging to a license with SPDX-ID
+        belonging to a license with SPDX-ID.
     :path_to_license_folder: str (optional)
-        Path to a folder with txt files containing license texts
+        Path to a folder with txt files containing license texts.
 
     Returns
     -------
@@ -103,10 +103,10 @@ def replace_license_name_with_id(license: dict, license_name_id_list: list) -> N
     Parameters
     ----------
     :license: dict
-        A license
+        A license.
     :license_name_id_map: list
         A list with possible license names and
-        belonging to a license id
+        belonging to a license id.
 
     Returns
     -------
@@ -137,7 +137,7 @@ def add_text_from_folder_to_license_with_name(
     Parameters
     ----------
     :license: dict
-        A license
+        A license.
     :path_to_license_folder: str
         The path to a folder with txt-files containing license descriptions.
     :component_id (optional): ComponentIdentity
@@ -194,7 +194,7 @@ def get_license_text_from_folder(license_name: str, path_to_license_folder: str)
     Parameters
     ----------
     :license_name: str
-        Name of the license
+        Name of the license.
     :path_to_license_folder: str
         Path to a folder with txt-files containing license descriptions.
 

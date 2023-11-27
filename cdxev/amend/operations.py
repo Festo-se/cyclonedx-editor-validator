@@ -7,7 +7,7 @@ import json
 import logging
 import uuid
 
-from cdxev.amend.replace_license_name_with_id import replace_license_name_with_id
+from cdxev.amend.process_license import process_license
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +128,9 @@ class InferSupplier(Operation):
     scheme.
     """
 
-    def handle_component(self, component: dict) -> None:
+    def handle_component(
+        self, component: dict, path_to_license_folder: str = ""
+    ) -> None:
         if (
             ("supplier" in component)
             or ("publisher" in component)
@@ -163,25 +165,43 @@ class InferSupplier(Operation):
                     return
 
 
-class ReplaceLicenseNameWithId(Operation):
+class ProcessLicense(Operation):
     """
     If there are components in "metadata" or "components" containing
     licenses with the entry "name" instead of "id", this operation attempts
-    to replace the name with an id, extracted from a provided list of possible license names
-    with associated id.
+    to replace the name with an SPDX-ID, extracted from a provided list of possible license names
+    with associated SPDX-ID.
+
+    If the license contains a name and
+    a path to a folder with txt files containing license descriptions with the
+    naming convention 'license name'.txt is provided,
+    the program searches for a file with matching name
+    and, if found, copies its content in the field "text".
     """
 
     list_of_license_names_string = (
         importlib.resources.files("cdxev.amend")
-        .joinpath("license_name_id_map.json")
+        .joinpath("license_name_spdx_id_map.json")
         .read_text(encoding="utf-8-sig")
     )
     list_of_license_names = json.loads(list_of_license_names_string)
 
+    def __init__(self) -> None:
+        self.path_to_license_folder = ""
+
+    def change_path_to_license_folder(self, path_to_license_folder: str) -> None:
+        self.path_to_license_folder = path_to_license_folder
+
     def handle_metadata(self, metadata: dict) -> None:
         if "component" not in metadata:
             return
-        replace_license_name_with_id(metadata["component"], self.list_of_license_names)
+        process_license(
+            metadata["component"],
+            self.list_of_license_names,
+            self.path_to_license_folder,
+        )
 
     def handle_component(self, component: dict) -> None:
-        replace_license_name_with_id(component, self.list_of_license_names)
+        process_license(
+            component, self.list_of_license_names, self.path_to_license_folder
+        )

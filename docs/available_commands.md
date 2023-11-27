@@ -19,6 +19,19 @@ Currently, the command adds or modifies the following pieces of information:
   * *externalReferences* of type *issue-tracker*
   * *externalReferences* of type *vcs*
 * Generates a *bom-ref* for components which don't have one, yet. The *bom-ref* will be a GUID.
+* If the path to a folder with license text files is provided, the text will be included in the SBOM, if the license has the corresponding `name`.
+
+### Copy license texts from files
+
+The program can copy the text describing a license from a specific file into the SBOM, if a license name is given.  
+
+This is done by submitting the path to a folder containing txt-files with the license text via the command `--license-path`.
+If for example the license name "Apache License 1.0" is given, the program will search in the provided folder for the file "Apache License 1.0.txt" and copy its content in the `text` field.
+The txt-files in the folder must follow the naming convention name.txt.
+
+    cdx-ev amend bom.json" --license-path=C:\Documents\licenses
+
+If a `text` field already exists, its content will be replaced.
 
 ## merge
 

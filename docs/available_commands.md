@@ -39,7 +39,7 @@ This command requires at least two input files, but can accept an arbitrary numb
 
 Alternatively only one file can be submitted and the command `--from-folder` must be used to provide the path to a folder.
 This command reads the contents of the provided folder and loads *all files* with "*.cdx.json" or the name "bom.json", according to the naming convention described in the [CycloneDX Specification](https://cyclonedx.org/specification/overview/#recognized-file-patterns).
-If a file in the folder has the same name as the provided SBOM to be merged in, it will be skipped.
+If a file in the folder has the same name as the provided sbom to be merged in, it will be skipped.
 The files are then merged in alphabetical order into the regularly provided SBOM in this order.
 
 The process runs iterative, merging two SBOMs in each step.

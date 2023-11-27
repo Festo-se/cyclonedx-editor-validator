@@ -385,7 +385,9 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "description": "some description",
             "scope": "required",
             "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
-            "licenses": [{"license": {"name": "license_name", "text": "other text"}}],
+            "licenses": [
+                {"license": {"name": "license_name", "text": {"content": "other text"}}}
+            ],
             "copyright": "Copyright 2000-2021 some name Contributors",
             "purl": "pkg:nuget/some name@1.3.2",
         }
@@ -393,7 +395,7 @@ class GetLicenseTextFromFile(unittest.TestCase):
             component, list_of_license_names, path_to_license_folder
         )
         self.assertEqual(
-            component["licenses"][0]["license"]["text"],  # type: ignore
+            component["licenses"][0]["license"]["text"]["content"],  # type: ignore
             "The text describing a license.",
         )
 
@@ -429,7 +431,7 @@ class GetLicenseTextFromFile(unittest.TestCase):
             component, list_of_license_names, path_to_license_folder
         )
         self.assertEqual(
-            component["licenses"][0]["license"]["text"],  # type: ignore
+            component["licenses"][0]["license"]["text"]["content"],  # type: ignore
             "The text describing a license.",
         )
 
@@ -465,7 +467,7 @@ class GetLicenseTextFromFile(unittest.TestCase):
             component, list_of_license_names, path_to_license_folder
         )
         self.assertEqual(
-            component["licenses"][0]["license"]["text"],  # type: ignore
+            component["licenses"][0]["license"]["text"]["content"],  # type: ignore
             "The text describing another license.",
         )
 

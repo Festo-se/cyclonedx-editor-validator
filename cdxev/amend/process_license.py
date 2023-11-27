@@ -163,7 +163,7 @@ def add_text_from_folder_to_license_with_name(
                 )
             )
         else:
-            if license.get("text", "") != "":
+            if license.get("text", {}).get("content", "") != "":
                 logger.warning(
                     LogMessage(
                         "License text replaced",
@@ -182,7 +182,7 @@ def add_text_from_folder_to_license_with_name(
                     ),
                 )
             )
-        license["text"] = license_text
+        license["text"] = {"content": license_text}
     return
 
 

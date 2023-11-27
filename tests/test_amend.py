@@ -3,7 +3,7 @@ import json
 import typing as t
 import unittest
 
-from cdxev.amend import process_license as prolic
+from cdxev.amend import process_license
 from cdxev.amend.command import run as run_amend
 from cdxev.amend.operations import (
     AddBomRefOperation,
@@ -309,7 +309,8 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
             license_id = licenses["exp"]
             for names in licenses["names"]:
                 self.assertEqual(
-                    prolic.find_license_id(names, list_of_license_names), license_id
+                    process_license.find_license_id(names, list_of_license_names),
+                    license_id,
                 )
 
     def test_find_license_id_fail(self) -> None:
@@ -319,11 +320,17 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
             encoding="utf-8-sig",
         ) as my_file:
             list_of_license_names = json.load(my_file)
-        self.assertEqual(prolic.find_license_id(10, list_of_license_names), "")  # type: ignore
         self.assertEqual(
-            prolic.find_license_id("no license", list_of_license_names), ""
+            process_license.find_license_id(10, list_of_license_names),  # type: ignore
+            "",
         )
-        self.assertEqual(prolic.find_license_id({}, list_of_license_names), "")  # type: ignore
+        self.assertEqual(
+            process_license.find_license_id("no license", list_of_license_names), ""
+        )
+        self.assertEqual(
+            process_license.find_license_id({}, list_of_license_names),  # type: ignore
+            "",
+        )
 
     def test_process_license_replace_name_with_id(self) -> None:
         with open(
@@ -344,16 +351,18 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
             encoding="utf-8-sig",
         ) as my_file:
             sbom_with_id = json.load(my_file)
-        prolic.process_license(sbom["metadata"]["component"], list_of_license_names)
+        process_license.process_license(
+            sbom["metadata"]["component"], list_of_license_names
+        )
         for component in sbom["components"]:
-            prolic.process_license(component, list_of_license_names)
+            process_license.process_license(component, list_of_license_names)
         self.assertTrue(compare_sboms(sbom, sbom_with_id))
 
 
 class GetLicenseTextFromFile(unittest.TestCase):
     def test_get_license_text_from_folder(self) -> None:
         path_to_license_folder = "tests/auxiliary/licenses"
-        license_text = prolic.get_license_text_from_folder(
+        license_text = process_license.get_license_text_from_folder(
             "license_name", path_to_license_folder
         )
         self.assertEqual(license_text, "The text describing a license.")
@@ -380,7 +389,9 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "copyright": "Copyright 2000-2021 some name Contributors",
             "purl": "pkg:nuget/some name@1.3.2",
         }
-        prolic.process_license(component, list_of_license_names, path_to_license_folder)
+        process_license.process_license(
+            component, list_of_license_names, path_to_license_folder
+        )
         self.assertEqual(
             component["licenses"][0]["license"]["text"],  # type: ignore
             "The text describing a license.",
@@ -414,7 +425,9 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "copyright": "Copyright 2000-2021 some name Contributors",
             "purl": "pkg:nuget/some name@1.3.2",
         }
-        prolic.process_license(component, list_of_license_names, path_to_license_folder)
+        process_license.process_license(
+            component, list_of_license_names, path_to_license_folder
+        )
         self.assertEqual(
             component["licenses"][0]["license"]["text"],  # type: ignore
             "The text describing a license.",
@@ -448,7 +461,9 @@ class GetLicenseTextFromFile(unittest.TestCase):
             "copyright": "Copyright 2000-2021 some name Contributors",
             "purl": "pkg:nuget/some name@1.3.2",
         }
-        prolic.process_license(component, list_of_license_names, path_to_license_folder)
+        process_license.process_license(
+            component, list_of_license_names, path_to_license_folder
+        )
         self.assertEqual(
             component["licenses"][0]["license"]["text"],  # type: ignore
             "The text describing another license.",
@@ -457,7 +472,9 @@ class GetLicenseTextFromFile(unittest.TestCase):
     def test_error_messages_does_not_exist(self) -> None:
         path_to_license_folder = "thispathdoesnotexist"
         with self.assertRaises(AppError) as ae:
-            prolic.get_license_text_from_folder("license_name", path_to_license_folder)
+            process_license.get_license_text_from_folder(
+                "license_name", path_to_license_folder
+            )
             self.assertIn(
                 "The submitted path thispathdoesnotexist does not exist.",
                 ae.exception.details.description,
@@ -466,7 +483,9 @@ class GetLicenseTextFromFile(unittest.TestCase):
     def test_error_messages_not_a_folder(self) -> None:
         path_to_license_folder = "tests/test_amend.py"
         with self.assertRaises(AppError) as ae:
-            prolic.get_license_text_from_folder("license_name", path_to_license_folder)
+            process_license.get_license_text_from_folder(
+                "license_name", path_to_license_folder
+            )
             self.assertIn(
                 "The submitted path (tests/test_amend.py) does not lead to a folder.",
                 ae.exception.details.description,

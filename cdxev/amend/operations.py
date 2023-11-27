@@ -169,8 +169,8 @@ class ProcessLicense(Operation):
     """
     If there are components in "metadata" or "components" containing
     licenses with the entry "name" instead of "id", this operation attempts
-    to replace the name with an id, extracted from a provided list of possible license names
-    with associated id.
+    to replace the name with an SPDX-ID, extracted from a provided list of possible license names
+    with associated SPDX-ID.
 
     If the license contains a name and
     a path to a folder with txt files containing license descriptions with the
@@ -181,7 +181,7 @@ class ProcessLicense(Operation):
 
     list_of_license_names_string = (
         importlib.resources.files("cdxev.amend")
-        .joinpath("license_name_id_map.json")
+        .joinpath("license_name_spdx_id_map.json")
         .read_text(encoding="utf-8-sig")
     )
     list_of_license_names = json.loads(list_of_license_names_string)

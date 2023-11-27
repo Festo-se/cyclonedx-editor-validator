@@ -16,20 +16,20 @@ logger = logging.getLogger(__name__)
 
 def find_license_id(license_name: str, license_namelist: Sequence[dict]) -> str:
     """
-    Searches in the given list for the name and returns
-    given the license
+    Searches in the given list for the name and returns the
+    SPDX-ID of the license, if existing.
 
     Parameters
     ----------
     license_name: str
         Name of a license
     license_namelist: list
-        Possible names of licenses and the id
+        Possible names of licenses and the SPDX-ID
 
     Returns
     -------
     str:
-        Id of the given string
+        SPDX-ID of the given string
     """
     license_id = ""
     if isinstance(license_name, str):
@@ -47,10 +47,10 @@ def process_license(
     component: dict, license_name_id_list: list, path_to_license_folder: str = ""
 ) -> None:
     """
-    Adds the id of a license to a component and removes the name, if the name
+    Adds the SPDX-ID of a license to a component and removes the name, if the name
     is in the list of licenses provided.
 
-    If the path to  a folder with txt files containing license descriptions with the
+    If the path to a folder with txt files containing license descriptions with the
     naming convention 'license name'.txt is given,
     the program searches for a file with matching name
     and, if found, copies its content in the field "text".
@@ -62,8 +62,8 @@ def process_license(
     :component: dict
         A component
     :license_name_id_map: list
-        A list with possible license names and
-        belonging to a license id
+        A list with possible license names
+        belonging to a license with SPDX-ID
     :path_to_license_folder: str (optional)
         Path to a folder with txt files containing license texts
 
@@ -95,7 +95,7 @@ def process_license(
 
 def replace_license_name_with_id(license: dict, license_name_id_list: list) -> None:
     """
-    Adds the id of a license to a license and removes the name, if the name
+    Adds the SPDX-ID of a license to a license and removes the name, if the name
     is in the list of licenses provided.
 
     The operation is performed on the provided license.
@@ -138,9 +138,10 @@ def add_text_from_folder_to_license_with_name(
     ----------
     :license: dict
         A license
-    :license_name_id_map: list
-        A list with possible license names and
-        belonging to a license id
+    :path_to_license_folder: str
+        The path to a folder with txt-files containing license descriptions.
+    :component_id (optional): ComponentIdentity
+        The ComponentIdentity of the component the submitted license belongs to.
 
     Returns
     -------
@@ -162,12 +163,22 @@ def add_text_from_folder_to_license_with_name(
                 )
             )
         else:
-            logger.warning(
+            if license.get("text", "") != "":
+                logger.warning(
+                    LogMessage(
+                        "License text replaced",
+                        (
+                            f"The license text of the license ({license.get('name', '')}),"
+                            f" in component ({component_id}), was overwritten."
+                        ),
+                    )
+                )
+            logger.info(
                 LogMessage(
-                    "License text replaced",
+                    "License text added",
                     (
-                        f"The license text of the license ({license.get('name', '')}),"
-                        f" in component ({component_id}), was overwritten."
+                        f"The text of the license ({license.get('name', '')}),"
+                        f" in component ({component_id}), was added."
                     ),
                 )
             )
@@ -185,7 +196,7 @@ def get_license_text_from_folder(license_name: str, path_to_license_folder: str)
     :license_name: str
         Name of the license
     :path_to_license_folder: str
-        path to a folder with txt-files containing license descriptions
+        Path to a folder with txt-files containing license descriptions.
 
     Returns
     -------

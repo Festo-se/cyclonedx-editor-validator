@@ -230,6 +230,6 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
                     f'The component "{update["id"]}" was not found and could not be updated.',
                 )
                 raise AppError(log_msg=msg)
-        if 'target_list' in locals():
+        if "target_list" in locals():
             for target in target_list:
                 _do_update(target, update, ctx)

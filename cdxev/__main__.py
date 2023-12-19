@@ -377,6 +377,11 @@ def create_set_parser(
         help="Allow writing protected fields, e.g., identifiers.",
         action="store_true",
     )
+    parser.add_argument(
+        "--ignore-missing",
+        help="Suppress warnings that a component is not present when using '--from-file' ",
+        action="store_true",
+    )
 
     identifiers = parser.add_argument_group(
         "target",
@@ -576,7 +581,7 @@ def invoke_set(args: argparse.Namespace) -> int:
 
     sbom, _ = read_sbom(args.input)
     cfg = cdxev.set.SetConfig(
-        args.force, args.allow_protected, [args.input], args.from_file
+        args.force, args.allow_protected, args.ignore_missing, [args.input], args.from_file
     )
     cdxev.set.run(sbom, updates, cfg)
     write_sbom(sbom, args.output)

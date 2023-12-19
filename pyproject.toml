@@ -36,7 +36,7 @@ pytest = "7.4.3"
 coverage = "7.3.2"
 toml = "0.10.2"
 typing-extensions = "4.8.0"
-bandit = "1.7.5"
+bandit = "1.7.6"
 isort = "5.13.0"
 
 [build-system]

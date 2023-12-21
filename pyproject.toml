@@ -27,17 +27,17 @@ jsonschema = {version = "4.17.3", extras = ["format"]}
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "6.1.0"
-black = "23.11.0"
+black = "23.12.0"
 pep8-naming = "0.13.3"
-mypy = "1.7.0"
+mypy = "1.7.1"
 types-python-dateutil = "2.8.19.14"
-types-jsonschema = "4.19.0.4"
+types-jsonschema = "4.20.0.0"
 pytest = "7.4.3"
-coverage = "7.3.2"
+coverage = "7.3.4"
 toml = "0.10.2"
-typing-extensions = "4.8.0"
-bandit = "1.7.5"
-isort = "5.12.0"
+typing-extensions = "4.9.0"
+bandit = "1.7.6"
+isort = "5.13.2"
 
 [build-system]
 requires = ["poetry-core"]

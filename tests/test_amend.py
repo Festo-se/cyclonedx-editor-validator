@@ -3,7 +3,7 @@ import json
 import typing as t
 import unittest
 
-from cdxev.amend import replace_license_name_with_id as ntl
+from cdxev.amend import process_license
 from cdxev.amend.command import run as run_amend
 from cdxev.amend.operations import (
     AddBomRefOperation,
@@ -11,8 +11,9 @@ from cdxev.amend.operations import (
     DefaultAuthorOperation,
     InferSupplier,
     Operation,
-    ReplaceLicenseNameWithId,
+    ProcessLicense,
 )
+from cdxev.error import AppError
 from tests.auxiliary.sbomFunctionsTests import compare_sboms
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_amend_sboms/"
@@ -230,10 +231,10 @@ class AddBomRefTestCase(AmendTestCase):
         self.assertEqual("already-present", component["bom-ref"])
 
 
-class ReplaceLicenseNameWithIdTestCase(AmendTestCase):
+class ProcessLicenseTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = ReplaceLicenseNameWithId()
+        self.operation = ProcessLicense()
 
     def test_replace_name_with_id(self) -> None:
         self.sbom_fixture["metadata"]["component"]["licenses"] = [
@@ -308,7 +309,8 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
             license_id = licenses["exp"]
             for names in licenses["names"]:
                 self.assertEqual(
-                    ntl.find_license_id(names, list_of_license_names), license_id
+                    process_license.find_license_id(names, list_of_license_names),
+                    license_id,
                 )
 
     def test_find_license_id_fail(self) -> None:
@@ -318,11 +320,19 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
             encoding="utf-8-sig",
         ) as my_file:
             list_of_license_names = json.load(my_file)
-        self.assertEqual(ntl.find_license_id(10, list_of_license_names), "")  # type: ignore
-        self.assertEqual(ntl.find_license_id("no license", list_of_license_names), "")
-        self.assertEqual(ntl.find_license_id({}, list_of_license_names), "")  # type: ignore
+        self.assertEqual(
+            process_license.find_license_id(10, list_of_license_names),  # type: ignore
+            "",
+        )
+        self.assertEqual(
+            process_license.find_license_id("no license", list_of_license_names), ""
+        )
+        self.assertEqual(
+            process_license.find_license_id({}, list_of_license_names),  # type: ignore
+            "",
+        )
 
-    def test_replace_license_name_with_id(self) -> None:
+    def test_process_license_replace_name_with_id(self) -> None:
         with open(
             (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
             "r",
@@ -341,12 +351,147 @@ class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
             encoding="utf-8-sig",
         ) as my_file:
             sbom_with_id = json.load(my_file)
-        ntl.replace_license_name_with_id(
+        process_license.process_license(
             sbom["metadata"]["component"], list_of_license_names
         )
         for component in sbom["components"]:
-            ntl.replace_license_name_with_id(component, list_of_license_names)
+            process_license.process_license(component, list_of_license_names)
         self.assertTrue(compare_sboms(sbom, sbom_with_id))
+
+
+class GetLicenseTextFromFile(unittest.TestCase):
+    def test_get_license_text_from_folder(self) -> None:
+        path_to_license_folder = "tests/auxiliary/licenses"
+        license_text = process_license.get_license_text_from_folder(
+            "license_name", path_to_license_folder
+        )
+        self.assertEqual(license_text, "The text describing a license.")
+
+    def test_process_license_replace_license_text(self) -> None:
+        path_to_license_folder = "tests/auxiliary/licenses"
+        with open(
+            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
+            "r",
+            encoding="utf-8-sig",
+        ) as my_file:
+            list_of_license_names = json.load(my_file)
+        component = {
+            "type": "library",
+            "bom-ref": "pkg:nuget/some name@1.3.3",
+            "publisher": "some publisher",
+            "name": "some name",
+            "version": "1.3.2",
+            "cpe": "",
+            "description": "some description",
+            "scope": "required",
+            "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
+            "licenses": [
+                {"license": {"name": "license_name", "text": {"content": "other text"}}}
+            ],
+            "copyright": "Copyright 2000-2021 some name Contributors",
+            "purl": "pkg:nuget/some name@1.3.2",
+        }
+        process_license.process_license(
+            component, list_of_license_names, path_to_license_folder
+        )
+        self.assertEqual(
+            component["licenses"][0]["license"]["text"]["content"],  # type: ignore
+            "The text describing a license.",
+        )
+
+    def test_process_license_add_license_text(self) -> None:
+        path_to_license_folder = "tests/auxiliary/licenses"
+        with open(
+            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
+            "r",
+            encoding="utf-8-sig",
+        ) as my_file:
+            list_of_license_names = json.load(my_file)
+        component = {
+            "type": "library",
+            "bom-ref": "pkg:nuget/some name@1.3.3",
+            "publisher": "some publisher",
+            "name": "some name",
+            "version": "1.3.2",
+            "cpe": "",
+            "description": "some description",
+            "scope": "required",
+            "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
+            "licenses": [
+                {
+                    "license": {
+                        "name": "license_name",
+                    }
+                }
+            ],
+            "copyright": "Copyright 2000-2021 some name Contributors",
+            "purl": "pkg:nuget/some name@1.3.2",
+        }
+        process_license.process_license(
+            component, list_of_license_names, path_to_license_folder
+        )
+        self.assertEqual(
+            component["licenses"][0]["license"]["text"]["content"],  # type: ignore
+            "The text describing a license.",
+        )
+
+    def test_process_license_add_license_text_with_space(self) -> None:
+        path_to_license_folder = "tests/auxiliary/licenses"
+        with open(
+            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
+            "r",
+            encoding="utf-8-sig",
+        ) as my_file:
+            list_of_license_names = json.load(my_file)
+        component = {
+            "type": "library",
+            "bom-ref": "pkg:nuget/some name@1.3.3",
+            "publisher": "some publisher",
+            "name": "some name",
+            "version": "1.3.2",
+            "cpe": "",
+            "description": "some description",
+            "scope": "required",
+            "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
+            "licenses": [
+                {
+                    "license": {
+                        "name": "another license",
+                    }
+                }
+            ],
+            "copyright": "Copyright 2000-2021 some name Contributors",
+            "purl": "pkg:nuget/some name@1.3.2",
+        }
+        process_license.process_license(
+            component, list_of_license_names, path_to_license_folder
+        )
+        self.assertEqual(
+            component["licenses"][0]["license"]["text"]["content"],  # type: ignore
+            "The text describing another license.",
+        )
+
+    def test_error_messages_does_not_exist(self) -> None:
+        path_to_license_folder = "thispathdoesnotexist"
+        with self.assertRaises(AppError) as ae:
+            process_license.get_license_text_from_folder(
+                "license_name", path_to_license_folder
+            )
+            self.assertIn(
+                "The submitted path thispathdoesnotexist does not exist.",
+                ae.exception.details.description,
+            )
+
+    def test_error_messages_not_a_folder(self) -> None:
+        path_to_license_folder = "tests/test_amend.py"
+        with self.assertRaises(AppError) as ae:
+            process_license.get_license_text_from_folder(
+                "license_name", path_to_license_folder
+            )
+            self.assertIn(
+                "The submitted path (tests/test_amend.py) does not lead to a folder.",
+                ae.exception.details.description,
+            )
 
 
 if __name__ == "__main__":

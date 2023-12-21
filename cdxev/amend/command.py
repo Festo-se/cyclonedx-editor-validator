@@ -2,7 +2,7 @@ import logging
 
 from cdxev.auxiliary.sbomFunctions import walk_components
 
-from .operations import Operation
+from .operations import Operation, ProcessLicense
 
 __operations: list[Operation] = []
 logger = logging.getLogger(__name__)
@@ -17,12 +17,16 @@ def register_operation(operation: Operation) -> None:
     __operations.append(operation)
 
 
-def run(sbom: dict) -> None:
+def run(sbom: dict, path_to_license_folder: str = "") -> None:
     """
     Runs the amend command on an SBOM. The SBOM is modified in-place.
 
     :param dict sbom: The SBOM model.
+    :param str path_to_license_folder: Path to a folder with license texts.
     """
+    for operation in __operations:
+        if type(operation) is ProcessLicense:
+            operation.change_path_to_license_folder(path_to_license_folder)
     _prepare(sbom)
     _metadata(sbom)
     walk_components(sbom, _do_amend, skip_meta=True)

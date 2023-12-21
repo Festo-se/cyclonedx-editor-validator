@@ -186,6 +186,13 @@ def create_amend_parser(
         help="Path to the SBOM file.",
         type=Path,
     )
+    parser.add_argument(
+        "--license-path",
+        metavar="<license-path>",
+        help="Path to a folder with txt-files containing license texts to be copied in the SBOM",
+        type=str,
+        default="",
+    )
     add_output_argument(parser)
 
     parser.set_defaults(cmd_handler=invoke_amend)
@@ -447,7 +454,7 @@ def create_build_public_bom_parser(
 
 def invoke_amend(args: argparse.Namespace) -> int:
     sbom, _ = read_sbom(args.input)
-    amend(sbom)
+    amend(sbom, args.license_path)
     write_sbom(sbom, args.output)
     return _STATUS_OK
 

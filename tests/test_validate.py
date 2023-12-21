@@ -1083,3 +1083,14 @@ class TestInternalNameSchema(unittest.TestCase):
             }
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
+
+    def test_no_components_no_dependencies(
+        self,
+    ) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom.pop("components")
+            sbom.pop("dependencies")
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])

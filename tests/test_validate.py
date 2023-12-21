@@ -1086,3 +1086,13 @@ class TestInternalNameSchema(unittest.TestCase):
             sbom.pop("dependencies")
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
+
+    def test_empty_content_license_text(self) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0]["licenses"] = [
+                {"license": {"name": "something", "text": {"content": ""}}}
+            ]
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("content", issues), True)

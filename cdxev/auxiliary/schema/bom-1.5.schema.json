@@ -6,7 +6,8 @@
   "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
   "required": [
     "bomFormat",
-    "specVersion"
+    "specVersion",
+    "version"
   ],
   "additionalProperties": false,
   "properties": {

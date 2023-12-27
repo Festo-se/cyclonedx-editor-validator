@@ -29,7 +29,7 @@ jsonschema = {version = "4.17.3", extras = ["format"]}
 flake8 = "6.1.0"
 black = "23.12.0"
 pep8-naming = "0.13.3"
-mypy = "1.7.1"
+mypy = "1.8.0"
 types-python-dateutil = "2.8.19.14"
 types-jsonschema = "4.20.0.0"
 pytest = "7.4.3"

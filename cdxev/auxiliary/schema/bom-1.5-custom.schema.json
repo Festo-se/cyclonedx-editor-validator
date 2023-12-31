@@ -312,12 +312,35 @@
         "component"
       ],
       "if": {
-        "type": "object",
-        "properties": {
-          "component": {
-            "type": "object"
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "component": {
+                "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
+                "required": ["supplier"]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "component": {
+                "properties": { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                "required": ["publisher"]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "component": {
+                "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                "required": ["author"]
+              }
+            }
           }
-        }
+        ]
       },
       "then": {
         "type": "object",

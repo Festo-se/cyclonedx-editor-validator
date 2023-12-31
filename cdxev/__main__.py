@@ -583,9 +583,9 @@ def invoke_set(args: argparse.Namespace) -> int:
     cfg = cdxev.set.SetConfig(
         args.force,
         args.allow_protected,
-        args.ignore_missing,
         [args.input],
         args.from_file,
+        args.ignore_missing,
     )
     cdxev.set.run(sbom, updates, cfg)
     write_sbom(sbom, args.output)

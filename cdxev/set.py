@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 class SetConfig:
     force: bool
     allow_protected: bool
-    ignore_missing: bool
     sbom_paths: t.Sequence[pathlib.Path]
     from_file: t.Optional[pathlib.Path]
+    ignore_missing: bool = False
 
 
 @dataclass

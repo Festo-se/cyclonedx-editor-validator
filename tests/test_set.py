@@ -54,7 +54,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             False,
             False,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
@@ -81,7 +80,6 @@ class SetTestCase(unittest.TestCase):
         ]
         cfg = cdxev.set.SetConfig(
             True,
-            False,
             False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
@@ -113,7 +111,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             True,
             False,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
@@ -141,7 +138,6 @@ class SetTestCase(unittest.TestCase):
         ]
         cfg = cdxev.set.SetConfig(
             True,
-            False,
             False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
@@ -172,7 +168,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             True,
             False,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
@@ -199,7 +194,6 @@ class SetTestCase(unittest.TestCase):
             }
         ]
         cfg = cdxev.set.SetConfig(
-            False,
             False,
             False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
@@ -235,7 +229,6 @@ class SetTestCase(unittest.TestCase):
         ]
         cfg = cdxev.set.SetConfig(
             True,
-            False,
             False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             pathlib.Path("MyUpdates.json"),
@@ -277,7 +270,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             True,
             False,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             pathlib.Path("MyUpdates.json"),
         )
@@ -295,7 +287,6 @@ class SetTestCase(unittest.TestCase):
         updates = [{"set": {"author": "some author"}}]
 
         cfg = cdxev.set.SetConfig(
-            False,
             False,
             False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
@@ -320,7 +311,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             False,
             False,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
@@ -338,7 +328,6 @@ class SetTestCase(unittest.TestCase):
         ]
 
         cfg = cdxev.set.SetConfig(
-            False,
             False,
             False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
@@ -368,7 +357,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             True,
             False,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             pathlib.Path("Some.json"),
         )
@@ -390,7 +378,6 @@ class SetTestCase(unittest.TestCase):
 
         cfg = cdxev.set.SetConfig(
             True,
-            False,
             False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
@@ -422,7 +409,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             True,
             False,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
@@ -445,7 +431,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             True,
             True,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
@@ -479,7 +464,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             True,
             True,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
@@ -526,9 +510,9 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             True,
             True,
-            True,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
+            True,
         )
 
         cdxev.set.run(self.sbom_fixture, updates, cfg)
@@ -536,7 +520,6 @@ class SetTestCase(unittest.TestCase):
         cfg = cdxev.set.SetConfig(
             True,
             True,
-            False,
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )

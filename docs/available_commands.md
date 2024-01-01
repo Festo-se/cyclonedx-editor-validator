@@ -154,6 +154,11 @@ When passing the targets, names and values in a file, the file must conform to t
         ...
     ]
 
+This file can then be applied as the following example shows:
+
+    # Perform several operations on properties using set-command
+    cdx-ev set bom.json --from-file mysetfile.json
+
 ## validate
 
 This command is used to validate the SBOM according to a specification.

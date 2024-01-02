@@ -232,3 +232,10 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
                     f'The component "{update["id"]}" was not found and could not be updated.',
                 )
                 raise AppError(log_msg=msg)
+            else:
+                logger.info(
+                    LogMessage(
+                        "Set not performed",
+                        f'The component "{update["id"]}" was not found and could not be updated.',
+                    )
+                )

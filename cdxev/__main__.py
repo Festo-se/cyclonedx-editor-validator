@@ -475,12 +475,9 @@ def invoke_merge(args: argparse.Namespace) -> int:
         path_to_folder = args.from_folder
         name_governing_sbom = os.path.basename(os.path.normpath(args.input[0]))
         list_folder_content = os.listdir(path_to_folder)
-        list_folder_content_lower = [x.lower() for x in list_folder_content]
         # use python sorted function to sort the names of the files, the
-        # names are compared using .lower() to adhere to alphabetical order
-        list_folder_content_sorted = [
-            x for _, x in sorted(zip(list_folder_content, list_folder_content_lower))
-        ]
+        # names are compared in lowercase to adhere to alphabetical order
+        list_folder_content_sorted = sorted(list_folder_content, key=str.lower)
 
         for file_name in list_folder_content_sorted:
             if (

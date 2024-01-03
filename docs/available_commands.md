@@ -20,7 +20,7 @@ Currently, the command adds or modifies the following pieces of information:
   * *externalReferences* of type *vcs*
 * Generates a *bom-ref* for components which don't have one, yet. The *bom-ref* will be a GUID.
 * If the path to a folder with license text files is provided, the text will be included in the SBOM, if the license has the corresponding `name`.
-* If a `license.name` is similar to an SPDX-ID, it will be replaced, e.g. `{"license": {"name": "The Apache License, Version 2.0"}}` leads to `{"license": {"id": "Apache-2.0"}}`. For this purpose a [JSON-file](https://github.com/Festo-se/cyclonedx-editor-validator/blob/main/cdxev/amend/license_name_spdx_id_map.json) is used, where we provide a mapping of license names to SPDX-IDs, based on this [license-mapping](https://github.com/CycloneDX/cyclonedx-core-java/blob/master/src/main/resources/license-mapping.json).
+* If a `license.name` is similar to an SPDX-ID, it will be replaced, e.g. `{"license": {"name": "The Apache License, Version 2.0"}}` leads to `{"license": {"id": "Apache-2.0"}}`. For this purpose a [JSON-file](https://github.com/Festo-se/cyclonedx-editor-validator/blob/main/cdxev/amend/license_name_spdx_id_map.json) is used, where we provide a mapping of license names to SPDX-IDs, based on this [license-mapping](https://github.com/CycloneDX/cyclonedx-core-java/blob/master/src/main/resources/license-mapping.json). 
 
 ### Copy license texts from files
 

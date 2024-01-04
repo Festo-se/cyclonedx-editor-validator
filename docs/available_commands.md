@@ -160,6 +160,12 @@ This file can then be applied as the following example shows:
     # Perform several operations on properties using set-command
     cdx-ev set bom.json --from-file mysetfile.json
 
+If the file contains a component not present in the SBOM, a error is thrown.
+This can be disabled with the `--ignore-missing` command.
+So only a message that the component was not found and could not be updated is logged.
+
+    cdx-ev set bom.json --from-file mysetfile.json --ignore-missing
+
 ## validate
 
 This command is used to validate the SBOM according to a specification.

@@ -155,7 +155,7 @@ class GitLabCQReporter(logging.Handler):
                     "begin": line_start if line_start is not None else 0,
                 },
             },
-            }
+        }
 
         return issue
 

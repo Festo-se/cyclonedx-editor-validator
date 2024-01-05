@@ -171,13 +171,13 @@ class TestValidateMetadata(unittest.TestCase):
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("supplier")
-            sbom["metadata"]["component"]["publisher"] = "pup"
+            sbom["metadata"]["component"]["publisher"] = "festo"
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("supplier")
-            sbom["metadata"]["component"]["author"] = "pup"
+            sbom["metadata"]["component"]["author"] = "festo"
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
 
@@ -362,14 +362,6 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(
                 search_for_word_issues("not a valid SPDX ID", issues), True
             )
-
-    def test_components_component_copyright(self) -> None:
-        for spec_version in list_of_specVersions:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][-1].pop("copyright")
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("copyright", issues), True)
 
     def test_version_short(self) -> None:
         for spec_version in list_of_specVersions:
@@ -711,3 +703,466 @@ class TestValidateUseSchemaType(unittest.TestCase):
             schema_type="default",
         )
         self.assertEqual(v, 0)
+
+
+class TestInternalNameSchema(unittest.TestCase):
+    def test_supplier_tagged_intern_no_internal_group(self) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "supplier": {"name": "Festo SE & Co.KG"},
+                "group": "",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "licenses": [{"license": {"id": "Apache-2.0"}}],
+                "copyright": "3rd Party",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("com.festo", issues), True)
+
+    def test_publisher_tagged_intern_no_internal_group(self) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "publisher": "festo",
+                "group": "",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "licenses": [{"license": {"id": "Apache-2.0"}}],
+                "copyright": "3rd Party",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("com.festo", issues), True)
+
+    def test_author_tagged_intern_no_internal_group(self) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "author": "festo",
+                "group": "",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "licenses": [{"license": {"id": "Apache-2.0"}}],
+                "copyright": "3rd Party",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("com.festo", issues), True)
+
+    def test_group_internal_neither_author_supplier_nor_publisher_tagged_intern(
+        self,
+    ) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "author": "automated",
+                "group": "com.festo.internal",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "licenses": [{"license": {"id": "Apache-2.0"}}],
+                "copyright": "3rd Party",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("automated", issues), True)
+
+    def test_group_internal_author_tagged_internal_supplier_and_publisher_not(
+        self,
+    ) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "author": "automated by festo",
+                "publisher": "automated publisher",
+                "supplier": {"name": "automated supplier"},
+                "group": "com.festo.internal",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "licenses": [{"license": {"id": "Apache-2.0"}}],
+                "copyright": "3rd Party",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
+    def test_group_internal_supplier_tagged_internal_author_and_publisher_not(
+        self,
+    ) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "author": "automated",
+                "publisher": "automated publisher",
+                "supplier": {"name": "automated by festo"},
+                "group": "com.festo.internal",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "licenses": [{"license": {"id": "Apache-2.0"}}],
+                "copyright": "3rd Party",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
+    def test_group_internal_publisher_tagged_internal_supplier_and_publisher_not(
+        self,
+    ) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "author": "automated",
+                "publisher": "automated by festo",
+                "supplier": {"name": "automated suppliers"},
+                "group": "com.festo.internal",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "licenses": [{"license": {"id": "Apache-2.0"}}],
+                "copyright": "3rd Party",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
+    def test_internal_component_component_copyright_festo(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "supplier": {"name": "Acme"},
+                    "copyright": "Acme",
+                    "name": "Acme_Application",
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "components": [
+                {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "supplier": {"name": "Acme"},
+                    "name": "Acme_Application",
+                    "copyright": "Festo SE & Co. KG 2022, all rights reserved",
+                    "version": "9.1.1",
+                    "group": "com.festo.internal",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                }
+            ],
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_specVersions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("supplier", issues), True)
+
+
+class TestInternalMetaData(unittest.TestCase):
+    def test_internal_component_metadata_no_issue(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "supplier": {"name": "Acme"},
+                    "name": "Acme_Application",
+                    "licenses": [{"license": {"id": "Apache-1.0"}}],
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_specVersions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
+    def test_internal_component_metadata_no_copyright_author_festo(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "group": "com.festo.internal",
+                    "author": "festo",
+                    "name": "Acme_Application",
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_specVersions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("copyright", issues), True)
+
+    def test_internal_component_metadata_no_copyright_supplier_festo(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "group": "com.festo.internal",
+                    "supplier": {"name": "festo"},
+                    "name": "Acme_Application",
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_specVersions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("copyright", issues), True)
+
+    def test_internal_component_metadata_no_copyright_publisher_festo(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "group": "com.festo.internal",
+                    "publisher": {"name": "festo"},
+                    "name": "Acme_Application",
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_specVersions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("copyright", issues), True)
+
+    def test_internal_component_metadata_no_group_author_festo(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "copyright": "Festo SE & Co. KG 2022, all rights reserved",
+                    "author": "festo",
+                    "name": "Acme_Application",
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_specVersions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("group", issues), True)
+
+    def test_internal_component_metadata_no_group_supplier_festo(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "copyright": "Festo SE & Co. KG 2022, all rights reserved",
+                    "supplier": {"name": "festo"},
+                    "name": "Acme_Application",
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_specVersions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("group", issues), True)
+
+    def test_internal_component_metadata_no_group_publisher_festo(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "copyright": "Festo SE & Co. KG 2022, all rights reserved",
+                    "publisher": {"name": "festo"},
+                    "name": "Acme_Application",
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_specVersions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("group", issues), True)
+
+    def test_internal_component_metadata_copyright_festo(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "supplier": {"name": "Acme"},
+                    "copyright": "Festo SE & Co. KG 2022, all rights reserved",
+                    "name": "Acme_Application",
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_specVersions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("supplier", issues), True)

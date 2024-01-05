@@ -182,8 +182,6 @@ class TestGitLabCQReporter(unittest.TestCase):
         record = mock.MagicMock()
         record.msg = log.LogMessage("Test Message", "test", "module", 10)
         record.exc_info = (None, None, mock.MagicMock())
-        record.exc_info[2].filename = "test.py"
-        record.exc_info[2].lineno = 30
 
         with mock.patch("traceback.extract_tb") as mock_extract_tb:
             mock_extract_tb.return_value = [

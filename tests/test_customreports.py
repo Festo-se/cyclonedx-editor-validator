@@ -181,7 +181,6 @@ class TestGitLabCQReporter(unittest.TestCase):
         handler = GitLabCQReporter(None, self.target)
         record = mock.MagicMock()
         record.msg = log.LogMessage("Test Message", "test", "module", 10)
-        record.msg.line_start = 20
         record.exc_info = (None, None, mock.MagicMock())
         record.exc_info[2].filename = "test.py"
         record.exc_info[2].lineno = 30

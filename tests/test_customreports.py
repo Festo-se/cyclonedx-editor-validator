@@ -150,20 +150,55 @@ class WarningsNgTestCase(unittest.TestCase):
 
 class TestGitLabCQReporter(unittest.TestCase):
     @classmethod
-    def setUpClass(cls) -> None:
-        formatter = log.LogMessageFormatter()
+    def setUpClass(cls):
         cls.file_path = Path("test.log")
         cls.target = mock.MagicMock()
-        cls.buffer = []
-        cls.logger = logging.getLogger(__name__)
-        cls.reporter = GitLabCQReporter(cls.file_path, cls.target, cls.buffer)
-        cls.reporter.setFormatter(formatter)
-        cls.logger.addHandler(cls.reporter)
+        cls.reporter = GitLabCQReporter(cls.file_path, cls.target)
 
-    def test_format_full(self):
-        record = log.LogMessage("Test Message", "test", "module", 10)
-        self.logger.error(record)
-        self.assertEqual(len(self.buffer), 1)
-        self.assertEqual(self.buffer[0]["description"], "test")
-        self.assertEqual(self.buffer[0]["location"]["path"], "test.log")
-        self.assertEqual(self.buffer[0]["location"]["lines"]["begin"], 10)
+    def test_emit(self):
+        record = mock.MagicMock()
+        record.exc_info = None
+        record.msg = log.LogMessage("Test Message", "test", "module", 10)
+        self.reporter.buffer = []
+        self.reporter.emit(record)
+        self.assertEqual(len(self.reporter.buffer), 1)
+        self.assertEqual(self.reporter.buffer[0]["description"], "test")
+        self.assertEqual(self.reporter.buffer[0]["location"]["path"], "test.log")
+        self.assertEqual(self.reporter.buffer[0]["location"]["lines"]["begin"], 10)
+
+    def test_type_error(self):
+        record = mock.MagicMock()
+        record.exc_info = None
+        record.msg = "String message"
+
+        with self.assertRaises(TypeError) as exc:
+            self.reporter.emit(record)
+        self.assertEqual(
+            "GitLabFormatter cannot process string messages", exc.exception.args[0]
+        )
+
+    def test_emit_with_frame(self):
+        handler = GitLabCQReporter(None, self.target)
+        record = mock.MagicMock()
+        record.msg = log.LogMessage("Test Message", "test", "module", 10)
+        record.msg.line_start = 20
+        record.exc_info = (None, None, mock.MagicMock())
+        record.exc_info[2].filename = "test.py"
+        record.exc_info[2].lineno = 30
+
+        with mock.patch("traceback.extract_tb") as mock_extract_tb:
+            mock_extract_tb.return_value = [
+                mock.MagicMock(filename="test.py", lineno=30)
+            ]
+            handler.emit(record)
+
+        self.assertEqual(len(handler.buffer), 1)
+        self.assertEqual(handler.buffer[0]["location"]["lines"]["begin"], 30)
+        self.assertEqual(handler.buffer[0]["location"]["path"], "test.py")
+
+    def test_close(self):
+        self.reporter.buffer = [{"issue": "1"}, {"issue": "2"}]
+        self.reporter.close()
+        self.assertEqual(self.target.write.call_count, 1)
+        expected_output = '[\n    {\n        "issue": "1"\n    },\n    {\n        "issue": "2"\n    }\n]'
+        self.assertEqual(self.target.write.call_args[0][0], expected_output)

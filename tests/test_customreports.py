@@ -197,5 +197,8 @@ class TestGitLabCQReporter(unittest.TestCase):
         self.reporter.buffer = [{"issue": "1"}, {"issue": "2"}]
         self.reporter.close()
         self.assertEqual(self.target.write.call_count, 1)
-        expected_output = '[\n    {\n        "issue": "1"\n    },\n    {\n        "issue": "2"\n    }\n]'
+        expected_output = (
+            '[\n    {\n        "issue": "1"\n    }'
+            + ',\n    {\n        "issue": "2"\n    }\n]'
+        )
         self.assertEqual(self.target.write.call_args[0][0], expected_output)

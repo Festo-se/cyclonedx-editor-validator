@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest import mock
 
 import cdxev.log as log
-from cdxev.validator.customreports import WarningsNgReporter, GitLabCQReporter
+from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
 
 
 # noinspection PyUnresolvedReferences

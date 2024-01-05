@@ -6,8 +6,8 @@ from pathlib import Path
 from jsonschema import Draft7Validator, FormatChecker, validators
 
 from cdxev.log import LogMessage
+from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
 from cdxev.validator.helper import open_schema, validate_filename
-from cdxev.validator.customreports import WarningsNgReporter, GitLabCQReporter
 
 logger = logging.getLogger(__name__)
 

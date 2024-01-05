@@ -1,9 +1,9 @@
+import hashlib
 import json
 import logging
 import pathlib
 import traceback
 import typing as t
-import hashlib
 
 from cdxev.log import LogMessage
 

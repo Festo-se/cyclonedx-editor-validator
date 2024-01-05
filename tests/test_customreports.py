@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest import mock
 
 import cdxev.log as log
-from cdxev.validator.warningsngreport import WarningsNgReporter
+from cdxev.validator.customreports import WarningsNgReporter, GitLabCQReporter
 
 
 # noinspection PyUnresolvedReferences
@@ -146,3 +146,31 @@ class WarningsNgTestCase(unittest.TestCase):
             self.logger.handlers[0].buffer["issues"][-1], expected_buffer
         )
         self.logger.handlers[0].file_path = Path(self.expected_file)
+
+
+class TestGitLabCQReporter(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        formatter = log.LogMessageFormatter()
+        cls.file_path = Path("test.log")
+        cls.target = mock.MagicMock()
+        cls.buffer = []
+        cls.logger = logging.getLogger(__name__)
+        cls.reporter = GitLabCQReporter(cls.file_path, cls.target, cls.buffer)
+        cls.reporter.setFormatter(formatter)
+        cls.logger.addHandler(cls.reporter)
+
+    def test_format_full(self):
+        record = log.LogMessage("Test Message", "test", "module", 10)
+        self.logger.error(record)
+        self.assertEqual(len(self.buffer), 1)
+        self.assertEqual(self.buffer[0]["description"], "test")
+        self.assertEqual(self.buffer[0]["location"]["path"], "test.log")
+        self.assertEqual(self.buffer[0]["location"]["lines"]["begin"], 10)
+
+    def test_wrong_format(self) -> None:
+        with self.assertRaises(TypeError) as exc:
+            self.logger.error("only string message")
+        self.assertEqual(
+            "GitLabFormatter cannot process string messages", exc.exception.args[0]
+        )

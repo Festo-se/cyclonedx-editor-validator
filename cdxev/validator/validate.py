@@ -7,7 +7,7 @@ from jsonschema import Draft7Validator, FormatChecker, validators
 
 from cdxev.log import LogMessage
 from cdxev.validator.helper import open_schema, validate_filename
-from cdxev.validator.warningsngreport import WarningsNgReporter
+from cdxev.validator.customreports import WarningsNgReporter, GitLabCQReporter
 
 logger = logging.getLogger(__name__)
 
@@ -148,6 +148,9 @@ def validate_sbom(
     if report_format == "warnings-ng":
         warnings_ng_handler = WarningsNgReporter(file, output)
         logger.addHandler(warnings_ng_handler)
+    elif report_format == "gitlab-code-quality":
+        gitlab_cq_handler = GitLabCQReporter(file, output)
+        logger.addHandler(gitlab_cq_handler)
     if len(sorted_errors) == 0:
         logger.info("SBOM is compliant to the provided specification schema")
         return 0

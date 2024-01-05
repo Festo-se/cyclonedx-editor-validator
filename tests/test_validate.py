@@ -99,6 +99,14 @@ class TestValidateInit(unittest.TestCase):
         self.assertTrue(
             search_for_word_issues("'version' is a required property", issues)
         )
+    
+    def test_gitlab_cq_format(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0].pop("version")
+        issues = validate_test(sbom, report_format="gitlab-code-quality")
+        self.assertTrue(
+            search_for_word_issues("'version' is a required property", issues)
+        )
 
 
 class TestValidateMetadata(unittest.TestCase):

@@ -495,3 +495,39 @@ class SetTestCase(unittest.TestCase):
         self.assertIn(
             "not found and could not be updated", cm.exception.details.description
         )
+
+    def test_set_ignore_missing(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "name": "depC_",
+                    "version": "3.2.1",
+                },
+                "set": {"name": "new name"},
+            },
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            True,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+            True,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            True,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        self.assertRaises(
+            cdxev.error.AppError,
+            cdxev.set.run,
+            self.sbom_fixture,
+            updates,
+            cfg,
+        )

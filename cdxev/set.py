@@ -18,6 +18,7 @@ class SetConfig:
     allow_protected: bool
     sbom_paths: t.Sequence[pathlib.Path]
     from_file: t.Optional[pathlib.Path]
+    ignore_missing: bool = False
 
 
 @dataclass
@@ -222,12 +223,19 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
         target_list: list[dict]
         try:
             target_list = ctx.component_map[update["id"][0]]
+            for target in target_list:
+                _do_update(target, update, ctx)
         except KeyError:
-            msg = LogMessage(
-                "Set not performed",
-                f'The component "{update["id"]}" was not found and could not be updated.',
-            )
-            raise AppError(log_msg=msg)
-
-        for target in target_list:
-            _do_update(target, update, ctx)
+            if not cfg.ignore_missing:
+                msg = LogMessage(
+                    "Set not performed",
+                    f'The component "{update["id"]}" was not found and could not be updated.',
+                )
+                raise AppError(log_msg=msg)
+            else:
+                logger.info(
+                    LogMessage(
+                        "Set not performed",
+                        f'The component "{update["id"]}" was not found and could not be updated.',
+                    )
+                )

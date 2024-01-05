@@ -271,7 +271,7 @@ def create_validation_parser(
             "Write log output in a specified format. "
             "If it's not specified, output is written to stdout."
         ),
-        choices=["stdout", "warnings-ng"],
+        choices=["stdout", "warnings-ng", "gitlab-code-quality"],
         default="stdout",
     )
     parser.add_argument(

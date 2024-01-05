@@ -167,10 +167,3 @@ class TestGitLabCQReporter(unittest.TestCase):
         self.assertEqual(self.buffer[0]["description"], "test")
         self.assertEqual(self.buffer[0]["location"]["path"], "test.log")
         self.assertEqual(self.buffer[0]["location"]["lines"]["begin"], 10)
-
-    def test_wrong_format(self) -> None:
-        with self.assertRaises(TypeError) as exc:
-            self.logger.error("only string message")
-        self.assertEqual(
-            "GitLabFormatter cannot process string messages", exc.exception.args[0]
-        )

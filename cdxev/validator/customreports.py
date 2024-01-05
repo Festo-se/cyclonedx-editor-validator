@@ -149,7 +149,9 @@ class GitLabCQReporter(logging.Handler):
         issue: dict[str, t.Union[str, int, dict]] = {
             "description": record.msg.description,
             "check_name": "CycloneDX Editor Validator",
-            "fingerprint": hashlib.md5("unknown".encode()).hexdigest(),
+            "fingerprint": hashlib.md5(
+                "unknown".encode(), usedforsecurity=False
+            ).hexdigest(),
             "severity": "blocker",
             "location": {
                 "path": file_name,

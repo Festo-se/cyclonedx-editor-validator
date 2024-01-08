@@ -4,14 +4,28 @@
   "type": "object",
   "title": "CycloneDX Software Bill of Materials Standard",
   "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
-  "required": [
-    "bomFormat",
-    "specVersion",
-    "version",
-    "metadata",
-    "dependencies",
-    "compositions"
-  ],
+  "if": {
+    "required": ["components"]
+  },
+  "then": {
+    "required": [
+      "bomFormat",
+      "specVersion",
+      "version",
+      "metadata",
+      "compositions",
+      "dependencies"
+    ]
+  },
+  "else": {
+    "required": [
+      "bomFormat",
+      "specVersion",
+      "version",
+      "metadata",
+      "compositions"
+    ]
+  },
   "additionalProperties": false,
   "properties": {
     "$schema": {

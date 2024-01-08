@@ -744,6 +744,7 @@
         "content": {
           "type": "string",
           "title": "Attachment Text",
+          "minLength": 1,
           "description": "The attachment data. Proactive controls such as input validation and sanitization should be employed to prevent misuse of attachment text."
         }
       }

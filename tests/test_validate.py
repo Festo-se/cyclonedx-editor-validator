@@ -705,6 +705,24 @@ class TestValidateUseSchema15(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("additional", issues), True)
 
+    def test_license_text_with_empty_content(self) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0]["licenses"] = [
+                {
+                    "license": {
+                        "id": "GPL-2.0-only",
+                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
+                        "text": {"content": ""},
+                    },
+                }
+            ]
+            issues = validate_test(sbom)
+            self.assertEqual(
+                search_for_word_issues("'content' must not be empty", issues), True
+            )
+
     def test_no_components_no_dependencies(
         self,
     ) -> None:

@@ -681,6 +681,7 @@
         "content": {
           "type": "string",
           "title": "Attachment Text",
+          "minLength": 1,
           "description": "The attachment data"
         }
       },

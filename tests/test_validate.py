@@ -705,6 +705,17 @@ class TestValidateUseSchema15(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("additional", issues), True)
 
+    def test_no_components_no_dependencies(
+        self,
+    ) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom.pop("components")
+            sbom.pop("dependencies")
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
 
 class TestValidateUseSchemaType(unittest.TestCase):
     @unittest.skipUnless("CI" in os.environ, "running only in CI")

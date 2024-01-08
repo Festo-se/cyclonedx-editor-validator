@@ -47,6 +47,11 @@ def open_schema(
         return sbom_schema, used_schema_path
 
 
+def load_spdx_schema() -> dict:
+    with open(path_to_spd_schema, "r") as f:
+        return json.load(f)
+
+
 def validate_filename(sbom: dict, file: Path, filename_regex: str) -> bool:
     if filename_regex:
         valid_filename = re.search(filename_regex, file.name)
@@ -134,8 +139,3 @@ def get_external_schema(schema_path: Path) -> tuple[dict, Path]:
             "Could not load schema",
             ("Path to the provided schema does not exist"),
         )
-
-
-def load_spdx_schema() -> dict:
-    with open(path_to_spd_schema, "r") as f:
-        return json.load(f)

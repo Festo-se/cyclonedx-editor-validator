@@ -9,7 +9,7 @@ from referencing.jsonschema import DRAFT202012
 
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
-from cdxev.validator.helper import open_schema, validate_filename
+from cdxev.validator.helper import load_spdx_schema, open_schema, validate_filename
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,3 @@
-import hashlib
 import json
 import logging
 import pathlib
@@ -80,86 +79,6 @@ class WarningsNgReporter(logging.Handler):
 
         if path_name is not None:
             issue["pathName"] = path_name
-
-        return issue
-
-    def close(self) -> None:
-        """
-        Close the handler and write the buffer to the target.
-        """
-        s = json.dumps(self.buffer, indent=4)
-        try:
-            if isinstance(self.target, pathlib.Path):
-                self.target.write_text(s)
-            else:
-                self.target.write(s)
-        finally:
-            super().close()
-
-
-class GitLabCQReporter(logging.Handler):
-    """
-    Reporter which writes in a JSON format for GitLab Code Quality Report.
-    See https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool
-    """
-
-    # noinspection PyDefaultArgument
-    def __init__(
-        self,
-        file_path: pathlib.Path,
-        target: t.Union[t.TextIO, pathlib.Path],
-        buffer: list = [],
-    ):
-        """
-        Creates a new handler with the given target.
-
-        :param target: The target can be either a path to a file or a text stream object.
-        """
-        super().__init__(logging.ERROR)
-        self.buffer = buffer
-        self.target = target
-        self.file_path = file_path
-
-    def emit(self, record: logging.LogRecord) -> None:
-        issue = self.format_record(record)
-        self.buffer.append(issue)
-
-    def format_record(
-        self, record: logging.LogRecord
-    ) -> dict[str, t.Union[str, int, dict]]:
-        if not isinstance(record.msg, LogMessage):
-            raise TypeError("GitLabFormatter cannot process string messages")
-
-        frame = None
-        if record.exc_info is not None:
-            tb = traceback.extract_tb(record.exc_info[2])
-            frame = tb.pop()
-
-        if self.file_path is not None:
-            file_name = self.file_path.name
-            line_start = record.msg.line_start
-        elif frame is not None:
-            file_path = pathlib.Path(frame.filename)
-            file_name = file_path.name
-            line_start = frame.lineno
-        else:
-            file_name = None
-            line_start = record.msg.line_start
-
-        issue: dict[str, t.Union[str, int, dict]] = {
-            "description": record.msg.description,
-            "check_name": "CycloneDX Editor Validator",
-            "fingerprint": hashlib.md5(
-                "unknown".encode(), usedforsecurity=False
-            ).hexdigest(),
-            "severity": "blocker",
-            "location": {
-                "path": file_name,
-                "lines": {
-                    "begin": line_start if line_start is not None else 0,
-                },
-            },
-        }
 
         return issue
 

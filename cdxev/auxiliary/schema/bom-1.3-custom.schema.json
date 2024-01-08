@@ -584,20 +584,8 @@
         },
         {
           "if": {
-            "anyOf": [
-              {
-                "properties": { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-                "required": ["publisher"]
-              },
-              {
-                "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-                "required": ["supplier"]
-              },
-              {
-                "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-                "required": ["author"]
-              }
-            ]
+            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["copyright"]
           },
           "then": {
             "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
@@ -610,55 +598,8 @@
             "required": ["group"]
           },
           "then": {
-            "if": {
-              "required": ["supplier"]
-            },
-            "then": {
-              "if": {
-                "not": {
-                  "anyOf":[
-                    {  
-                      "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-                      "required": ["author"]
-                    },
-                    {
-                      "properties":   { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-                      "required": ["publisher"]
-                    }
-                  ]
-                }
-              },
-              "then": {
-                "properties": { "supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}}},
-                "required": ["supplier"]
-              }
-            },
-            "else": {
-              "if": {
-                "required": ["publisher"]
-              },
-              "then": {
-                "if": {
-                  "not": {
-                    "properties":   { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-                    "required": ["author"]
-                  }
-                },
-                "then": {
-                  "properties": { "publisher": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-                  "required": ["publisher"]
-                }
-              },
-              "else": {
-                "if": {
-                  "required": ["author"]
-                },
-                "then": {
-                  "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-                  "required": ["author"]
-                }
-              }
-            }
+            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["copyright"]
           }
         }
       ],

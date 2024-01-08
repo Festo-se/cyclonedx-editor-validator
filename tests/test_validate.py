@@ -704,7 +704,7 @@ class TestValidateUseSchema15(unittest.TestCase):
             ]
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("additional", issues), True)
-            
+
     def test_empty_content(self) -> None:
         for spec_version in list_of_specVersions:
             sbom = get_test_sbom()

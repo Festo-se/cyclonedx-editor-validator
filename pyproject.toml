@@ -26,13 +26,13 @@ python-dateutil = "2.8.2"
 jsonschema = {version = "4.17.3", extras = ["format"]}
 
 [tool.poetry.group.dev.dependencies]
-flake8 = "6.1.0"
+flake8 = "7.0.0"
 black = "23.12.1"
 pep8-naming = "0.13.3"
 mypy = "1.8.0"
-types-python-dateutil = "2.8.19.14"
-types-jsonschema = "4.20.0.0"
-pytest = "7.4.3"
+types-python-dateutil = "2.8.19.20240106"
+types-jsonschema = "4.20.0.20240105"
+pytest = "7.4.4"
 coverage = "7.3.4"
 toml = "0.10.2"
 typing-extensions = "4.9.0"

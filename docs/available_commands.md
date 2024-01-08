@@ -206,10 +206,11 @@ Otherwise, this may lead to undesired results as your input is not sanitized.
 
 Per default the command only writes to stdout. However, for supporting integration into CI/CD, other formats shall be supported, too. This can be controlled via the flag `--report-format`.
 
-Currently, only another format is supported: The [warnings-ng-plugin](https://github.com/jenkinsci/warnings-ng-plugin). It can be used as followed:
+Currently, two formats are supported: The [warnings-ng-plugin](https://github.com/jenkinsci/warnings-ng-plugin) and [GitLab Code Quality Report](https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool). They can be used as followed:
 
     cdx-ev validate bom.json --report-format=warnings-ng" # writes issues to a file "issues.json" and stdout
     cdx-ev validate bom.json --report-format=warnings-ng --output=myfile.json" # write issues to a file "myfile.json" and stdout
+    cdx-ev validate bom.json --report-format=gitlab-code-quality # writes issues to a file "issues.json" and stdout
 
 ## build-public
 

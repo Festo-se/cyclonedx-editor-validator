@@ -210,7 +210,7 @@ Currently, two formats are supported: The [warnings-ng-plugin](https://github.co
 
     cdx-ev validate bom.json --report-format=warnings-ng" # writes issues to a file "issues.json" and stdout
     cdx-ev validate bom.json --report-format=warnings-ng --output=myfile.json" # write issues to a file "myfile.json" and stdout
-    cdx-ev validate bom.json --report-format=gitlab-code-quality
+    cdx-ev validate bom.json --report-format=gitlab-code-quality # writes issues to a file "issues.json" and stdout
 
 ## build-public
 

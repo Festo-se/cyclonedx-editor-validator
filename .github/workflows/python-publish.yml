@@ -36,7 +36,7 @@ jobs:
           poetry version ${{ github.ref_name }}
       - name: Deploy pages
         run: |
-          python -m pip install mkdocs
+          python -m pip install mkdocs mdx_truly_sane_lists
           mkdocs gh-deploy --strict --force
       - name: Publish package
         run: poetry publish --build

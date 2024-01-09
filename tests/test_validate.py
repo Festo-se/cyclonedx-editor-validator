@@ -301,10 +301,7 @@ class TestValidateComponents(unittest.TestCase):
             sbom["specVersion"] = spec_version
             sbom["components"][0].pop("supplier")
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("supplier", issues),
-                True
-            )
+            self.assertEqual(search_for_word_issues("supplier", issues), True)
 
     def test_components_component_license_and_copyright_missing(self) -> None:
         for spec_version in list_of_spec_versions:

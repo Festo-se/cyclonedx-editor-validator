@@ -196,6 +196,18 @@ class TestValidateMetadata(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("copyright", issues), True)
 
+    def test_metadata_component_with_license(self) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["metadata"]["component"].pop("copyright")
+            sbom["metadata"]["component"]["supplier"] = {"name": "Acme"}
+            sbom["metadata"]["component"]["licenses"] = [
+                {"license": {"id": "Apache-1.0"}}
+            ]
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
     def test_metadata_component_author_festo_copyright_not_festo(self) -> None:
         for spec_version in list_of_specVersions:
             sbom = get_test_sbom()
@@ -203,9 +215,9 @@ class TestValidateMetadata(unittest.TestCase):
             sbom["metadata"]["component"].pop("supplier")
             sbom["metadata"]["component"]["author"] = "festo"
             sbom["metadata"]["component"]["copyright"] = "something"
-            sbom["metadata"]["component"]["licenses"] = (
-                [{"license": {"id": "Apache-1.0"}}],
-            )
+            sbom["metadata"]["component"]["licenses"] = [
+                {"license": {"id": "Apache-1.0"}}
+            ]
             issues = validate_test(sbom)
             self.assertEqual(
                 search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
@@ -282,17 +294,16 @@ class TestValidateComponents(unittest.TestCase):
                     issues = validate_test(sbom)
                     self.assertEqual(search_for_word_issues(fields, issues), True)
 
-    def test_components_component_supplier_etc(self) -> None:
+
+    def test_components_component_supplier_missing(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0].pop("supplier")
             issues = validate_test(sbom)
             self.assertEqual(
-                search_for_word_issues("supplier", issues)
-                or search_for_word_issues("authors", issues)
-                or search_for_word_issues("publisher", issues),
-                True,
+                search_for_word_issues("supplier", issues),
+                True
             )
 
     def test_components_component_license_and_copyright_missing(self) -> None:

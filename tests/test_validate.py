@@ -179,7 +179,6 @@ class TestValidateMetadata(unittest.TestCase):
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("supplier")
-            sbom["metadata"]["component"]["publisher"] = "automated"
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("supplier", issues), True)
 

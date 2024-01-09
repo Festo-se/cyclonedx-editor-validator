@@ -553,13 +553,13 @@
             "required": ["copyright"]
           },
           "then": {
-            "properties": { "supplier": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
             "required": ["supplier"]
           }
         },
         {
           "if": {
-            "properties": { "supplier": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
             "required": ["supplier"]
           },
           "then": {

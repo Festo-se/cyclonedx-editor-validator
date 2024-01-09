@@ -268,7 +268,7 @@ def create_validation_parser(
             "Write log output in a specified format. "
             "If it's not specified, output is written to stdout."
         ),
-        choices=["stdout", "warnings-ng"],
+        choices=["stdout", "warnings-ng", "gitlab-code-quality"],
         default="stdout",
     )
     parser.add_argument(
@@ -374,6 +374,11 @@ def create_set_parser(
         help="Allow writing protected fields, e.g., identifiers.",
         action="store_true",
     )
+    parser.add_argument(
+        "--ignore-missing",
+        help="Suppress warnings that a component is not present when using '--from-file' ",
+        action="store_true",
+    )
 
     identifiers = parser.add_argument_group(
         "target",
@@ -472,12 +477,9 @@ def invoke_merge(args: argparse.Namespace) -> int:
         path_to_folder = args.from_folder
         name_governing_sbom = os.path.basename(os.path.normpath(args.input[0]))
         list_folder_content = os.listdir(path_to_folder)
-        list_folder_content_lower = [x.lower() for x in list_folder_content]
         # use python sorted function to sort the names of the files, the
-        # names are compared using .lower() to adhere to alphabetical order
-        list_folder_content_sorted = [
-            x for _, x in sorted(zip(list_folder_content, list_folder_content_lower))
-        ]
+        # names are compared in lowercase to adhere to alphabetical order
+        list_folder_content_sorted = sorted(list_folder_content, key=str.lower)
 
         for file_name in list_folder_content_sorted:
             if (
@@ -575,7 +577,11 @@ def invoke_set(args: argparse.Namespace) -> int:
 
     sbom, _ = read_sbom(args.input)
     cfg = cdxev.set.SetConfig(
-        args.force, args.allow_protected, [args.input], args.from_file
+        args.force,
+        args.allow_protected,
+        [args.input],
+        args.from_file,
+        args.ignore_missing,
     )
     cdxev.set.run(sbom, updates, cfg)
     write_sbom(sbom, args.output)

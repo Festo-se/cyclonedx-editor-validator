@@ -2,7 +2,7 @@ site_name: CycloneDX Editor Validator Tool
 site_url: https://festo-se.github.io/cyclonedx-editor-validator/
 repo_url: https://github.com/Festo-se/cyclonedx-editor-validator/
 edit_uri: blob/main/docs/
-copyright: Copyright 2023, Copyright (c) Festo SE & Co. KG
+copyright: Copyright 2024, Copyright (c) Festo SE & Co. KG
 
 theme:
     name: readthedocs

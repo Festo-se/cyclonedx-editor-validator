@@ -977,7 +977,7 @@ class TestValidateUseSchemaType(unittest.TestCase):
 
 
 class TestInternalNameSchema(unittest.TestCase):
-    def test_components_no_copyright(self) -> None:
+    def test_components_supplier_festo_no_copyright(self) -> None:
         for spec_version in list_of_specVersions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -996,7 +996,7 @@ class TestInternalNameSchema(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("copyright", issues), True)
 
-    def test_components_supplier_tagged_intern_no_internal_copyright(self) -> None:
+    def test_components_supplier_festo_copyright_not(self) -> None:
         for spec_version in list_of_specVersions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -1018,7 +1018,7 @@ class TestInternalNameSchema(unittest.TestCase):
                 search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
             )
 
-    def test_copyright_internal_supplier_not_tagged_intern(
+    def test_copyright_festo_supplier_not(
         self,
     ) -> None:
         for spec_version in list_of_specVersions:
@@ -1255,7 +1255,7 @@ class TestInternalMetaData(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
 
-    def test_internal_component_metadata_copyright_festo(self) -> None:
+    def test_internal_component_metadata_copyright_festo_no_supplier(self) -> None:
         sbom = {
             "bomFormat": "CycloneDX",
             "specVersion": "1.3",

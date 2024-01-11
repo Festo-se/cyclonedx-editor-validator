@@ -131,18 +131,12 @@ class InferSupplier(Operation):
     def handle_component(
         self, component: dict, path_to_license_folder: str = ""
     ) -> None:
-        if (
-            ("supplier" in component)
-        ):
+        if "supplier" in component:
             return
-        if (
-            ("publisher" in component)
-        ):
+        if "publisher" in component:
             component["supplier"] = component["publisher"]
             return
-        if (
-            ("author" in component)
-        ):
+        if "author" in component:
             component["supplier"] = component["author"]
             return
 

@@ -133,9 +133,17 @@ class InferSupplier(Operation):
     ) -> None:
         if (
             ("supplier" in component)
-            or ("publisher" in component)
-            or ("author" in component)
         ):
+            return
+        if (
+            ("publisher" in component)
+        ):
+            component["supplier"] = component["publisher"]
+            return
+        if (
+            ("author" in component)
+        ):
+            component["supplier"] = component["author"]
             return
 
         if "externalReferences" in component:

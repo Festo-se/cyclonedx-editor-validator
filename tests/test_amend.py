@@ -58,8 +58,7 @@ class CommandIntegrationTestCase(AmendTestCase):
     def test_suppliers(self) -> None:
         run_amend(self.sbom_fixture)
         components = self.sbom_fixture["components"]
-
-        self.assertNotIn("supplier", components[0])
+        self.assertIn("supplier", components[0])
         self.assertDictEqual(
             {
                 "name": "Some Vendor Inc.",
@@ -150,6 +149,7 @@ class InferSupplierTestCase(AmendTestCase):
     def test_author_already_present(self) -> None:
         component = {"author": "x"}
         expected = copy.deepcopy(component)
+        expected["supplier"] = "x"
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
@@ -162,6 +162,7 @@ class InferSupplierTestCase(AmendTestCase):
     def test_publisher_already_present(self) -> None:
         component = {"author": "x", "publisher": "y"}
         expected = copy.deepcopy(component)
+        expected["supplier"] = "y"
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 

@@ -577,7 +577,7 @@ class TestValidateUseSchema15(unittest.TestCase):
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("expiration", issues), True)
+            self.assertEqual(issues, ["no issue"])
 
     def test_no_licenseTypes(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:

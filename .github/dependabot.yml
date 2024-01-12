@@ -3,6 +3,6 @@ updates:
   - package-ecosystem: "pip" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "daily"
     open-pull-requests-limit: 10
-    target-branch: main
+    target-branch: bugfix

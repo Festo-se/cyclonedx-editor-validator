@@ -43,15 +43,19 @@ Footnotes:
 
 The following things are to consider before submitting a pull request.
 
-1. All [tests](https://github.com/Festo-se/cyclonedx-editor-validator/tree/main/tests) should be passing.
+1. Base your PR against `dev` or `bugfix` branch (depending on your target branch).
 
-2. If you provide a new feature also include tests for it.
+2. All [tests](https://github.com/Festo-se/cyclonedx-editor-validator/tree/main/tests) should be passing.
 
-3. Please ensure that types are correct according to [__mypy__][mypy].
+3. If you provide a new feature also include tests for it.
 
-4. All submitted code should conform to [__PEP8__][pep8] and [__Black__][black].
+4. Please ensure that types are correct according to [__mypy__][mypy].
 
-5. The code should be python 3.9 compliant.
+5. All submitted code should conform to [__PEP8__][pep8] and [__Black__][black].
+
+6. The code should be python 3.9 compliant.
+
+7. Submit your PR to the `dev` or `bugfix` branch.
 
 [black]: https://black.readthedocs.io/en/stable/index.html
 [pep8]: https://www.python.org/dev/peps/pep-0008/

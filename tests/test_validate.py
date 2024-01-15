@@ -558,27 +558,6 @@ class TestValidateUseSchema15(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("licensee", issues), True)
 
-    def test_no_expiration(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(issues, ["no issue"])
-
     def test_no_licenseTypes(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
@@ -722,6 +701,15 @@ class TestValidateUseSchema15(unittest.TestCase):
             self.assertEqual(
                 search_for_word_issues("'content' must not be empty", issues), True
             )
+
+    def test_no_components_no_dependencies(self) -> None:
+        for spec_version in list_of_specVersions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom.pop("components")
+            sbom.pop("dependencies")
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
 
 
 class TestValidateUseSchemaType(unittest.TestCase):

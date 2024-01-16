@@ -20,8 +20,9 @@ Feel free to assign issues to yourself and make changes to our tool. Please cons
 
 - For compatibility reasons, the code should be compliant to python 3.9 or higher.
 - Make sure to use the latest code by performing a `git pull`.
-- For a major change it is recommended that you get in touch with us by [creating an issue](#create-issues) to discuss changes prior to dedicating time and resources.  This process allows us to better coordinate our efforts and prevent duplication of work.
+- For a major change it is recommended that you get in touch with us by [creating an issue](#create-issues) to discuss changes prior to dedicating time and resources. This process allows us to better coordinate our efforts and prevent duplication of work.
 - Otherwise, feel free to directly [submit a pull request](#submitting-pull-requests).
+- Please also take our [branching strategy](./git/branching-strategy.md) into consideration.
 
 ### Write new commands, options or arguments
 

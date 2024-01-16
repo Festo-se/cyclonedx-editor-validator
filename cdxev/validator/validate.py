@@ -1,24 +1,16 @@
 import logging
 import re
-from importlib import resources
 from pathlib import Path
 
-from jsonschema import Draft7Validator, FormatChecker, validators
+from jsonschema import Draft7Validator, FormatChecker
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT202012
 
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
-from cdxev.validator.helper import open_schema, validate_filename
+from cdxev.validator.helper import load_spdx_schema, open_schema, validate_filename
 
 logger = logging.getLogger(__name__)
-
-schema_path = resources.files("cdxev.auxiliary") / "schema"
-with resources.as_file(schema_path) as path:
-    # noinspection PyTypeChecker
-    resolver = validators.RefResolver(
-        base_uri=f"{path.as_uri()}/",
-        # according to documentation referrer has to be True, therefore ignore error from mypy
-        referrer=True,  # type: ignore
-    )
 
 
 def validate_sbom(
@@ -42,14 +34,21 @@ def validate_sbom(
                 "SBOM has the mistake: file name is not according to the given regex"
             )
             errors.append(message)
-        resolver = validators.RefResolver(
-            base_uri=f"{used_schema_path.as_uri()}/",
-            # according to documentation referrer has to be True, therefore ignore error from mypy
-            referrer=True,  # type: ignore
-        )
+        schema = Resource(
+            sbom_schema, specification=DRAFT202012
+        )  # type: ignore[call-arg, var-annotated]
+        schema_spdx = Resource(
+            load_spdx_schema(), specification=DRAFT202012
+        )  # type: ignore[call-arg, var-annotated]
+        registry = Registry().with_resources(
+            [
+                (f"{used_schema_path.as_uri()}/", schema),
+                ("spdx.schema.json", schema_spdx),
+            ]
+        )  # type: ignore[var-annotated]
         v = Draft7Validator(
-            schema=sbom_schema, resolver=resolver, format_checker=FormatChecker()
-        )
+            schema=sbom_schema, registry=registry, format_checker=FormatChecker()
+        )  # type: ignore[call-arg]
         for error in sorted(v.iter_errors(sbom), key=str):
             try:
                 if len(error.absolute_path) > 3:

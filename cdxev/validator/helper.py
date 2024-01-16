@@ -6,8 +6,6 @@ from pathlib import Path
 
 from cdxev.error import AppError
 
-path_to_spd_schema = "cdxev/auxiliary/schema/spdx.schema.json"
-
 
 def open_schema(
     sbom: dict, file: Path, schema_type: str, schema_path: str
@@ -48,7 +46,7 @@ def open_schema(
 
 
 def load_spdx_schema() -> dict:
-    with open(path_to_spd_schema, "r") as f:
+    with open("cdxev/auxiliary/schema/spdx.schema.json", "r") as f:
         return json.load(f)
 
 

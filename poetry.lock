@@ -912,13 +912,13 @@ files = [
 
 [[package]]
 name = "types-jsonschema"
-version = "4.20.0.20240105"
+version = "4.21.0.20240118"
 description = "Typing stubs for jsonschema"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-jsonschema-4.20.0.20240105.tar.gz", hash = "sha256:4a71af7e904498e7ad055149f6dc1eee04153b59a99ad7dd17aa3769c9bc5982"},
-    {file = "types_jsonschema-4.20.0.20240105-py3-none-any.whl", hash = "sha256:26706cd70a273e59e718074c4e756608a25ba61327a7f9a4493ebd11941e5ad4"},
+    {file = "types-jsonschema-4.21.0.20240118.tar.gz", hash = "sha256:31aae1b5adc0176c1155c2d4f58348b22d92ae64315e9cc83bd6902168839232"},
+    {file = "types_jsonschema-4.21.0.20240118-py3-none-any.whl", hash = "sha256:77a4ac36b0be4f24274d5b9bf0b66208ee771c05f80e34c4641de7d63e8a872d"},
 ]
 
 [package.dependencies]
@@ -978,4 +978,4 @@ tests = ["pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9.0"
-content-hash = "ad9e3eb2c5d4a446b520e13cc83ef4903d58d3b02527db528fe503ac88e6e49c"
+content-hash = "0b2e88afa4e5b6563c9fcbeac8c395740cabd7b0af4d6d1e67fe3bc9be607390"

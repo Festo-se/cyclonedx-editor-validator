@@ -137,7 +137,7 @@ def validate_sbom(
                         error_path
                         + "'"
                         + error.absolute_path[-1]
-                        + "' must not be empty"
+                        + "' should be non-empty"
                     )
                 elif error.validator == "pattern":
                     errors.append(error_path + error.message.replace("\\", ""))

@@ -86,7 +86,7 @@ def generate_validation_pattern(sbom: dict) -> str:
     ]
     hashes_regex = "(" + "|".join(hashes) + ")"
 
-    if not hashes_regex:
+    if not hashes:
         regex += timestamp_regex
     else:
         regex += f"({hashes_regex}|{hashes_regex}_{timestamp_regex}|{timestamp_regex})"

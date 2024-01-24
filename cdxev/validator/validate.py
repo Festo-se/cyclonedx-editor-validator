@@ -6,10 +6,10 @@ from jsonschema import Draft7Validator, FormatChecker
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 
+from cdxev.auxiliary.filename_gen import generate_validation_pattern
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
 from cdxev.validator.helper import load_spdx_schema, open_schema
-from cdxev.auxiliary.filename_gen import generate_validation_pattern
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,9 @@
-import unittest
-import re
 import datetime as dt
+import re
+import unittest
+from unittest.mock import patch
 
 import cdxev.auxiliary.filename_gen as fn
-from unittest.mock import patch
 
 
 class FilenameGeneratorTestCase(unittest.TestCase):

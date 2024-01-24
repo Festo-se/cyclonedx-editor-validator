@@ -1,10 +1,9 @@
-import typing as t
-from datetime import datetime, timezone
 import logging
 import re
+import typing as t
+from datetime import datetime, timezone
 
 from dateutil.parser import isoparse
-
 
 logger = logging.getLogger(__name__)
 

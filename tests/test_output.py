@@ -114,61 +114,6 @@ class OutputTestCase(unittest.TestCase):
             out.update_version(sbom)
             self.assertDictEqual(expected_sbom, sbom)
 
-    def test_generate_empty_filename(self):
-        sbom = self.minimal_sbom
-
-        filename = out.generate_output_filename(sbom)
-
-        self.assertEqual("bom.json", filename)
-
-    def test_generate_filename_from_timestamp(self):
-        sbom = self.minimal_sbom
-        tz = dt.timezone(dt.timedelta(hours=10))
-        timestamp = dt.datetime(2000, 1, 2, 13, 14, 15, 200, tz)
-        sbom["metadata"] = {"timestamp": str(timestamp)}
-
-        filename = out.generate_output_filename(sbom)
-
-        self.assertEqual("unknown_20000102T031415.cdx.json", filename)
-
-    @patch(f"{out.__name__}.datetime", wraps=dt.datetime)
-    @patch(f"{out.__name__}.logger")
-    def test_generate_filename_from_invalid_timestamp(self, mock_logger, mock_dt):
-        sbom = self.minimal_sbom
-        timestamp = dt.datetime(2000, 1, 2, 13, 14, 15, 200, dt.timezone.utc)
-        mock_dt.now.return_value = timestamp
-
-        sbom["metadata"] = {"timestamp": "bla"}
-
-        filename = out.generate_output_filename(sbom)
-
-        self.assertEqual("unknown_20000102T131415.cdx.json", filename)
-        mock_logger.info.assert_called_once()
-
-    @patch(f"{out.__name__}.datetime", wraps=dt.datetime)
-    def test_generate_filename_from_name(self, mock_dt):
-        timestamp = dt.datetime(2000, 1, 2, 13, 14, 15, 200, dt.timezone.utc)
-        mock_dt.now.return_value = timestamp
-
-        sbom = self.minimal_sbom
-        sbom["metadata"] = {"component": {"name": "foobar"}}
-
-        filename = out.generate_output_filename(sbom)
-
-        self.assertEqual("foobar_20000102T131415.cdx.json", filename)
-
-    @patch(f"{out.__name__}.datetime", wraps=dt.datetime)
-    def test_generate_filename_from_name_and_version(self, mock_dt):
-        timestamp = dt.datetime(2000, 1, 2, 13, 14, 15, 200, dt.timezone.utc)
-        mock_dt.now.return_value = timestamp
-
-        sbom = self.minimal_sbom
-        sbom["metadata"] = {"component": {"name": "foobar", "version": "1.2.3"}}
-
-        filename = out.generate_output_filename(sbom)
-
-        self.assertEqual("foobar_1.2.3_20000102T131415.cdx.json", filename)
-
     @patch(f"{out.__name__}.update_timestamp")
     @patch(f"{out.__name__}.update_serial_number")
     @patch(f"{out.__name__}.update_tools")

@@ -84,12 +84,12 @@ def generate_validation_pattern(sbom: dict) -> str:
         hash["content"]
         for hash in sbom.get("metadata", {}).get("component", {}).get("hashes", [])
     ]
-    hashes = "(" + "|".join(hashes) + ")"
+    hashes_regex = "(" + "|".join(hashes) + ")"
 
-    if not hashes:
+    if not hashes_regex:
         regex += timestamp_regex
     else:
-        regex += f"({hashes}|{hashes}_{timestamp_regex}|{timestamp_regex})"
+        regex += f"({hashes_regex}|{hashes_regex}_{timestamp_regex}|{timestamp_regex})"
 
     regex += "\\.cdx\\.json"
 

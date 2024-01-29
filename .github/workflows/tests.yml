@@ -21,10 +21,8 @@ jobs:
           cache: 'poetry'
       - name: Install dependencies from poetry
         run: poetry install --no-root
-      - name: Install and run black
-        run: |
-          python -m pip install black
-          python -m black cdxev tests --check
+      - name: Run black
+        run: poetry run black cdxev tests --check
       - name: Run isort
         run: poetry run isort cdxev/ tests/ --check-only --profile black
       - name: Install and run flake8

@@ -92,6 +92,14 @@ class FilenameGeneratorTestCase(unittest.TestCase):
         pattern = fn.generate_validation_pattern(self.sbom)
         self.assertIsNotNone(re.fullmatch(pattern, filename))
 
+    def test_name_with_path_separator(self):
+        self.sbom["metadata"]["component"]["name"] = "Te\\st"
+        filename = fn.generate_filename(self.sbom)
+        self.assertEqual("Test_1.0_20000101T123045.cdx.json", filename)
+
+        pattern = fn.generate_validation_pattern(self.sbom)
+        self.assertIsNotNone(re.fullmatch(pattern, filename))
+
     def test_version_with_underscore(self):
         self.sbom["metadata"]["component"]["version"] = "1.0_build1"
         filename = fn.generate_filename(self.sbom)

@@ -1,6 +1,7 @@
 import logging
 import re
 import typing as t
+import unicodedata
 from datetime import datetime, timezone
 
 from dateutil.parser import isoparse
@@ -19,8 +20,10 @@ def generate_filename(sbom: dict) -> str:
 
     :return: The filename.
     """
-    name = sbom.get("metadata", {}).get("component", {}).get("name")
-    version = sbom.get("metadata", {}).get("component", {}).get("version")
+    name = sbom.get("metadata", {}).get("component", {}).get("name", "")
+    name = _sanitize(name)
+    version = sbom.get("metadata", {}).get("component", {}).get("version", "")
+    version = _sanitize(version)
     timestamp_str: t.Union[str, None] = sbom.get("metadata", {}).get("timestamp")
 
     if not name and not version and not timestamp_str:
@@ -65,9 +68,11 @@ def generate_validation_pattern(sbom: dict) -> str:
     regex = "bom\\.json|"
 
     name = sbom.get("metadata", {}).get("component", {}).get("name", "unknown")
+    name = _sanitize(name)
     regex += re.escape(name) + "_"
 
-    version = sbom.get("metadata", {}).get("component", {}).get("version")
+    version = sbom.get("metadata", {}).get("component", {}).get("version", "")
+    version = _sanitize(version)
     if version:
         regex += re.escape(version) + "_"
 
@@ -108,3 +113,22 @@ def _timestamp_to_utc_str(timestamp: datetime) -> str:
     """
     timestamp = timestamp.astimezone(timezone.utc)
     return timestamp.strftime("%Y%m%dT%H%M%S")
+
+
+def _sanitize(s: str) -> str:
+    """
+    Converts a string to a representation safe for filenames.
+
+    The following transformations are done:
+    * Normalize Unicode
+    * Filter out any characters which aren't alphanumeric, spaces, dashes, periods or underscores.
+    * Strip any leading or trailing non-alphanumeric characters.
+
+    :param str value: The original string.
+
+    :return: A representation safe for use as a filename.
+    """
+    s = unicodedata.normalize("NFKC", s)
+    s = "".join(c for c in s if (c.isalnum() or c in r" .-_"))
+    s.strip(r" .-_")
+    return s

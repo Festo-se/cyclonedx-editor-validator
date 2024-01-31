@@ -132,7 +132,7 @@ def validate_sbom(
                         errors.append(
                             "SBOM has the mistake: Could not find reference for dependencies"
                         )
-                elif "too short" in error.message:
+                elif "non-empty" in error.message:
                     errors.append(
                         error_path
                         + "'"

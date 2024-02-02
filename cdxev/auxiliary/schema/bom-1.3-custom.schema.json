@@ -294,8 +294,7 @@
         "type",
         "name",
         "version",
-        "bom-ref",
-        "supplier"
+        "bom-ref"
       ],
       "properties": {
         "type": {
@@ -544,6 +543,20 @@
                   "minLength": 1
                 }
               }
+            }
+          ]
+        },
+        {
+          "anyOf": [
+            {
+              "required": [
+                "supplier"
+              ]
+            },
+            {
+              "required": [
+                "author"
+              ]
             }
           ]
         },

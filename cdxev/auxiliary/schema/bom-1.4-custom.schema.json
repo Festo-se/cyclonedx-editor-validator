@@ -611,6 +611,20 @@
           ]
         },
         {
+          "anyOf": [
+            {
+              "required": [
+                "supplier"
+              ]
+            },
+            {
+              "required": [
+                "author"
+              ]
+            }
+          ]
+        },
+        {
           "if": {
             "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
             "required": ["copyright"]

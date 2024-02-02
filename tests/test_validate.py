@@ -183,7 +183,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(search_for_word_issues("supplier", issues), True)
 
     def test_metadata_component_supplier_and_author_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("supplier")
@@ -191,7 +191,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(search_for_word_issues("author", issues), True)
 
     def test_metadata_component_author_festo_no_copyright(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("copyright")
@@ -204,7 +204,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(search_for_word_issues("copyright", issues), True)
 
     def test_metadata_component_with_license(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("copyright")
@@ -216,7 +216,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(issues, ["no issue"])
 
     def test_metadata_component_author_festo_copyright_not_festo(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("supplier")
@@ -300,7 +300,6 @@ class TestValidateComponents(unittest.TestCase):
                     sbom["components"][component_number].pop(fields)
                     issues = validate_test(sbom)
                     self.assertEqual(search_for_word_issues(fields, issues), True)
-
 
     def test_components_component_supplier_missing(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -599,222 +598,6 @@ class TestValidateUseSchema15(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("licensee", issues), True)
 
-    def test_no_expiration(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("expiration", issues), True)
-
-    def test_no_licenseTypes(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("licenseTypes", issues), True)
-
-    def test_no_licensing(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("licensing", issues), True)
-
-    def test_licensing_no_text(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("text", issues), True)
-
-    def test_not_allowed_licenseType(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["something"],
-                            "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("something", issues), True)
-
-    def test_licensing_neither_organization_nor_individual(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensor": {},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("individual", issues), True)
-            self.assertEqual(search_for_word_issues("organization", issues), True)
-
-    def test_licensing_additional_field(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                            "additional_field": "",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("additional", issues), True)
-
-
-list_of_spec_versions_containing_licensing = ["1.5"]
-
-
-class TestValidateUseSchema15(unittest.TestCase):
-    def test_correct_license(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(issues, ["no issue"])
-
-    def test_no_licensor(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensee": {"organization": {"name": "Acme.ing"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("licensor", issues), True)
-
-    def test_no_licensee(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensor": {"individual": {"name": "Something"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("licensee", issues), True)
-
     def test_no_license_types(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
@@ -988,7 +771,7 @@ class TestValidateUseSchemaType(unittest.TestCase):
 
 class TestInternalNameSchema(unittest.TestCase):
     def test_components_supplier_festo_no_copyright(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0] = {
@@ -1007,7 +790,7 @@ class TestInternalNameSchema(unittest.TestCase):
             self.assertEqual(search_for_word_issues("copyright", issues), True)
 
     def test_components_supplier_festo_copyright_not(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0] = {
@@ -1031,7 +814,7 @@ class TestInternalNameSchema(unittest.TestCase):
     def test_copyright_festo_supplier_not(
         self,
     ) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0] = {
@@ -1097,7 +880,7 @@ class TestInternalNameSchema(unittest.TestCase):
             "compositions": [],
             "dependencies": [],
         }
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("supplier", issues), True)
@@ -1131,7 +914,7 @@ class TestInternalMetaData(unittest.TestCase):
             "compositions": [],
             "dependencies": [],
         }
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
@@ -1163,7 +946,7 @@ class TestInternalMetaData(unittest.TestCase):
             "compositions": [],
             "dependencies": [],
         }
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("copyright", issues), True)
@@ -1195,7 +978,7 @@ class TestInternalMetaData(unittest.TestCase):
             "compositions": [],
             "dependencies": [],
         }
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("copyright", issues), True)
@@ -1228,7 +1011,7 @@ class TestInternalMetaData(unittest.TestCase):
             "compositions": [],
             "dependencies": [],
         }
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
@@ -1260,7 +1043,7 @@ class TestInternalMetaData(unittest.TestCase):
             "compositions": [],
             "dependencies": [],
         }
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
@@ -1292,7 +1075,7 @@ class TestInternalMetaData(unittest.TestCase):
             "compositions": [],
             "dependencies": [],
         }
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("supplier", issues), True)

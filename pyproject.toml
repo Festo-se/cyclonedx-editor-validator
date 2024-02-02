@@ -54,8 +54,7 @@ upload_to_release = false
 build_command = "pip install poetry && poetry build"
 
 [tool.mypy]
-files = ["cdxev/*"]
-exclude = ["tests/*"]
+packages = "cdxev"
 disallow_untyped_defs = true
 no_error_summary = true
 

@@ -276,9 +276,9 @@ def merge_vulnerabilities(
                     )
                     entry_of_merged_vulnerability["ratings"] = merged_ratings
                 elif original_vulnerability.get("ratings", []):
-                    entry_of_merged_vulnerability[
-                        "ratings"
-                    ] = original_vulnerability.get("ratings", 2)
+                    entry_of_merged_vulnerability["ratings"] = (
+                        original_vulnerability.get("ratings", 2)
+                    )
                 elif vulnerability.get("ratings", []):
                     entry_of_merged_vulnerability["ratings"] = vulnerability.get(
                         "ratings", 2

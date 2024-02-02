@@ -19,7 +19,7 @@ path_to_modified_sbom = (
     "Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
-list_of_specVersions = ["1.3", "1.4", "1.5"]
+list_of_spec_versions = ["1.3", "1.4", "1.5"]
 
 
 def search_for_word_issues(word: str, issue_list: list) -> bool:
@@ -111,7 +111,7 @@ class TestValidateInit(unittest.TestCase):
 
 class TestValidateMetadata(unittest.TestCase):
     def test_metadata_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom.pop("metadata")
@@ -119,7 +119,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertTrue(search_for_word_issues("metadata", issues))
 
     def test_timestamp(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["timestamp"] = "2022-02-17T10:14:59Zpp"
@@ -134,7 +134,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(search_for_word_issues("name", issues), True)
 
     def test_metadata_authors_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"].pop("authors")
@@ -142,7 +142,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(search_for_word_issues("authors", issues), True)
 
     def test_metadata_authors_name_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["authors"][0].pop("name")
@@ -151,7 +151,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(search_for_word_issues("authors", issues), True)
 
     def test_metadata_component_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"].pop("component")
@@ -167,7 +167,7 @@ class TestValidateMetadata(unittest.TestCase):
             "version",
             "bom-ref",
         ]:
-            for spec_version in list_of_specVersions:
+            for spec_version in list_of_spec_versions:
                 sbom = get_test_sbom()
                 sbom["specVersion"] = spec_version
                 sbom["metadata"]["component"].pop(fields)
@@ -175,7 +175,7 @@ class TestValidateMetadata(unittest.TestCase):
                 self.assertEqual(search_for_word_issues(fields, issues), True)
 
     def test_metadata_component_supplier_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("supplier")
@@ -190,7 +190,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(issues, ["no issue"])
 
     def test_metadata_internal_component_copyright_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("copyright")
@@ -204,7 +204,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(search_for_word_issues("copyright", issues), True)
 
     def test_metadata_component_no_license_or_copyright(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("copyright")
@@ -227,8 +227,8 @@ class TestValidateMetadata(unittest.TestCase):
             ae.exception.details.description,
         )
 
-    def test_metadata_illegitimate_bomFormat(self) -> None:
-        for spec_version in list_of_specVersions:
+    def test_metadata_illegitimate_bom_format(self) -> None:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["bomFormat"] = "wrongFormat"
@@ -238,7 +238,7 @@ class TestValidateMetadata(unittest.TestCase):
 
 class TestValidateComponents(unittest.TestCase):
     def test_components_empty(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom.pop("components")
@@ -253,7 +253,7 @@ class TestValidateComponents(unittest.TestCase):
                 "version",
                 "bom-ref",
             ]:
-                for spec_version in list_of_specVersions:
+                for spec_version in list_of_spec_versions:
                     sbom = get_test_sbom()
                     sbom["specVersion"] = spec_version
                     sbom["components"][component_number].pop(fields)
@@ -261,7 +261,7 @@ class TestValidateComponents(unittest.TestCase):
                     self.assertEqual(search_for_word_issues(fields, issues), True)
 
     def test_components_component_supplier_etc(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0].pop("supplier")
@@ -274,7 +274,7 @@ class TestValidateComponents(unittest.TestCase):
             )
 
     def test_components_component_license_and_copyright_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0].pop("licenses")
@@ -282,7 +282,7 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(search_for_word_issues("licenses", issues), True)
 
     def test_components_component_copyright_instead_of_license_etc(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0].pop("licenses")
@@ -291,7 +291,7 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(issues, ["no issue"])
 
     def test_components_component_license_or_expression(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["licenses"] = [
@@ -302,7 +302,7 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(search_for_word_issues("license", issues), True)
 
     def test_components_component_license_expression(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["licenses"] = [{"expression": "Apache-2.0"}]
@@ -310,7 +310,7 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(issues, ["no issue"])
 
     def test_components_license_without_name_and_id(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["licenses"] = [{"license": {}}]
@@ -319,7 +319,7 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(search_for_word_issues("id", issues), True)
 
     def test_components_license_additional_fields(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["licenses"] = [
@@ -337,7 +337,7 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(search_for_word_issues("additional", issues), True)
 
     def test_components_license_name_without_text(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["licenses"] = [{"license": {"name": "something"}}]
@@ -345,7 +345,7 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(search_for_word_issues("text", issues), True)
 
     def test_components_license_text_without_content(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["licenses"] = [
@@ -355,7 +355,7 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(search_for_word_issues("content", issues), True)
 
     def test_components_license_wrong_spdxid(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["licenses"] = [
@@ -372,7 +372,7 @@ class TestValidateComponents(unittest.TestCase):
             )
 
     def test_components_component_copyright(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][-1].pop("copyright")
@@ -380,17 +380,19 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(search_for_word_issues("copyright", issues), True)
 
     def test_version_short(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["version"] = ""
             issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("must not be empty", issues), True)
+            self.assertEqual(
+                search_for_word_issues("'version' should be non-empty", issues), True
+            )
 
 
 class TestValidateDependencies(unittest.TestCase):
     def test_dependencies_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom.pop("dependencies")
@@ -398,15 +400,15 @@ class TestValidateDependencies(unittest.TestCase):
             self.assertEqual(search_for_word_issues("dependencies", issues), True)
 
     def test_dependencies_ref_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["dependencies"][0].pop("ref")
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("ref", issues), True)
 
-    def test_dependencies_duplicate_dependsOn(self) -> None:
-        for spec_version in list_of_specVersions:
+    def test_dependencies_duplicate_dependson(self) -> None:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["dependencies"][0]["dependsOn"].append(
@@ -418,7 +420,7 @@ class TestValidateDependencies(unittest.TestCase):
 
 class TestValidateCompositions(unittest.TestCase):
     def test_compositions_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom.pop("compositions")
@@ -426,7 +428,7 @@ class TestValidateCompositions(unittest.TestCase):
             self.assertEqual(search_for_word_issues("compositions", issues), True)
 
     def test_compositions_aggregate_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["compositions"][0].pop("aggregate")
@@ -434,7 +436,7 @@ class TestValidateCompositions(unittest.TestCase):
             self.assertEqual(search_for_word_issues("aggregate", issues), True)
 
     def test_compositions_assemblies_missing(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["compositions"][0].pop("assemblies")
@@ -442,7 +444,7 @@ class TestValidateCompositions(unittest.TestCase):
             self.assertEqual(search_for_word_issues("assemblies", issues), True)
 
     def test_compositions_aggregate_not_valid(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["compositions"][0]["aggregate"] = "something"
@@ -477,7 +479,7 @@ class TestValidateUseOwnSchema(unittest.TestCase):
             ap.exception.details.description,
         )
 
-    def test_use_own_schema_invalid_JSON(self) -> None:
+    def test_use_own_schema_invalid_json(self) -> None:
         sbom = get_test_sbom()
         with self.assertRaises(AppError) as ap:
             validate_test(sbom, schema_path="cdxev/auxiliary/schema")
@@ -558,7 +560,7 @@ class TestValidateUseSchema15(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("licensee", issues), True)
 
-    def test_no_licenseTypes(self) -> None:
+    def test_no_license_types(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -616,7 +618,7 @@ class TestValidateUseSchema15(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("text", issues), True)
 
-    def test_not_allowed_licenseType(self) -> None:
+    def test_not_allowed_license_type(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -685,7 +687,7 @@ class TestValidateUseSchema15(unittest.TestCase):
             self.assertEqual(search_for_word_issues("additional", issues), True)
 
     def test_license_text_with_empty_content(self) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["licenses"] = [
@@ -699,13 +701,13 @@ class TestValidateUseSchema15(unittest.TestCase):
             ]
             issues = validate_test(sbom)
             self.assertEqual(
-                search_for_word_issues("'content' must not be empty", issues), True
+                search_for_word_issues("'content' should be non-empty", issues), True
             )
 
     def test_no_components_no_dependencies(
         self,
     ) -> None:
-        for spec_version in list_of_specVersions:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom.pop("components")

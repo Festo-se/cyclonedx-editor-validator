@@ -527,9 +527,13 @@ def invoke_set(args: argparse.Namespace) -> int:
             args.swid,
             args.purl,
             args.cpe,
-            Key.from_coordinates(name=args.name, version=args.version, group=args.group)
-            if args.name is not None
-            else None,
+            (
+                Key.from_coordinates(
+                    name=args.name, version=args.version, group=args.group
+                )
+                if args.name is not None
+                else None
+            ),
         ]
         actual_targets = [x for x in possible_targets if x is not None]
         if len(actual_targets) > 1:

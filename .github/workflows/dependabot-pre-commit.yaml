@@ -1,0 +1,39 @@
+name: Dependabot pre-commit updater
+on: pull_request
+
+permissions:
+  contents: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - uses: actions/checkout@v4
+        with:
+          # Check out HEAD of source branch. Without this option, the merge commit would be checked out.
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Update .pre-commit-config.yaml
+        id: update-pre-commit
+        run: |
+          # Reduces the output of the metadata step above to a simpler JSON format:
+          # { "<package-1-name>": "<new-version>", ... }
+          export updates=$(yq --null-input 'env(updates) | .[] as $item ireduce ({}; .[$item | .dependencyName] = ($item | .newVersion))' -o json)
+
+          # Goes through the dependencies of the mypy hook in pre-commit config and if any of them have
+          # been updated in this PR, replace the version number with the new version
+          yq --inplace 'env(updates) as $up | (.repos[].hooks[] | select(.id == "mypy").additional_dependencies[] | select(split(">=") | .[0] as $pkg | $up | has ($pkg))) |= (split(">=") | .[0] as $pkg | $pkg + "==" + $up[$pkg])' .pre-commit-config.yaml
+
+          # Commit the changes
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .pre-commit-config.yaml
+          git commit -m "Update additional dependencies for mypy pre-commit hook"
+          git push
+        env:
+          updates: ${{ steps.metadata.outputs.updated-dependencies-json }}

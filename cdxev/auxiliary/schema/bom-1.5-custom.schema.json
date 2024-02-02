@@ -426,8 +426,7 @@
         "type",
         "name",
         "version",
-        "bom-ref",
-        "supplier"
+        "bom-ref"
       ],
       "additionalProperties": false,
       "properties": {

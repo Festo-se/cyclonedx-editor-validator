@@ -300,13 +300,23 @@ class TestValidateComponents(unittest.TestCase):
                     issues = validate_test(sbom)
                     self.assertEqual(search_for_word_issues(fields, issues), True)
 
-    def test_components_component_supplier_missing(self) -> None:
+    def test_components_component_supplier_and_author_missing(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0].pop("supplier")
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("supplier", issues), True)
+            self.assertEqual(search_for_word_issues("author", issues), True)
+
+    def test_components_component_supplier_missing_author(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0].pop("supplier")
+            sbom["components"][0]["author"] = "author"
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
 
     def test_components_component_license_and_copyright_missing(self) -> None:
         for spec_version in list_of_spec_versions:

@@ -160,8 +160,7 @@ class InferSupplierTestCase(AmendTestCase):
 
     def test_publisher_is_preferred_to_author(self) -> None:
         component = {"author": "x", "publisher": "y"}
-        expected = copy.deepcopy(component)
-        expected["supplier"] = "y"
+        expected = {"author": "x", "publisher": "y", "supplier": {"name": "y"}}
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 

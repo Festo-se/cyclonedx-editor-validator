@@ -432,7 +432,6 @@ class TestValidateComponents(unittest.TestCase):
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["supplier"] = {"name": ""}
-            sbom["components"][0]["copyright"] = "FE"
             issues = validate_test(sbom)
             self.assertEqual(
                 search_for_word_issues("'name' should be non-empty", issues), True

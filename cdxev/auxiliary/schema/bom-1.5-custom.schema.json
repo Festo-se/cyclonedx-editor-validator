@@ -361,6 +361,7 @@
         "name": {
           "type": "string",
           "title": "Name",
+          "minLength": 1,
           "description": "The name of the organization",
           "examples": [
             "Example Inc."

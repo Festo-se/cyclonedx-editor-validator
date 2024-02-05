@@ -427,6 +427,16 @@ class TestValidateComponents(unittest.TestCase):
                 search_for_word_issues("'version' should be non-empty", issues), True
             )
 
+    def test_supplier_empty(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0]["supplier"] = {"name": ""}
+            issues = validate_test(sbom)
+            self.assertEqual(
+                search_for_word_issues("'name' should be non-empty", issues), True
+            )
+
 
 class TestValidateDependencies(unittest.TestCase):
     def test_dependencies_missing(self) -> None:

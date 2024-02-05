@@ -173,20 +173,13 @@ class TestValidateMetadata(unittest.TestCase):
                 issues = validate_test(sbom)
                 self.assertEqual(search_for_word_issues(fields, issues), True)
 
-    def test_metadata_component_supplier_missing(self) -> None:
-        for spec_version in list_of_spec_versions:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["metadata"]["component"].pop("supplier")
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("supplier", issues), True)
-
     def test_metadata_component_supplier_and_author_missing(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("supplier")
             issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("supplier", issues), True)
             self.assertEqual(search_for_word_issues("author", issues), True)
 
     def test_metadata_component_author_festo_no_copyright(self) -> None:

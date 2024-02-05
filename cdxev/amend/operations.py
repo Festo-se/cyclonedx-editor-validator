@@ -135,10 +135,10 @@ class InferSupplier(Operation):
         if "supplier" in component:
             return
         if "publisher" in component:
-            component["supplier"] = component["publisher"]
+            component["supplier"] = {"name": component["publisher"]}
             return
         if "author" in component:
-            component["supplier"] = component["author"]
+            component["supplier"] = {"name": component["author"]}
             return
 
         if "externalReferences" in component:

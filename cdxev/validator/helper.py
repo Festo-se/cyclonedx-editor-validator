@@ -46,7 +46,10 @@ def open_schema(
 
 
 def load_spdx_schema() -> dict:
-    with open("cdxev/auxiliary/schema/spdx.schema.json", "r") as f:
+    path_to_embedded_schema = (
+        resources.files("cdxev.auxiliary.schema") / "spdx.schema.json"
+    )
+    with path_to_embedded_schema.open() as f:
         return json.load(f)
 
 

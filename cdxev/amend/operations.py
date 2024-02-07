@@ -129,16 +129,8 @@ class InferSupplier(Operation):
     scheme.
     """
 
-    def handle_component(
-        self, component: dict, path_to_license_folder: str = ""
-    ) -> None:
+    def infer_supplier(self, component: dict) -> None:
         if "supplier" in component:
-            return
-        if "publisher" in component:
-            component["supplier"] = {"name": component["publisher"]}
-            return
-        if "author" in component:
-            component["supplier"] = {"name": component["author"]}
             return
 
         if "externalReferences" in component:
@@ -166,6 +158,21 @@ class InferSupplier(Operation):
                         ext_ref["url"],
                     )
                     return
+        if "publisher" in component:
+            component["supplier"] = {"name": component["publisher"]}
+            return
+        if "author" in component:
+            component["supplier"] = {"name": component["author"]}
+            return
+
+    def handle_component(
+        self, component: dict, path_to_license_folder: str = ""
+    ) -> None:
+        self.infer_supplier(component)
+
+    def handle_metadata(self, metadata: dict) -> None:
+        component = metadata.get("component", {})
+        self.infer_supplier(component)
 
 
 class ProcessLicense(Operation):

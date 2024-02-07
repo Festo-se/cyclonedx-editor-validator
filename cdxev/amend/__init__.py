@@ -8,7 +8,7 @@ from .operations import (
 )
 
 register_operation(AddBomRefOperation())
+register_operation(InferSupplier())
 register_operation(DefaultAuthorOperation())
 register_operation(CompositionsOperation())
-register_operation(InferSupplier())
 register_operation(ProcessLicense())

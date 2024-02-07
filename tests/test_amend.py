@@ -146,7 +146,7 @@ class InferSupplierTestCase(AmendTestCase):
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
-    def test_author_metadata(self) -> None:
+    def test_author_already_present(self) -> None:
         component = {"author": "x"}
         expected = {"author": "x", "supplier": {"name": "x"}}
         self.operation.handle_component(component)

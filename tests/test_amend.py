@@ -174,7 +174,6 @@ class InferSupplierTestCase(AmendTestCase):
     def test_author_set_supplier_components(self) -> None:
         self.sbom_fixture["components"][0].pop("externalReferences")
         run_amend(self.sbom_fixture)
-        print(self.sbom_fixture["components"][0])
         self.assertEqual(
             self.sbom_fixture["components"][0]["supplier"]["name"],
             self.sbom_fixture["components"][0]["author"],

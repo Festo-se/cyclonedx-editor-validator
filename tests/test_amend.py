@@ -164,6 +164,21 @@ class InferSupplierTestCase(AmendTestCase):
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
+    def test_author_set_supplier_in_metadata(self) -> None:
+        run_amend(self.sbom_fixture)
+        self.assertEqual(
+            self.sbom_fixture["metadata"]["component"]["supplier"]["name"],
+            self.sbom_fixture["metadata"]["component"]["author"],
+        )
+
+    def test_author_set_supplier_components(self) -> None:
+        self.sbom_fixture["components"][0].pop("externalReferences")
+        run_amend(self.sbom_fixture)
+        self.assertEqual(
+            self.sbom_fixture["components"][0]["supplier"]["name"],
+            self.sbom_fixture["components"][0]["author"],
+        )
+
     def test_supplier_from_website(self) -> None:
         component = {
             "externalReferences": [

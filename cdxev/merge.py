@@ -20,7 +20,7 @@ from cdxev.log import LogMessage
 logger = logging.getLogger(__name__)
 
 
-def merge_components(governing_sbom: dict, sbom_to_be_merged: dict):
+def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[dict]:
     """
     Function that gets two lists of components and merges them unique into one.
 

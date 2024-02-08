@@ -249,7 +249,8 @@
           "items": {
             "$ref": "#/definitions/organizationalContact"
           }
-        }
+        },
+        "additionalProperties": false
       }
     },
     "organizationalContact": {
@@ -589,7 +590,7 @@
               "required": ["copyright"]
             }
           }
-        },                    
+        },
         {
           "if": {
             "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },

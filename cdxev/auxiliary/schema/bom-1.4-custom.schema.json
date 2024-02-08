@@ -653,7 +653,7 @@
               "required": ["copyright"]
             }
           }
-        }, 
+        },
         {
           "if": {
             "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },

@@ -293,6 +293,14 @@ class TestValidateComponents(unittest.TestCase):
                     issues = validate_test(sbom)
                     self.assertEqual(search_for_word_issues(fields, issues), True)
 
+    def test_supplier_name_missing(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0]["supplier"] = {"url": ["https://example.com"]}
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("name", issues), True)
+
     def test_components_component_supplier_and_author_missing(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()

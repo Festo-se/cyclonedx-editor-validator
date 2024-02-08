@@ -14,10 +14,10 @@ Currently, the command adds or modifies the following pieces of information:
 
 * If the SBOM metadata doesn't specify an *author* from the SBOM, it will be set to `{"name": "automated"}`.
 * The *compositions* array will be overwritten with a new one which specifies a single *incomplete* aggregate. This aggregate contains all components, including the metadata component.
-* If a component does not have a *supplier*, the tool will try to infer the supplier from the fields (in order of precedence):
+* If a component does have a publisher and/or author but does not have a *supplier*, the tool will try to infer the `supplier.name` from the fields (in order of precedence):
   * *publisher*
   * *author*
-* If a component does not have an *author*, *publisher* or *supplier*, the tool will try to infer the supplier from (in order of precedence):
+ And if the component contains *externalReferences*, the tool will try to infer the *supplier.url* from (in order of precedence):
   * *externalReferences* of type *website*
   * *externalReferences* of type *issue-tracker*
   * *externalReferences* of type *vcs*

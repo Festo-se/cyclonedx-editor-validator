@@ -157,10 +157,12 @@ class InferSupplier(Operation):
                         component.get("bom-ref", "<no bom-ref>"),
                         ext_ref["url"],
                     )
-                    return
+                    break
+
         if "publisher" in component:
             component["supplier"] = {"name": component["publisher"]}
             return
+
         if "author" in component:
             component["supplier"] = {"name": component["author"]}
             return

@@ -7,6 +7,7 @@ import importlib.resources
 import json
 import logging
 import uuid
+import datetime
 
 from cdxev.amend.process_license import delete_license_unknown, process_license
 

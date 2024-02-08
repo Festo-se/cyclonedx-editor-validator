@@ -17,7 +17,7 @@ Currently, the command adds or modifies the following pieces of information:
 * If a component does have a publisher and/or author but does not have a *supplier*, the tool will try to infer the `supplier.name` from the fields (in order of precedence):
   * *publisher*
   * *author*
-* If the component contains no supplier but *externalReferences*, the tool will try to infer the *supplier.url* from (in order of precedence):
+* If the component contains no *supplier* but *externalReferences*, the tool will try to infer the *supplier.url* from (in order of precedence):
   * *externalReferences* of type *website*
   * *externalReferences* of type *issue-tracker*
   * *externalReferences* of type *vcs*

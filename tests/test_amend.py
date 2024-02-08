@@ -58,8 +58,7 @@ class CommandIntegrationTestCase(AmendTestCase):
     def test_suppliers(self) -> None:
         run_amend(self.sbom_fixture)
         components = self.sbom_fixture["components"]
-
-        self.assertNotIn("supplier", components[0])
+        self.assertIn("supplier", components[0])
         self.assertDictEqual(
             {
                 "name": "Some Vendor Inc.",
@@ -149,7 +148,7 @@ class InferSupplierTestCase(AmendTestCase):
 
     def test_author_already_present(self) -> None:
         component = {"author": "x"}
-        expected = copy.deepcopy(component)
+        expected = {"author": "x", "supplier": {"name": "x"}}
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
@@ -159,11 +158,26 @@ class InferSupplierTestCase(AmendTestCase):
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
-    def test_publisher_already_present(self) -> None:
+    def test_publisher_is_preferred_to_author(self) -> None:
         component = {"author": "x", "publisher": "y"}
-        expected = copy.deepcopy(component)
+        expected = {"author": "x", "publisher": "y", "supplier": {"name": "y"}}
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
+
+    def test_author_set_supplier_in_metadata(self) -> None:
+        run_amend(self.sbom_fixture)
+        self.assertEqual(
+            self.sbom_fixture["metadata"]["component"]["supplier"]["name"],
+            self.sbom_fixture["metadata"]["component"]["author"],
+        )
+
+    def test_author_set_supplier_components(self) -> None:
+        self.sbom_fixture["components"][0].pop("externalReferences")
+        run_amend(self.sbom_fixture)
+        self.assertEqual(
+            self.sbom_fixture["components"][0]["supplier"]["name"],
+            self.sbom_fixture["components"][0]["author"],
+        )
 
     def test_supplier_from_website(self) -> None:
         component = {

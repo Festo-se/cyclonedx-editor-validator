@@ -119,53 +119,62 @@ class InferSupplier(Operation):
     """
     As we need a contact in case of a security incident, at least one of the 'author', 'supplier'
     or 'publisher' fields must be set on any component. If that's not the case, this operation
-    attempts to infer the 'supplier' from the following sources, in order of precedence:
+    attempts to infer the 'supplier.url'  from the following sources, in order of precedence:
 
     - If an 'externalReference' of type 'website' is present, it is used as supplier URL.
     - If an 'externalReference' of type 'issue-tracker' is present, it is used as supplier URL.
     - If an 'externalReference' of type 'vcs' is present, it is used as supplier URL.
+
+    as well as the 'supplier.name' from:
+
+    - If an 'publisher' is present, it is used as supplier name.
+    - If an 'author' is present, it is used as supplier name.
 
     For all of the URLs there is the additional condition that they must utilize the http or https
     scheme.
     """
 
     def infer_supplier(self, component: dict) -> None:
-        if "supplier" in component:
-            return
+        if "url" not in component.get("supplier", {}):
 
-        if "externalReferences" in component:
-            accepted_references = ("website", "issue-tracker", "vcs")
-            accepted_url_schemes = ("http://", "https://")
-            for key in accepted_references:
-                ext_ref = next(
-                    (
-                        x
-                        for x in component["externalReferences"]
-                        if x.get("type") == key
-                    ),
-                    None,
-                )
-                if ext_ref is not None and (
-                    any(
-                        ext_ref["url"].startswith(scheme)
-                        for scheme in accepted_url_schemes
+            if "externalReferences" in component:
+                accepted_references = ("website", "issue-tracker", "vcs")
+                accepted_url_schemes = ("http://", "https://")
+                for key in accepted_references:
+                    ext_ref = next(
+                        (
+                            x
+                            for x in component["externalReferences"]
+                            if x.get("type") == key
+                        ),
+                        None,
                     )
-                ):
-                    component["supplier"] = {"url": [ext_ref["url"]]}
-                    logger.debug(
-                        "Set supplier of %s to URL: %s",
-                        component.get("bom-ref", "<no bom-ref>"),
-                        ext_ref["url"],
-                    )
-                    break
+                    if ext_ref is not None and (
+                        any(
+                            ext_ref["url"].startswith(scheme)
+                            for scheme in accepted_url_schemes
+                        )
+                    ):
+                        component["supplier"] = component.get("supplier", {})
+                        component["supplier"]["url"] = [ext_ref["url"]]
+                        logger.debug(
+                            "Set supplier of %s to URL: %s",
+                            component.get("bom-ref", "<no bom-ref>"),
+                            ext_ref["url"],
+                        )
+                        break
 
-        if "publisher" in component:
-            component["supplier"] = {"name": component["publisher"]}
-            return
+        if "name" not in component.get("supplier", {}):
 
-        if "author" in component:
-            component["supplier"] = {"name": component["author"]}
-            return
+            if "publisher" in component:
+                component["supplier"] = component.get("supplier", {})
+                component["supplier"]["name"] = component["publisher"]
+                return
+
+            if "author" in component:
+                component["supplier"] = component.get("supplier", {})
+                component["supplier"]["name"] = component["author"]
+                return
 
     def handle_component(
         self, component: dict, path_to_license_folder: str = ""

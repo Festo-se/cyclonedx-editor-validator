@@ -585,9 +585,6 @@
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
       },
-      "dependencies": {
-        "supplier": {"properties": {"supplier": {"required": ["name"]}}}
-      },
       "allOf": [
         {
           "anyOf": [

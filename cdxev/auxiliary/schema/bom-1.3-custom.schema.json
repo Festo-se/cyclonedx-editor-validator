@@ -522,9 +522,6 @@
           }
         }
       },
-      "dependencies": {
-        "supplier": {"properties": {"supplier": {"required": ["name"]}}}
-      },
       "allOf": [
         {
           "anyOf": [

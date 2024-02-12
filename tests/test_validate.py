@@ -902,6 +902,20 @@ class TestInternalNameSchema(unittest.TestCase):
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("supplier", issues), True)
+            self.assertEqual(
+                search_for_word_issues("([Ff][Ee][Ss][Tt][Oo])", issues), True
+            )
+
+    def test_internal_component_copyright_festo_supplier_empty(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["supplier"] = {}
+        sbom["components"][0][
+            "copyright"
+        ] = "Festo SE & Co. KG 2022, all rights reserved"
+        for spec_version in list_of_spec_versions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("name", issues), True)
 
 
 class TestInternalMetaData(unittest.TestCase):

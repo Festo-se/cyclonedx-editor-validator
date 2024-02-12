@@ -249,9 +249,26 @@
           "items": {
             "$ref": "#/definitions/organizationalContact"
           }
+        }
+      },
+      "additionalProperties": false,
+      "anyOf": [
+        {
+            "required": [
+                "name"
+            ]
         },
-        "additionalProperties": false
+        {
+            "required": [
+                "url"
+            ]
+        },
+        {
+          "required": [
+              "contact"
+          ]
       }
+    ]
     },
     "organizationalContact": {
       "type": "object",
@@ -568,24 +585,22 @@
           },
           "then": {
             "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-            "required": ["supplier"]
+            "dependencies": {
+              "supplier": {"properties": {"supplier": {"required": ["name"]}}}
+            }
           }
         },
         {
-          "if":{ 
+          "if": {
+            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
+            "required": ["supplier"],
             "dependencies": {
               "supplier": {"properties": {"supplier": {"required": ["name"]}}}
             }
           },
           "then": {
-            "if": {
-              "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-              "required": ["supplier"]
-            },
-            "then": {
-              "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-              "required": ["copyright"]
-            }
+            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["copyright"]
           }
         },
         {

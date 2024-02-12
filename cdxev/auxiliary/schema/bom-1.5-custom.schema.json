@@ -383,7 +383,24 @@
           "description": "A contact at the organization. Multiple contacts are allowed.",
           "items": {"$ref": "#/definitions/organizationalContact"}
         }
+      },
+      "anyOf": [
+        {
+            "required": [
+                "name"
+            ]
+        },
+        {
+            "required": [
+                "url"
+            ]
+        },
+        {
+          "required": [
+              "contact"
+          ]
       }
+    ]
     },
     "organizationalContact": {
       "type": "object",
@@ -692,24 +709,22 @@
           },
           "then": {
             "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-            "required": ["supplier"]
+            "dependencies": {
+              "supplier": {"properties": {"supplier": {"required": ["name"]}}}
+            }
           }
         },
         {
-          "if":{ 
+          "if": {
+            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
+            "required": ["supplier"],
             "dependencies": {
               "supplier": {"properties": {"supplier": {"required": ["name"]}}}
             }
           },
           "then": {
-            "if": {
-              "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-              "required": ["supplier"]
-            },
-            "then": {
-              "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-              "required": ["copyright"]
-            }
+            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["copyright"]
           }
         },
         {

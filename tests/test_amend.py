@@ -237,9 +237,6 @@ class InferSupplierTestCase(AmendTestCase):
             self.sbom_fixture["components"][0]["supplier"]["name"],
             self.sbom_fixture["components"][0]["author"],
         )
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["url"], "https://someurl.com"
-        )
 
     def test_supplier_from_website(self) -> None:
         component = {

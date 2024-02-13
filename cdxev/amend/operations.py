@@ -8,7 +8,7 @@ import json
 import logging
 import uuid
 
-from cdxev.amend.process_license import process_license
+from cdxev.amend.process_license import process_license, delete_unknown_license
 
 logger = logging.getLogger(__name__)
 
@@ -223,8 +223,10 @@ class ProcessLicense(Operation):
             self.list_of_license_names,
             self.path_to_license_folder,
         )
+        delete_unknown_license(metadata["component"])
 
     def handle_component(self, component: dict) -> None:
         process_license(
             component, self.list_of_license_names, self.path_to_license_folder
         )
+        delete_unknown_license(component)

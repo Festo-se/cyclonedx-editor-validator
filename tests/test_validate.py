@@ -1092,7 +1092,7 @@ class TestInternalMetaData(unittest.TestCase):
                 "component": {
                     "type": "application",
                     "bom-ref": "acme-app",
-                    "supplier": {"name": "Acme"},
+                    "author": "Acme",
                     "copyright": "Festo SE & Co. KG 2022, all rights reserved",
                     "name": "Acme_Application",
                     "version": "9.1.1",
@@ -1110,4 +1110,5 @@ class TestInternalMetaData(unittest.TestCase):
         for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
+            print(issues)
             self.assertEqual(search_for_word_issues("supplier", issues), True)

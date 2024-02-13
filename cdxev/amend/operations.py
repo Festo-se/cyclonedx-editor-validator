@@ -119,11 +119,11 @@ class InferSupplier(Operation):
     """
     At least one of the 'author', 'supplier' or 'publisher' fields must be set on any component but
     the supplier field is desired.
-    If not already present this function wil, try to infer a 'supplier.name'
+    If not already present this function will, try to infer a 'supplier.name'
     and 'supplier.url'.
     The supplier name will be inferred from:
 
-    - If an 'publisher' is present, it is used as supplier name.
+    - If a 'publisher' is present, it is used as supplier name.
     - If no 'publisher but an 'author' is present, it is used as supplier name.
 
     The 'supplier.url' will be inferred from the following sources, in order of precedence:
@@ -134,8 +134,6 @@ class InferSupplier(Operation):
 
     For all of the URLs there is the additional condition that they must utilize the http or https
     scheme.
-
-    If no supplier is present, the function will try to create one with those information
     """
 
     def infer_supplier(self, component: dict) -> None:

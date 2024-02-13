@@ -1110,5 +1110,4 @@ class TestInternalMetaData(unittest.TestCase):
         for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
-            print(issues)
             self.assertEqual(search_for_word_issues("supplier", issues), True)

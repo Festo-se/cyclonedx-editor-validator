@@ -8,7 +8,7 @@ import json
 import logging
 import uuid
 
-from cdxev.amend.process_license import process_license, delete_unknown_license
+from cdxev.amend.process_license import delete_unknown_license, process_license
 
 logger = logging.getLogger(__name__)
 

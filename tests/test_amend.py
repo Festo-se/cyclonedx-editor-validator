@@ -195,7 +195,7 @@ class InferSupplierTestCase(AmendTestCase):
         )
         self.assertEqual(
             self.sbom_fixture["components"][0]["supplier"]["bom-ref"],
-            "Reference to a supplier entry"
+            "Reference to a supplier entry",
         )
 
     def test_supplier_add_url_to_name(self) -> None:

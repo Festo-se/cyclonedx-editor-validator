@@ -179,6 +179,52 @@ class InferSupplierTestCase(AmendTestCase):
             self.sbom_fixture["components"][0]["author"],
         )
 
+    def test_supplier_get_not_overwritten(self) -> None:
+        self.sbom_fixture["components"][0]["supplier"] = {
+            "bom-ref": "Reference to a supplier entry",
+            "name": "Some name of a supplier",
+            "url": "https://someurl.com",
+        }
+        run_amend(self.sbom_fixture)
+        self.assertEqual(
+            self.sbom_fixture["components"][0]["supplier"]["name"],
+            "Some name of a supplier",
+        )
+        self.assertEqual(
+            self.sbom_fixture["components"][0]["supplier"]["url"], "https://someurl.com"
+        )
+        self.assertEqual(
+            self.sbom_fixture["components"][0]["supplier"]["bom-ref"],
+            "Reference to a supplier entry",
+        )
+
+    def test_supplier_add_url_to_name(self) -> None:
+        self.sbom_fixture["components"][0]["supplier"] = {
+            "name": "Some name of a supplier"
+        }
+        run_amend(self.sbom_fixture)
+        self.assertEqual(
+            self.sbom_fixture["components"][0]["supplier"]["name"],
+            "Some name of a supplier",
+        )
+        self.assertEqual(
+            self.sbom_fixture["components"][0]["supplier"]["url"][0],
+            self.sbom_fixture["components"][0]["externalReferences"][0]["url"],
+        )
+
+    def test_supplier_set_nothing_in_an_empty_component(self) -> None:
+        self.sbom_fixture["components"][0] = {"bom-ref": "component 0"}
+        run_amend(self.sbom_fixture)
+        self.assertEqual(self.sbom_fixture["components"][0], {"bom-ref": "component 0"})
+
+    def test_supplier_add_name_to_url(self) -> None:
+        self.sbom_fixture["components"][0]["supplier"] = {"url": "https://someurl.com"}
+        run_amend(self.sbom_fixture)
+        self.assertEqual(
+            self.sbom_fixture["components"][0]["supplier"]["name"],
+            self.sbom_fixture["components"][0]["author"],
+        )
+
     def test_supplier_from_website(self) -> None:
         component = {
             "externalReferences": [

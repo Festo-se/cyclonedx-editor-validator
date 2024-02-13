@@ -117,21 +117,25 @@ class DefaultAuthorOperation(Operation):
 
 class InferSupplier(Operation):
     """
-    As we need a contact in case of a security incident, at least one of the 'author', 'supplier'
-    or 'publisher' fields must be set on any component. If that's not the case, this operation
-    attempts to infer the 'supplier.url'  from the following sources, in order of precedence:
+    At least one of the 'author', 'supplier' or 'publisher' fields must be set on any component but
+    the supplier field is desired.
+    If not already present this function wil, try to infer a 'supplier.name'
+    and 'supplier.url'.
+    The supplier name will be inferred from:
+
+    - If an 'publisher' is present, it is used as supplier name.
+    - If no 'publisher but an 'author' is present, it is used as supplier name.
+
+    The 'supplier.url' will be inferred from the following sources, in order of precedence:
 
     - If an 'externalReference' of type 'website' is present, it is used as supplier URL.
     - If an 'externalReference' of type 'issue-tracker' is present, it is used as supplier URL.
     - If an 'externalReference' of type 'vcs' is present, it is used as supplier URL.
 
-    as well as the 'supplier.name' from:
-
-    - If an 'publisher' is present, it is used as supplier name.
-    - If an 'author' is present, it is used as supplier name.
-
     For all of the URLs there is the additional condition that they must utilize the http or https
     scheme.
+
+    If no supplier is present, the function will try to create one with those information
     """
 
     def infer_supplier(self, component: dict) -> None:

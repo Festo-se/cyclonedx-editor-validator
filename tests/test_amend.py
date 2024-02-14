@@ -582,7 +582,7 @@ class TestInferCopyright(AmendTestCase):
     def test_create_copyright(self) -> None:
         component = {"supplier": {"name": "Acme Inc."}}
         year = datetime.date.today().year
-        copyright = f"Acme Inc. {year}, all rights reserved"
+        copyright = f"Copyright Acme Inc. {year}, all rights reserved"
         expected = {"copyright": copyright, "supplier": {"name": "Acme Inc."}}
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
@@ -593,7 +593,7 @@ class TestInferCopyright(AmendTestCase):
         run_amend(self.sbom_fixture)
         self.assertEqual(
             self.sbom_fixture["metadata"]["component"]["copyright"],
-            f"Acme Inc. {year}, all rights reserved",
+            f"Copyright Acme Inc. {year}, all rights reserved",
         )
 
     def test_set_copyright_from_supplier_in_components(self) -> None:
@@ -605,7 +605,7 @@ class TestInferCopyright(AmendTestCase):
         company = self.sbom_fixture["components"][0]["supplier"]["name"]
         self.assertEqual(
             self.sbom_fixture["components"][0]["copyright"],
-            f"{company} {year}, all rights reserved",
+            f"Copyright {company} {year}, all rights reserved",
         )
 
 

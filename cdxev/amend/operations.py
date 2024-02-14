@@ -230,4 +230,35 @@ class ProcessLicense(Operation):
         process_license(
             component, self.list_of_license_names, self.path_to_license_folder
         )
-        delete_license_unknown(component)
+
+
+class InferCopyright(Operation):
+    """
+    If neither a license nor a copyright is present in a component,
+    this function will create a 'copyright' field in the schema
+    'supplier.name year, all rights reserved'
+    """
+
+    def infer_copyright(self, component: dict) -> None:
+        if "copyright" in component.keys() or "licenses" in component.keys():
+            return
+
+        if "supplier" not in component.keys():
+            return
+
+        if "name" not in component.get("supplier", {}).keys():
+            return
+
+        year = datetime.date.today().year
+        supplier_name = component.get("supplier", {}).get("name", "")
+        copyright = f"Copyright {supplier_name} {year}, all rights reserved"
+        component["copyright"] = copyright
+
+    def handle_component(
+        self, component: dict, path_to_license_folder: str = ""
+    ) -> None:
+        self.infer_copyright(component)
+
+    def handle_metadata(self, metadata: dict) -> None:
+        component = metadata.get("component", {})
+        self.infer_copyright(component)

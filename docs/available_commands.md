@@ -25,7 +25,7 @@ Currently, the command adds or modifies the following pieces of information:
 * If the path to a folder with license text files is provided, the text will be included in the SBOM, if the license has the corresponding `name`.
 * If a `license.name` is similar to an SPDX-ID, it will be replaced, e.g. `{"license": {"name": "The Apache License, Version 2.0"}}` leads to `{"license": {"id": "Apache-2.0"}}`. For this purpose a [JSON-file](https://github.com/Festo-se/cyclonedx-editor-validator/blob/main/cdxev/amend/license_name_spdx_id_map.json) is used, where we provide a mapping of license names to SPDX-IDs, based on this [license-mapping](https://github.com/CycloneDX/cyclonedx-core-java/blob/master/src/main/resources/license-mapping.json).
 * If the SBOM contains a license which `name` includes any variation of the letter sequence "unknown" and no or an empty `text`, the license will be removed. Empty `licenses` fields will also be removed.
-* If neither `licenses` nor `copyright` exist but a supplier.name is present, the tool will create a copyright with the schema 'Copyright supplier.name current year, all rights reserved'. For example ´Copyright Acme. Inc. 2024, all rights reserved´ is created from the `{"supplier":{"name": "Acme Inc."}}` in the year 2024.
+* If neither `licenses` nor `copyright` exist but a supplier.name is present, the tool will create a copyright with the schema 'Copyright supplier.name current year, all rights reserved'. For example ´Copyright 2024 Acme. Inc., all rights reserved´ is created from the `{"supplier":{"name": "Acme Inc."}}` in the year 2024.
 
 ### Copy license texts from files
 

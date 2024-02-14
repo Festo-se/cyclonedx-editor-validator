@@ -251,7 +251,7 @@ class InferCopyright(Operation):
 
         year = datetime.date.today().year
         supplier_name = component.get("supplier", {}).get("name", "")
-        copyright = f"Copyright {supplier_name} {year}, all rights reserved"
+        copyright = f"Copyright {year} {supplier_name}, all rights reserved"
         component["copyright"] = copyright
 
     def handle_component(

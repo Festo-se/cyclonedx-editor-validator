@@ -3,9 +3,9 @@ from .operations import (
     AddBomRefOperation,
     CompositionsOperation,
     DefaultAuthorOperation,
+    InferCopyright,
     InferSupplier,
     ProcessLicense,
-    InferCopyright
 )
 
 register_operation(AddBomRefOperation())

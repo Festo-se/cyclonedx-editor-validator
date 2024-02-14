@@ -13,7 +13,7 @@ from cdxev.amend.operations import (
     InferSupplier,
     Operation,
     ProcessLicense,
-    InferCopyright
+    InferCopyright,
 )
 from cdxev.error import AppError
 from tests.auxiliary.sbomFunctionsTests import compare_sboms
@@ -589,27 +589,23 @@ class TestInferCopyright(AmendTestCase):
 
     def test_set_copyright_from_supplier_in_metadata(self) -> None:
         year = datetime.date.today().year
-        self.sbom_fixture["metadata"]["component"]["supplier"] = {
-            "name": "Acme Inc."
-        }
+        self.sbom_fixture["metadata"]["component"]["supplier"] = {"name": "Acme Inc."}
         run_amend(self.sbom_fixture)
         self.assertEqual(
             self.sbom_fixture["metadata"]["component"]["copyright"],
-            f"Acme Inc. {year}, all rights reserved"
+            f"Acme Inc. {year}, all rights reserved",
         )
 
     def test_set_copyright_from_supplier_in_components(self) -> None:
         self.sbom_fixture["components"][0].pop("licenses")
         self.sbom_fixture["components"][0].pop("externalReferences")
-        self.sbom_fixture["components"][0]["supplier"] = {
-            "name": "Acme Inc."
-        }
+        self.sbom_fixture["components"][0]["supplier"] = {"name": "Acme Inc."}
         year = datetime.date.today().year
         run_amend(self.sbom_fixture)
         company = self.sbom_fixture["components"][0]["supplier"]["name"]
         self.assertEqual(
             self.sbom_fixture["components"][0]["copyright"],
-            f"{company} {year}, all rights reserved"
+            f"{company} {year}, all rights reserved",
         )
 
 

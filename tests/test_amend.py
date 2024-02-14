@@ -1,8 +1,8 @@
 import copy
+import datetime
 import json
 import typing as t
 import unittest
-import datetime
 
 from cdxev.amend import process_license
 from cdxev.amend.command import run as run_amend
@@ -10,10 +10,10 @@ from cdxev.amend.operations import (
     AddBomRefOperation,
     CompositionsOperation,
     DefaultAuthorOperation,
+    InferCopyright,
     InferSupplier,
     Operation,
     ProcessLicense,
-    InferCopyright,
 )
 from cdxev.error import AppError
 from tests.auxiliary.sbomFunctionsTests import compare_sboms

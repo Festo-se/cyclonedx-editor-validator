@@ -38,6 +38,7 @@ toml = "0.10.2"
 typing-extensions = "4.9.0"
 bandit = "1.7.7"
 isort = "5.13.2"
+pre-commit = "3.6.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -53,8 +54,7 @@ upload_to_release = false
 build_command = "pip install poetry && poetry build"
 
 [tool.mypy]
-files = ["cdxev/*"]
-exclude = ["tests/*"]
+packages = "cdxev"
 disallow_untyped_defs = true
 no_error_summary = true
 
@@ -63,4 +63,3 @@ source = ["cdxev"]
 
 [tool.coverage.report]
 omit = ["*__init__.py*"]
-

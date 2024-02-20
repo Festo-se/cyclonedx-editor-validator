@@ -63,3 +63,5 @@ source = ["cdxev"]
 
 [tool.coverage.report]
 omit = ["*__init__.py*"]
+
+[tool.black]

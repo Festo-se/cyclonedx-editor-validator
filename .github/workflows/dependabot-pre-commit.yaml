@@ -30,8 +30,8 @@ jobs:
           yq --inplace 'env(updates) as $up | (.repos[].hooks[] | select(.id == "mypy").additional_dependencies[] | select(split("==") | .[0] as $pkg | $up | has ($pkg))) |= (split("==") | .[0] as $pkg | $pkg + "==" + $up[$pkg])' .pre-commit-config.yaml
 
           # Commit the changes
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add .pre-commit-config.yaml
           git commit -m "Update additional dependencies for mypy pre-commit hook"
           git push

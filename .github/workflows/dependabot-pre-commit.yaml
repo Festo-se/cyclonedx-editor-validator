@@ -7,7 +7,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    # if: github.actor == 'dependabot[bot]'
     steps:
       - name: Dependabot metadata
         id: metadata
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           # Check out HEAD of source branch. Without this option, the merge commit would be checked out.
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Update .pre-commit-config.yaml
         id: update-pre-commit
         run: |
@@ -27,7 +27,7 @@ jobs:
 
           # Goes through the dependencies of the mypy hook in pre-commit config and if any of them have
           # been updated in this PR, replace the version number with the new version
-          yq --inplace 'env(updates) as $up | (.repos[].hooks[] | select(.id == "mypy").additional_dependencies[] | select(split(">=") | .[0] as $pkg | $up | has ($pkg))) |= (split(">=") | .[0] as $pkg | $pkg + "==" + $up[$pkg])' .pre-commit-config.yaml
+          yq --inplace 'env(updates) as $up | (.repos[].hooks[] | select(.id == "mypy").additional_dependencies[] | select(split("==") | .[0] as $pkg | $up | has ($pkg))) |= (split("==") | .[0] as $pkg | $pkg + "==" + $up[$pkg])' .pre-commit-config.yaml
 
           # Commit the changes
           git config user.name github-actions

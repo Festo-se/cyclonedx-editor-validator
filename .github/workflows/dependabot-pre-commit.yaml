@@ -14,6 +14,10 @@ jobs:
         uses: dependabot/fetch-metadata@v1
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.1
+        with:
+          ssh-private-key: ${{ secrets.COMMIT_KEY }}
       - uses: actions/checkout@v4
         with:
           # Check out HEAD of source branch. Without this option, the merge commit would be checked out.

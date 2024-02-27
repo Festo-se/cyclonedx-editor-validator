@@ -14,10 +14,14 @@ jobs:
         uses: dependabot/fetch-metadata@v1
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.1
+        with:
+          ssh-private-key: ${{ secrets.COMMIT_KEY }}
       - uses: actions/checkout@v4
         with:
           # Check out HEAD of source branch. Without this option, the merge commit would be checked out.
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Update .pre-commit-config.yaml
         id: update-pre-commit
         run: |
@@ -27,13 +31,20 @@ jobs:
 
           # Goes through the dependencies of the mypy hook in pre-commit config and if any of them have
           # been updated in this PR, replace the version number with the new version
-          yq --inplace 'env(updates) as $up | (.repos[].hooks[] | select(.id == "mypy").additional_dependencies[] | select(split(">=") | .[0] as $pkg | $up | has ($pkg))) |= (split(">=") | .[0] as $pkg | $pkg + "==" + $up[$pkg])' .pre-commit-config.yaml
+          yq --inplace 'env(updates) as $up | (.repos[].hooks[] | select(.id == "mypy").additional_dependencies[] | select(split("==") | .[0] as $pkg | $up | has ($pkg))) |= (split("==") | .[0] as $pkg | $pkg + "==" + $up[$pkg])' .pre-commit-config.yaml
 
           # Commit the changes
-          git config user.name github-actions
-          git config user.email github-actions@github.com
           git add .pre-commit-config.yaml
-          git commit -m "Update additional dependencies for mypy pre-commit hook"
-          git push
+          if ! git diff-index --cached --quiet HEAD --
+          then
+            echo "::notice::Committing changes"
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git remote set-url origin "git@github.com:${{ github.repository }}.git"
+            git commit -m "Update additional dependencies for mypy pre-commit hook"
+            git push
+          else
+            echo "::notice::No changes made"
+          fi
         env:
           updates: ${{ steps.metadata.outputs.updated-dependencies-json }}

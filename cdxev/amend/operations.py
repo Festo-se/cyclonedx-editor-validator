@@ -3,8 +3,8 @@ This module defines the amend operations which can be performed on an SBOM.
 It also declares a base class to inherit from when implementing new operations.
 """
 
-import importlib.resources
 import datetime
+import importlib.resources
 import json
 import logging
 import uuid

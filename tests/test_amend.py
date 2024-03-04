@@ -560,9 +560,9 @@ class TestDeleteUnknownComponent(AmendTestCase):
             {"license": {"name": "unknown.something"}},
             {"license": {"name": "whateverUnknown"}},
             {"license": {"name": "unKnowN etc"}},
-            {"license": {"name": "AunknowNM", "text": ""}},
-            {"license": {"name": "unknown", "text": "license text"}},
-            {"license": {"name": "some license", "text": "license text"}},
+            {"license": {"name": "AunknowNM", "text": {"content": ""}}},
+            {"license": {"name": "unknown", "text": {"content": "license text"}}},
+            {"license": {"name": "some license", "text": {"content": "license text"}}},
             {"license": {"name": "some license"}},
             {"license": {"name": ""}},
         ]
@@ -578,8 +578,13 @@ class TestDeleteUnknownComponent(AmendTestCase):
                     "licenses": [
                         {"license": {"name": "some_license"}},
                         {"license": {"name": "license"}},
-                        {"license": {"name": "unknown", "text": ""}},
-                        {"license": {"name": "unknown", "text": "some text"}},
+                        {"license": {"name": "unknown", "text": {"content": ""}}},
+                        {
+                            "license": {
+                                "name": "unknown",
+                                "text": {"content": "some text"},
+                            }
+                        },
                     ],
                 },
                 "authors": [{"name": "automated"}],
@@ -597,9 +602,15 @@ class TestDeleteUnknownComponent(AmendTestCase):
                     "licenses": [
                         {"license": {"name": "some_unknown_license"}},
                         {"license": {"name": "license"}},
-                        {"license": {"name": "unknown", "text": "some description"}},
+                        {
+                            "license": {
+                                "name": "unknown",
+                                "text": {"content": "some description"},
+                            }
+                        },
                     ],
                 },
+                {"name": "test", "bom-ref": "reference"},
             ],
             "compositions": [
                 {
@@ -615,7 +626,12 @@ class TestDeleteUnknownComponent(AmendTestCase):
                     "licenses": [
                         {"license": {"name": "some_license"}},
                         {"license": {"name": "license"}},
-                        {"license": {"name": "unknown", "text": "some text"}},
+                        {
+                            "license": {
+                                "name": "unknown",
+                                "text": {"content": "some text"},
+                            }
+                        },
                     ],
                 },
                 "authors": [{"name": "automated"}],
@@ -632,14 +648,25 @@ class TestDeleteUnknownComponent(AmendTestCase):
                     "bom-ref": "a third bom-ref",
                     "licenses": [
                         {"license": {"name": "license"}},
-                        {"license": {"name": "unknown", "text": "some description"}},
+                        {
+                            "license": {
+                                "name": "unknown",
+                                "text": {"content": "some description"},
+                            }
+                        },
                     ],
                 },
+                {"name": "test", "bom-ref": "reference"},
             ],
             "compositions": [
                 {
                     "aggregate": "incomplete",
-                    "assemblies": ["a bom-ref", "a second bom-ref", "a third bom-ref"],
+                    "assemblies": [
+                        "a bom-ref",
+                        "a second bom-ref",
+                        "a third bom-ref",
+                        "reference",
+                    ],
                 }
             ],
         }
@@ -652,7 +679,7 @@ class TestDeleteUnknownComponent(AmendTestCase):
                 "component": {
                     "bom-ref": "a bom-ref",
                     "licenses": [
-                        {"license": {"name": "unknown", "text": ""}},
+                        {"license": {"name": "unknown", "text": {"content": ""}}},
                     ],
                 },
                 "authors": [{"name": "automated"}],

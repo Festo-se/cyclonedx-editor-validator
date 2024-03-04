@@ -22,7 +22,7 @@ cdx-ev = "cdxev.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.9.0"
-python-dateutil = "2.8.2"
+python-dateutil = "2.9.0.post0"
 jsonschema = {version = "4.21.1", extras = ["format"]}
 
 [tool.poetry.group.dev.dependencies]

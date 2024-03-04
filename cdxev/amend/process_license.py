@@ -239,8 +239,6 @@ def delete_license_unknown(component: dict) -> None:
 
         elif not regex.search(license.get("license", {}).get("name", "false")):
             licenses_filtered.append(license)
-        print(license)
-        print(licenses_filtered)
     if licenses_filtered:
         component["licenses"] = licenses_filtered
     else:

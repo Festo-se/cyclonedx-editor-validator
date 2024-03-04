@@ -3,8 +3,8 @@ This module defines the amend operations which can be performed on an SBOM.
 It also declares a base class to inherit from when implementing new operations.
 """
 
-import datetime
 import importlib.resources
+import datetime
 import json
 import logging
 import uuid
@@ -230,6 +230,7 @@ class ProcessLicense(Operation):
         process_license(
             component, self.list_of_license_names, self.path_to_license_folder
         )
+        delete_license_unknown(component)
 
 
 class InferCopyright(Operation):
@@ -251,7 +252,7 @@ class InferCopyright(Operation):
 
         year = datetime.date.today().year
         supplier_name = component.get("supplier", {}).get("name", "")
-        copyright = f"Copyright {year} {supplier_name}, all rights reserved"
+        copyright = f"Copyright {year} {supplier_name}"
         component["copyright"] = copyright
 
     def handle_component(

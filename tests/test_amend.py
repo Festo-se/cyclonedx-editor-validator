@@ -554,5 +554,187 @@ class GetLicenseTextFromFile(unittest.TestCase):
             )
 
 
+class TestDeleteUnknownComponent(AmendTestCase):
+    def test_delete_unknown_component(self) -> None:
+        licenses = [
+            {"license": {"name": "unknown.something"}},
+            {"license": {"name": "whateverUnknown"}},
+            {"license": {"name": "unKnowN etc"}},
+            {"license": {"name": "AunknowNM", "text": {"content": ""}}},
+            {"license": {"name": "unknown", "text": {"content": "license text"}}},
+            {"license": {"name": "some license", "text": {"content": "license text"}}},
+            {"license": {"name": "some license"}},
+            {"license": {"name": ""}},
+        ]
+        component = {"licenses": copy.deepcopy(licenses)}
+        process_license.delete_license_unknown(component)
+        self.assertEqual(component["licenses"], licenses[4:])
+
+    def test_amend_delete_license_unknown(self) -> None:
+        sbom = {
+            "metadata": {
+                "component": {
+                    "bom-ref": "a bom-ref",
+                    "licenses": [
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                        {"license": {"name": "unknown", "text": {"content": ""}}},
+                        {
+                            "license": {
+                                "name": "unknown",
+                                "text": {"content": "some text"},
+                            }
+                        },
+                    ],
+                },
+                "authors": [{"name": "automated"}],
+            },
+            "components": [
+                {
+                    "bom-ref": "a second bom-ref",
+                    "licenses": [
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                    ],
+                },
+                {
+                    "bom-ref": "a third bom-ref",
+                    "licenses": [
+                        {"license": {"name": "some_unknown_license"}},
+                        {"license": {"name": "license"}},
+                        {
+                            "license": {
+                                "name": "unknown",
+                                "text": {"content": "some description"},
+                            }
+                        },
+                    ],
+                },
+                {"name": "test", "bom-ref": "reference"},
+            ],
+            "compositions": [
+                {
+                    "aggregate": "incomplete",
+                    "assemblies": ["a bom-ref", "a second bom-ref", "a third bom-ref"],
+                }
+            ],
+        }
+        sbom_changed = {
+            "metadata": {
+                "component": {
+                    "bom-ref": "a bom-ref",
+                    "licenses": [
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                        {
+                            "license": {
+                                "name": "unknown",
+                                "text": {"content": "some text"},
+                            }
+                        },
+                    ],
+                },
+                "authors": [{"name": "automated"}],
+            },
+            "components": [
+                {
+                    "bom-ref": "a second bom-ref",
+                    "licenses": [
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                    ],
+                },
+                {
+                    "bom-ref": "a third bom-ref",
+                    "licenses": [
+                        {"license": {"name": "license"}},
+                        {
+                            "license": {
+                                "name": "unknown",
+                                "text": {"content": "some description"},
+                            }
+                        },
+                    ],
+                },
+                {"name": "test", "bom-ref": "reference"},
+            ],
+            "compositions": [
+                {
+                    "aggregate": "incomplete",
+                    "assemblies": [
+                        "a bom-ref",
+                        "a second bom-ref",
+                        "a third bom-ref",
+                        "reference",
+                    ],
+                }
+            ],
+        }
+        run_amend(sbom)
+        self.assertEqual(sbom, sbom_changed)
+
+    def test_amend_delete_single_license(self) -> None:
+        sbom = {
+            "metadata": {
+                "component": {
+                    "bom-ref": "a bom-ref",
+                    "licenses": [
+                        {"license": {"name": "unknown", "text": {"content": ""}}},
+                    ],
+                },
+                "authors": [{"name": "automated"}],
+            },
+            "components": [
+                {
+                    "bom-ref": "a second bom-ref",
+                    "licenses": [
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                    ],
+                },
+                {
+                    "bom-ref": "a third bom-ref",
+                    "licenses": [
+                        {"license": {"name": "some_unknown_license"}},
+                    ],
+                },
+            ],
+            "compositions": [
+                {
+                    "aggregate": "incomplete",
+                    "assemblies": ["a bom-ref", "a second bom-ref", "a third bom-ref"],
+                }
+            ],
+        }
+        sbom_changed = {
+            "metadata": {
+                "component": {
+                    "bom-ref": "a bom-ref",
+                },
+                "authors": [{"name": "automated"}],
+            },
+            "components": [
+                {
+                    "bom-ref": "a second bom-ref",
+                    "licenses": [
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                    ],
+                },
+                {
+                    "bom-ref": "a third bom-ref",
+                },
+            ],
+            "compositions": [
+                {
+                    "aggregate": "incomplete",
+                    "assemblies": ["a bom-ref", "a second bom-ref", "a third bom-ref"],
+                }
+            ],
+        }
+        run_amend(sbom)
+        self.assertEqual(sbom, sbom_changed)
+
+
 if __name__ == "__main__":
     unittest.main()

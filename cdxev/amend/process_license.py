@@ -227,7 +227,7 @@ def get_license_text_from_folder(license_name: str, path_to_license_folder: str)
             )
 
 
-def delete_unknown_license(component: dict) -> None:
+def delete_license_unknown(component: dict) -> None:
     if component.get("licenses", False):
         regex = re.compile(r"[Uu][Nn][Kk][Nn][Oo][Ww][Nn]")
         licenses_filtered = []

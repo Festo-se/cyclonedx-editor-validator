@@ -567,10 +567,10 @@ class TestDeleteUnknownComponent(AmendTestCase):
             {"license": {"name": ""}},
         ]
         component = {"licenses": copy.deepcopy(licenses)}
-        process_license.delete_unknown_license(component)
+        process_license.delete_license_unknown(component)
         self.assertEqual(component["licenses"], licenses[4:])
 
-    def test_amend_delete_unknown_license(self) -> None:
+    def test_amend_delete_license_unknown(self) -> None:
         sbom = {
             "metadata": {
                 "component": {

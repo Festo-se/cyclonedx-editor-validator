@@ -557,14 +557,14 @@ class GetLicenseTextFromFile(unittest.TestCase):
 class TestDeleteUnknownComponent(AmendTestCase):
     def test_delete_unknown_component(self) -> None:
         licenses = [
-            {"name": "unknown.something"},
-            {"name": "whateverUnknown"},
-            {"name": "unKnowN etc"},
-            {"name": "AunknowNM", "text": ""},
-            {"name": "unknown", "text": "license text"},
-            {"name": "some license", "text": "license text"},
-            {"name": "some license"},
-            {"name": ""},
+            {"license": {"name": "unknown.something"}},
+            {"license": {"name": "whateverUnknown"}},
+            {"license": {"name": "unKnowN etc"}},
+            {"license": {"name": "AunknowNM", "text": ""}},
+            {"license": {"name": "unknown", "text": "license text"}},
+            {"license": {"name": "some license", "text": "license text"}},
+            {"license": {"name": "some license"}},
+            {"license": {"name": ""}},
         ]
         component = {"licenses": copy.deepcopy(licenses)}
         process_license.delete_unknown_license(component)
@@ -576,10 +576,10 @@ class TestDeleteUnknownComponent(AmendTestCase):
                 "component": {
                     "bom-ref": "a bom-ref",
                     "licenses": [
-                        {"name": "some_license"},
-                        {"name": "license"},
-                        {"name": "unknown", "text": ""},
-                        {"name": "unknown", "text": "some text"},
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                        {"license": {"name": "unknown", "text": ""}},
+                        {"license": {"name": "unknown", "text": "some text"}},
                     ],
                 },
                 "authors": [{"name": "automated"}],
@@ -587,14 +587,17 @@ class TestDeleteUnknownComponent(AmendTestCase):
             "components": [
                 {
                     "bom-ref": "a second bom-ref",
-                    "licenses": [{"name": "some_license"}, {"name": "license"}],
+                    "licenses": [
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                    ],
                 },
                 {
                     "bom-ref": "a third bom-ref",
                     "licenses": [
-                        {"name": "some_unknown_license"},
-                        {"name": "license"},
-                        {"name": "unknown", "text": "some description"},
+                        {"license": {"name": "some_unknown_license"}},
+                        {"license": {"name": "license"}},
+                        {"license": {"name": "unknown", "text": "some description"}},
                     ],
                 },
             ],
@@ -610,9 +613,9 @@ class TestDeleteUnknownComponent(AmendTestCase):
                 "component": {
                     "bom-ref": "a bom-ref",
                     "licenses": [
-                        {"name": "some_license"},
-                        {"name": "license"},
-                        {"name": "unknown", "text": "some text"},
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                        {"license": {"name": "unknown", "text": "some text"}},
                     ],
                 },
                 "authors": [{"name": "automated"}],
@@ -620,13 +623,16 @@ class TestDeleteUnknownComponent(AmendTestCase):
             "components": [
                 {
                     "bom-ref": "a second bom-ref",
-                    "licenses": [{"name": "some_license"}, {"name": "license"}],
+                    "licenses": [
+                        {"license": {"name": "some_license"}},
+                        {"license": {"name": "license"}},
+                    ],
                 },
                 {
                     "bom-ref": "a third bom-ref",
                     "licenses": [
-                        {"name": "license"},
-                        {"name": "unknown", "text": "some description"},
+                        {"license": {"name": "license"}},
+                        {"license": {"name": "unknown", "text": "some description"}},
                     ],
                 },
             ],

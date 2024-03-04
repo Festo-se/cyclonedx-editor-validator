@@ -231,10 +231,10 @@ def delete_unknown_license(component: dict) -> None:
     regex = re.compile(r"[Uu][Nn][Kk][Nn][Oo][Ww][Nn]")
     licenses_filtered = []
     for license in component.get("licenses", []):
-        if license.get("text", False):
+        if license.get("license", {}).get("text", False):
             licenses_filtered.append(license)
 
-        elif not regex.search(license.get("name", "false")):
+        elif not regex.search(license.get("license", {}).get("name", "false")):
             licenses_filtered.append(license)
 
     if licenses_filtered:

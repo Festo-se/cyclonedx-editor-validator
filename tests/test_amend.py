@@ -685,8 +685,7 @@ class TestDeleteUnknownComponent(AmendTestCase):
             "metadata": {
                 "component": {
                     "bom-ref": "a bom-ref",
-                    "licenses": [
-                    ],
+                    "licenses": [],
                 },
                 "authors": [{"name": "automated"}],
             },

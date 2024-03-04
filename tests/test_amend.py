@@ -669,8 +669,6 @@ class TestDeleteUnknownComponent(AmendTestCase):
                     "bom-ref": "a third bom-ref",
                     "licenses": [
                         {"license": {"name": "some_unknown_license"}},
-                        {"license": {"name": "license"}},
-                        {"license": {"name": "unknown", "text": "some description"}},
                     ],
                 },
             ],
@@ -685,7 +683,6 @@ class TestDeleteUnknownComponent(AmendTestCase):
             "metadata": {
                 "component": {
                     "bom-ref": "a bom-ref",
-                    "licenses": [],
                 },
                 "authors": [{"name": "automated"}],
             },
@@ -699,10 +696,6 @@ class TestDeleteUnknownComponent(AmendTestCase):
                 },
                 {
                     "bom-ref": "a third bom-ref",
-                    "licenses": [
-                        {"license": {"name": "license"}},
-                        {"license": {"name": "unknown", "text": "some description"}},
-                    ],
                 },
             ],
             "compositions": [

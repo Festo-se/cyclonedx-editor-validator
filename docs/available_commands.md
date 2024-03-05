@@ -14,13 +14,17 @@ Currently, the command adds or modifies the following pieces of information:
 
 * If the SBOM metadata doesn't specify an *author* from the SBOM, it will be set to `{"name": "automated"}`.
 * The *compositions* array will be overwritten with a new one which specifies a single *incomplete* aggregate. This aggregate contains all components, including the metadata component.
-* If a component does not have an *author*, *publisher* or *supplier*, the tool will try to infer the supplier from (in order of precedence):
+* If a component does have a publisher and/or author but does not have a *supplier*, the tool will try to infer the `supplier.name` from the fields (in order of precedence):
+  * *publisher*
+  * *author*
+* If a component contains externalReferences and no supplier.url is provided, the tool will try to infer the *supplier.url* from (in order of precedence):
   * *externalReferences* of type *website*
   * *externalReferences* of type *issue-tracker*
   * *externalReferences* of type *vcs*
 * Generates a *bom-ref* for components which don't have one, yet. The *bom-ref* will be a GUID.
 * If the path to a folder with license text files is provided, the text will be included in the SBOM, if the license has the corresponding `name`.
 * If a `license.name` is similar to an SPDX-ID, it will be replaced, e.g. `{"license": {"name": "The Apache License, Version 2.0"}}` leads to `{"license": {"id": "Apache-2.0"}}`. For this purpose a [JSON-file](https://github.com/Festo-se/cyclonedx-editor-validator/blob/main/cdxev/amend/license_name_spdx_id_map.json) is used, where we provide a mapping of license names to SPDX-IDs, based on this [license-mapping](https://github.com/CycloneDX/cyclonedx-core-java/blob/master/src/main/resources/license-mapping.json).
+* If the SBOM contains a license which `name` includes any variation of the letter sequence "unknown" and no or an empty `text`, the license will be removed. Empty `licenses` fields will also be removed.
 
 ### Copy license texts from files
 

@@ -310,24 +310,7 @@
         "timestamp",
         "authors",
         "component"
-      ],
-      "if": {
-        "type": "object",
-        "properties": {
-          "component": {
-            "type": "object"
-          }
-        }
-      },
-      "then": {
-        "type": "object",
-        "properties": {
-          "component": {
-            "type": "object",
-            "required": ["copyright", "group"]
-          }
-        }
-      }
+      ]
     },
     "tool": {
       "type": "object",
@@ -378,6 +361,7 @@
         "name": {
           "type": "string",
           "title": "Name",
+          "minLength": 1,
           "description": "The name of the organization",
           "examples": [
             "Example Inc."
@@ -399,7 +383,24 @@
           "description": "A contact at the organization. Multiple contacts are allowed.",
           "items": {"$ref": "#/definitions/organizationalContact"}
         }
+      },
+      "anyOf": [
+        {
+            "required": [
+                "name"
+            ]
+        },
+        {
+            "required": [
+                "url"
+            ]
+        },
+        {
+          "required": [
+              "contact"
+          ]
       }
+    ]
     },
     "organizationalContact": {
       "type": "object",
@@ -691,11 +692,6 @@
           "anyOf": [
             {
               "required": [
-                "publisher"
-              ]
-            },
-            {
-              "required": [
                 "supplier"
               ]
             },
@@ -712,14 +708,30 @@
             "required": ["copyright"]
           },
           "then": {
-            "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
-            "required": ["group"]
+            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
+            "required": ["supplier"],
+            "dependencies": {
+              "supplier": {"properties": {"supplier": {"required": ["name"]}}}
+            }
           }
         },
         {
           "if": {
-            "properties": { "group": { "pattern": "^(com\\.festo\\.)" } },
-            "required": ["group"]
+            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
+            "required": ["supplier"],
+            "dependencies": {
+              "supplier": {"properties": {"supplier": {"required": ["name"]}}}
+            }
+          },
+          "then": {
+            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["copyright"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+            "required": ["author"]
           },
           "then": {
             "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },

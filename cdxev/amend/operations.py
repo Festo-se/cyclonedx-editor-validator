@@ -8,7 +8,7 @@ import json
 import logging
 import uuid
 
-from cdxev.amend.process_license import process_license
+from cdxev.amend.process_license import delete_license_unknown, process_license
 
 logger = logging.getLogger(__name__)
 
@@ -117,9 +117,16 @@ class DefaultAuthorOperation(Operation):
 
 class InferSupplier(Operation):
     """
-    As we need a contact in case of a security incident, at least one of the 'author', 'supplier'
-    or 'publisher' fields must be set on any component. If that's not the case, this operation
-    attempts to infer the 'supplier' from the following sources, in order of precedence:
+    At least one of the 'author', 'supplier' or 'publisher' fields must be set on any component but
+    the supplier field is desired.
+    If not already present this function will, try to infer a 'supplier.name'
+    and 'supplier.url'.
+    The supplier name will be inferred from:
+
+    - If a 'publisher' is present, it is used as supplier name.
+    - If no 'publisher but an 'author' is present, it is used as supplier name.
+
+    The 'supplier.url' will be inferred from the following sources, in order of precedence:
 
     - If an 'externalReference' of type 'website' is present, it is used as supplier URL.
     - If an 'externalReference' of type 'issue-tracker' is present, it is used as supplier URL.
@@ -129,41 +136,56 @@ class InferSupplier(Operation):
     scheme.
     """
 
+    def infer_supplier(self, component: dict) -> None:
+        if "url" not in component.get("supplier", {}):
+
+            if "externalReferences" in component:
+                accepted_references = ("website", "issue-tracker", "vcs")
+                accepted_url_schemes = ("http://", "https://")
+                for key in accepted_references:
+                    ext_ref = next(
+                        (
+                            x
+                            for x in component["externalReferences"]
+                            if x.get("type") == key
+                        ),
+                        None,
+                    )
+                    if ext_ref is not None and (
+                        any(
+                            ext_ref["url"].startswith(scheme)
+                            for scheme in accepted_url_schemes
+                        )
+                    ):
+                        component["supplier"] = component.get("supplier", {})
+                        component["supplier"]["url"] = [ext_ref["url"]]
+                        logger.debug(
+                            "Set supplier of %s to URL: %s",
+                            component.get("bom-ref", "<no bom-ref>"),
+                            ext_ref["url"],
+                        )
+                        break
+
+        if "name" not in component.get("supplier", {}):
+
+            if "publisher" in component:
+                component["supplier"] = component.get("supplier", {})
+                component["supplier"]["name"] = component["publisher"]
+                return
+
+            if "author" in component:
+                component["supplier"] = component.get("supplier", {})
+                component["supplier"]["name"] = component["author"]
+                return
+
     def handle_component(
         self, component: dict, path_to_license_folder: str = ""
     ) -> None:
-        if (
-            ("supplier" in component)
-            or ("publisher" in component)
-            or ("author" in component)
-        ):
-            return
+        self.infer_supplier(component)
 
-        if "externalReferences" in component:
-            accepted_references = ("website", "issue-tracker", "vcs")
-            accepted_url_schemes = ("http://", "https://")
-            for key in accepted_references:
-                ext_ref = next(
-                    (
-                        x
-                        for x in component["externalReferences"]
-                        if x.get("type") == key
-                    ),
-                    None,
-                )
-                if ext_ref is not None and (
-                    any(
-                        ext_ref["url"].startswith(scheme)
-                        for scheme in accepted_url_schemes
-                    )
-                ):
-                    component["supplier"] = {"url": [ext_ref["url"]]}
-                    logger.debug(
-                        "Set supplier of %s to URL: %s",
-                        component.get("bom-ref", "<no bom-ref>"),
-                        ext_ref["url"],
-                    )
-                    return
+    def handle_metadata(self, metadata: dict) -> None:
+        component = metadata.get("component", {})
+        self.infer_supplier(component)
 
 
 class ProcessLicense(Operation):
@@ -201,8 +223,10 @@ class ProcessLicense(Operation):
             self.list_of_license_names,
             self.path_to_license_folder,
         )
+        delete_license_unknown(metadata["component"])
 
     def handle_component(self, component: dict) -> None:
         process_license(
             component, self.list_of_license_names, self.path_to_license_folder
         )
+        delete_license_unknown(component)

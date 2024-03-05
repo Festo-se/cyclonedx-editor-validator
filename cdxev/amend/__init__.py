@@ -3,6 +3,7 @@ from .operations import (
     AddBomRefOperation,
     CompositionsOperation,
     DefaultAuthorOperation,
+    InferCopyright,
     InferSupplier,
     ProcessLicense,
 )
@@ -12,3 +13,4 @@ register_operation(DefaultAuthorOperation())
 register_operation(CompositionsOperation())
 register_operation(InferSupplier())
 register_operation(ProcessLicense())
+register_operation(InferCopyright())

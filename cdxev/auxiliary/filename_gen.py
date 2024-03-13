@@ -124,7 +124,7 @@ def _sanitize(s: str) -> str:
     * Filter out any characters which aren't alphanumeric, spaces, dashes, periods or underscores.
     * Strip any leading or trailing non-alphanumeric characters.
 
-    :param str value: The original string.
+    :param str s: The original string.
 
     :return: A representation safe for use as a filename.
     """

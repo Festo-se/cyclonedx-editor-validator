@@ -70,6 +70,43 @@ class FilenameGeneratorTestCase(unittest.TestCase):
         self.assertIsNotNone(re.fullmatch(pattern, filename))
 
     @patch(f"{fn.__name__}.datetime", wraps=dt.datetime)
+    def test_only_name(self, mock_dt):
+        mock_dt.now.return_value = dt.datetime(
+            1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc
+        )
+
+        del self.sbom["metadata"]["timestamp"]
+        del self.sbom["metadata"]["component"]["version"]
+        filename = fn.generate_filename(self.sbom)
+        self.assertEqual("Test_19990101T101112.cdx.json", filename)
+
+        pattern = fn.generate_validation_pattern(self.sbom)
+        self.assertIsNotNone(re.fullmatch(pattern, filename))
+
+    @patch(f"{fn.__name__}.datetime", wraps=dt.datetime)
+    def test_only_version(self, mock_dt):
+        mock_dt.now.return_value = dt.datetime(
+            1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc
+        )
+
+        del self.sbom["metadata"]["timestamp"]
+        del self.sbom["metadata"]["component"]["name"]
+        filename = fn.generate_filename(self.sbom)
+        self.assertEqual("unknown_1.0_19990101T101112.cdx.json", filename)
+
+        pattern = fn.generate_validation_pattern(self.sbom)
+        self.assertIsNotNone(re.fullmatch(pattern, filename))
+
+    def test_only_timestamp(self):
+        del self.sbom["metadata"]["component"]["name"]
+        del self.sbom["metadata"]["component"]["version"]
+        filename = fn.generate_filename(self.sbom)
+        self.assertEqual("unknown_20000101T123045.cdx.json", filename)
+
+        pattern = fn.generate_validation_pattern(self.sbom)
+        self.assertIsNotNone(re.fullmatch(pattern, filename))
+
+    @patch(f"{fn.__name__}.datetime", wraps=dt.datetime)
     @patch(f"{fn.__name__}.logger")
     def test_invalid_timestamp(self, mock_logger, mock_dt):
         mock_dt.now.return_value = dt.datetime(

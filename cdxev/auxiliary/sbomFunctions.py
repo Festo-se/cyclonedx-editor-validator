@@ -6,6 +6,7 @@ from enum import Enum
 from functools import total_ordering
 from re import fullmatch
 from typing import Any, Callable, Literal, Optional, Sequence, Union
+from cdxev.error import AppError
 
 from dateutil.parser import parse
 
@@ -465,6 +466,18 @@ class VersionConstraint:
         except:
             return False
 
+    def __lt__(self, other: object) -> bool:
+        return False
+
+    def __le__(self, other: object) -> bool:
+        return False
+
+    def __gt__(self, other: object) -> bool:
+        return False
+
+    def __ge__(self, other: object) -> bool:
+        return False
+
     def parse_version_schema(self) -> object:
         return self.version_string
 
@@ -512,6 +525,9 @@ class VersionConstraint:
             return True
         else:
             return False
+
+    def get_versioning_schema(self) -> str:
+        return self._version_schema
 
 
 class VersionConstraintSemver(VersionConstraint):
@@ -561,7 +577,7 @@ class VersionRange:
         self._sub_ranges: list[dict] = []
 
         # TODO check if range is  a valid expression
-        self._versioning_scheme = range[range.find(":") + 1 : range.find("/")]
+        self._versioning_scheme = range[: range.find("/")]
         self._version_constraints = range[range.find("/") + 1 :].split("|")
 
         self._version_objects = self._create_semver_version_from_constraints()
@@ -669,27 +685,66 @@ class VersionRange:
                     }
                 )
 
+    def version_is_in(self, version: VersionConstraint) -> bool:
+        def is_lesser_then_upper_limit(
+                upper_limit: VersionConstraint,
+                version: VersionConstraint
+        ) -> bool:
 
-"""
-        index = 0
-        counter = 0
-        version_range = {}
-        upper_limit = None
-        lower_limit = None
-        fixed_version = False
-        while (index and counter < len(self._version_constraints)):
-            counter += 1
-            if self._version_constraints[index]._lesser_then
-            or self._version_constraints[index]._lesser_equal:
-                upper_limit = self._version_constraints[index]
-            elif self._version_constraints[index]._greater_then
-            or self._version_constraints[index]._greater_equal:
-                lower_limit = self._version_constraints[index]
-                for n in range(index+1, len(self._version_constraints)):
-                    if self._version_constraints[n]._lesser_then
-                    or self._version_constraints[n]._lesser_equal:
-                        upper_limit = self._version_constraints[index]
-            else:
-                fixed_version = True
-    def is_in_range(self, version: object) -> bool:
-"""
+            if upper_limit._lesser_then:
+                if version < upper_limit:
+                    return True
+            elif upper_limit._lesser_equal:
+                if version <= upper_limit:
+                    return True
+            return False
+
+        def is_greater_then_lower_limit(
+                lower_limit: VersionConstraint,
+                version: VersionConstraint
+        ) -> bool:
+
+            if lower_limit._greater_then:
+                if version > lower_limit:
+                    return True
+            elif lower_limit._greater_equal:
+                if version >= lower_limit:
+                    return True
+            return False
+
+        if not version.get_versioning_schema() == self._versioning_scheme:
+            raise AppError(
+                "Incompatible version schemes",
+                (
+                    f'The scheme {version.get_versioning_schema()} of the provided '
+                    f'software version does not match the versions'
+                    f' in the ranges provided "{self.get_versioning_scheme()}".'
+                ),
+            )
+        for sub_range in self._sub_ranges:
+            is_in = True
+            if sub_range.get("is_fixed_version", False):
+                if not version == sub_range.get(
+                    "fixed_version",
+                    VersionConstraint("0.0.0")
+                ):
+                    is_in = False
+
+            if sub_range.get("has_lower_limit", False):
+                lower_limit = sub_range.get(
+                    "lower_limit",
+                    VersionConstraint("0.0.0")
+                )
+                if not is_greater_then_lower_limit(lower_limit, version):
+                    is_in = False
+
+            if sub_range.get("has_upper_limit", False):
+                upper_limit = sub_range.get(
+                    "upper_limit",
+                    VersionConstraint("0.0.0")
+                )
+                if not is_lesser_then_upper_limit(upper_limit, version):
+                    is_in = False
+            if is_in:
+                return True
+        return False

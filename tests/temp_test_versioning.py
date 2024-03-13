@@ -1,6 +1,7 @@
 import unittest
 
 from cdxev.auxiliary import sbomFunctions as sbF
+from cdxev.error import AppError
 
 
 class TestVersionConstraint(unittest.TestCase):
@@ -306,10 +307,6 @@ class TestVersionRange(unittest.TestCase):
         version_range_7 = sbF.VersionRange(
             "semver/<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
         )
-        for object in version_range_7._sub_ranges:
-            print("subrange")
-            print(object["lower_limit"])
-            print(object["upper_limit"])
         self.assertEqual(
             version_range_7._sub_ranges[0],
             {
@@ -354,3 +351,37 @@ class TestVersionRange(unittest.TestCase):
                 "is_fixed_version": False
             }
         )
+        version_range_8 = sbF.VersionRange(
+            "semver/>1.0.0"
+        )
+        self.assertEqual(
+            version_range_8._sub_ranges[0],
+            {
+                "lower_limit": sbF.VersionConstraintSemver(">1.0.0"),
+                "upper_limit": None,
+                "fixed_version": None,
+                "has_upper_limit": False,
+                "has_lower_limit": True,
+                "is_fixed_version": False
+            }
+        )
+
+    def test_semver_is_in_one_limit(self) -> None:
+        version_range_1 = sbF.VersionRange(
+            "semver/<1.0.0"
+        )
+        version_range_2 = sbF.VersionRange(
+            "semver/1.0.0"
+        )
+        version_range_3 = sbF.VersionRange(
+            "semver/>1.0.0"
+        )
+        with self.assertRaises(AppError):
+            version_range_1.version_is_in(sbF.VersionConstraint(">=6.1.0"))
+
+        self.assertTrue(version_range_2.version_is_in(sbF.VersionConstraintSemver("1.0.0")))
+        self.assertFalse(version_range_2.version_is_in(sbF.VersionConstraintSemver("1.1.0")))
+        self.assertTrue(version_range_1.version_is_in(sbF.VersionConstraintSemver("0.1.0")))
+        self.assertFalse(version_range_1.version_is_in(sbF.VersionConstraintSemver("1.1.0")))
+        self.assertTrue(version_range_3.version_is_in(sbF.VersionConstraintSemver("1.1.0")))
+        self.assertFalse(version_range_3.version_is_in(sbF.VersionConstraintSemver("1.0.0")))

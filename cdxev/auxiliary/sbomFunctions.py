@@ -406,3 +406,290 @@ def get_corresponding_reference_to_component(
             bomref_from_list = component_from_list.get("bom-ref", "")
             break
     return is_in_list, bomref_from_list
+
+
+class version:
+    def __init__(self, version: str, type: str):
+        self.version_string = version
+        self.version_type = type
+
+
+class VersionConstraint:
+    _lesser_then: bool = False
+    _lesser_equal: bool = False
+    _greater_then: bool = False
+    _greater_equal: bool = False
+    _version_schema = "undefined"
+
+    def __init__(
+        self,
+        version: str,
+        lesser_then: bool = False,
+        lesser_equal: bool = False,
+        greater_then: bool = False,
+        greater_equal: bool = False,
+    ) -> None:
+        self._input = version
+        self._lesser_then = lesser_then
+        self._lesser_equal = lesser_equal
+        self._greater_then = greater_then
+        self._greater_equal = greater_equal
+        self.version_string = self._parse_version(version)
+        self.version = self.parse_version_schema()
+
+    def __str__(self) -> str:
+        if self._lesser_then:
+            return "<" + self.version_string
+        elif self._lesser_equal:
+            return "<=" + self.version_string
+        elif self._greater_equal:
+            return ">=" + self.version_string
+        elif self._greater_then:
+            return ">" + self.version_string
+        else:
+            return self.version_string
+
+    def __eq__(self, other: object) -> bool:
+        try:
+            if (
+                self.version_string == other.version_string  # type:ignore
+                and self._lesser_then == other._lesser_then  # type:ignore
+                and self._lesser_equal == other._lesser_equal  # type:ignore
+                and self._greater_then == other._greater_then  # type:ignore
+                and self._greater_equal == other._greater_equal  # type:ignore
+                and self._version_schema == other._version_schema  # type:ignore
+            ):
+                return True
+            else:
+                return False
+        except:
+            return False
+
+    def parse_version_schema(self) -> object:
+        return self.version_string
+
+    def _parse_version(self, version: str) -> str:
+        if "<=" in version:
+            self._lesser_equal = True
+            return version.replace("<=", "")
+        elif ">=" in version:
+            self._greater_equal = True
+            return version.replace(">=", "")
+        elif "<" in version:
+            self._lesser_then = True
+            return version.replace("<", "")
+        elif ">" in version:
+            self._greater_then = True
+            return version.replace(">", "")
+        else:
+            return version
+
+    def is_upper_limit(self) -> bool:
+        if (
+            self._lesser_then
+            or self._lesser_equal
+        ):
+            return True
+        else:
+            return False
+
+    def is_lower_limit(self) -> bool:
+        if (
+            self._greater_then
+            or self._greater_equal
+        ):
+            return True
+        else:
+            return False
+
+    def is_fixed_version(self) -> bool:
+        if (
+            self._lesser_then is False
+            and self._lesser_equal is False
+            and self._greater_then is False
+            and self._greater_equal is False
+        ):
+            return True
+        else:
+            return False
+
+
+class VersionConstraintSemver(VersionConstraint):
+    _version_schema = "semver"
+
+    def parse_version_schema(self) -> semver.Version:
+        return semver.Version.parse(self.version_string)
+
+    def __lt__(self, other: object) -> bool:
+        if semver.Version.compare(self.version, other.version) == -1:  # type:ignore
+            return True
+        else:
+            return False
+
+    def __le__(self, other: object) -> bool:
+        if (
+            semver.Version.compare(self.version, other.version) == -1  # type:ignore
+            or semver.Version.compare(self.version, other.version) == 0  # type:ignore
+        ):  # type:ignore
+            return True
+        else:
+            return False
+
+    def __gt__(self, other: object) -> bool:
+        if semver.Version.compare(self.version, other.version) == 1:  # type:ignore
+            return True
+        else:
+            return False
+
+    def __ge__(self, other: object) -> bool:
+        if (
+            semver.Version.compare(self.version, other.version) == 1  # type:ignore
+            or semver.Version.compare(self.version, other.version) == 0  # type:ignore
+        ):  # type:ignore
+            return True
+        else:
+            return False
+
+
+class VersionRange:
+    _supported_schemata = ["semver", "calver"]
+
+    def __init__(self, range: str):
+        self._versioning_scheme = ""
+        self._version_constraints: list[str] = []
+        self._sorted_versions: list[object] = []
+        self._sub_ranges: list[dict] = []
+
+        # TODO check if range is  a valid expression
+        self._versioning_scheme = range[range.find(":") + 1 : range.find("/")]
+        self._version_constraints = range[range.find("/") + 1 :].split("|")
+
+        self._version_objects = self._create_semver_version_from_constraints()
+        self._sort_versions()
+        self._extract_sub_ranges()
+
+    def __str__(self) -> str:
+        print_string = self._versioning_scheme + "/"
+        for constraint in self._version_objects:
+            print_string += constraint.__str__() + "|"
+        return print_string[:-1]
+
+    def get_versioning_scheme(self) -> str:
+        return self._versioning_scheme
+
+    def get_version_constraints(self) -> list[str]:
+        return self._version_constraints
+
+    def _create_semver_version_from_constraints(self) -> list[VersionConstraintSemver]:
+        list_of_version_objects = []
+        for constraint in self._version_constraints:
+            list_of_version_objects.append(VersionConstraintSemver(constraint))
+        return list_of_version_objects
+
+    def _sort_versions(self) -> None:
+        n = len(self._version_objects)
+        for i in range(n):
+            already_sorted = True
+            for j in range(n - i - 1):
+                if self._version_objects[j] > self._version_objects[j + 1]:  # type:ignore
+                    self._version_objects[j], self._version_objects[j + 1] = (  # type:ignore
+                        self._version_objects[j + 1],
+                        self._version_objects[j],
+                    )
+                    already_sorted = False
+            if already_sorted:
+                break
+
+    def _extract_sub_ranges(self) -> None:
+        index = 0
+        counter = 0
+        upper_limit: object = None
+        lower_limit: object = None
+        fixed_version: object = None
+        has_upper_limit = False
+        has_lower_limit = False
+        while (index < len(self._version_objects) and counter < len(self._version_objects)):
+            counter += 1
+            constraint = self._version_objects[index]
+            if constraint.is_lower_limit():
+                lower_limit = constraint
+                fixed_version = None
+                upper_limit = None
+                has_lower_limit = True
+                has_upper_limit = False
+                index += 1
+                for n in range(index, len(self._version_objects)):
+                    if (
+                            upper_limit is not None
+                            and self._version_objects[n].is_lower_limit()
+                    ):
+                        break
+                    elif self._version_objects[n].is_upper_limit():
+                        upper_limit = self._version_objects[n]
+                        has_upper_limit = True
+                        index = n + 1
+
+            elif constraint.is_upper_limit():
+                upper_limit = constraint
+                has_upper_limit = True
+                fixed_version = None
+                index += 1
+                for n in range(index, len(self._version_objects)):
+                    if (
+                        self._version_objects[n].is_lower_limit()
+                        or self._version_objects[n].is_fixed_version()
+                    ):
+                        break
+                    elif self._version_objects[n].is_upper_limit():
+                        upper_limit = self._version_objects[n]
+                        index = n + 1
+
+            if constraint.is_fixed_version():
+                fixed_version = self._version_objects[index]
+                index += 1
+                self._sub_ranges.append(
+                    {
+                        "upper_limit": None,
+                        "lower_limit": None,
+                        "fixed_version": fixed_version,
+                        "has_upper_limit": False,
+                        "has_lower_limit": False,
+                        "is_fixed_version": True
+                    }
+                )
+            else:
+                self._sub_ranges.append(
+                    {
+                        "upper_limit": upper_limit,
+                        "lower_limit": lower_limit,
+                        "fixed_version": fixed_version,
+                        "has_upper_limit": has_upper_limit,
+                        "has_lower_limit": has_lower_limit,
+                        "is_fixed_version": False
+                    }
+                )
+
+
+"""
+        index = 0
+        counter = 0
+        version_range = {}
+        upper_limit = None
+        lower_limit = None
+        fixed_version = False
+        while (index and counter < len(self._version_constraints)):
+            counter += 1
+            if self._version_constraints[index]._lesser_then
+            or self._version_constraints[index]._lesser_equal:
+                upper_limit = self._version_constraints[index]
+            elif self._version_constraints[index]._greater_then
+            or self._version_constraints[index]._greater_equal:
+                lower_limit = self._version_constraints[index]
+                for n in range(index+1, len(self._version_constraints)):
+                    if self._version_constraints[n]._lesser_then
+                    or self._version_constraints[n]._lesser_equal:
+                        upper_limit = self._version_constraints[index]
+            else:
+                fixed_version = True
+    def is_in_range(self, version: object) -> bool:
+"""

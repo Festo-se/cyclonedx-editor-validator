@@ -432,6 +432,19 @@ class TestVersionRange(unittest.TestCase):
         self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("10.2.0")))
         self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.1.0")))
 
+    def test_version_string_is_in_range(self) -> None:
+        version_range = verpro_.VersionRange(
+            "semver/<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
+        )
+        self.assertTrue(version_range.version_string_is_in_range("4.0.0"))
+        self.assertTrue(version_range.version_string_is_in_range("6.1.0"))
+        self.assertTrue(version_range.version_string_is_in_range("8.1.1"))
+        self.assertTrue(version_range.version_string_is_in_range("1.5.1"))
+        self.assertTrue(version_range.version_string_is_in_range("5.0.0"))
+        self.assertTrue(version_range.version_string_is_in_range("7.9.9"))
+        self.assertFalse(version_range.version_string_is_in_range("10.2.0"))
+        self.assertFalse(version_range.version_string_is_in_range("4.1.0"))
+
 
 class TestVersionCalVer(unittest.TestCase):
     def test_regular_expressions(self) -> None:
@@ -487,6 +500,6 @@ class TestVersionCalVer(unittest.TestCase):
         self.assertTrue(version_3 < version_2)
         self.assertTrue(version_3 < version_1)
 
-    def test_version_range(self) -> None:
+    def test_print_version_range(self) -> None:
         version_range = verpro_.VersionRange("calver/<1.2.5|>1-2.6|<=2.0-0|>=3-1.2")
         self.assertEqual(version_range.__str__(), "calver/<1.2.5|>1-2.6|<=2.0-0|>=3-1.2")

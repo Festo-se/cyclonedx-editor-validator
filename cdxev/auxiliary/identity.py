@@ -266,16 +266,16 @@ class UpdateIdentity(ComponentIdentity):
         else:
             return str(self._keys[0]) if len(self) > 0 else ""
 
-    def is_target_in_version_range(self, identity: ComponentIdentity) -> bool:
+    def is_target_in_version_range(self, identity: Key) -> bool:
         if self._version_range is None:
             return False
         # only one identity specifier is allowed, so its has to be Coordinates, if it exists
-        update_name = identity.__getitem__(0).key.name
-        update_group = identity.__getitem__(0).key.group
-        if isinstance(identity.__getitem__(0).key, Coordinates):
-            component_name = identity.__getitem__(0).key.name
-            component_group = identity.__getitem__(0).key.group
-            component_version = identity.__getitem__(0).key.version
+        update_name = self.__getitem__(0).key.name
+        update_group = self.__getitem__(0).key.group
+        if identity.type == KeyType.COORDINATES:
+            component_name = identity.key.name
+            component_group = identity.key.group
+            component_version = identity.key.version
         else:
             return False
 
@@ -289,7 +289,7 @@ class UpdateIdentity(ComponentIdentity):
             return False
 
         version_range = self._version_range
-        if not version_range.version_is_in(component_version):
+        if not version_range.version_string_is_in_range(component_version):
             return False
 
         return True

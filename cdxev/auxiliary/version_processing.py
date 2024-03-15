@@ -230,16 +230,16 @@ class VersionConstraintCalVer(VersionConstraint):
 
 
 class VersionRange:
-    _supported_schemata = ["semver", "calver"]
+    _supported_schemas = ["semver", "calver"]
 
     def __init__(self, range: str):
-        self._versioning_scheme = ""
+        self._versioning_schema = ""
         self._version_constraints: list[str] = []
         self._sorted_versions: list[object] = []
         self._sub_ranges: list[dict] = []
 
         # TODO check if range is  a valid expression
-        self._versioning_scheme = range[: range.find("/")]
+        self._versioning_schema = range[: range.find("/")]
         self._version_constraints = range[range.find("/") + 1 :].split("|")
 
         self._version_objects = self._create_version_from_constraints()
@@ -247,13 +247,13 @@ class VersionRange:
         self._extract_sub_ranges()
 
     def __str__(self) -> str:
-        print_string = self._versioning_scheme + "/"
+        print_string = self._versioning_schema + "/"
         for constraint in self._version_objects:
             print_string += constraint.__str__() + "|"
         return print_string[:-1]
 
-    def get_versioning_scheme(self) -> str:
-        return self._versioning_scheme
+    def get_versioning_schema(self) -> str:
+        return self._versioning_schema
 
     def get_version_constraints(self) -> list[str]:
         return self._version_constraints
@@ -262,15 +262,16 @@ class VersionRange:
             self
     ) -> list[VersionConstraintSemver | VersionConstraintCalVer]:
         VersionClass: VersionConstraintSemver | VersionConstraintCalVer
-        if self._versioning_scheme == "calver":
+        if self._versioning_schema == "calver":
             VersionClass = VersionConstraintCalVer  # type:ignore
-        elif self._versioning_scheme == "semver":
+        elif self._versioning_schema == "semver":
             VersionClass = VersionConstraintSemver  # type:ignore
         else:
             raise AppError(
                 message="Version schema not supported",
                 description=(
-                    f'The versioning schema {self._versioning_scheme} is not supported.'
+                    f'The versioning schema {self._versioning_schema} is not supported. '
+                    f'The supporrted schemas are {self._supported_schemas}'
                 ),
             )
 
@@ -362,6 +363,13 @@ class VersionRange:
                     }
                 )
 
+    def version_string_is_in_range(self, version: str) -> bool:
+        if self._versioning_schema == "semver":
+            version_object = VersionConstraintSemver(version)
+        elif self._versioning_schema == "calver":
+            version_object = VersionConstraintCalVer(version)  # type:ignore
+        return self.version_is_in(version_object)
+
     def version_is_in(self, version: VersionConstraint) -> bool:
         def is_lesser_then_upper_limit(
                 upper_limit: VersionConstraint,
@@ -389,13 +397,13 @@ class VersionRange:
                     return True
             return False
 
-        if not version.get_versioning_schema() == self._versioning_scheme:
+        if not version.get_versioning_schema() == self._versioning_schema:
             raise AppError(
-                message="Incompatible version schemes",
+                message="Incompatible version schemas",
                 description=(
-                    f'The scheme {version.get_versioning_schema()} of the provided '
+                    f'The schema {version.get_versioning_schema()} of the provided '
                     f'software version does not match the versions'
-                    f' in the ranges provided "{self.get_versioning_scheme()}".'
+                    f' in the ranges provided "{self.get_versioning_schema()}".'
                 ),
             )
         for sub_range in self._sub_ranges:

@@ -222,13 +222,13 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
     ctx.component_map = _map_out_components(sbom)
 
     for update in updates:
-        target_list: list[dict]
+        target_list: list[dict] = []
         try:
             update_id = update["id"]
             if update_id.has_version_range:
                 for key in ctx.component_map.keys():
                     if update_id.is_target_in_version_range(key):
-                        target_list = ctx.component_map[key]
+                        target_list += ctx.component_map[key]
             else:
                 target_list = ctx.component_map[update_id[0]]
             for target in target_list:

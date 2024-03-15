@@ -167,8 +167,8 @@ class VersionConstraintCalVer(VersionConstraint):
     def check_regex(self, version_string: str) -> None:
         if not re.fullmatch("[0-9]+([-.][0-9]+)*", version_string):
             raise AppError(
-                "Version schema not valid",
-                (
+                message="Version schema not valid",
+                description=(
                     f'The version {version_string} is not according '
                     f'to "[0-9]+([-.][0-9]+)*"'
                 ),
@@ -268,8 +268,8 @@ class VersionRange:
             VersionClass = VersionConstraintSemver  # type:ignore
         else:
             raise AppError(
-                "Version schema not supported",
-                (
+                message="Version schema not supported",
+                description=(
                     f'The versioning schema {self._versioning_scheme} is not supported.'
                 ),
             )
@@ -391,8 +391,8 @@ class VersionRange:
 
         if not version.get_versioning_schema() == self._versioning_scheme:
             raise AppError(
-                "Incompatible version schemes",
-                (
+                message="Incompatible version schemes",
+                description=(
                     f'The scheme {version.get_versioning_schema()} of the provided '
                     f'software version does not match the versions'
                     f' in the ranges provided "{self.get_versioning_scheme()}".'

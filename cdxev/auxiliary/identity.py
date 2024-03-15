@@ -6,6 +6,7 @@ import typing as t
 from dataclasses import dataclass
 from enum import Enum
 from cdxev.auxiliary.version_processing import VersionRange
+from cdxev.error import AppError
 
 
 @functools.total_ordering
@@ -246,8 +247,15 @@ class UpdateIdentity(ComponentIdentity):
             coordinates = None
         version_range = None
         if "version_range" in update:
-            version_range = VersionRange(update["version_range"])
+            if "version_range" in update.keys() and "version" in update.keys():
+                raise AppError(
+                    message="Version and Versionrange provided",
+                    description=(
+                        f'The update: {update} contains a specific version and a version_range.'
+                    ),
+                )
 
+            version_range = VersionRange(update["version_range"])
         return UpdateIdentity(cpe, purl, swid, coordinates, version_range=version_range)
 
     def __str__(self) -> str:

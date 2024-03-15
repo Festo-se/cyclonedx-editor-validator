@@ -1,4 +1,5 @@
 import semver
+import re
 from cdxev.error import AppError
 
 
@@ -160,6 +161,74 @@ class VersionConstraintSemver(VersionConstraint):
             return False
 
 
+class VersionConstraintCalVer(VersionConstraint):
+    _version_schema = "calver"
+
+    def check_regex(self, version_string: str) -> None:
+        if not re.fullmatch("[0-9]+([-.][0-9]+)*", version_string):
+            raise AppError(
+                "Version schema not valid",
+                (
+                    f'The version {version_string} is not according '
+                    f'to "[0-9]+([-.][0-9]+)*"'
+                ),
+            )
+
+    def compare(self, version_1: VersionConstraint, version_2: VersionConstraint) -> int:
+        self.check_regex(version_1.version_string)
+        self.check_regex(version_2.version_string)
+
+        for n in range(min(len(version_1.version), len(version_2.version))):  # type:ignore
+            if version_1.version[n] > version_2.version[n]:  # type:ignore
+                return 1
+            elif version_1.version[n] < version_2.version[n]:  # type:ignore
+                return -1
+
+        if len(version_1.version) == len(version_2.version):  # type:ignore
+            return 0
+        elif len(version_1.version) > len(version_2.version):  # type:ignore
+            return 1
+        else:
+            return -1
+
+    def __lt__(self, other: object) -> bool:
+        if self.compare(self, other) == -1:  # type:ignore
+            return True
+        return False
+
+    def __le__(self, other: object) -> bool:
+        if (
+            self.compare(self, other) == -1  # type:ignore
+            or self.compare(self, other) == 0  # type:ignore
+        ):
+            return True
+        return False
+
+    def __gt__(self, other: object) -> bool:
+        if self.compare(self, other) == 1:  # type:ignore
+            return True
+        return False
+
+    def __ge__(self, other: object) -> bool:
+        if (
+            self.compare(self, other) == 1  # type:ignore
+            or self.compare(self, other) == 0  # type:ignore
+        ):
+            return True
+        return False
+
+    def parse_version_schema(self) -> list:
+        self.check_regex(self.version_string)
+        version_list = []
+        lower_limit = 0
+        for index, symbol in enumerate(self.version_string):
+            if symbol == "." or symbol == "-":
+                version_list.append(int(self.version_string[lower_limit:index]))
+                lower_limit = index + 1
+        version_list.append(int(self.version_string[lower_limit:]))
+        return version_list
+
+
 class VersionRange:
     _supported_schemata = ["semver", "calver"]
 
@@ -173,7 +242,7 @@ class VersionRange:
         self._versioning_scheme = range[: range.find("/")]
         self._version_constraints = range[range.find("/") + 1 :].split("|")
 
-        self._version_objects = self._create_semver_version_from_constraints()
+        self._version_objects = self._create_version_from_constraints()
         self._sort_versions()
         self._extract_sub_ranges()
 
@@ -189,10 +258,25 @@ class VersionRange:
     def get_version_constraints(self) -> list[str]:
         return self._version_constraints
 
-    def _create_semver_version_from_constraints(self) -> list[VersionConstraintSemver]:
+    def _create_version_from_constraints(
+            self
+    ) -> list[VersionConstraintSemver | VersionConstraintCalVer]:
+        VersionClass: VersionConstraintSemver | VersionConstraintCalVer
+        if self._versioning_scheme == "calver":
+            VersionClass = VersionConstraintCalVer  # type:ignore
+        elif self._versioning_scheme == "semver":
+            VersionClass = VersionConstraintSemver  # type:ignore
+        else:
+            raise AppError(
+                "Version schema not supported",
+                (
+                    f'The versioning schema {self._versioning_scheme} is not supported.'
+                ),
+            )
+
         list_of_version_objects = []
         for constraint in self._version_constraints:
-            list_of_version_objects.append(VersionConstraintSemver(constraint))
+            list_of_version_objects.append(VersionClass(constraint))  # type:ignore
         return list_of_version_objects
 
     def _sort_versions(self) -> None:

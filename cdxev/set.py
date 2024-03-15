@@ -6,7 +6,7 @@ import sys
 import typing as t
 from dataclasses import dataclass, field
 
-from cdxev.auxiliary.identity import ComponentIdentity, Key
+from cdxev.auxiliary.identity import ComponentIdentity, Key, UpdateIdentity
 from cdxev.auxiliary.sbomFunctions import walk_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
@@ -180,7 +180,7 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
             raise AppError(
                 "Invalid set file", "An update object is missing the 'id' property."
             )
-        component_id = ComponentIdentity.create(upd["id"], True)
+        component_id = UpdateIdentity.create(upd["id"], True)
         upd["id"] = component_id
 
         if len(component_id) == 0:
@@ -224,20 +224,27 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
     for update in updates:
         target_list: list[dict]
         try:
-            target_list = ctx.component_map[update["id"][0]]
+            update_id = update["id"]
+            if update_id.has_version_range:
+                for key in ctx.component_map.keys():
+                    if update_id.is_target_in_version_range(key):
+                        target_list = ctx.component_map[key]
+            else:
+                target_list = ctx.component_map[update_id[0]]
             for target in target_list:
                 _do_update(target, update, ctx)
+
         except KeyError:
             if not cfg.ignore_missing:
                 msg = LogMessage(
                     "Set not performed",
-                    f'The component "{update["id"]}" was not found and could not be updated.',
+                    f'The component "{update_id}" was not found and could not be updated.',
                 )
                 raise AppError(log_msg=msg)
             else:
                 logger.info(
                     LogMessage(
                         "Set not performed",
-                        f'The component "{update["id"]}" was not found and could not be updated.',
+                        f'The component "{update_id}" was not found and could not be updated.',
                     )
                 )

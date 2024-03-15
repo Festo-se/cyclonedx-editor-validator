@@ -5,6 +5,7 @@ import json
 import typing as t
 from dataclasses import dataclass
 from enum import Enum
+from cdxev.auxiliary.version_processing import VersionRange
 
 
 @functools.total_ordering
@@ -184,3 +185,103 @@ class ComponentIdentity:
             coordinates = None
 
         return ComponentIdentity(cpe, purl, swid, coordinates)
+
+
+@dataclass(frozen=True)
+class UpdateIdentity(ComponentIdentity):
+    _version_range: t.Union[VersionRange | None]
+    has_version_range: bool
+
+    def __init__(self, *keys: t.Optional[Key], version_range: t.Optional[VersionRange] = None):
+        filtered = (key for key in keys if key is not None)
+        sorted_keys = sorted(filtered, key=lambda k: k.type)
+        keyset = tuple(sorted_keys)
+        has_version_range = False
+        if version_range is not None:
+            has_version_range = True
+        object.__setattr__(self, "_keys", keyset)
+        object.__setattr__(self, "_version_range", version_range)
+        object.__setattr__(self, "has_version_range", has_version_range)
+
+    @classmethod
+    def create(
+        cls, update: t.Mapping[str, t.Any], allow_unsafe: bool = False
+    ) -> "UpdateIdentity":  # TODO adapt description!
+        """
+        Creates a :py:class:`.UpdateIdentity` for the given component.
+
+        The identity will contain all keys specified on the component.
+
+        If the `allow_unsafe` argument is set to `True`, then component properties will be taken
+        into account for identification which might not enforce strict identity.
+
+        This function considers as *safe*:
+
+        * *purl*
+        * *cpe*
+        * *swid*
+
+        The following are considered *unsafe*:
+
+        * package coordinates, i.e. the combination of *name*, *group* and *version*
+
+        :param component: one component dictionary from sbom["components"]
+
+        :param bool allow_unsafe: If set to true, *unsafe* keys will also be added to the returned
+                                    identity.
+
+        :returns: The `ComponentIdentity`.
+        """
+        cpe = Key.from_cpe(update["cpe"]) if "cpe" in update else None
+        purl = Key.from_purl(update["purl"]) if "purl" in update else None
+        swid = Key.from_swid(update["swid"]) if "swid" in update else None
+
+        if allow_unsafe and "name" in update:
+            coordinates = Key.from_coordinates(
+                name=update["name"],
+                group=update.get("group"),
+                version=update.get("version"),
+            )
+        else:
+            coordinates = None
+        version_range = None
+        if "version_range" in update:
+            version_range = VersionRange(update["version_range"])
+
+        return UpdateIdentity(cpe, purl, swid, coordinates, version_range=version_range)
+
+    def __str__(self) -> str:
+        if self.has_version_range:
+            range_str = self._version_range.__str__()
+            range_str = "@" + "version_range:" + range_str[range_str.find("/") + 1:]
+            return str(self._keys[0]) + range_str if len(self) > 0 else ""
+        else:
+            return str(self._keys[0]) if len(self) > 0 else ""
+
+    def is_target_in_version_range(self, identity: ComponentIdentity) -> bool:
+        if self._version_range is None:
+            return False
+        # only one identity specifier is allowed, so its has to be Coordinates, if it exists
+        update_name = identity.__getitem__(0).key.name
+        update_group = identity.__getitem__(0).key.group
+        if isinstance(identity.__getitem__(0).key, Coordinates):
+            component_name = identity.__getitem__(0).key.name
+            component_group = identity.__getitem__(0).key.group
+            component_version = identity.__getitem__(0).key.version
+        else:
+            return False
+
+        if update_name != component_name:
+            return False
+
+        if (
+            update_group != component_group
+            and update_group is not None
+        ):
+            return False
+
+        version_range = self._version_range
+        if not version_range.version_is_in(component_version):
+            return False
+
+        return True

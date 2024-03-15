@@ -2,6 +2,7 @@ import unittest
 
 from cdxev.auxiliary import version_processing as verpro_
 from cdxev.error import AppError
+import re
 
 
 class TestVersionConstraint(unittest.TestCase):
@@ -430,3 +431,62 @@ class TestVersionRange(unittest.TestCase):
         self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("7.9.9")))
         self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("10.2.0")))
         self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.1.0")))
+
+
+class TestVersionCalVer(unittest.TestCase):
+    def test_regular_expressions(self) -> None:
+        self.assertTrue(re.fullmatch("[0-9]+(.[0-9]+)*", "10000.20202.4932832"))
+        self.assertTrue(re.fullmatch("[0-9]+([-.][0-9]+)*", "10000.20202.4932832"))
+        self.assertTrue(re.fullmatch("[0-9]+([-.][0-9]+)*", "10000-20202-4932832"))
+        self.assertTrue(re.fullmatch("[0-9]+([-.][0-9]+)*", "10000.20202-4932832"))
+        self.assertFalse(re.fullmatch("[0-9]+([-.][0-9]+)*", "10000.20202--4932832"))
+
+    def test_parse_version(self) -> None:
+        version = verpro_.VersionConstraintCalVer("10000.20202-4932832")
+        self.assertEqual(version.version, [10000, 20202, 4932832])
+        version_2 = verpro_.VersionConstraintCalVer("10000-20202-4932832")
+        self.assertEqual(version_2.version, [10000, 20202, 4932832])
+        version_3 = verpro_.VersionConstraintCalVer("10000.20202.4932832")
+        self.assertEqual(version_3.version, [10000, 20202, 4932832])
+        version_4 = verpro_.VersionConstraintCalVer("10000.20202.4932832-2234.556.0001")
+        self.assertEqual(version_4.version, [10000, 20202, 4932832, 2234, 556, 1])
+        with self.assertRaises(AppError):
+            verpro_.VersionConstraintCalVer("10000..20202.4932832")
+
+    def test_order_operators_same_length(self) -> None:
+        version_1 = verpro_.VersionConstraintCalVer("10000.20202-4932832")
+        version_2 = verpro_.VersionConstraintCalVer("10000.20202-4932832")
+        version_3 = verpro_.VersionConstraintCalVer("10001.20202-4932832")
+        version_4 = verpro_.VersionConstraintCalVer("10000.30202-4932832")
+        version_5 = verpro_.VersionConstraintCalVer("10000.20202-4932833")
+        version_6 = verpro_.VersionConstraintCalVer("10000.20201-4932833")
+        self.assertTrue(version_1 == version_2)
+        self.assertTrue(version_1 <= version_2)
+        self.assertTrue(version_1 >= version_2)
+        self.assertTrue(version_1 < version_3)
+        self.assertTrue(version_1 < version_4)
+        self.assertTrue(version_1 < version_5)
+        self.assertTrue(version_1 > version_6)
+        self.assertTrue(version_6 < version_1)
+        self.assertTrue(version_3 > version_1)
+        self.assertTrue(version_4 > version_1)
+        self.assertTrue(version_5 > version_1)
+        self.assertFalse(version_1 != version_2)
+        self.assertFalse(version_1 < version_2)
+        self.assertFalse(version_1 > version_2)
+
+    def test_order_operators_different_length(self) -> None:
+        version_1 = verpro_.VersionConstraintCalVer("10000.20202-4932832")
+        version_2 = verpro_.VersionConstraintCalVer("10000.20202-4932832.333")
+        version_3 = verpro_.VersionConstraintCalVer("10000.20202-4932831")
+        self.assertTrue(version_1 <= version_2)
+        self.assertTrue(version_1 < version_2)
+        self.assertTrue(version_2 > version_1)
+        self.assertTrue(version_2 >= version_1)
+        self.assertTrue(version_1 > version_3)
+        self.assertTrue(version_3 < version_2)
+        self.assertTrue(version_3 < version_1)
+
+    def test_version_range(self) -> None:
+        version_range = verpro_.VersionRange("calver/<1.2.5|>1-2.6|<=2.0-0|>=3-1.2")
+        self.assertEqual(version_range.__str__(), "calver/<1.2.5|>1-2.6|<=2.0-0|>=3-1.2")

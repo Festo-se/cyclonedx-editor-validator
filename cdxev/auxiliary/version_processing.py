@@ -1,6 +1,13 @@
 import semver
 import re
-from cdxev.error import AppError
+import typing as t
+import logging
+from cdxev.error import AppError, InputFileError
+from pathlib import Path
+import json
+
+
+logger = logging.getLogger(__name__)
 
 
 class version:
@@ -227,6 +234,206 @@ class VersionConstraintCalVer(VersionConstraint):
                 lower_limit = index + 1
         version_list.append(int(self.version_string[lower_limit:]))
         return version_list
+
+
+class CustomVersionData:
+    """
+    Class storing the data for software versions provided by the user.
+    The input is a path to a file containing the information about the versions.
+    The file has to be of the form:
+
+    [
+        {
+            "name: "Name of the versioning",
+            "version_list": [
+                Ordered list of the software versions
+            ]
+        }
+    ]
+
+    The "version_type" field is a identifier for the versioning schema.
+    The "version_list" is a list of all the software versions,
+    beginning with the lowest up to the highest.
+    """
+    _version_schema = "custom"
+    _custom_versions: dict[str, t.Any] = {}
+
+    def __init__(self, path_to_file: Path):
+        schema_data = self.read_schema_data_from_file(path_to_file)
+        self.add_data_to_custom_versions(schema_data)
+
+    def add_data_from_file(self, path_to_file: Path) -> None:
+        schema_data = self.read_schema_data_from_file(path_to_file)
+        self.add_data_to_custom_versions(schema_data)
+
+    def add_data_from_list(self, list_of_schema_data: list) -> None:
+        self.add_data_to_custom_versions(list_of_schema_data)
+
+    def add_data_from_dict(self, schema_data_dict: dict) -> None:
+        schema_data = [schema_data_dict]
+        self.add_data_to_custom_versions(schema_data)
+
+    def read_schema_data_from_file(self, path_to_file: Path) -> list:
+        with open(path_to_file, "r") as from_file:
+            try:
+                schema_data = json.load(from_file)
+            except json.JSONDecodeError as ex:
+                raise InputFileError(
+                    "Invalid JSON passed to --custom_versions",
+                    None,
+                    ex.lineno,
+                ) from ex
+
+        # Check the format of the input file
+        if isinstance(schema_data, dict):
+            schema_data = [schema_data]
+
+        return schema_data
+
+    def add_data_to_custom_versions(self, schema_data: list) -> None:
+        if len(schema_data) == 0:
+            return
+
+        for schema in schema_data:
+            if not ("version_type" in schema.keys() and "version_list" in schema.keys()):
+                raise AppError(
+                    message="Invalid format",
+                    description=(
+                        f'The provided schema {schema} is not according to the specified format.'
+                        '"version_type" and "version_list" are required properties.'
+                    ),
+                )
+            if not (isinstance(schema["version_type"], str) and isinstance(
+                schema["version_list"], list)
+            ):
+                raise AppError(
+                    message="Inavlid type",
+                    description=(
+                        '"version_type" has to be of type "str" and "version_list" of type "list".'
+                    ),
+                )
+        if schema["version_type"] in self._custom_versions.keys():
+            logger.info(
+                (
+                    f'The version schema "{schema["version_type"]}"'
+                    'existed already and will be overwritten'
+                )
+            )
+        self._custom_versions[schema["version_type"]] = schema["version_list"]
+
+
+class VersionConstraintCustom(VersionConstraint, CustomVersionData):
+    def __init__(
+        self,
+        version: str,
+        version_type: str
+    ) -> None:
+        self._input = version
+        self._lesser_then = False
+        self._lesser_equal = False
+        self._greater_then = False
+        self._greater_equal = False
+        self.version_typ = version_type
+        self.version_string = self._parse_version(version)
+        self.version = self.parse_version_schema()
+
+    def get_index(self, version: str) -> int:
+        if version in self._custom_versions.get(self.version_typ, []):
+            return self._custom_versions.get(self.version_typ, []).index(version)
+        else:
+            raise AppError(
+                message="Unknown version",
+                description=(
+                    f'The provided version "{version}" was not found in the'
+                    'provided version ist'
+                    f' of "{self.version_typ}".'
+                ),
+            )
+
+    def __eq__(self, other: object) -> bool:
+        try:
+            if (
+                self.version_string == other.version_string  # type:ignore
+                and self._lesser_then == other._lesser_then  # type:ignore
+                and self._lesser_equal == other._lesser_equal  # type:ignore
+                and self._greater_then == other._greater_then  # type:ignore
+                and self._greater_equal == other._greater_equal  # type:ignore
+                and self._version_schema == other._version_schema  # type:ignore
+                and self.version_typ == other.version_typ  # type:ignore
+            ):
+                return True
+            else:
+                return False
+        except:
+            return False
+
+    def __lt__(self, other: object) -> bool:
+        if self.version_typ != other.version_type:  # type:ignore
+            raise AppError(
+                message="Versions of different type cannot be compared",
+                description=(
+                    f'The compared versions are of type "{self.version_typ}" and'
+                    f' "{other.version_type}"'  # type:ignore
+                    'no order operator for different version types is implemented'
+                ),
+            )
+        own_index = self.get_index(self.version)  # type:ignore
+        other_index = other.get_index(self.version)  # type:ignore
+        if own_index < other_index:
+            return True
+        else:
+            return False
+
+    def __le__(self, other: object) -> bool:
+        if self.version_typ != other.version_type:  # type:ignore
+            raise AppError(
+                message="Versions of different type cannot be compared",
+                description=(
+                    f'The compared versions are of type "{self.version_typ}" and'
+                    f' "{other.version_type}"'  # type:ignore
+                    'no order operator for different version types is implemented'
+                ),
+            )
+        own_index = self.get_index(self.version)  # type:ignore
+        other_index = other.get_index(self.version)  # type:ignore
+        if own_index <= other_index:
+            return True
+        else:
+            return False
+
+    def __gt__(self, other: object) -> bool:
+        if self.version_typ != other.version_type:  # type:ignore
+            raise AppError(
+                message="Versions of different type cannot be compared",
+                description=(
+                    f'The compared versions are of type "{self.version_typ}" and'
+                    f' "{other.version_type}"'  # type:ignore
+                    'no order operator for different version types is implemented'
+                ),
+            )
+        own_index = self.get_index(self.version)  # type:ignore
+        other_index = other.get_index(self.version)  # type:ignore
+        if own_index > other_index:
+            return True
+        else:
+            return False
+
+    def __ge__(self, other: object) -> bool:
+        if self.version_typ != other.version_type:  # type:ignore
+            raise AppError(
+                message="Versions of different type cannot be compared",
+                description=(
+                    f'The compared versions are of type "{self.version_typ}" and'
+                    f' "{other.version_type}"'  # type:ignore
+                    'no order operator for different version types is implemented'
+                ),
+            )
+        own_index = self.get_index(self.version)  # type:ignore
+        other_index = other.get_index(self.version)  # type:ignore
+        if own_index >= other_index:
+            return True
+        else:
+            return False
 
 
 class VersionRange:

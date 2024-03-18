@@ -62,7 +62,7 @@ def update_timestamp(sbom: dict) -> None:
 def update_tools(sbom: dict) -> None:
     """Adds this tool to the list of tools in metadata."""
     metadata: dict = sbom.setdefault("metadata", {})
-    tools: dict | list = metadata.setdefault("tools", [])
+    tools: t.Union[dict, list] = metadata.setdefault("tools", [])
 
     # Starting in CycloneDX 1.5 tools might be a list or a dict.
     if isinstance(tools, dict):

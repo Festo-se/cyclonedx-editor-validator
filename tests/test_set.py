@@ -7,6 +7,7 @@ import unittest
 
 import cdxev.error
 import cdxev.set
+import copy
 
 from typing import Sequence, Any
 
@@ -510,7 +511,6 @@ class SetTestCase(unittest.TestCase):
                 "set": {"name": "new name"},
             },
         ]
-
         cfg = cdxev.set.SetConfig(
             True,
             True,
@@ -519,7 +519,7 @@ class SetTestCase(unittest.TestCase):
             True,
         )
 
-        cdxev.set.run(self.sbom_fixture, updates, cfg)
+        cdxev.set.run(self.sbom_fixture, copy.deepcopy(updates), cfg)
 
         cfg = cdxev.set.SetConfig(
             True,

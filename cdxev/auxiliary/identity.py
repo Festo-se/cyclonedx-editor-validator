@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 from cdxev.auxiliary.version_processing import VersionRange
 from cdxev.error import AppError
+import re
 
 
 @functools.total_ordering
@@ -245,26 +246,29 @@ class UpdateIdentity(ComponentIdentity):
             )
         else:
             coordinates = None
+
         version_range = None
-        if "version_range" in update:
-            if "version_range" in update.keys() and "version" in update.keys():
+        version_str = update.get("version", "")
+        if re.match('^range:.*', version_str):
+            if re.fullmatch('^range:.*/.*', version_str):
+                version_range = VersionRange(version_str[version_str.find(":") + 1:])
+            else:
                 raise AppError(
-                    message="Version and Versionrange provided",
+                    message="Provided version range does not match the required schema",
                     description=(
-                        f'The update: {update} contains a specific version and a version_range.'
+                        f'The provided version range: {update.get("version", "")} does'
+                        ' not match the required schema "^range:.*/.*".'
                     ),
                 )
-
-            version_range = VersionRange(update["version_range"])
         return UpdateIdentity(cpe, purl, swid, coordinates, version_range=version_range)
 
     def __str__(self) -> str:
-        if self.has_version_range:
-            range_str = self._version_range.__str__()
-            range_str = "@" + "version_range:" + range_str[range_str.find("/") + 1:]
-            return str(self._keys[0]) + range_str if len(self) > 0 else ""
-        else:
-            return str(self._keys[0]) if len(self) > 0 else ""
+        return str(self._keys[0]) if len(self) > 0 else ""
+
+    def __eq__(self, other: object) -> bool:
+        return (isinstance(other, UpdateIdentity) and any(
+            k in self._keys for k in other._keys
+        ) and self._version_range == other._version_range)
 
     def is_target_in_version_range(self, identity: Key) -> bool:
         if self._version_range is None:

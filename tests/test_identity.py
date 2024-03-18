@@ -2,7 +2,8 @@
 
 import unittest
 
-from cdxev.auxiliary.identity import ComponentIdentity, Key, KeyType
+from cdxev.auxiliary.identity import ComponentIdentity, Key, KeyType, UpdateIdentity
+from cdxev.error import AppError
 
 
 class IdentityTestCase(unittest.TestCase):
@@ -206,3 +207,115 @@ class IdentityTestCase(unittest.TestCase):
         self.assertTrue(purl_key in component_id)
         self.assertTrue(coordinates_key in component_id)
         self.assertFalse(swid_key in component_id)
+
+
+class TestUpdateIdentity(unittest.TestCase):
+    sample_cpe = "cpe:/a:example:mylibrary:1.0.0"
+    sample_purl = "pkg:maven/org.apache.tomcat/tomcat-catalina@9.0.14"
+    sample_swid = {
+        "tagId": "swidgen-242eb18a-503e-ca37-393b-cf156ef09691_9.1.1",
+        "name": "Acme Application",
+        "version": "9.1.1",
+        "text": {
+            "contentType": "text/xml",
+            "encoding": "base64",
+            "content": (
+                "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiID8+"
+                "CjxTb2Z0d2FyZUlkZW50aXR5IHhtbDpsYW5nPSJFTiIgbmFtZT0i"
+                "QWNtZSBBcHBsaWNhdGlvbiIgdmVyc2lvbj0iOS4xLjEiIAogdmVy"
+                "c2lvblNjaGVtZT0ibXVsdGlwYXJ0bnVtZXJpYyIgCiB0YWdJZD0i"
+                "c3dpZGdlbi1iNTk1MWFjOS00MmMwLWYzODItM2YxZS1iYzdhMmE0"
+                "NDk3Y2JfOS4xLjEiIAogeG1sbnM9Imh0dHA6Ly9zdGFuZGFyZHMu"
+                "aXNvLm9yZy9pc28vMTk3NzAvLTIvMjAxNS9zY2hlbWEueHNkIj4g"
+                "CiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1M"
+                "U2NoZW1hLWluc3RhbmNlIiAKIHhzaTpzY2hlbWFMb2NhdGlvbj0i"
+                "aHR0cDovL3N0YW5kYXJkcy5pc28ub3JnL2lzby8xOTc3MC8tMi8y"
+                "MDE1LWN1cnJlbnQvc2NoZW1hLnhzZCBzY2hlbWEueHNkIiA+CiAg"
+                "PE1ldGEgZ2VuZXJhdG9yPSJTV0lEIFRhZyBPbmxpbmUgR2VuZXJh"
+                "dG9yIHYwLjEiIC8+IAogIDxFbnRpdHkgbmFtZT0iQWNtZSwgSW5j"
+                "LiIgcmVnaWQ9ImV4YW1wbGUuY29tIiByb2xlPSJ0YWdDcmVhdG9y"
+                "IiAvPiAKPC9Tb2Z0d2FyZUlkZW50aXR5Pg=="
+            ),
+        },
+    }
+    sample_coordinates = {"name": "mylibrary", "group": "acme", "version": "0.2.4"}
+
+    def test_comparison(self) -> None:
+        component = {
+            "type": "library",
+            "bom-ref": "some bom-ref",
+            "author": "Company Unit",
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": self.sample_coordinates["version"],
+            "cpe": self.sample_cpe,
+            "purl": self.sample_purl,
+            "swid": self.sample_swid,
+        }
+        component.pop("purl")
+        component.pop("swid")
+        update_1 = UpdateIdentity.create(component)
+        component["cpe"] = "some cpe"
+        update_2 = UpdateIdentity.create(component)
+        self.assertFalse(update_1 == update_2)
+        component.pop("cpe")
+        component["name"] = "another name"
+        update_1 = UpdateIdentity.create(component)
+        update_2 = UpdateIdentity.create(component)
+        self.assertFalse(update_1 == update_2)
+
+    def test_submit_version_range(self) -> None:
+        update_id = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": "range:semver/<6.0.0",
+        }
+        update_1 = UpdateIdentity.create(update_id, allow_unsafe=True)
+        self.assertTrue(update_1.has_version_range)
+
+    def test_wrong_version_schema(self) -> None:
+        update_id = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": "range:semver<6.0.0",
+        }
+        with self.assertRaises(AppError):
+            UpdateIdentity.create(update_id, allow_unsafe=True)
+
+    def test_print(self) -> None:
+        update_id = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": "range:semver/<6.0.0",
+        }
+        update = UpdateIdentity.create(update_id, allow_unsafe=True)
+        self.assertEqual(update.__str__(), "COORDINATES[acme/mylibrary@range:semver/<6.0.0]")
+
+    def test_get_version_range(self) -> None:
+        update_id = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": "range:semver/<6.0.0|>6.0.0",
+        }
+        component_1 = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": "5.0.0",
+        }
+        component_2 = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": "6.0.0",
+        }
+        component_3 = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": "6.1.0",
+        }
+        identity_1 = ComponentIdentity.create(component_1, allow_unsafe=True)
+        identity_2 = ComponentIdentity.create(component_2, allow_unsafe=True)
+        identity_3 = ComponentIdentity.create(component_3, allow_unsafe=True)
+        update = UpdateIdentity.create(update_id, allow_unsafe=True)
+        self.assertTrue(update.is_target_in_version_range(identity_1._keys[0]))
+        self.assertFalse(update.is_target_in_version_range(identity_2._keys[0]))
+        self.assertTrue(update.is_target_in_version_range(identity_3._keys[0]))

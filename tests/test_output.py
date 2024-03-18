@@ -76,6 +76,18 @@ class OutputTestCase(unittest.TestCase):
 
         self.assertDictEqual(expected_sbom, sbom)
 
+    def test_tool_already_present(self):
+        sbom = self.minimal_sbom
+        sbom["metadata"] = {
+            "tools": [{"name": pkg.NAME, "vendor": pkg.VENDOR, "version": pkg.VERSION}]
+        }
+
+        expected_sbom = copy.deepcopy(sbom)
+
+        out.update_tools(sbom)
+
+        self.assertDictEqual(expected_sbom, sbom)
+
     def test_append_tool_to_array(self):
         sbom = self.minimal_sbom
         sbom["metadata"] = {"foo": "bar", "tools": [{"name": "some tool"}]}

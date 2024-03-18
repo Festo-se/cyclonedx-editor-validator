@@ -62,7 +62,17 @@ def update_timestamp(sbom: dict) -> None:
 def update_tools(sbom: dict) -> None:
     """Adds this tool to the list of tools in metadata."""
     metadata: dict = sbom.setdefault("metadata", {})
-    tools: list = metadata.setdefault("tools", [])
+    tools: dict | list = metadata.setdefault("tools", [])
+
+    # Starting in CycloneDX 1.5 tools might be a list or a dict.
+    if isinstance(tools, dict):
+        tools = tools.setdefault("components", [])
+
+    # At this point we can be sure that tools is definitely a list.
+    # This assertion is for mypy only and has no runtime relevance, because if tools isn't truly
+    # a list that would mean the SBOM is invalid in which case we're fine with letting the tool
+    # crash. Therefore, bandit error B101 is silenced.
+    assert isinstance(tools, list)  # nosec
 
     this_tool = {
         "name": pkg.NAME,

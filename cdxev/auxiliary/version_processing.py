@@ -5,6 +5,7 @@ import logging
 from cdxev.error import AppError, InputFileError
 from pathlib import Path
 import json
+import copy
 
 
 logger = logging.getLogger(__name__)
@@ -321,6 +322,9 @@ class CustomVersionData:
             )
         self._custom_versions[schema["version_type"]] = schema["version_list"]
 
+    def get_data(self) -> dict:
+        return copy.deepcopy(self._custom_versions)
+
 
 class VersionConstraintCustom(VersionConstraint, CustomVersionData):
     def __init__(
@@ -368,68 +372,68 @@ class VersionConstraintCustom(VersionConstraint, CustomVersionData):
             return False
 
     def __lt__(self, other: object) -> bool:
-        if self.version_typ != other.version_type:  # type:ignore
+        if self.version_typ != other.version_typ:  # type:ignore
             raise AppError(
                 message="Versions of different type cannot be compared",
                 description=(
                     f'The compared versions are of type "{self.version_typ}" and'
-                    f' "{other.version_type}"'  # type:ignore
+                    f' "{other.version_typ}"'  # type:ignore
                     'no order operator for different version types is implemented'
                 ),
             )
         own_index = self.get_index(self.version)  # type:ignore
-        other_index = other.get_index(self.version)  # type:ignore
+        other_index = other.get_index(other.version)  # type:ignore
         if own_index < other_index:
             return True
         else:
             return False
 
     def __le__(self, other: object) -> bool:
-        if self.version_typ != other.version_type:  # type:ignore
+        if self.version_typ != other.version_typ:  # type:ignore
             raise AppError(
                 message="Versions of different type cannot be compared",
                 description=(
                     f'The compared versions are of type "{self.version_typ}" and'
-                    f' "{other.version_type}"'  # type:ignore
+                    f' "{other.version_typ}"'  # type:ignore
                     'no order operator for different version types is implemented'
                 ),
             )
         own_index = self.get_index(self.version)  # type:ignore
-        other_index = other.get_index(self.version)  # type:ignore
+        other_index = other.get_index(other.version)  # type:ignore
         if own_index <= other_index:
             return True
         else:
             return False
 
     def __gt__(self, other: object) -> bool:
-        if self.version_typ != other.version_type:  # type:ignore
+        if self.version_typ != other.version_typ:  # type:ignore
             raise AppError(
                 message="Versions of different type cannot be compared",
                 description=(
                     f'The compared versions are of type "{self.version_typ}" and'
-                    f' "{other.version_type}"'  # type:ignore
+                    f' "{other.version_typ}"'  # type:ignore
                     'no order operator for different version types is implemented'
                 ),
             )
         own_index = self.get_index(self.version)  # type:ignore
-        other_index = other.get_index(self.version)  # type:ignore
+        other_index = other.get_index(other.version)  # type:ignore
         if own_index > other_index:
             return True
         else:
             return False
 
     def __ge__(self, other: object) -> bool:
-        if self.version_typ != other.version_type:  # type:ignore
+        if self.version_typ != other.version_typ:  # type:ignore
             raise AppError(
                 message="Versions of different type cannot be compared",
                 description=(
                     f'The compared versions are of type "{self.version_typ}" and'
-                    f' "{other.version_type}"'  # type:ignore
+                    f' "{other.version_typ}"'  # type:ignore
                     'no order operator for different version types is implemented'
                 ),
             )
         own_index = self.get_index(self.version)  # type:ignore
-        other_index = other.get_index(self.version)  # type:ignore
+        other_index = other.get_index(other.version)  # type:ignore
         if own_index >= other_index:
             return True
         else:

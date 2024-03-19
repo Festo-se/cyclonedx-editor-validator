@@ -1,4 +1,5 @@
 import unittest
+import pathlib
 
 from cdxev.auxiliary import version_processing as verpro_
 from cdxev.error import AppError
@@ -503,3 +504,116 @@ class TestVersionCalVer(unittest.TestCase):
     def test_print_version_range(self) -> None:
         version_range = verpro_.VersionRange("calver/<1.2.5|>1-2.6|<=2.0-0|>=3-1.2")
         self.assertEqual(version_range.__str__(), "calver/<1.2.5|>1-2.6|<=2.0-0|>=3-1.2")
+
+
+class TestCustomVersionData(unittest.TestCase):
+    path_to_version_file = pathlib.Path("tests/auxiliary/custom_version_list.json")
+
+    def test_init(self) -> None:
+        data = verpro_.CustomVersionData(path_to_file=self.path_to_version_file)
+        self.assertEqual(data._custom_versions["ubuntu"][0], "Warty Warthog")
+        del data
+
+    def test_add_data_file(self) -> None:
+        data = verpro_.CustomVersionData(path_to_file=self.path_to_version_file)
+        test_data_1 = [
+            {
+                "version_typ": "ubuntu",
+                "version_list": [
+                    "version 1",
+                    "version 2"
+                ]
+            }
+        ]
+        test_data_2 = [
+            {
+                "version_type": "ubuntu",
+                "version_list": "str"
+            }
+        ]
+        test_data_3 = [
+            {
+                "version_type": "some_type",
+                "version_list": [
+                    "version 1",
+                    "version 2"
+                ]
+            }
+        ]
+        with self.assertRaises(AppError):
+            data.add_data_from_dict(test_data_1[0])
+        with self.assertRaises(AppError):
+            data.add_data_from_list(test_data_1)
+        with self.assertRaises(AppError):
+            data.add_data_from_dict(test_data_2[0])
+        with self.assertRaises(AppError):
+            data.add_data_from_list(test_data_2)
+        with self.assertRaises(AppError):
+            data.add_data_from_file(
+                pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")
+            )
+        data.add_data_from_list(test_data_3)
+        self.assertEqual(
+            data._custom_versions["some_type"], [
+                "version 1",
+                "version 2"
+            ]
+        )
+        del data
+
+    def test_get_datacls(self) -> None:
+        data = verpro_.CustomVersionData(path_to_file=self.path_to_version_file)
+        self.assertTrue(data.get_data()["ubuntu"][0] == "Warty Warthog")
+
+
+class TestVersionConstraintCustom(unittest.TestCase):
+    path_to_version_file = pathlib.Path("tests/auxiliary/custom_version_list.json")
+    data = verpro_.CustomVersionData(path_to_file=path_to_version_file)
+    test_data = [
+        {
+            "version_type": "some_type",
+            "version_list": [
+                "version 1",
+                "version 2",
+                "version 3",
+                "version 4"
+            ]
+        }
+    ]
+    data.add_data_from_list(test_data)
+
+    def test_equal(self) -> None:
+        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
+        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
+        version_1_2 = verpro_.VersionConstraintCustom("version 1", "some_type")
+        version_1_2 = verpro_.VersionConstraintCustom("version 1", "some_type")
+        version_ubuntu = verpro_.VersionConstraintCustom("Warty Warthog", "ubuntu")
+        self.assertTrue(version_1 == version_1_2)
+        self.assertFalse(version_1 == version_2)
+        self.assertFalse(version_1 == version_ubuntu)
+
+    def test_lesser_then(self) -> None:
+        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
+        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
+        self.assertTrue(version_1 < version_2)
+        self.assertFalse(version_1 > version_2)
+
+    def test_lesser_equal(self) -> None:
+        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
+        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
+        self.assertTrue(version_1 <= version_2)
+        self.assertTrue(version_1 <= version_1)
+        self.assertFalse(version_1 >= version_2)
+
+    def test_greater_then(self) -> None:
+        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
+        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
+        self.assertTrue(version_2 > version_1)
+        self.assertFalse(version_2 < version_1)
+
+    def test_greater_equal(self) -> None:
+        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
+        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
+        self.assertTrue(version_2 >= version_1)
+        self.assertTrue(version_2 >= version_2)
+        self.assertFalse(version_2 <= version_1)

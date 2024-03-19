@@ -106,14 +106,19 @@ class OutputTestCase(unittest.TestCase):
         sbom["metadata"] = {
             "foo": "bar",
             "tools": {
-                "components": [{"name": "some tool"}],
+                "components": [{"type": "application", "name": "some tool"}],
                 "services": [{"name": "some service"}],
             },
         }
 
         expected_sbom = copy.deepcopy(sbom)
         expected_sbom["metadata"]["tools"]["components"].append(
-            {"name": pkg.NAME, "vendor": pkg.VENDOR, "version": pkg.VERSION}
+            {
+                "type": "application",
+                "name": pkg.NAME,
+                "publisher": pkg.VENDOR,
+                "version": pkg.VERSION,
+            }
         )
 
         out.update_tools(sbom)

@@ -11,16 +11,48 @@ import copy
 logger = logging.getLogger(__name__)
 
 
+class IncompatibleVersionError(AppError):
+    """Indicates that the software version schemas are not compatible under a given operation."""
+
+
+class UnsupportedVersionError(AppError):
+    """Indicates that software versions with the provided schema are not supported."""
+
+
+def throw_incompatible_version_error(
+    own_version_schema: str, other_version_schema: str
+) -> str:
+    raise AppError(
+        message="Versions of different type cannot be compared",
+        description=(
+            f'The compared versions are of type "{own_version_schema}" and'
+            f' "{other_version_schema}"'  # type:ignore
+            "no order operator for different version types is implemented"
+        ),
+    )
+
+
+def throw_unsupported_version_error(version: str) -> None:
+    raise AppError(
+        message="Version schema not supported",
+        description=(
+            f"The version {version}"
+            f" does not belong to any supported schemas or provided custom schemas"
+        ),
+    )
+
+
 class version:
     def __init__(self, version: str, type: str):
         self.version_string = version
-        self._version_schemae = type
+        self._version_schema = type
 
 
 class VersionConstraint:
     """
     Class to describe a constraint for a software version.
     """
+
     _lesser_then: bool = False
     _lesser_equal: bool = False
     _greater_then: bool = False
@@ -103,19 +135,13 @@ class VersionConstraint:
             return version
 
     def is_upper_limit(self) -> bool:
-        if (
-            self._lesser_then
-            or self._lesser_equal
-        ):
+        if self._lesser_then or self._lesser_equal:
             return True
         else:
             return False
 
     def is_lower_limit(self) -> bool:
-        if (
-            self._greater_then
-            or self._greater_equal
-        ):
+        if self._greater_then or self._greater_equal:
             return True
         else:
             return False
@@ -175,7 +201,7 @@ class VersionConstraintSemver(VersionConstraint):
         return is_semver
 
 
-class CustomVersionData():
+class CustomVersionData:
     """
     Class storing the data for software versions provided by the user.
     The input is a path to a file containing the information about the versions.
@@ -194,6 +220,7 @@ class CustomVersionData():
     The "version_list" is a list of all the software versions,
     beginning with the lowest up to the highest.
     """
+
     _custom_versions: dict[str, t.Any] = {}
 
     @classmethod
@@ -249,16 +276,19 @@ class CustomVersionData():
             return
 
         for schema in schema_data:
-            if not ("version_type" in schema.keys() and "version_list" in schema.keys()):
+            if not (
+                "version_type" in schema.keys() and "version_list" in schema.keys()
+            ):
                 raise AppError(
                     message="Invalid format",
                     description=(
-                        f'The provided schema {schema} is not according to the specified format.'
+                        f"The provided schema {schema} is not according to the specified format."
                         '"version_type" and "version_list" are required properties.'
                     ),
                 )
-            if not (isinstance(schema["version_type"], str) and isinstance(
-                schema["version_list"], list)
+            if not (
+                isinstance(schema["version_type"], str)
+                and isinstance(schema["version_list"], list)
             ):
                 raise AppError(
                     message="Inavlid type",
@@ -270,26 +300,16 @@ class CustomVersionData():
             logger.info(
                 (
                     f'The version schema "{schema["version_type"]}"'
-                    'existed already and will be overwritten'
+                    "existed already and will be overwritten"
                 )
             )
         cls._custom_versions[schema["version_type"]] = schema["version_list"]
 
 
 class VersionConstraintCustom(VersionConstraint):
-    def __init__(
-        self,
-        version: str,
-        version_type: str
-    ) -> None:
+    def __init__(self, version: str, version_type: str) -> None:
         if not CustomVersionData.version_is_in_custom_versions(version):
-            raise AppError(
-                message="Version schema not supported",
-                description=(
-                    f'The version {version}'
-                    f' does not belong to any supported schemas or provided custom schemas'
-                ),
-            )
+            throw_unsupported_version_error(version)
         self._input = version
         self._lesser_then = False
         self._lesser_equal = False
@@ -301,16 +321,14 @@ class VersionConstraintCustom(VersionConstraint):
 
     def get_index(self, version: str) -> int:
         if version in CustomVersionData.get_data().get(self._version_schema, []):
-            return CustomVersionData.get_data().get(self._version_schema, []).index(version)
-        else:
-            raise AppError(
-                message="Unknown version",
-                description=(
-                    f'The provided version "{version}" was not found in the'
-                    'provided version ist'
-                    f' of "{self._version_schema}".'
-                ),
+            return (
+                CustomVersionData.get_data()
+                .get(self._version_schema, [])
+                .index(version)
             )
+        else:
+            throw_unsupported_version_error(version)
+            return 1
 
     def __eq__(self, other: object) -> bool:
         try:
@@ -331,13 +349,8 @@ class VersionConstraintCustom(VersionConstraint):
 
     def __lt__(self, other: object) -> bool:
         if self._version_schema != other._version_schema:  # type:ignore
-            raise AppError(
-                message="Versions of different type cannot be compared",
-                description=(
-                    f'The compared versions are of type "{self._version_schema}" and'
-                    f' "{other._version_schema}"'  # type:ignore
-                    'no order operator for different version types is implemented'
-                ),
+            throw_incompatible_version_error(
+                self._version_schema, other._version_schema  # type:ignore
             )
         own_index = self.get_index(self.version)  # type:ignore
         other_index = other.get_index(other.version)  # type:ignore
@@ -348,13 +361,8 @@ class VersionConstraintCustom(VersionConstraint):
 
     def __le__(self, other: object) -> bool:
         if self._version_schema != other._version_schema:  # type:ignore
-            raise AppError(
-                message="Versions of different type cannot be compared",
-                description=(
-                    f'The compared versions are of type "{self._version_schema}" and'
-                    f' "{other._version_schema}"'  # type:ignore
-                    'no order operator for different version types is implemented'
-                ),
+            throw_incompatible_version_error(
+                self._version_schema, other._version_schema  # type:ignore
             )
         own_index = self.get_index(self.version)  # type:ignore
         other_index = other.get_index(other.version)  # type:ignore
@@ -365,13 +373,8 @@ class VersionConstraintCustom(VersionConstraint):
 
     def __gt__(self, other: object) -> bool:
         if self._version_schema != other._version_schema:  # type:ignore
-            raise AppError(
-                message="Versions of different type cannot be compared",
-                description=(
-                    f'The compared versions are of type "{self._version_schema}" and'
-                    f' "{other._version_schema}"'  # type:ignore
-                    'no order operator for different version types is implemented'
-                ),
+            throw_incompatible_version_error(
+                self._version_schema, other._version_schema  # type:ignore
             )
         own_index = self.get_index(self.version)  # type:ignore
         other_index = other.get_index(other.version)  # type:ignore
@@ -382,13 +385,8 @@ class VersionConstraintCustom(VersionConstraint):
 
     def __ge__(self, other: object) -> bool:
         if self._version_schema != other._version_schema:  # type:ignore
-            raise AppError(
-                message="Versions of different type cannot be compared",
-                description=(
-                    f'The compared versions are of type "{self._version_schema}" and'
-                    f' "{other._version_schema}"'  # type:ignore
-                    'no order operator for different version types is implemented'
-                ),
+            throw_incompatible_version_error(
+                self._version_schema, other._version_schema  # type:ignore
             )
         own_index = self.get_index(self.version)  # type:ignore
         other_index = other.get_index(other.version)  # type:ignore
@@ -405,6 +403,7 @@ class VersionRange:
     that define what versions fall into this range and functions to verify,
     if a specific version is in the represented version range.
     """
+
     _supported_schemas = ["semver", "custom"]
 
     def __init__(self, range: str):
@@ -428,8 +427,8 @@ class VersionRange:
     def process_constraints(self, range: str) -> None:
         for constraint in self._version_constraints:
             if constraint.find("*") != -1:
-                regex_string = constraint.replace('.', '\\.')
-                regex_string = regex_string.replace('*', '.*')
+                regex_string = constraint.replace(".", "\\.")
+                regex_string = regex_string.replace("*", ".*")
                 regex = re.compile(regex_string)
                 self.regex_constraints.append(regex)
             else:
@@ -450,7 +449,7 @@ class VersionRange:
         return self._version_constraints
 
     def _create_version_from_constraints(
-            self
+        self,
     ) -> list[VersionConstraintSemver | VersionConstraintCustom]:
         list_of_version_objects: list[
             VersionConstraintSemver | VersionConstraintCustom
@@ -462,26 +461,19 @@ class VersionRange:
                 for constraint in self.regular_constraints:
                     list_of_version_objects.append(VersionConstraintSemver(constraint))
             else:
-                matched_schema, version_schema = CustomVersionData.version_is_in_custom_versions(
-                    version
+                matched_schema, version_schema = (
+                    CustomVersionData.version_is_in_custom_versions(version)
                 )
                 self._versioning_schema = version_schema
                 if matched_schema:
                     for constraint in self.regular_constraints:
                         list_of_version_objects.append(
                             VersionConstraintCustom(
-                                version=constraint,
-                                version_type=version_schema
+                                version=constraint, version_type=version_schema
                             )  # type:ignore
                         )
                 if not matched_schema:
-                    raise AppError(
-                        message="Version schema not supported",
-                        description=(
-                            f'The version {version}'
-                            f' does not belong to any supported schemas or provided custom schemas'
-                        ),
-                    )
+                    throw_unsupported_version_error(version)
         return list_of_version_objects
 
     def extract_version_from_constrained(self, version_constrained: str) -> str:
@@ -496,8 +488,13 @@ class VersionRange:
         for i in range(n):
             already_sorted = True
             for j in range(n - i - 1):
-                if self._version_objects[j] > self._version_objects[j + 1]:  # type:ignore
-                    self._version_objects[j], self._version_objects[j + 1] = (  # type:ignore
+                if (
+                    self._version_objects[j] > self._version_objects[j + 1]
+                ):  # type:ignore
+                    (
+                        self._version_objects[j],
+                        self._version_objects[j + 1],
+                    ) = (  # type:ignore
                         self._version_objects[j + 1],
                         self._version_objects[j],
                     )
@@ -513,7 +510,9 @@ class VersionRange:
         fixed_version: object = None
         has_upper_limit = False
         has_lower_limit = False
-        while (index < len(self._version_objects) and counter < len(self._version_objects)):
+        while index < len(self._version_objects) and counter < len(
+            self._version_objects
+        ):
             counter += 1
             constraint = self._version_objects[index]
             if constraint.is_lower_limit():
@@ -525,8 +524,8 @@ class VersionRange:
                 index += 1
                 for n in range(index, len(self._version_objects)):
                     if (
-                            upper_limit is not None
-                            and self._version_objects[n].is_lower_limit()
+                        upper_limit is not None
+                        and self._version_objects[n].is_lower_limit()
                     ):
                         break
                     elif self._version_objects[n].is_upper_limit():
@@ -559,7 +558,7 @@ class VersionRange:
                         "fixed_version": fixed_version,
                         "has_upper_limit": False,
                         "has_lower_limit": False,
-                        "is_fixed_version": True
+                        "is_fixed_version": True,
                     }
                 )
             else:
@@ -570,7 +569,7 @@ class VersionRange:
                         "fixed_version": fixed_version,
                         "has_upper_limit": has_upper_limit,
                         "has_lower_limit": has_lower_limit,
-                        "is_fixed_version": False
+                        "is_fixed_version": False,
                     }
                 )
 
@@ -586,19 +585,12 @@ class VersionRange:
                         version=version, version_type=key
                     )  # type:ignore# type:ignore
             if not found:
-                raise AppError(
-                    message="Version not known",
-                    description=(
-                        f'The version "{version}" of the type "{self._versioning_schema}" '
-                        f'does not match the known or provided version data'
-                    ),
-                )
+                throw_unsupported_version_error(version)
         return self.version_is_in(version_object)
 
     def version_is_in(self, version: VersionConstraint) -> bool:
         def is_lesser_then_upper_limit(
-                upper_limit: VersionConstraint,
-                version: VersionConstraint
+            upper_limit: VersionConstraint, version: VersionConstraint
         ) -> bool:
             if upper_limit._lesser_then:
                 if version < upper_limit:
@@ -609,8 +601,7 @@ class VersionRange:
             return False
 
         def is_greater_then_lower_limit(
-                lower_limit: VersionConstraint,
-                version: VersionConstraint
+            lower_limit: VersionConstraint, version: VersionConstraint
         ) -> bool:
             if lower_limit._greater_then:
                 if version > lower_limit:
@@ -622,16 +613,11 @@ class VersionRange:
 
         # check that versioning schemas are comparable if regular constraints are provided
         if not (
-                version.get_versioning_schema() == self._versioning_schema
-                or not self.regular_constraints
+            version.get_versioning_schema() == self._versioning_schema
+            or not self.regular_constraints
         ):
-            raise AppError(
-                message="Incompatible version schemas",
-                description=(
-                    f'The schema {version.get_versioning_schema()} of the provided '
-                    f'software version does not match the versions'
-                    f' in the ranges provided "{self.get_versioning_schema()}".'
-                ),
+            throw_incompatible_version_error(
+                version.get_versioning_schema(), self.get_versioning_schema()
             )
 
         if self.regex_constraints:
@@ -648,24 +634,17 @@ class VersionRange:
             is_in = True
             if sub_range.get("is_fixed_version", False):
                 if not version == sub_range.get(
-                    "fixed_version",
-                    VersionConstraint("0.0.0")
+                    "fixed_version", VersionConstraint("0.0.0")
                 ):
                     is_in = False
 
             if sub_range.get("has_lower_limit", False):
-                lower_limit = sub_range.get(
-                    "lower_limit",
-                    VersionConstraint("0.0.0")
-                )
+                lower_limit = sub_range.get("lower_limit", VersionConstraint("0.0.0"))
                 if not is_greater_then_lower_limit(lower_limit, version):
                     is_in = False
 
             if sub_range.get("has_upper_limit", False):
-                upper_limit = sub_range.get(
-                    "upper_limit",
-                    VersionConstraint("0.0.0")
-                )
+                upper_limit = sub_range.get("upper_limit", VersionConstraint("0.0.0"))
                 if not is_lesser_then_upper_limit(upper_limit, version):
                     is_in = False
             if is_in and matches_regex:

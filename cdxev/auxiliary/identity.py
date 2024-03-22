@@ -194,7 +194,9 @@ class UpdateIdentity(ComponentIdentity):
     _version_range: t.Union[VersionRange | None]
     has_version_range: bool
 
-    def __init__(self, *keys: t.Optional[Key], version_range: t.Optional[VersionRange] = None):
+    def __init__(
+        self, *keys: t.Optional[Key], version_range: t.Optional[VersionRange] = None
+    ):
         filtered = (key for key in keys if key is not None)
         sorted_keys = sorted(filtered, key=lambda k: k.type)
         keyset = tuple(sorted_keys)
@@ -249,9 +251,9 @@ class UpdateIdentity(ComponentIdentity):
 
         version_range = None
         version_str = update.get("version", "")
-        if re.match('^range:.*', version_str):
-            if re.fullmatch('^range:(.*|)*.*', version_str):
-                version_range = VersionRange(version_str[version_str.find(":") + 1:])
+        if re.match("^range:.*", version_str):
+            if re.fullmatch("^range:(.*|)*.*", version_str):
+                version_range = VersionRange(version_str[version_str.find(":") + 1 :])
             else:
                 raise AppError(
                     message="Provided version range does not match the required schema",
@@ -266,9 +268,11 @@ class UpdateIdentity(ComponentIdentity):
         return str(self._keys[0]) if len(self) > 0 else ""
 
     def __eq__(self, other: object) -> bool:
-        return (isinstance(other, UpdateIdentity) and any(
-            k in self._keys for k in other._keys
-        ) and self._version_range == other._version_range)
+        return (
+            isinstance(other, UpdateIdentity)
+            and any(k in self._keys for k in other._keys)
+            and self._version_range == other._version_range
+        )
 
     def is_target_in_version_range(self, identity: Key) -> bool:
         if self._version_range is None:
@@ -286,10 +290,7 @@ class UpdateIdentity(ComponentIdentity):
         if update_name != component_name:
             return False
 
-        if (
-            update_group != component_group
-            and update_group is not None
-        ):
+        if update_group != component_group and update_group is not None:
             return False
 
         version_range = self._version_range

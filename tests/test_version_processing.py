@@ -3,7 +3,6 @@ import pathlib
 
 from cdxev.auxiliary import version_processing as verpro_
 from cdxev.error import AppError
-import re
 
 
 class TestVersionConstraint(unittest.TestCase):
@@ -446,7 +445,7 @@ class TestVersionRange(unittest.TestCase):
         self.assertFalse(version_range.version_string_is_in_range("10.2.0"))
         self.assertFalse(version_range.version_string_is_in_range("4.1.0"))
 
-    def test_all_versions(self) -> None:
+    def test_regex_versions(self) -> None:
         version_range_1 = verpro_.VersionRange(
             "semver/*"
         )
@@ -466,6 +465,36 @@ class TestVersionRange(unittest.TestCase):
         self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
         self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("5.0.0")))
         self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("12.1.1")))
+
+        version_range_3 = verpro_.VersionRange(
+            "semver/1.*.2"
+        )
+        self.assertTrue(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.2")))
+        self.assertFalse(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
+        self.assertFalse(version_range_3.version_is_in(verpro_.VersionConstraintSemver("2.1.2")))
+        self.assertTrue(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.2")))
+        self.assertFalse(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.2.21")))
+
+    def test_regex_and_regular_constrained_versions(self) -> None:
+        version_range_1 = verpro_.VersionRange(
+            "semver/1.*|<1.5"
+        )
+        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
+        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
+        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.2.1")))
+        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
+        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("5.0.0")))
+        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.6.0")))
+
+        version_range_2 = verpro_.VersionRange(
+            "semver/1.*|<1.5|>1.7"
+        )
+        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
+        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
+        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.2.1")))
+        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
+        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("5.0.0")))
+        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.8.0")))
 
 
 class TestCustomVersionData(unittest.TestCase):

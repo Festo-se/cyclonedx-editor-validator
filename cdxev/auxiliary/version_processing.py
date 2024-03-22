@@ -569,7 +569,6 @@ class VersionRange:
                 upper_limit: VersionConstraint,
                 version: VersionConstraint
         ) -> bool:
-
             if upper_limit._lesser_then:
                 if version < upper_limit:
                     return True
@@ -582,7 +581,6 @@ class VersionRange:
                 lower_limit: VersionConstraint,
                 version: VersionConstraint
         ) -> bool:
-
             if lower_limit._greater_then:
                 if version > lower_limit:
                     return True
@@ -591,10 +589,7 @@ class VersionRange:
                     return True
             return False
 
-        for regex in self.regex_constraints:
-            if regex.fullmatch(version.version_string):
-                return True
-
+        # check that versioning schemas are comparable
         if not version.get_versioning_schema() == self._versioning_schema:
             raise AppError(
                 message="Incompatible version schemas",
@@ -604,6 +599,17 @@ class VersionRange:
                     f' in the ranges provided "{self.get_versioning_schema()}".'
                 ),
             )
+
+        if self.regex_constraints:
+            matches_regex = False
+            for regex in self.regex_constraints:
+                if regex.fullmatch(version.version_string):
+                    matches_regex = True
+            if matches_regex and not self._sub_ranges:
+                return True
+        else:
+            matches_regex = True
+
         for sub_range in self._sub_ranges:
             is_in = True
             if sub_range.get("is_fixed_version", False):
@@ -628,6 +634,6 @@ class VersionRange:
                 )
                 if not is_lesser_then_upper_limit(upper_limit, version):
                     is_in = False
-            if is_in:
+            if is_in and matches_regex:
                 return True
         return False

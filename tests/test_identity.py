@@ -268,7 +268,7 @@ class TestUpdateIdentity(unittest.TestCase):
         update_id = {
             "name": self.sample_coordinates["name"],
             "group": self.sample_coordinates["group"],
-            "version": "range:semver/<6.0.0",
+            "version": "range:<6.0.0",
         }
         update_1 = UpdateIdentity.create(update_id, allow_unsafe=True)
         self.assertTrue(update_1.has_version_range)
@@ -286,16 +286,16 @@ class TestUpdateIdentity(unittest.TestCase):
         update_id = {
             "name": self.sample_coordinates["name"],
             "group": self.sample_coordinates["group"],
-            "version": "range:semver/<6.0.0",
+            "version": "range:<6.0.0",
         }
         update = UpdateIdentity.create(update_id, allow_unsafe=True)
-        self.assertEqual(update.__str__(), "COORDINATES[acme/mylibrary@range:semver/<6.0.0]")
+        self.assertEqual(update.__str__(), "COORDINATES[acme/mylibrary@range:<6.0.0]")
 
     def test_get_version_range(self) -> None:
         update_id = {
             "name": self.sample_coordinates["name"],
             "group": self.sample_coordinates["group"],
-            "version": "range:semver/<6.0.0|>6.0.0",
+            "version": "range:<6.0.0|>6.0.0",
         }
         component_1 = {
             "name": self.sample_coordinates["name"],

@@ -10,6 +10,7 @@ from cdxev.auxiliary.identity import ComponentIdentity, Key, UpdateIdentity
 from cdxev.auxiliary.sbomFunctions import walk_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
+from cdxev.auxiliary.version_processing import CustomVersionData
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,7 @@ class SetConfig:
     sbom_paths: t.Sequence[pathlib.Path]
     from_file: t.Optional[pathlib.Path]
     ignore_missing: bool = False
+    custom_versions: t.Union[pathlib.Path | None] = None
 
 
 @dataclass
@@ -209,7 +211,8 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
 
 def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> None:
     ctx = Context(cfg, sbom)
-
+    if cfg.custom_versions is not None:
+        CustomVersionData(cfg.custom_versions)
     try:
         _validate_update_list(updates, ctx)
     except AppError:

@@ -250,14 +250,14 @@ class UpdateIdentity(ComponentIdentity):
         version_range = None
         version_str = update.get("version", "")
         if re.match('^range:.*', version_str):
-            if re.fullmatch('^range:.*/.*', version_str):
+            if re.fullmatch('^range:(.*|)*.*', version_str):
                 version_range = VersionRange(version_str[version_str.find(":") + 1:])
             else:
                 raise AppError(
                     message="Provided version range does not match the required schema",
                     description=(
                         f'The provided version range: {update.get("version", "")} does'
-                        ' not match the required schema "^range:.*/.*".'
+                        ' not match the required schema "^range:(.*|).*'
                     ),
                 )
         return UpdateIdentity(cpe, purl, swid, coordinates, version_range=version_range)

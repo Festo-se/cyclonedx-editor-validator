@@ -21,8 +21,8 @@ class UnsupportedVersionError(AppError):
 
 def throw_incompatible_version_error(
     own_version_schema: str, other_version_schema: str
-) -> str:
-    raise AppError(
+) -> None:
+    raise IncompatibleVersionError(
         message="Versions of different type cannot be compared",
         description=(
             f'The compared versions are of type "{own_version_schema}" and'
@@ -33,7 +33,7 @@ def throw_incompatible_version_error(
 
 
 def throw_unsupported_version_error(version: str) -> None:
-    raise AppError(
+    raise UnsupportedVersionError(
         message="Version schema not supported",
         description=(
             f"The version {version}"
@@ -49,29 +49,18 @@ class version:
 
 
 class VersionConstraint:
-    """
-    Class to describe a constraint for a software version.
-    """
-
-    _lesser_then: bool = False
-    _lesser_equal: bool = False
-    _greater_then: bool = False
-    _greater_equal: bool = False
     _version_schema = "undefined"
 
     def __init__(
         self,
         version: str,
-        lesser_then: bool = False,
-        lesser_equal: bool = False,
-        greater_then: bool = False,
-        greater_equal: bool = False,
     ) -> None:
+        self._lesser_then: bool = False
+        self._lesser_equal: bool = False
+        self._greater_then: bool = False
+        self._greater_equal: bool = False
+
         self._input = version
-        self._lesser_then = lesser_then
-        self._lesser_equal = lesser_equal
-        self._greater_then = greater_then
-        self._greater_equal = greater_equal
         self.version_string = self._parse_version(version)
         self.version = self.parse_version_schema()
 
@@ -162,6 +151,28 @@ class VersionConstraint:
 
 
 class VersionConstraintSemver(VersionConstraint):
+    """
+    Class to describe a constraint for a software version.
+
+    Attributes
+    ----------
+    version_string : str
+        the version string of the version defining this constraint
+    version : packaging.Version
+        version object generated from the submitted version
+
+        _input: str
+            the version constraint string provided as input
+        _lesser_then: bool
+            a variable describing if the associated constraint of the version is <
+        _lesser_equal: bool
+            a variable describing if the associated constraint of the version is <=
+        _greater_then: bool
+            a variable describing if the associated constraint of the version is >
+        _greater_equal: bool
+            a variable describing if the associated constraint of the version is >=
+
+    """
     _version_schema = "semver"
 
     def parse_version_schema(self) -> pack_ver.Version:
@@ -481,6 +492,8 @@ class VersionRange:
         version = version.replace(">=", "")
         version = version.replace(">", "")
         version = version.replace("<", "")
+        # remove leading whitespaces
+        version = version.lstrip()
         return version
 
     def _sort_versions(self) -> None:

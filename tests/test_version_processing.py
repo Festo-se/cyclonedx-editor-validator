@@ -7,10 +7,18 @@ from cdxev.error import AppError
 
 class TestVersionConstraint(unittest.TestCase):
     def test_compare_function(self) -> None:
-        version_constraint_1 = verpro_.VersionConstraint("some_version", lesser_then=True)
-        version_constraint_2 = verpro_.VersionConstraint("some_version", lesser_equal=True)
-        version_constraint_3 = verpro_.VersionConstraint("some_version", greater_then=True)
-        version_constraint_4 = verpro_.VersionConstraint("some_version", greater_equal=True)
+        version_constraint_1 = verpro_.VersionConstraint(
+            "<some_version"
+        )
+        version_constraint_2 = verpro_.VersionConstraint(
+            "<=some_version"
+        )
+        version_constraint_3 = verpro_.VersionConstraint(
+            ">some_version"
+        )
+        version_constraint_4 = verpro_.VersionConstraint(
+            ">=some_version"
+        )
         version_constraint_5 = verpro_.VersionConstraint("<some_version")
         version_constraint_6 = verpro_.VersionConstraint("<=some_version")
         version_constraint_7 = verpro_.VersionConstraint(">some_version")
@@ -53,16 +61,24 @@ class TestVersionConstraint(unittest.TestCase):
         version_no_constraint = verpro_.VersionConstraint("some_version")
         self.assertEqual(version_no_constraint.__str__(), "some_version")
 
-        version_lesser_then = verpro_.VersionConstraint("some_version", lesser_then=True)
+        version_lesser_then = verpro_.VersionConstraint(
+            "<some_version"
+        )
         self.assertEqual(version_lesser_then.__str__(), "<some_version")
 
-        version_lesser_then = verpro_.VersionConstraint("some_version", lesser_equal=True)
+        version_lesser_then = verpro_.VersionConstraint(
+            "<=some_version"
+        )
         self.assertEqual(version_lesser_then.__str__(), "<=some_version")
 
-        version_lesser_then = verpro_.VersionConstraint("some_version", greater_then=True)
+        version_lesser_then = verpro_.VersionConstraint(
+            ">some_version"
+        )
         self.assertEqual(version_lesser_then.__str__(), ">some_version")
 
-        version_lesser_then = verpro_.VersionConstraint("some_version", greater_equal=True)
+        version_lesser_then = verpro_.VersionConstraint(
+            ">=some_version"
+        )
         self.assertEqual(version_lesser_then.__str__(), ">=some_version")
 
     def test_is_upper_limit(self) -> None:
@@ -149,20 +165,17 @@ class TestVersionRange(unittest.TestCase):
         self.assertEqual(version_range.__str__(), "<1.2.5")
         self.assertEqual(version_range._version_constraints, ["<1.2.5"])
         self.assertEqual(
-            version_range._version_objects[0],
-            verpro_.VersionConstraintSemver("<1.2.5")
+            version_range._version_objects[0], verpro_.VersionConstraintSemver("<1.2.5")
         )
 
         version_range = verpro_.VersionRange("<1.2.5|>2.1.1")
         self.assertEqual(version_range.__str__(), "<1.2.5|>2.1.1")
         self.assertEqual(version_range._version_constraints, ["<1.2.5", ">2.1.1"])
         self.assertEqual(
-            version_range._version_objects[0],
-            verpro_.VersionConstraintSemver("<1.2.5")
+            version_range._version_objects[0], verpro_.VersionConstraintSemver("<1.2.5")
         )
         self.assertEqual(
-            version_range._version_objects[1],
-            verpro_.VersionConstraintSemver(">2.1.1")
+            version_range._version_objects[1], verpro_.VersionConstraintSemver(">2.1.1")
         )
 
     def test_semver_version_print(self) -> None:
@@ -183,8 +196,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": True,
                 "has_lower_limit": True,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
         version_range_2 = verpro_.VersionRange("<3.1.2")
         self.assertEqual(
@@ -195,8 +208,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": True,
                 "has_lower_limit": False,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
         version_range_3 = verpro_.VersionRange(">3.1.2")
         self.assertEqual(
@@ -207,8 +220,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": False,
                 "has_lower_limit": True,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
         version_range_4 = verpro_.VersionRange("3.1.2")
         self.assertEqual(
@@ -219,8 +232,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": verpro_.VersionConstraintSemver("3.1.2"),
                 "has_upper_limit": False,
                 "has_lower_limit": False,
-                "is_fixed_version": True
-            }
+                "is_fixed_version": True,
+            },
         )
         version_range_5 = verpro_.VersionRange(
             ">1.0.0|<2.0.0|>2.1.0|2.2.0|<3.0.0|<3.1.1|>3.1.2|<3.1.4"
@@ -233,8 +246,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": True,
                 "has_lower_limit": True,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
         self.assertEqual(
             version_range_5._sub_ranges[1],
@@ -244,8 +257,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": True,
                 "has_lower_limit": True,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
         self.assertEqual(
             version_range_5._sub_ranges[2],
@@ -255,8 +268,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": True,
                 "has_lower_limit": True,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
         version_range_6 = verpro_.VersionRange(
             "<1.0.0|<2.0.0|2.1.0|>2.2.0|<3.0.0|>3.1.1"
@@ -269,8 +282,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": True,
                 "has_lower_limit": False,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
         self.assertEqual(
             version_range_6._sub_ranges[1],
@@ -280,8 +293,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": verpro_.VersionConstraintSemver("2.1.0"),
                 "has_upper_limit": False,
                 "has_lower_limit": False,
-                "is_fixed_version": True
-            }
+                "is_fixed_version": True,
+            },
         )
         self.assertEqual(
             version_range_6._sub_ranges[2],
@@ -291,7 +304,7 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": True,
                 "has_lower_limit": True,
-                "is_fixed_version": False
+                "is_fixed_version": False,
             },
         )
         self.assertEqual(
@@ -302,8 +315,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": False,
                 "has_lower_limit": True,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
         version_range_7 = verpro_.VersionRange(
             "<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
@@ -316,8 +329,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": True,
                 "has_lower_limit": False,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
         self.assertEqual(
             version_range_7._sub_ranges[1],
@@ -327,8 +340,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": verpro_.VersionConstraintSemver("4.0.0"),
                 "has_upper_limit": False,
                 "has_lower_limit": False,
-                "is_fixed_version": True
-            }
+                "is_fixed_version": True,
+            },
         )
         self.assertEqual(
             version_range_7._sub_ranges[2],
@@ -338,8 +351,8 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": verpro_.VersionConstraintSemver("5.0.0"),
                 "has_upper_limit": False,
                 "has_lower_limit": False,
-                "is_fixed_version": True
-            }
+                "is_fixed_version": True,
+            },
         )
         self.assertEqual(
             version_range_7._sub_ranges[3],
@@ -349,12 +362,10 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": True,
                 "has_lower_limit": True,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
-        version_range_8 = verpro_.VersionRange(
-            ">1.0.0"
-        )
+        version_range_8 = verpro_.VersionRange(">1.0.0")
         self.assertEqual(
             version_range_8._sub_ranges[0],
             {
@@ -363,74 +374,106 @@ class TestVersionRange(unittest.TestCase):
                 "fixed_version": None,
                 "has_upper_limit": False,
                 "has_lower_limit": True,
-                "is_fixed_version": False
-            }
+                "is_fixed_version": False,
+            },
         )
 
     def test_semver_is_in_one_limit(self) -> None:
-        version_range_1 = verpro_.VersionRange(
-            "<1.0.0"
-        )
-        version_range_2 = verpro_.VersionRange(
-            "1.0.0"
-        )
-        version_range_3 = verpro_.VersionRange(
-            ">1.0.0"
-        )
-        version_range_4 = verpro_.VersionRange(
-            "<=1.0.0"
-        )
-        version_range_5 = verpro_.VersionRange(
-            ">=1.0.0"
-        )
+        version_range_1 = verpro_.VersionRange("<1.0.0")
+        version_range_2 = verpro_.VersionRange("1.0.0")
+        version_range_3 = verpro_.VersionRange(">1.0.0")
+        version_range_4 = verpro_.VersionRange("<=1.0.0")
+        version_range_5 = verpro_.VersionRange(">=1.0.0")
         with self.assertRaises(AppError):
             version_range_1.version_is_in(verpro_.VersionConstraint(">=6.1.0"))
 
-        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
-        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("0.1.0")))
-        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
-        self.assertTrue(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
-        self.assertFalse(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
-        self.assertTrue(version_range_4.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
-        self.assertTrue(version_range_5.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
+        self.assertTrue(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
+        )
+        self.assertFalse(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.1.0"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("0.1.0"))
+        )
+        self.assertFalse(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.1.0"))
+        )
+        self.assertTrue(
+            version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.1.0"))
+        )
+        self.assertFalse(
+            version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
+        )
+        self.assertTrue(
+            version_range_4.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
+        )
+        self.assertTrue(
+            version_range_5.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
+        )
 
     def test_semver_is_in_one_range(self) -> None:
-        version_range_1 = verpro_.VersionRange(
-            "<1.0.0|>0.0.1"
+        version_range_1 = verpro_.VersionRange("<1.0.0|>0.0.1")
+        version_range_2 = verpro_.VersionRange("1.0.0|>1.1.0")
+        version_range_3 = verpro_.VersionRange(">1.0.0|<=1.1.0")
+        version_range_4 = verpro_.VersionRange("<1.0.0|>=2.1.0")
+        self.assertTrue(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
         )
-        version_range_2 = verpro_.VersionRange(
-            "1.0.0|>1.1.0"
+        self.assertFalse(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.1.0"))
         )
-        version_range_3 = verpro_.VersionRange(
-            ">1.0.0|<=1.1.0"
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("0.1.0"))
         )
-        version_range_4 = verpro_.VersionRange(
-            "<1.0.0|>=2.1.0"
+        self.assertFalse(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.1.0"))
         )
-        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
-        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("0.1.0")))
-        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
-        self.assertTrue(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
-        self.assertFalse(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
+        self.assertTrue(
+            version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.1.0"))
+        )
+        self.assertFalse(
+            version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
+        )
 
-        self.assertTrue(version_range_4.version_is_in(verpro_.VersionConstraintSemver("0.1.0")))
-        self.assertTrue(version_range_4.version_is_in(verpro_.VersionConstraintSemver("2.2.0")))
-        self.assertFalse(version_range_4.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
+        self.assertTrue(
+            version_range_4.version_is_in(verpro_.VersionConstraintSemver("0.1.0"))
+        )
+        self.assertTrue(
+            version_range_4.version_is_in(verpro_.VersionConstraintSemver("2.2.0"))
+        )
+        self.assertFalse(
+            version_range_4.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
+        )
 
     def test_semver_is_in_complex_example(self) -> None:
         version_range_1 = verpro_.VersionRange(
             "<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
         )
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.0.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("6.1.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("8.1.1")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("5.0.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("7.9.9")))
-        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("10.2.0")))
-        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.1.0")))
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.0.0"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("6.1.0"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("8.1.1"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.5.1"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("5.0.0"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("7.9.9"))
+        )
+        self.assertFalse(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("10.2.0"))
+        )
+        self.assertFalse(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.1.0"))
+        )
 
     def test_version_string_is_in_range(self) -> None:
         version_range = verpro_.VersionRange(
@@ -446,55 +489,103 @@ class TestVersionRange(unittest.TestCase):
         self.assertFalse(version_range.version_string_is_in_range("4.1.0"))
 
     def test_regex_versions(self) -> None:
-        version_range_1 = verpro_.VersionRange(
-            "*"
+        version_range_1 = verpro_.VersionRange("*")
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.0.0"))
         )
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.0.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("6.1.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("8.1.1")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("5.0.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("7.9.9")))
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("6.1.0"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("8.1.1"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.5.1"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("5.0.0"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("7.9.9"))
+        )
 
-        version_range_2 = verpro_.VersionRange(
-            "1.*"
+        version_range_2 = verpro_.VersionRange("1.*")
+        self.assertTrue(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
         )
-        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
-        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("2.1.0")))
-        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("8.1.1")))
-        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
-        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("5.0.0")))
-        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("12.1.1")))
+        self.assertFalse(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("2.1.0"))
+        )
+        self.assertFalse(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("8.1.1"))
+        )
+        self.assertTrue(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.5.1"))
+        )
+        self.assertFalse(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("5.0.0"))
+        )
+        self.assertFalse(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("12.1.1"))
+        )
 
-        version_range_3 = verpro_.VersionRange(
-            "1.*.2"
+        version_range_3 = verpro_.VersionRange("1.*.2")
+        self.assertTrue(
+            version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.2"))
         )
-        self.assertTrue(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.2")))
-        self.assertFalse(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
-        self.assertFalse(version_range_3.version_is_in(verpro_.VersionConstraintSemver("2.1.2")))
-        self.assertTrue(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.2")))
-        self.assertFalse(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.2.21")))
+        self.assertFalse(
+            version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.5.1"))
+        )
+        self.assertFalse(
+            version_range_3.version_is_in(verpro_.VersionConstraintSemver("2.1.2"))
+        )
+        self.assertTrue(
+            version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.2"))
+        )
+        self.assertFalse(
+            version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.2.21"))
+        )
 
     def test_regex_and_regular_constrained_versions(self) -> None:
-        version_range_1 = verpro_.VersionRange(
-            "1.*|<1.5"
+        version_range_1 = verpro_.VersionRange("1.*|<1.5")
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
         )
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
-        self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.2.1")))
-        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
-        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("5.0.0")))
-        self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.6.0")))
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.1.0"))
+        )
+        self.assertTrue(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.2.1"))
+        )
+        self.assertFalse(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.5.1"))
+        )
+        self.assertFalse(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("5.0.0"))
+        )
+        self.assertFalse(
+            version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.6.0"))
+        )
 
-        version_range_2 = verpro_.VersionRange(
-            "1.*|<1.5|>1.7"
+        version_range_2 = verpro_.VersionRange("1.*|<1.5|>1.7")
+        self.assertTrue(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
         )
-        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
-        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
-        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.2.1")))
-        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
-        self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("5.0.0")))
-        self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.8.0")))
+        self.assertTrue(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.1.0"))
+        )
+        self.assertTrue(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.2.1"))
+        )
+        self.assertFalse(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.5.1"))
+        )
+        self.assertFalse(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("5.0.0"))
+        )
+        self.assertTrue(
+            version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.8.0"))
+        )
 
 
 class TestCustomVersionData(unittest.TestCase):
@@ -507,28 +598,11 @@ class TestCustomVersionData(unittest.TestCase):
     def test_add_data_file(self) -> None:
         data = verpro_.CustomVersionData(path_to_file=self.path_to_version_file)
         test_data_1 = [
-            {
-                "version_typ": "ubuntu",
-                "version_list": [
-                    "version 1",
-                    "version 2"
-                ]
-            }
+            {"version_typ": "ubuntu", "version_list": ["version 1", "version 2"]}
         ]
-        test_data_2 = [
-            {
-                "version_type": "ubuntu",
-                "version_list": "str"
-            }
-        ]
+        test_data_2 = [{"version_type": "ubuntu", "version_list": "str"}]
         test_data_3 = [
-            {
-                "version_type": "some_type",
-                "version_list": [
-                    "version 1",
-                    "version 2"
-                ]
-            }
+            {"version_type": "some_type", "version_list": ["version 1", "version 2"]}
         ]
         with self.assertRaises(AppError):
             data.add_data_from_dict(test_data_1[0])
@@ -543,12 +617,7 @@ class TestCustomVersionData(unittest.TestCase):
                 pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")
             )
         data.add_data_from_list(test_data_3)
-        self.assertEqual(
-            data.get_data()["some_type"], [
-                "version 1",
-                "version 2"
-            ]
-        )
+        self.assertEqual(data.get_data()["some_type"], ["version 1", "version 2"])
         del data
 
     def test_get_data(self) -> None:
@@ -562,12 +631,7 @@ class TestVersionConstraintCustom(unittest.TestCase):
     test_data = [
         {
             "version_type": "some_type",
-            "version_list": [
-                "version 1",
-                "version 2",
-                "version 3",
-                "version 4"
-            ]
+            "version_list": ["version 1", "version 2", "version 3", "version 4"],
         }
     ]
     data.add_data_from_list(test_data)
@@ -626,9 +690,6 @@ class TestVersionConstraintCustom(unittest.TestCase):
         self.assertFalse(version_3 >= version_4)
 
     def test_version_range(self) -> None:
-        version_range_1 = verpro_.VersionRange(
-            ">Warty Warthog"
-        )
-        print(version_range_1)
+        version_range_1 = verpro_.VersionRange(">Warty Warthog")
         self.assertTrue(version_range_1.version_string_is_in_range("Bionic Beaver"))
         self.assertFalse(version_range_1.version_string_is_in_range("Warty Warthog"))

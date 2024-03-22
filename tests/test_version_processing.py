@@ -145,16 +145,16 @@ class TestVersionConstraintSemver(unittest.TestCase):
 
 class TestVersionRange(unittest.TestCase):
     def test_semver_parse_input(self) -> None:
-        version_range = verpro_.VersionRange("semver/<1.2.5")
-        self.assertEqual(version_range.__str__(), "semver/<1.2.5")
+        version_range = verpro_.VersionRange("<1.2.5")
+        self.assertEqual(version_range.__str__(), "<1.2.5")
         self.assertEqual(version_range._version_constraints, ["<1.2.5"])
         self.assertEqual(
             version_range._version_objects[0],
             verpro_.VersionConstraintSemver("<1.2.5")
         )
 
-        version_range = verpro_.VersionRange("semver/<1.2.5|>2.1.1")
-        self.assertEqual(version_range.__str__(), "semver/<1.2.5|>2.1.1")
+        version_range = verpro_.VersionRange("<1.2.5|>2.1.1")
+        self.assertEqual(version_range.__str__(), "<1.2.5|>2.1.1")
         self.assertEqual(version_range._version_constraints, ["<1.2.5", ">2.1.1"])
         self.assertEqual(
             version_range._version_objects[0],
@@ -166,15 +166,15 @@ class TestVersionRange(unittest.TestCase):
         )
 
     def test_semver_version_print(self) -> None:
-        version_range = verpro_.VersionRange("semver/<1.2.5|>1.2.6|<=2.0.0|>=3.1.2")
-        self.assertEqual(version_range.__str__(), "semver/<1.2.5|>1.2.6|<=2.0.0|>=3.1.2")
+        version_range = verpro_.VersionRange("<1.2.5|>1.2.6|<=2.0.0|>=3.1.2")
+        self.assertEqual(version_range.__str__(), "<1.2.5|>1.2.6|<=2.0.0|>=3.1.2")
 
     def test_semver_version_sort_input(self) -> None:
-        version_range = verpro_.VersionRange("semver/>=3.1.2|<1.2.5|<=2.0.0|>1.2.6")
-        self.assertEqual(version_range.__str__(), "semver/<1.2.5|>1.2.6|<=2.0.0|>=3.1.2")
+        version_range = verpro_.VersionRange(">=3.1.2|<1.2.5|<=2.0.0|>1.2.6")
+        self.assertEqual(version_range.__str__(), "<1.2.5|>1.2.6|<=2.0.0|>=3.1.2")
 
     def test_semver_create_sub_ranges(self) -> None:
-        version_range_1 = verpro_.VersionRange("semver/<3.1.2|>=1.2.5|<=2.0.0|>1.2.6")
+        version_range_1 = verpro_.VersionRange("<3.1.2|>=1.2.5|<=2.0.0|>1.2.6")
         self.assertEqual(
             version_range_1._sub_ranges[0],
             {
@@ -186,7 +186,7 @@ class TestVersionRange(unittest.TestCase):
                 "is_fixed_version": False
             }
         )
-        version_range_2 = verpro_.VersionRange("semver/<3.1.2")
+        version_range_2 = verpro_.VersionRange("<3.1.2")
         self.assertEqual(
             version_range_2._sub_ranges[0],
             {
@@ -198,7 +198,7 @@ class TestVersionRange(unittest.TestCase):
                 "is_fixed_version": False
             }
         )
-        version_range_3 = verpro_.VersionRange("semver/>3.1.2")
+        version_range_3 = verpro_.VersionRange(">3.1.2")
         self.assertEqual(
             version_range_3._sub_ranges[0],
             {
@@ -210,7 +210,7 @@ class TestVersionRange(unittest.TestCase):
                 "is_fixed_version": False
             }
         )
-        version_range_4 = verpro_.VersionRange("semver/3.1.2")
+        version_range_4 = verpro_.VersionRange("3.1.2")
         self.assertEqual(
             version_range_4._sub_ranges[0],
             {
@@ -223,7 +223,7 @@ class TestVersionRange(unittest.TestCase):
             }
         )
         version_range_5 = verpro_.VersionRange(
-            "semver/>1.0.0|<2.0.0|>2.1.0|2.2.0|<3.0.0|<3.1.1|>3.1.2|<3.1.4"
+            ">1.0.0|<2.0.0|>2.1.0|2.2.0|<3.0.0|<3.1.1|>3.1.2|<3.1.4"
         )
         self.assertEqual(
             version_range_5._sub_ranges[0],
@@ -259,7 +259,7 @@ class TestVersionRange(unittest.TestCase):
             }
         )
         version_range_6 = verpro_.VersionRange(
-            "semver/<1.0.0|<2.0.0|2.1.0|>2.2.0|<3.0.0|>3.1.1"
+            "<1.0.0|<2.0.0|2.1.0|>2.2.0|<3.0.0|>3.1.1"
         )
         self.assertEqual(
             version_range_6._sub_ranges[0],
@@ -306,7 +306,7 @@ class TestVersionRange(unittest.TestCase):
             }
         )
         version_range_7 = verpro_.VersionRange(
-            "semver/<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
+            "<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
         )
         self.assertEqual(
             version_range_7._sub_ranges[0],
@@ -353,7 +353,7 @@ class TestVersionRange(unittest.TestCase):
             }
         )
         version_range_8 = verpro_.VersionRange(
-            "semver/>1.0.0"
+            ">1.0.0"
         )
         self.assertEqual(
             version_range_8._sub_ranges[0],
@@ -369,19 +369,19 @@ class TestVersionRange(unittest.TestCase):
 
     def test_semver_is_in_one_limit(self) -> None:
         version_range_1 = verpro_.VersionRange(
-            "semver/<1.0.0"
+            "<1.0.0"
         )
         version_range_2 = verpro_.VersionRange(
-            "semver/1.0.0"
+            "1.0.0"
         )
         version_range_3 = verpro_.VersionRange(
-            "semver/>1.0.0"
+            ">1.0.0"
         )
         version_range_4 = verpro_.VersionRange(
-            "semver/<=1.0.0"
+            "<=1.0.0"
         )
         version_range_5 = verpro_.VersionRange(
-            "semver/>=1.0.0"
+            ">=1.0.0"
         )
         with self.assertRaises(AppError):
             version_range_1.version_is_in(verpro_.VersionConstraint(">=6.1.0"))
@@ -397,16 +397,16 @@ class TestVersionRange(unittest.TestCase):
 
     def test_semver_is_in_one_range(self) -> None:
         version_range_1 = verpro_.VersionRange(
-            "semver/<1.0.0|>0.0.1"
+            "<1.0.0|>0.0.1"
         )
         version_range_2 = verpro_.VersionRange(
-            "semver/1.0.0|>1.1.0"
+            "1.0.0|>1.1.0"
         )
         version_range_3 = verpro_.VersionRange(
-            "semver/>1.0.0|<=1.1.0"
+            ">1.0.0|<=1.1.0"
         )
         version_range_4 = verpro_.VersionRange(
-            "semver/<1.0.0|>=2.1.0"
+            "<1.0.0|>=2.1.0"
         )
         self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
         self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
@@ -421,7 +421,7 @@ class TestVersionRange(unittest.TestCase):
 
     def test_semver_is_in_complex_example(self) -> None:
         version_range_1 = verpro_.VersionRange(
-            "semver/<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
+            "<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
         )
         self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.0.0")))
         self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("6.1.0")))
@@ -434,7 +434,7 @@ class TestVersionRange(unittest.TestCase):
 
     def test_version_string_is_in_range(self) -> None:
         version_range = verpro_.VersionRange(
-            "semver/<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
+            "<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
         )
         self.assertTrue(version_range.version_string_is_in_range("4.0.0"))
         self.assertTrue(version_range.version_string_is_in_range("6.1.0"))
@@ -447,7 +447,7 @@ class TestVersionRange(unittest.TestCase):
 
     def test_regex_versions(self) -> None:
         version_range_1 = verpro_.VersionRange(
-            "semver/*"
+            "*"
         )
         self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("4.0.0")))
         self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("6.1.0")))
@@ -457,7 +457,7 @@ class TestVersionRange(unittest.TestCase):
         self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("7.9.9")))
 
         version_range_2 = verpro_.VersionRange(
-            "semver/1.*"
+            "1.*"
         )
         self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
         self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("2.1.0")))
@@ -467,7 +467,7 @@ class TestVersionRange(unittest.TestCase):
         self.assertFalse(version_range_2.version_is_in(verpro_.VersionConstraintSemver("12.1.1")))
 
         version_range_3 = verpro_.VersionRange(
-            "semver/1.*.2"
+            "1.*.2"
         )
         self.assertTrue(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.0.2")))
         self.assertFalse(version_range_3.version_is_in(verpro_.VersionConstraintSemver("1.5.1")))
@@ -477,7 +477,7 @@ class TestVersionRange(unittest.TestCase):
 
     def test_regex_and_regular_constrained_versions(self) -> None:
         version_range_1 = verpro_.VersionRange(
-            "semver/1.*|<1.5"
+            "1.*|<1.5"
         )
         self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
         self.assertTrue(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
@@ -487,7 +487,7 @@ class TestVersionRange(unittest.TestCase):
         self.assertFalse(version_range_1.version_is_in(verpro_.VersionConstraintSemver("1.6.0")))
 
         version_range_2 = verpro_.VersionRange(
-            "semver/1.*|<1.5|>1.7"
+            "1.*|<1.5|>1.7"
         )
         self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0")))
         self.assertTrue(version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.1.0")))
@@ -585,25 +585,50 @@ class TestVersionConstraintCustom(unittest.TestCase):
     def test_lesser_then(self) -> None:
         version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
         version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
+        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn", "ubuntu")
+        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver", "ubuntu")
         self.assertTrue(version_1 < version_2)
-        self.assertFalse(version_1 > version_2)
+        self.assertFalse(version_2 < version_1)
+        self.assertTrue(version_3 < version_4)
+        self.assertFalse(version_4 < version_3)
 
     def test_lesser_equal(self) -> None:
         version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
         version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
+        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn", "ubuntu")
+        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver", "ubuntu")
         self.assertTrue(version_1 <= version_2)
         self.assertTrue(version_1 <= version_1)
-        self.assertFalse(version_1 >= version_2)
+        self.assertFalse(version_2 <= version_1)
+        self.assertTrue(version_3 <= version_4)
+        self.assertFalse(version_4 <= version_3)
 
     def test_greater_then(self) -> None:
         version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
         version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
+        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn", "ubuntu")
+        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver", "ubuntu")
         self.assertTrue(version_2 > version_1)
-        self.assertFalse(version_2 < version_1)
+        self.assertFalse(version_1 > version_2)
+        self.assertTrue(version_4 > version_3)
+        self.assertFalse(version_3 > version_4)
 
     def test_greater_equal(self) -> None:
         version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
         version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
+        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn", "ubuntu")
+        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver", "ubuntu")
+
         self.assertTrue(version_2 >= version_1)
         self.assertTrue(version_2 >= version_2)
-        self.assertFalse(version_2 <= version_1)
+        self.assertFalse(version_1 >= version_2)
+        self.assertTrue(version_4 >= version_3)
+        self.assertFalse(version_3 >= version_4)
+
+    def test_version_range(self) -> None:
+        version_range_1 = verpro_.VersionRange(
+            ">Warty Warthog"
+        )
+        print(version_range_1)
+        self.assertTrue(version_range_1.version_string_is_in_range("Bionic Beaver"))
+        self.assertFalse(version_range_1.version_string_is_in_range("Warty Warthog"))

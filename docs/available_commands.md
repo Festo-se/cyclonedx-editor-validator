@@ -289,6 +289,65 @@ This file can then be applied as the following example shows:
     # Perform several operations on properties using set-command
     cdx-ev set bom.json --from-file mysetfile.json
 
+If the file contains a component not present in the SBOM, a error is thrown.
+This can be disabled with the `--ignore-missing` command.
+So only a message that the component was not found and could not be updated is logged.
+
+    cdx-ev set bom.json --from-file mysetfile.json --ignore-missing
+
+#### set for version ranges
+
+To perform set on a range of versions "name" and "version" have to be used as "id".
+To specify a version range, the version string has to begin with the key phrase "range:".
+The version constraints can then be specified with a list of single versions or with the use of the order operators >, <, >=, <=,
+and be separated with a |. An example for a version range string would be "range:>1.1.1|<1.5.6|2.0.0".
+
+It is also possible to use a wildcard with "\*". So would "range:\*" include all versions and "range:1.*" all versions that begin with "1.".
+This can be combined with constraints using order operators.
+
+The program is able to parse versions following the Major.Minor.Patch matching the regex "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]" versioning schema, for other version schemas see upload of custom versions.
+
+An example for a file would be:  
+
+    [
+        {
+            "id": {
+                "name": "web-framework",
+                "group": "org.acme",
+                "version": "range:<3.0.0|>3.2.0|<4.0.0|5.0.0",
+            },
+            "set": {"copyright": "1990 Acme Inc"},
+        },
+        {
+            "id": {
+                "name": "embedded-framework",
+                "group": "org.acme",
+                "version": "range:2.*|<2.5.8",
+            },
+            "set": {"copyright": "2000 Acme Inc"},
+        },
+    ]
+
+##### Uploading of own versions
+
+It is possible to upload lists of custom software versions the program can then parse and perform set with version ranges on it.
+For this use the `--custom-versions` command to provide the path to file containing the versions.
+
+The file has to follow the format:
+
+[
+    {
+        "version_schema": "ubuntu",
+        "version_list":[
+        version 1
+        version 2
+        version 3
+        ]
+    }
+]
+
+The order of versions has to be aligned with their index in the list.
+
 ## validate
 
 This command is used to validate the SBOM against a JSON schema.

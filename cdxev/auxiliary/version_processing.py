@@ -28,7 +28,7 @@ def throw_incompatible_version_error(
         description=(
             f'The compared versions are of type "{own_version_schema}" and'
             f' "{other_version_schema}"'  # type:ignore
-            "no order operator for different version types is implemented"
+            " no order operator for different version types is implemented"
         ),
     )
 
@@ -273,7 +273,7 @@ class CustomVersionData:
                 schema_data = json.load(from_file)
             except json.JSONDecodeError as ex:
                 raise InputFileError(
-                    "Invalid JSON passed to --custom_versions",
+                    "Invalid JSON passed to --custom-versions",
                     None,
                     ex.lineno,
                 ) from ex
@@ -591,9 +591,9 @@ class VersionRange:
                 )
 
     def version_string_is_in_range(self, version: str) -> bool:
-        if self._versioning_schema == "semver":
+        try:
             version_object = VersionConstraintSemver(version)
-        else:
+        except pack_ver.InvalidVersion:
             found = False
             for key in CustomVersionData.get_data().keys():
                 if version in CustomVersionData.get_data()[key]:
@@ -633,9 +633,7 @@ class VersionRange:
             version.get_versioning_schema() == self._versioning_schema
             or not self.regular_constraints
         ):
-            throw_incompatible_version_error(
-                version.get_versioning_schema(), self.get_versioning_schema()
-            )
+            return False
 
         if self.regex_constraints:
             matches_regex = False

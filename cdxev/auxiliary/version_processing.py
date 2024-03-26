@@ -1,12 +1,13 @@
+import copy
+import json
+import logging
 import re
 import typing as t
-import logging
-from cdxev.error import AppError, InputFileError
-from packaging import version as pack_ver
 from pathlib import Path
-import json
-import copy
 
+from packaging import version as pack_ver
+
+from cdxev.error import AppError, InputFileError
 
 logger = logging.getLogger(__name__)
 
@@ -174,6 +175,7 @@ class VersionConstraintSemver(VersionConstraint):
             a variable describing if the associated constraint of the version is >=
 
     """
+
     _version_schema = "semver"
 
     def parse_version_schema(self) -> pack_ver.Version:
@@ -228,7 +230,7 @@ class CustomVersionData:
         }
     ]
 
-    The "version_type" field is a identifier for the versioning schema.
+    The "version_schema" field is a identifier for the versioning schema.
     The "version_list" is a list of all the software versions,
     beginning with the lowest up to the highest.
     """
@@ -289,37 +291,38 @@ class CustomVersionData:
 
         for schema in schema_data:
             if not (
-                "version_type" in schema.keys() and "version_list" in schema.keys()
+                "version_schema" in schema.keys() and "version_list" in schema.keys()
             ):
                 raise AppError(
                     message="Invalid format",
                     description=(
                         f"The provided schema {schema} is not according to the specified format."
-                        '"version_type" and "version_list" are required properties.'
+                        '"version_schema" and "version_list" are required properties.'
                     ),
                 )
             if not (
-                isinstance(schema["version_type"], str)
+                isinstance(schema["version_schema"], str)
                 and isinstance(schema["version_list"], list)
             ):
                 raise AppError(
-                    message="Inavlid type",
+                    message="Invalid type",
                     description=(
-                        '"version_type" has to be of type "str" and "version_list" of type "list".'
+                        '"version_schema" has to be of type "str"'
+                        ' and "version_list" of type "list".'
                     ),
                 )
-        if schema["version_type"] in cls._custom_versions.keys():
+        if schema["version_schema"] in cls._custom_versions.keys():
             logger.info(
                 (
-                    f'The version schema "{schema["version_type"]}"'
+                    f'The version schema "{schema["version_schema"]}"'
                     "existed already and will be overwritten"
                 )
             )
-        cls._custom_versions[schema["version_type"]] = schema["version_list"]
+        cls._custom_versions[schema["version_schema"]] = schema["version_list"]
 
 
 class VersionConstraintCustom(VersionConstraint):
-    def __init__(self, version: str, version_type: str) -> None:
+    def __init__(self, version: str, version_schema: str) -> None:
         if not CustomVersionData.version_is_in_custom_versions(version):
             throw_unsupported_version_error(version)
         self._input = version
@@ -327,7 +330,7 @@ class VersionConstraintCustom(VersionConstraint):
         self._lesser_equal = False
         self._greater_then = False
         self._greater_equal = False
-        self._version_schema = version_type
+        self._version_schema = version_schema
         self.version_string = self._parse_version(version)
         self.version = self.parse_version_schema()
 
@@ -481,7 +484,7 @@ class VersionRange:
                     for constraint in self.regular_constraints:
                         list_of_version_objects.append(
                             VersionConstraintCustom(
-                                version=constraint, version_type=version_schema
+                                version=constraint, version_schema=version_schema
                             )  # type:ignore
                         )
                 if not matched_schema:
@@ -596,7 +599,7 @@ class VersionRange:
                 if version in CustomVersionData.get_data()[key]:
                     found = True
                     version_object = VersionConstraintCustom(
-                        version=version, version_type=key
+                        version=version, version_schema=key
                     )  # type:ignore# type:ignore
             if not found:
                 throw_unsupported_version_error(version)

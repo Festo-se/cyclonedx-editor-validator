@@ -1,11 +1,12 @@
 import functools
 import json
+import re
 import typing as t
 from dataclasses import dataclass
 from enum import Enum
+
 from cdxev.auxiliary.version_processing import VersionRange
 from cdxev.error import AppError
-import re
 
 
 @functools.total_ordering

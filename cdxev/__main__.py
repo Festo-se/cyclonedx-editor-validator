@@ -619,7 +619,7 @@ def create_set_parser(
         help="Version of target component. If specified, name must also be specified.",
     )
     parser.add_argument(
-        "--custom_versions",
+        "--custom-versions",
         metavar="<file>",
         type=Path,
         help=(

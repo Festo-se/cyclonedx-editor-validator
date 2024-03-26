@@ -7,18 +7,10 @@ from cdxev.error import AppError
 
 class TestVersionConstraint(unittest.TestCase):
     def test_compare_function(self) -> None:
-        version_constraint_1 = verpro_.VersionConstraint(
-            "<some_version"
-        )
-        version_constraint_2 = verpro_.VersionConstraint(
-            "<=some_version"
-        )
-        version_constraint_3 = verpro_.VersionConstraint(
-            ">some_version"
-        )
-        version_constraint_4 = verpro_.VersionConstraint(
-            ">=some_version"
-        )
+        version_constraint_1 = verpro_.VersionConstraint("<some_version")
+        version_constraint_2 = verpro_.VersionConstraint("<=some_version")
+        version_constraint_3 = verpro_.VersionConstraint(">some_version")
+        version_constraint_4 = verpro_.VersionConstraint(">=some_version")
         version_constraint_5 = verpro_.VersionConstraint("<some_version")
         version_constraint_6 = verpro_.VersionConstraint("<=some_version")
         version_constraint_7 = verpro_.VersionConstraint(">some_version")
@@ -61,24 +53,16 @@ class TestVersionConstraint(unittest.TestCase):
         version_no_constraint = verpro_.VersionConstraint("some_version")
         self.assertEqual(version_no_constraint.__str__(), "some_version")
 
-        version_lesser_then = verpro_.VersionConstraint(
-            "<some_version"
-        )
+        version_lesser_then = verpro_.VersionConstraint("<some_version")
         self.assertEqual(version_lesser_then.__str__(), "<some_version")
 
-        version_lesser_then = verpro_.VersionConstraint(
-            "<=some_version"
-        )
+        version_lesser_then = verpro_.VersionConstraint("<=some_version")
         self.assertEqual(version_lesser_then.__str__(), "<=some_version")
 
-        version_lesser_then = verpro_.VersionConstraint(
-            ">some_version"
-        )
+        version_lesser_then = verpro_.VersionConstraint(">some_version")
         self.assertEqual(version_lesser_then.__str__(), ">some_version")
 
-        version_lesser_then = verpro_.VersionConstraint(
-            ">=some_version"
-        )
+        version_lesser_then = verpro_.VersionConstraint(">=some_version")
         self.assertEqual(version_lesser_then.__str__(), ">=some_version")
 
     def test_is_upper_limit(self) -> None:
@@ -600,9 +584,9 @@ class TestCustomVersionData(unittest.TestCase):
         test_data_1 = [
             {"version_typ": "ubuntu", "version_list": ["version 1", "version 2"]}
         ]
-        test_data_2 = [{"version_type": "ubuntu", "version_list": "str"}]
+        test_data_2 = [{"version_schema": "ubuntu", "version_list": "str"}]
         test_data_3 = [
-            {"version_type": "some_type", "version_list": ["version 1", "version 2"]}
+            {"version_schema": "some_type", "version_list": ["version 1", "version 2"]}
         ]
         with self.assertRaises(AppError):
             data.add_data_from_dict(test_data_1[0])
@@ -630,7 +614,7 @@ class TestVersionConstraintCustom(unittest.TestCase):
     data = verpro_.CustomVersionData(path_to_file=path_to_version_file)
     test_data = [
         {
-            "version_type": "some_type",
+            "version_schema": "some_type",
             "version_list": ["version 1", "version 2", "version 3", "version 4"],
         }
     ]

@@ -8,9 +8,9 @@ from dataclasses import dataclass, field
 
 from cdxev.auxiliary.identity import ComponentIdentity, Key, UpdateIdentity
 from cdxev.auxiliary.sbomFunctions import walk_components
+from cdxev.auxiliary.version_processing import CustomVersionData
 from cdxev.error import AppError
 from cdxev.log import LogMessage
-from cdxev.auxiliary.version_processing import CustomVersionData
 
 logger = logging.getLogger(__name__)
 

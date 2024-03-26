@@ -1,6 +1,6 @@
 [
     {
-        "version_type": "ubuntu",
+        "version_schema": "ubuntu",
         "version_list":[
             "Warty Warthog",
             "Hoary Hedgehog",

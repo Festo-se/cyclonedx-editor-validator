@@ -108,18 +108,19 @@ class VersionConstraint:
         return self.version_string
 
     def _parse_version(self, version: str) -> str:
-        if "<=" in version:
+        version = version.lstrip()
+        if re.match("^<=.*", version):
             self._lesser_equal = True
-            return version.replace("<=", "")
-        elif ">=" in version:
+            return version.replace("<=", "").lstrip()
+        elif re.match("^>=.*", version):
             self._greater_equal = True
-            return version.replace(">=", "")
-        elif "<" in version:
+            return version.replace(">=", "").lstrip()
+        elif re.match("^<.*", version):
             self._lesser_then = True
-            return version.replace("<", "")
-        elif ">" in version:
+            return version.replace("<", "").lstrip()
+        elif re.match("^>.*", version):
             self._greater_then = True
-            return version.replace(">", "")
+            return version.replace(">", "").lstrip()
         else:
             return version
 

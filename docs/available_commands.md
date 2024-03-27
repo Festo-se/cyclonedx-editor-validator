@@ -297,7 +297,7 @@ So only a message that the component was not found and could not be updated is l
 
 #### set for version ranges
 
-To perform set on a range of versions "name" and "version" and, if it exists, group have to be used as "id".
+To perform set on a range of versions "name", "version" and, if it exists, group have to be used as "id".
 The version constraints can then be specified with a list of single versions or with the use of the order operators >, <, >=, <=,
 and be separated with a |. An example for a version range string would be ">1.1.1|<1.5.6|2.0.0".
 

@@ -305,7 +305,7 @@ and be separated with a |. An example for a version range string would be "range
 It is also possible to use a wildcard with "\*". So would "range:\*" include all versions and "range:1.*" all versions that begin with "1.".
 This can be combined with constraints using order operators.
 
-The program is able to parse versions following the Major.Minor.Patch matching the regex "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]" versioning schema, for other version schemas see upload of custom versions.
+The program is able to parse versions following the Major.Minor.Patch matching the regular expression "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]" versioning schema, for other version schemas see upload of custom versions.
 
 An example for a file would be:  
 

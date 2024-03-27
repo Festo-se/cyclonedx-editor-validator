@@ -335,16 +335,16 @@ For this use the `--custom-versions` command to provide the path to file contain
 
 The file has to follow the format:
 
-[
-    {
-        "version_schema": "ubuntu",
-        "version_list":[
-        version 1
-        version 2
-        version 3
-        ]
-    }
-]
+    [
+        {
+            "version_schema": "ubuntu",
+            "version_list":[
+            version 1
+            version 2
+            version 3
+            ]
+        }
+    ]
 
 The order of versions has to be aligned with their index in the list.
 

@@ -570,6 +570,28 @@ class TestVersionRange(unittest.TestCase):
             version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.8.0"))
         )
 
+    def test_get_versioning_schema(self) -> None:
+        version_range = verpro_.VersionRange("<1.5|>1.7")
+        self.assertEqual("semver", version_range.get_versioning_schema())
+
+    def _create_version_from_constraints(self) -> None:
+        version_range = verpro_.VersionRange("1.*|<1.5|>1.7")
+        self.assertEqual(
+            version_range.get_version_constraints(), ["1.*", "<1.5", ">1.7"]
+        )
+
+    def test_get_version_constraints(self) -> None:
+        version_range = verpro_.VersionRange("1.*|<1.5|>1.7")
+        self.assertEqual(
+            version_range.get_version_constraints(), ["1.*", "<1.5", ">1.7"]
+        )
+
+    def test_create_version_from_constraints(self) -> None:
+        version_range = verpro_.VersionRange("1.*|<1.5|>1.7")
+        version_range.regular_constraints = ["> not a version"]
+        with self.assertRaises(verpro_.UnsupportedVersionError):
+            version_range._create_version_from_constraints()
+
 
 class TestCustomVersionData(unittest.TestCase):
     path_to_version_file = pathlib.Path("tests/auxiliary/custom_version_list.json")
@@ -661,6 +683,8 @@ class TestVersionConstraintCustom(unittest.TestCase):
         self.assertFalse(version_2 < version_1)
         self.assertTrue(version_3 < version_4)
         self.assertFalse(version_4 < version_3)
+        with self.assertRaises(verpro_.IncompatibleVersionError):
+            version_1 < version_4
 
     def test_lesser_equal(self) -> None:
         version_1 = verpro_.VersionConstraintCustom("version 1")
@@ -672,6 +696,8 @@ class TestVersionConstraintCustom(unittest.TestCase):
         self.assertFalse(version_2 <= version_1)
         self.assertTrue(version_3 <= version_4)
         self.assertFalse(version_4 <= version_3)
+        with self.assertRaises(verpro_.IncompatibleVersionError):
+            version_1 <= version_4
 
     def test_greater_then(self) -> None:
         version_1 = verpro_.VersionConstraintCustom("version 1")
@@ -682,12 +708,16 @@ class TestVersionConstraintCustom(unittest.TestCase):
         self.assertFalse(version_1 > version_2)
         self.assertTrue(version_4 > version_3)
         self.assertFalse(version_3 > version_4)
+        with self.assertRaises(verpro_.IncompatibleVersionError):
+            version_1 > version_4
 
     def test_greater_equal(self) -> None:
         version_1 = verpro_.VersionConstraintCustom("version 1")
         version_2 = verpro_.VersionConstraintCustom("version 2")
         version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn")
         version_4 = verpro_.VersionConstraintCustom("Bionic Beaver")
+        with self.assertRaises(verpro_.IncompatibleVersionError):
+            version_1 >= version_4
 
         self.assertTrue(version_2 >= version_1)
         self.assertTrue(version_2 >= version_2)
@@ -696,7 +726,6 @@ class TestVersionConstraintCustom(unittest.TestCase):
         self.assertFalse(version_3 >= version_4)
 
     def test_version_range(self) -> None:
-        print(verpro_.CustomVersionData.get_data())
         version_range_1 = verpro_.VersionRange(">Warty Warthog")
         self.assertTrue(version_range_1.version_string_is_in_range("Bionic Beaver"))
         self.assertFalse(version_range_1.version_string_is_in_range("Warty Warthog"))

@@ -368,8 +368,6 @@ class TestVersionRange(unittest.TestCase):
         version_range_3 = verpro_.VersionRange(">1.0.0")
         version_range_4 = verpro_.VersionRange("<=1.0.0")
         version_range_5 = verpro_.VersionRange(">=1.0.0")
-        with self.assertRaises(AppError):
-            version_range_1.version_is_in(verpro_.VersionConstraint(">=6.1.0"))
 
         self.assertTrue(
             version_range_2.version_is_in(verpro_.VersionConstraintSemver("1.0.0"))
@@ -677,3 +675,9 @@ class TestVersionConstraintCustom(unittest.TestCase):
         version_range_1 = verpro_.VersionRange(">Warty Warthog")
         self.assertTrue(version_range_1.version_string_is_in_range("Bionic Beaver"))
         self.assertFalse(version_range_1.version_string_is_in_range("Warty Warthog"))
+
+    def test_is_for_different_version_types(self) -> None:
+        version_range = verpro_.VersionRange(
+            "<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
+        )
+        self.assertFalse(version_range.version_string_is_in_range("Warty Warthog"))

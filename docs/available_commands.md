@@ -297,7 +297,7 @@ So only a message that the component was not found and could not be updated is l
 
 #### set for version ranges
 
-To perform set on a range of versions "name" and "version" have to be used as "id".
+To perform set on a range of versions "name" and "version" and, if it exists, group have to be used as "id".
 To specify a version range, the version string has to begin with the key phrase "range:".
 The version constraints can then be specified with a list of single versions or with the use of the order operators >, <, >=, <=,
 and be separated with a |. An example for a version range string would be "range:>1.1.1|<1.5.6|2.0.0".
@@ -305,9 +305,9 @@ and be separated with a |. An example for a version range string would be "range
 It is also possible to use a wildcard with "\*". So would "range:\*" include all versions and "range:1.*" all versions that begin with "1.".
 This can be combined with constraints using order operators.
 
-The program is able to parse versions following the Major.Minor.Patch matching the regular expression "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]" versioning schema, for other version schemas see upload of custom versions.
+The program is able to parse versions following the MAJOR.MINOR.PATCH schema matching the regular expression "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]", for other version schemas see upload of custom versions.
 
-An example for a file would be:  
+An example for a update file with version ranges:  
 
     [
         {
@@ -337,16 +337,24 @@ The file has to follow the format:
 
     [
         {
-            "version_schema": "ubuntu",
+            "version_schema": "some identifier",
             "version_list":[
-            version 1
-            version 2
+            version 1,
+            version 2,
             version 3
+            ]
+        },
+        {
+            "version_schema": "some other identifier",
+            "version_list":[
+            first version,
+            second version,
+            third version
             ]
         }
     ]
 
-The order of versions has to be aligned with their index in the list.
+The order of the versions has to be aligned with their index in the list.
 
 ## validate
 

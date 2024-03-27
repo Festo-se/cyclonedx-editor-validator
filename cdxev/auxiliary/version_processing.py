@@ -442,7 +442,6 @@ class VersionRange:
         self.regex_constraints: list = []
 
         self.all_versions = False
-        # TODO check if range is  a valid expression
         if len(range) and range[-1] == "|":
             range = range[:-1]
         self._version_constraints = range.split("|")

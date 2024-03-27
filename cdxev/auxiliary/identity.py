@@ -209,14 +209,15 @@ class UpdateIdentity(ComponentIdentity):
     @classmethod
     def create(
         cls, update: t.Mapping[str, t.Any], allow_unsafe: bool = False
-    ) -> "UpdateIdentity":  # TODO adapt description!
+    ) -> "UpdateIdentity":
         """
-        Creates a :py:class:`.UpdateIdentity` for the given component.
+        Creates a :py:class:`.UpdateIdentity` for the given update.
 
-        The identity will contain all keys specified on the component.
+        The identity will contain all keys specified on the update.
 
         If the `allow_unsafe` argument is set to `True`, then component properties will be taken
         into account for identification which might not enforce strict identity.
+        This is necessary for the use of version ranges.
 
         This function considers as *safe*:
 
@@ -228,12 +229,12 @@ class UpdateIdentity(ComponentIdentity):
 
         * package coordinates, i.e. the combination of *name*, *group* and *version*
 
-        :param component: one component dictionary from sbom["components"]
+        :param update: one update dictionary for a component.
 
         :param bool allow_unsafe: If set to true, *unsafe* keys will also be added to the returned
                                     identity.
 
-        :returns: The `ComponentIdentity`.
+        :returns: The `UpdateIdentity`.
         """
         cpe = Key.from_cpe(update["cpe"]) if "cpe" in update else None
         purl = Key.from_purl(update["purl"]) if "purl" in update else None

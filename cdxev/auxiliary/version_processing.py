@@ -477,7 +477,7 @@ class VersionRange:
         for constraint in self._version_objects:
             print_string += constraint.__str__() + "|"
         for regex in self.regex_constraints:
-            print_string += regex.__str__() + "|"
+            print_string += regex.pattern + "|"
         return print_string[:-1]
 
     def get_versioning_schema(self) -> str:

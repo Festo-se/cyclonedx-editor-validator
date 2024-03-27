@@ -1,5 +1,5 @@
-import unittest
 import pathlib
+import unittest
 
 from cdxev.auxiliary import version_processing as verpro_
 from cdxev.error import AppError

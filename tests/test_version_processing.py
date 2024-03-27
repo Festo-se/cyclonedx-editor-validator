@@ -109,6 +109,7 @@ class TestVersionConstraintSemver(unittest.TestCase):
         version_3 = verpro_.VersionConstraintSemver("1.1.1")
         self.assertTrue(version_1 == version_2)
         self.assertFalse(version_1 == version_3)
+        self.assertFalse(version_1 == "not a version")
 
     def test_semver_compare_smaller(self) -> None:
         version_1 = verpro_.VersionConstraintSemver("1.2.3")
@@ -598,6 +599,8 @@ class TestCustomVersionData(unittest.TestCase):
             data.add_data_from_file(
                 pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")
             )
+        with self.assertRaises(AppError):
+            data.add_data_from_file(pathlib.Path("tests/test_set.py"))
         data.add_data_from_list(test_data_3)
         self.assertEqual(data.get_data()["some_type"], ["version 1", "version 2"])
         del data
@@ -605,6 +608,22 @@ class TestCustomVersionData(unittest.TestCase):
     def test_get_data(self) -> None:
         data = verpro_.CustomVersionData(path_to_file=self.path_to_version_file)
         self.assertTrue(data.get_data()["ubuntu"][0] == "Warty Warthog")
+
+    def test_add_data_to_custom_versions(self) -> None:
+        list_of_versions = verpro_.CustomVersionData.get_data()
+        verpro_.CustomVersionData.add_data_to_custom_versions([])
+        self.assertEqual(list_of_versions, verpro_.CustomVersionData.get_data())
+        new_versions = [
+            {
+                "version_schema": "some version",
+                "version_list": ["first version", "second version"],
+            }
+        ]
+        verpro_.CustomVersionData.add_data_to_custom_versions(new_versions)
+        self.assertEqual(
+            new_versions[0]["version_list"],
+            verpro_.CustomVersionData.get_data()["some version"],
+        )
 
 
 class TestVersionConstraintCustom(unittest.TestCase):
@@ -618,31 +637,36 @@ class TestVersionConstraintCustom(unittest.TestCase):
     ]
     data.add_data_from_list(test_data)
 
+    def test_init(self) -> None:
+        verpro_.VersionConstraintCustom("version 1")
+        with self.assertRaises(verpro_.UnsupportedVersionError):
+            verpro_.VersionConstraintCustom("an unsupported version")
+
     def test_equal(self) -> None:
-        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
-        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
-        version_1_2 = verpro_.VersionConstraintCustom("version 1", "some_type")
-        version_1_2 = verpro_.VersionConstraintCustom("version 1", "some_type")
-        version_ubuntu = verpro_.VersionConstraintCustom("Warty Warthog", "ubuntu")
+        version_1 = verpro_.VersionConstraintCustom("version 1")
+        version_2 = verpro_.VersionConstraintCustom("version 2")
+        version_1_2 = verpro_.VersionConstraintCustom("version 1")
+        version_1_2 = verpro_.VersionConstraintCustom("version 1")
+        version_ubuntu = verpro_.VersionConstraintCustom("Warty Warthog")
         self.assertTrue(version_1 == version_1_2)
         self.assertFalse(version_1 == version_2)
         self.assertFalse(version_1 == version_ubuntu)
 
     def test_lesser_then(self) -> None:
-        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
-        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
-        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn", "ubuntu")
-        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver", "ubuntu")
+        version_1 = verpro_.VersionConstraintCustom("version 1")
+        version_2 = verpro_.VersionConstraintCustom("version 2")
+        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn")
+        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver")
         self.assertTrue(version_1 < version_2)
         self.assertFalse(version_2 < version_1)
         self.assertTrue(version_3 < version_4)
         self.assertFalse(version_4 < version_3)
 
     def test_lesser_equal(self) -> None:
-        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
-        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
-        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn", "ubuntu")
-        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver", "ubuntu")
+        version_1 = verpro_.VersionConstraintCustom("version 1")
+        version_2 = verpro_.VersionConstraintCustom("version 2")
+        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn")
+        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver")
         self.assertTrue(version_1 <= version_2)
         self.assertTrue(version_1 <= version_1)
         self.assertFalse(version_2 <= version_1)
@@ -650,20 +674,20 @@ class TestVersionConstraintCustom(unittest.TestCase):
         self.assertFalse(version_4 <= version_3)
 
     def test_greater_then(self) -> None:
-        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
-        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
-        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn", "ubuntu")
-        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver", "ubuntu")
+        version_1 = verpro_.VersionConstraintCustom("version 1")
+        version_2 = verpro_.VersionConstraintCustom("version 2")
+        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn")
+        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver")
         self.assertTrue(version_2 > version_1)
         self.assertFalse(version_1 > version_2)
         self.assertTrue(version_4 > version_3)
         self.assertFalse(version_3 > version_4)
 
     def test_greater_equal(self) -> None:
-        version_1 = verpro_.VersionConstraintCustom("version 1", "some_type")
-        version_2 = verpro_.VersionConstraintCustom("version 2", "some_type")
-        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn", "ubuntu")
-        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver", "ubuntu")
+        version_1 = verpro_.VersionConstraintCustom("version 1")
+        version_2 = verpro_.VersionConstraintCustom("version 2")
+        version_3 = verpro_.VersionConstraintCustom("Utopic Unicorn")
+        version_4 = verpro_.VersionConstraintCustom("Bionic Beaver")
 
         self.assertTrue(version_2 >= version_1)
         self.assertTrue(version_2 >= version_2)
@@ -672,6 +696,7 @@ class TestVersionConstraintCustom(unittest.TestCase):
         self.assertFalse(version_3 >= version_4)
 
     def test_version_range(self) -> None:
+        print(verpro_.CustomVersionData.get_data())
         version_range_1 = verpro_.VersionRange(">Warty Warthog")
         self.assertTrue(version_range_1.version_string_is_in_range("Bionic Beaver"))
         self.assertFalse(version_range_1.version_string_is_in_range("Warty Warthog"))
@@ -681,3 +706,25 @@ class TestVersionConstraintCustom(unittest.TestCase):
             "<2.0.0|<1.0.0|<3.0.0|5.0.0|>=6.1.0|>=7.3.2|>=8.1.1|<10.1.1|4.0.0"
         )
         self.assertFalse(version_range.version_string_is_in_range("Warty Warthog"))
+
+
+class TestFunctions(unittest.TestCase):
+    def test_throw_incompatible_version_error(self) -> None:
+        with self.assertRaises(verpro_.IncompatibleVersionError):
+            verpro_.throw_incompatible_version_error(
+                "own_version_schema", "other_version_schema"
+            )
+
+    def test_throw_unsupported_version_error(self) -> None:
+        with self.assertRaises(verpro_.UnsupportedVersionError):
+            verpro_.throw_unsupported_version_error("not a version")
+
+    def test_is_version_range(self) -> None:
+        self.assertFalse(verpro_.is_version_range("1.0.0"))
+        self.assertFalse(verpro_.is_version_range("a version"))
+        self.assertTrue(verpro_.is_version_range("1.0.0|1.2.3"))
+        self.assertTrue(verpro_.is_version_range("*"))
+        self.assertTrue(verpro_.is_version_range("<1.0.0"))
+        self.assertTrue(verpro_.is_version_range(">1.0.0"))
+        self.assertTrue(verpro_.is_version_range("<=1.0.0"))
+        self.assertTrue(verpro_.is_version_range(">=1.2.0"))

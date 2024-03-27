@@ -55,6 +55,20 @@ def is_version_range(version_str: str) -> bool:
         return False
 
 
+def get_version_from_regular_constraint(version: str) -> str:
+    version = version.lstrip()
+    if re.match("^<=.*", version):
+        return version.replace("<=", "").lstrip()
+    elif re.match("^>=.*", version):
+        return version.replace(">=", "").lstrip()
+    elif re.match("^<.*", version):
+        return version.replace("<", "").lstrip()
+    elif re.match("^>.*", version):
+        return version.replace(">", "").lstrip()
+    else:
+        return version
+
+
 class VersionConstraint:
     _version_schema = "undefined"
 
@@ -328,15 +342,19 @@ class CustomVersionData:
 
 
 class VersionConstraintCustom(VersionConstraint):
-    def __init__(self, version: str, version_schema: str) -> None:
-        if not CustomVersionData.version_is_in_custom_versions(version):
+
+    def __init__(self, version: str) -> None:
+        matched_schema, schema = CustomVersionData.version_is_in_custom_versions(
+            get_version_from_regular_constraint(version)
+        )
+        if not matched_schema:
             throw_unsupported_version_error(version)
         self._input = version
         self._lesser_then = False
         self._lesser_equal = False
         self._greater_then = False
         self._greater_equal = False
-        self._version_schema = version_schema
+        self._version_schema = schema
         self.version_string = self._parse_version(version)
         self.version = self.parse_version_schema()
 
@@ -475,35 +493,25 @@ class VersionRange:
             t.Union[VersionConstraintSemver, VersionConstraintCustom]
         ] = []
         if self.regular_constraints:
-            version = self.extract_version_from_constrained(self.regular_constraints[0])
+            matched_schema, schema = CustomVersionData.version_is_in_custom_versions(
+                get_version_from_regular_constraint(self.regular_constraints[0])
+            )
+            version = get_version_from_regular_constraint(self.regular_constraints[0])
             if VersionConstraintSemver.is_semver_version(version):
                 self._versioning_schema = "semver"
                 for constraint in self.regular_constraints:
                     list_of_version_objects.append(VersionConstraintSemver(constraint))
+            elif matched_schema:
+                self._versioning_schema = schema
+                for constraint in self.regular_constraints:
+                    list_of_version_objects.append(
+                        VersionConstraintCustom(version=constraint)  # type:ignore
+                    )
             else:
-                matched_schema, version_schema = (
-                    CustomVersionData.version_is_in_custom_versions(version)
+                throw_unsupported_version_error(
+                    get_version_from_regular_constraint(self.regular_constraints[0])
                 )
-                self._versioning_schema = version_schema
-                if matched_schema:
-                    for constraint in self.regular_constraints:
-                        list_of_version_objects.append(
-                            VersionConstraintCustom(
-                                version=constraint, version_schema=version_schema
-                            )  # type:ignore
-                        )
-                if not matched_schema:
-                    throw_unsupported_version_error(version)
         return list_of_version_objects
-
-    def extract_version_from_constrained(self, version_constrained: str) -> str:
-        version = version_constrained.replace("<=", "")
-        version = version.replace(">=", "")
-        version = version.replace(">", "")
-        version = version.replace("<", "")
-        # remove leading whitespaces
-        version = version.lstrip()
-        return version
 
     def _sort_versions(self) -> None:
         n = len(self._version_objects)
@@ -599,15 +607,9 @@ class VersionRange:
         try:
             version_object = VersionConstraintSemver(version)
         except pack_ver.InvalidVersion:
-            found = False
-            for key in CustomVersionData.get_data().keys():
-                if version in CustomVersionData.get_data()[key]:
-                    found = True
-                    version_object = VersionConstraintCustom(
-                        version=version, version_schema=key
-                    )  # type:ignore# type:ignore
-            if not found:
-                throw_unsupported_version_error(version)
+            version_object = VersionConstraintCustom(
+                version=version
+            )  # type:ignore# type:ignore
         return self.version_is_in(version_object)
 
     def version_is_in(self, version: VersionConstraint) -> bool:

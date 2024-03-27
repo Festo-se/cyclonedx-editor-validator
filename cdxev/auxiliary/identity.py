@@ -190,7 +190,7 @@ class ComponentIdentity:
 
 @dataclass(frozen=True)
 class UpdateIdentity(ComponentIdentity):
-    _version_range: t.Union[VersionRange | None]
+    _version_range: t.Union[VersionRange, None]
     has_version_range: bool
 
     def __init__(

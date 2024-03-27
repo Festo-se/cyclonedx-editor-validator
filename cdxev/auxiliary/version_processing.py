@@ -470,9 +470,9 @@ class VersionRange:
 
     def _create_version_from_constraints(
         self,
-    ) -> list[VersionConstraintSemver | VersionConstraintCustom]:
+    ) -> list[t.Union[VersionConstraintSemver, VersionConstraintCustom]]:
         list_of_version_objects: list[
-            VersionConstraintSemver | VersionConstraintCustom
+            t.Union[VersionConstraintSemver, VersionConstraintCustom]
         ] = []
         if self.regular_constraints:
             version = self.extract_version_from_constrained(self.regular_constraints[0])

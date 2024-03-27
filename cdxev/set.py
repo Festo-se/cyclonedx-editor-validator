@@ -22,7 +22,7 @@ class SetConfig:
     sbom_paths: t.Sequence[pathlib.Path]
     from_file: t.Optional[pathlib.Path]
     ignore_missing: bool = False
-    custom_versions: t.Union[pathlib.Path | None] = None
+    custom_versions: t.Union[pathlib.Path, None] = None
 
 
 @dataclass

@@ -154,6 +154,8 @@ class TestVersionRange(unittest.TestCase):
         )
 
         version_range = verpro_.VersionRange("<1.2.5|>2.1.1")
+        version_range_2 = verpro_.VersionRange("<1.2.5|>2.1.1|")
+        self.assertEqual(version_range.__str__(), version_range_2.__str__())
         self.assertEqual(version_range.__str__(), "<1.2.5|>2.1.1")
         self.assertEqual(version_range._version_constraints, ["<1.2.5", ">2.1.1"])
         self.assertEqual(
@@ -166,6 +168,8 @@ class TestVersionRange(unittest.TestCase):
     def test_semver_version_print(self) -> None:
         version_range = verpro_.VersionRange("<1.2.5|>1.2.6|<=2.0.0|>=3.1.2")
         self.assertEqual(version_range.__str__(), "<1.2.5|>1.2.6|<=2.0.0|>=3.1.2")
+        version_range = verpro_.VersionRange("1.*|<1.5|>1.7")
+        self.assertEqual(version_range.__str__(), "<1.5|>1.7|1\\..*")
 
     def test_semver_version_sort_input(self) -> None:
         version_range = verpro_.VersionRange(">=3.1.2|<1.2.5|<=2.0.0|>1.2.6")
@@ -673,6 +677,7 @@ class TestVersionConstraintCustom(unittest.TestCase):
         self.assertTrue(version_1 == version_1_2)
         self.assertFalse(version_1 == version_2)
         self.assertFalse(version_1 == version_ubuntu)
+        self.assertFalse(version_1 == "not a version")
 
     def test_lesser_then(self) -> None:
         version_1 = verpro_.VersionConstraintCustom("version 1")

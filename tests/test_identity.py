@@ -258,9 +258,15 @@ class TestUpdateIdentity(unittest.TestCase):
         update_2 = UpdateIdentity.create(component)
         self.assertFalse(update_1 == update_2)
         component.pop("cpe")
+        update_1 = UpdateIdentity.create(component, allow_unsafe=True)
+        update_2 = UpdateIdentity.create(component, allow_unsafe=True)
+        self.assertTrue(update_1 == update_2)
+        update_1 = UpdateIdentity.create(component, allow_unsafe=True)
         component["name"] = "another name"
-        update_1 = UpdateIdentity.create(component)
-        update_2 = UpdateIdentity.create(component)
+        update_2 = UpdateIdentity.create(component, allow_unsafe=True)
+        self.assertFalse(update_1 == update_2)
+        component["group"] = "new group"
+        update_2 = UpdateIdentity.create(component, allow_unsafe=True)
         self.assertFalse(update_1 == update_2)
 
     def test_submit_version_range(self) -> None:

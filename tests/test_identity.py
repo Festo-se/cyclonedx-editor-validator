@@ -3,7 +3,6 @@
 import unittest
 
 from cdxev.auxiliary.identity import ComponentIdentity, Key, KeyType, UpdateIdentity
-from cdxev.error import AppError
 
 
 class IdentityTestCase(unittest.TestCase):
@@ -268,34 +267,25 @@ class TestUpdateIdentity(unittest.TestCase):
         update_id = {
             "name": self.sample_coordinates["name"],
             "group": self.sample_coordinates["group"],
-            "version": "range:<6.0.0",
+            "version": "<6.0.0",
         }
         update_1 = UpdateIdentity.create(update_id, allow_unsafe=True)
         self.assertTrue(update_1.has_version_range)
-
-    def test_wrong_version_schema(self) -> None:
-        update_id = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": "range:semver<6.0.0",
-        }
-        with self.assertRaises(AppError):
-            UpdateIdentity.create(update_id, allow_unsafe=True)
 
     def test_print(self) -> None:
         update_id = {
             "name": self.sample_coordinates["name"],
             "group": self.sample_coordinates["group"],
-            "version": "range:<6.0.0",
+            "version": "<6.0.0",
         }
         update = UpdateIdentity.create(update_id, allow_unsafe=True)
-        self.assertEqual(update.__str__(), "COORDINATES[acme/mylibrary@range:<6.0.0]")
+        self.assertEqual(update.__str__(), "COORDINATES[acme/mylibrary@<6.0.0]")
 
     def test_get_version_range(self) -> None:
         update_id = {
             "name": self.sample_coordinates["name"],
             "group": self.sample_coordinates["group"],
-            "version": "range:<6.0.0|>6.0.0",
+            "version": "<6.0.0|>6.0.0",
         }
         component_1 = {
             "name": self.sample_coordinates["name"],

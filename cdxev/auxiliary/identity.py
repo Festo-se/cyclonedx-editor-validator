@@ -2,13 +2,11 @@
 
 import functools
 import json
-import re
 import typing as t
 from dataclasses import dataclass
 from enum import Enum
 
-from cdxev.auxiliary.version_processing import VersionRange
-from cdxev.error import AppError
+from cdxev.auxiliary.version_processing import VersionRange, is_version_range
 
 
 @functools.total_ordering
@@ -252,17 +250,9 @@ class UpdateIdentity(ComponentIdentity):
 
         version_range = None
         version_str = update.get("version", "")
-        if re.match("^range:.*", version_str):
-            if re.fullmatch("^range:(.*|)*.*", version_str):
-                version_range = VersionRange(version_str[version_str.find(":") + 1 :])
-            else:
-                raise AppError(
-                    message="Provided version range does not match the required schema",
-                    description=(
-                        f'The provided version range: {update.get("version", "")} does'
-                        ' not match the required schema "^range:(.*|).*'
-                    ),
-                )
+        if is_version_range(version_str):
+            version_range = VersionRange(version_str)
+
         return UpdateIdentity(cpe, purl, swid, coordinates, version_range=version_range)
 
     def __str__(self) -> str:

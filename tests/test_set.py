@@ -552,7 +552,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "Acme_Application",
                     "group": "com.acme.internal",
-                    "version": "range:9.1.1",
+                    "version": "9.1.1|8.1.1",
                 },
                 "set": {"copyright": "2022 Acme Inc"},
             }
@@ -590,7 +590,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "range:<6.0.0",
+                    "version": "<6.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             }
@@ -617,7 +617,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "range:>3.0.0",
+                    "version": ">3.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             }
@@ -651,7 +651,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "range:>3.0.0",
+                    "version": ">3.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             },
@@ -659,7 +659,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "range:<=3.0.0",
+                    "version": "<=3.0.0",
                 },
                 "set": {"copyright": "2000 Acme Inc"},
             },
@@ -667,7 +667,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "range:<2.0.0|>4.0.0",
+                    "version": "<2.0.0|>4.0.0",
                 },
                 "set": {
                     "supplier": {"name": "New supplier"},
@@ -737,7 +737,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "range:>=Natty Narwhal",
+                    "version": ">=Natty Narwhal",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             }

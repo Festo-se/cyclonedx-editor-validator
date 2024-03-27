@@ -43,6 +43,18 @@ def throw_unsupported_version_error(version: str) -> None:
     )
 
 
+def is_version_range(version_str: str) -> bool:
+    if (
+        "|" in version_str
+        or ">" in version_str
+        or "<" in version_str
+        or "*" in version_str
+    ):
+        return True
+    else:
+        return False
+
+
 class version:
     def __init__(self, version: str, type: str):
         self.version_string = version
@@ -431,7 +443,7 @@ class VersionRange:
 
         self.all_versions = False
         # TODO check if range is  a valid expression
-        if range[-1] == "|":
+        if len(range) and range[-1] == "|":
             range = range[:-1]
         self._version_constraints = range.split("|")
         self.process_constraints(range)

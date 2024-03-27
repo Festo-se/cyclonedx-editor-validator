@@ -298,11 +298,10 @@ So only a message that the component was not found and could not be updated is l
 #### set for version ranges
 
 To perform set on a range of versions "name" and "version" and, if it exists, group have to be used as "id".
-To specify a version range, the version string has to begin with the key phrase "range:".
 The version constraints can then be specified with a list of single versions or with the use of the order operators >, <, >=, <=,
-and be separated with a |. An example for a version range string would be "range:>1.1.1|<1.5.6|2.0.0".
+and be separated with a |. An example for a version range string would be ">1.1.1|<1.5.6|2.0.0".
 
-It is also possible to use a wildcard with "\*". So would "range:\*" include all versions and "range:1.*" all versions that begin with "1.".
+It is also possible to use a wildcard with "\*". So would "\*" include all versions and "1.\*" all versions that begin with "1.".
 This can be combined with constraints using order operators.
 
 The program is able to parse versions following the MAJOR.MINOR.PATCH schema matching the regular expression "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]", for other version schemas see upload of custom versions.
@@ -314,7 +313,7 @@ An example for a update file with version ranges:
             "id": {
                 "name": "web-framework",
                 "group": "org.acme",
-                "version": "range:<3.0.0|>3.2.0|<4.0.0|5.0.0",
+                "version": "<3.0.0|>3.2.0|<4.0.0|5.0.0",
             },
             "set": {"copyright": "1990 Acme Inc"},
         },
@@ -322,7 +321,7 @@ An example for a update file with version ranges:
             "id": {
                 "name": "embedded-framework",
                 "group": "org.acme",
-                "version": "range:2.*|<2.5.8",
+                "version": "2.*|<2.5.8",
             },
             "set": {"copyright": "2000 Acme Inc"},
         },

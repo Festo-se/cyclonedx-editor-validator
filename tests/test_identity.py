@@ -309,3 +309,27 @@ class TestUpdateIdentity(unittest.TestCase):
         self.assertTrue(update.is_target_in_version_range(identity_1._keys[0]))
         self.assertFalse(update.is_target_in_version_range(identity_2._keys[0]))
         self.assertTrue(update.is_target_in_version_range(identity_3._keys[0]))
+
+    def test_no_range_is_in_range_function(self) -> None:
+        component_1 = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": "5.0.0",
+        }
+        component_2 = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": "8.0.0",
+        }
+        component_3 = {
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "purl": self.sample_purl,
+        }
+        identity_1 = ComponentIdentity.create(component_1, allow_unsafe=True)
+        identity_2 = ComponentIdentity.create(component_2, allow_unsafe=True)
+        identity_3 = ComponentIdentity.create(component_3)
+        update = UpdateIdentity.create(component_1, allow_unsafe=True)
+        self.assertTrue(update.is_target_in_version_range(identity_1._keys[0]))
+        self.assertFalse(update.is_target_in_version_range(identity_2._keys[0]))
+        self.assertFalse(update.is_target_in_version_range(identity_3._keys[0]))

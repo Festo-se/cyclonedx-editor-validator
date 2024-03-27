@@ -268,7 +268,13 @@ class UpdateIdentity(ComponentIdentity):
 
     def is_target_in_version_range(self, identity: Key) -> bool:
         if self._version_range is None:
-            return False
+            try:
+                if identity.key.version == self.__getitem__(0).key.version:
+                    return True
+                else:
+                    return False
+            except:
+                return False
         # only one identity specifier is allowed, so its has to be Coordinates, if it exists
         update_name = self.__getitem__(0).key.name
         update_group = self.__getitem__(0).key.group

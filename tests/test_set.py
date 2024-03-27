@@ -1,13 +1,12 @@
+import copy
 import json
 import pathlib
 import typing as t
 import unittest
+from typing import Any, Sequence
 
 import cdxev.error
 import cdxev.set
-import copy
-
-from typing import Sequence, Any
 
 
 class SetTestCase(unittest.TestCase):

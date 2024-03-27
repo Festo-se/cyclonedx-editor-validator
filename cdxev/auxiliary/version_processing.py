@@ -55,12 +55,6 @@ def is_version_range(version_str: str) -> bool:
         return False
 
 
-class version:
-    def __init__(self, version: str, type: str):
-        self.version_string = version
-        self._version_schema = type
-
-
 class VersionConstraint:
     _version_schema = "undefined"
 

@@ -608,7 +608,7 @@ class VersionRange:
                 )
 
     def version_string_is_in_range(self, version: str) -> bool:
-        # if only regular expression constrains are given,
+        # if only regular expression constraints are given,
         #  the version schema does not matter
         if not self.regular_constraints:
             for constrained in self. regex_constraints:

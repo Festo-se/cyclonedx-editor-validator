@@ -444,7 +444,7 @@ class VersionRange:
     if a specific version is in the represented version range.
     """
 
-    _supported_schemas = ["semver", "custom"]
+    _supported_schemas = ["'[N!]N(.N)*[{a|b|rc}N][.postN][.devN]'"]
 
     def __init__(self, range: str):
         self._versioning_schema = ""
@@ -608,6 +608,14 @@ class VersionRange:
                 )
 
     def version_string_is_in_range(self, version: str) -> bool:
+        # if only regular expression constrains are given,
+        #  the version schema does not matter
+        if not self.regular_constraints:
+            for constrained in self. regex_constraints:
+                if constrained.fullmatch(version):
+                    return True
+                return False
+
         try:
             version_object = VersionConstraintSemver(version)
         except pack_ver.InvalidVersion:

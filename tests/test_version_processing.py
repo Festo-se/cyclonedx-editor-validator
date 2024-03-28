@@ -596,6 +596,12 @@ class TestVersionRange(unittest.TestCase):
         with self.assertRaises(verpro_.UnsupportedVersionError):
             version_range._create_version_from_constraints()
 
+    def test_provide_regular_expression(self) -> None:
+        version_range = verpro_.VersionRange("regex:3\\.[ab].*")
+        self.assertTrue(
+            version_range.version_is_in(verpro_.VersionConstraintSemver("3.a"))
+        )
+
 
 class TestCustomVersionData(unittest.TestCase):
     path_to_version_file = pathlib.Path("tests/auxiliary/custom_version_list.json")

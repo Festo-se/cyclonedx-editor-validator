@@ -605,6 +605,15 @@ class TestVersionRange(unittest.TestCase):
             version_range.version_is_in(verpro_.VersionConstraintSemver("3.b"))
         )
 
+    def test_regular_expression_unknown_version_schema(self) -> None:
+        version_range = verpro_.VersionRange("regex:(unknown-)3\\.[a].*")
+        self.assertTrue(
+            version_range.version_string_is_in_range("unknown-3.a")
+        )
+        self.assertFalse(
+            version_range.version_string_is_in_range("unknown3")
+        )
+
 
 class TestCustomVersionData(unittest.TestCase):
     path_to_version_file = pathlib.Path("tests/auxiliary/custom_version_list.json")

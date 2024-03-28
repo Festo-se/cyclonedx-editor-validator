@@ -59,7 +59,7 @@ def generate_validation_pattern(sbom: dict) -> str:
     * ``<name>_[<version>_][<hash>_<timestamp>|<hash>|<timestamp>].cdx.json``, where
       * ``<name>`` == ``metadata.component.name``, if it exists, otherwise ``unknown``.
       * ``<version>`` MUST be present, if and only if ``metadata.component.version`` exists.
-      * ``<hash>`` is ``metadata.component.hashes[x].content`` for
+      * ``<hash>`` == ``metadata.component.hashes[x].content`` for any index x.
 
     :param dict sbom: The SBOM whose filename to validate.
 

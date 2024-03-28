@@ -6,9 +6,10 @@ from jsonschema import Draft7Validator, FormatChecker
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 
+from cdxev.auxiliary.filename_gen import generate_validation_pattern
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
-from cdxev.validator.helper import load_spdx_schema, open_schema, validate_filename
+from cdxev.validator.helper import load_spdx_schema, open_schema
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +29,15 @@ def validate_sbom(
         sbom_schema, used_schema_path = open_schema(
             sbom, file, schema_type, schema_path
         )
-        valid_filename = validate_filename(sbom, file, filename_regex)
-        if not valid_filename:
-            message = (
-                "SBOM has the mistake: file name is not according to the given regex"
+
+        if not filename_regex:
+            filename_regex = generate_validation_pattern(sbom)
+        if re.fullmatch(filename_regex, file.name) is None:
+            errors.append(
+                f"SBOM has the mistake: \
+                        filename doesn't match regular expression {filename_regex}"
             )
-            errors.append(message)
+
         schema = Resource(
             sbom_schema, specification=DRAFT202012
         )  # type: ignore[call-arg, var-annotated]

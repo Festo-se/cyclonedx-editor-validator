@@ -623,8 +623,9 @@ def create_set_parser(
         metavar="<file>",
         type=Path,
         help=(
-            "Read lists of versions from a file to make usage of version ranges"
-            " for not supported versioning schemas possible"
+            "Read lists of versions from a file to make usage of version ranges possible"
+            " for versions whose schema is not supported by the tooling"
+            " (i.e. not according to '[N!]N(.N)*[{a|b|rc}N][.postN][.devN]')"
         ),
     )
 

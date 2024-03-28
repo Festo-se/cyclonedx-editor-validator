@@ -597,9 +597,12 @@ class TestVersionRange(unittest.TestCase):
             version_range._create_version_from_constraints()
 
     def test_provide_regular_expression(self) -> None:
-        version_range = verpro_.VersionRange("regex:3\\.[ab].*")
+        version_range = verpro_.VersionRange("regex:3\\.[a].*")
         self.assertTrue(
             version_range.version_is_in(verpro_.VersionConstraintSemver("3.a"))
+        )
+        self.assertFalse(
+            version_range.version_is_in(verpro_.VersionConstraintSemver("3.b"))
         )
 
 

@@ -607,12 +607,8 @@ class TestVersionRange(unittest.TestCase):
 
     def test_regular_expression_unknown_version_schema(self) -> None:
         version_range = verpro_.VersionRange("regex:(unknown-)3\\.[a].*")
-        self.assertTrue(
-            version_range.version_string_is_in_range("unknown-3.a")
-        )
-        self.assertFalse(
-            version_range.version_string_is_in_range("unknown3")
-        )
+        self.assertTrue(version_range.version_string_is_in_range("unknown-3.a"))
+        self.assertFalse(version_range.version_string_is_in_range("unknown3"))
 
 
 class TestCustomVersionData(unittest.TestCase):

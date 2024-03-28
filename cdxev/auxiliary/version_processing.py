@@ -611,7 +611,7 @@ class VersionRange:
         # if only regular expression constraints are given,
         #  the version schema does not matter
         if not self.regular_constraints:
-            for constrained in self. regex_constraints:
+            for constrained in self.regex_constraints:
                 if constrained.fullmatch(version):
                     return True
                 return False

@@ -301,13 +301,13 @@ To perform set on a range of versions "name", "version" and, if it exists, group
 The version constraints can then be specified with a list of single versions or with the use of the order operators >, <, >=, <=,
 and be separated with a |. An example for a version range string would be ">1.1.1|<1.5.6|2.0.0".
 
+The program is able to parse versions following the MAJOR.MINOR.PATCH schema matching the regular expression "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]", for other version schemas see upload of custom versions.
+
 It is possible to use a wildcard with "\*". So would "\*" include all versions and "1.\*" all versions that begin with "1.".
 This can be combined with constraints using order operators. The wildcard applies to everything following the designated position (i.e. (.)*).
 
-It is also possible to provide a regular expression. For this, the constraint has to begin with the key phrase "regex:" followed by the expressions that shell be used.
-Please pay attention to escape all the necessary characters to create a valid regex string.
-
-The program is able to parse versions following the MAJOR.MINOR.PATCH schema matching the regular expression "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]", for other version schemas see upload of custom versions.
+It is also possible to provide a regular expression. For this, the constraint has to begin with the key phrase "regex:" followed by the expression that shell be used.
+Please pay attention to escape all the necessary characters to create a valid regex string, fo example "regex:3\\.\[ab\].*".
 
 An example for a update file with version ranges:  
 
@@ -325,6 +325,14 @@ An example for a update file with version ranges:
                 "name": "embedded-framework",
                 "group": "org.acme",
                 "version": "2.*|<2.5.8",
+            },
+            "set": {"copyright": "2000 Acme Inc"},
+        },
+        {
+            "id": {
+                "name": "embedded-framework",
+                "group": "org.acme",
+                "version": "<2.5.8|regex:3\\.[ab].*",
             },
             "set": {"copyright": "2000 Acme Inc"},
         },

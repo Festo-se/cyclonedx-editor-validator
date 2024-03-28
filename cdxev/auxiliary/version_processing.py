@@ -49,6 +49,7 @@ def is_version_range(version_str: str) -> bool:
         or ">" in version_str
         or "<" in version_str
         or "*" in version_str
+        or "regex:" in version_str
     ):
         return True
     else:
@@ -464,7 +465,10 @@ class VersionRange:
 
     def process_constraints(self, range: str) -> None:
         for constraint in self._version_constraints:
-            if constraint.find("*") != -1:
+            if re.fullmatch("^regex:(.)*", constraint):
+                regex = re.compile(constraint[6:])
+                self.regex_constraints.append(regex)
+            elif constraint.find("*") != -1:
                 regex_string = constraint.replace(".", "\\.")
                 regex_string = regex_string.replace("*", ".*")
                 regex = re.compile(regex_string)

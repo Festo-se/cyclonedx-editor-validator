@@ -2,6 +2,7 @@
 # Module with functions for the work with sboms
 ###################################################
 
+
 from typing import Any, Callable, Literal, Optional, Sequence, Union
 
 from dateutil.parser import parse

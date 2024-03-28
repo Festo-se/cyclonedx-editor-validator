@@ -171,6 +171,80 @@ So only a message that the component was not found and could not be updated is l
 
     cdx-ev set bom.json --from-file mysetfile.json --ignore-missing
 
+#### set for version ranges
+
+To perform set on a range of versions "name", "version" and, if it exists, group have to be used as "id".
+The version constraints can then be specified with a list of single versions or with the use of the order operators >, <, >=, <=,
+and be separated with a |. An example for a version range string would be ">1.1.1|<1.5.6|2.0.0".
+
+The program is able to parse ordered restraints (> and <) for versions following the MAJOR.MINOR.PATCH schema matching the regular expression "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]", for other version schemas see upload of custom versions.
+
+It is possible to use a wildcard with "\*". So would "\*" include all versions and "1.\*" all versions that begin with "1.".
+
+It is also possible to provide a regular expression. For this, the constraint has to begin with the key phrase "regex:" followed by the expression that shell be used.
+Please pay attention to escape all the necessary characters to create a valid regex string, fo example "regex:3\\.\[ab\].*".
+
+There is no limitation on the version schema when regex or wildcard expressions are used.
+
+It is possible to use ordered and regex constraints together, but in that case, the version schema must be supported or the versions provided by the user.
+
+An example for a update file with version ranges:  
+
+    [
+        {
+            "id": {
+                "name": "web-framework",
+                "group": "org.acme",
+                "version": "<3.0.0|>3.2.0|<4.0.0|5.0.0",
+            },
+            "set": {"copyright": "1990 Acme Inc"},
+        },
+        {
+            "id": {
+                "name": "embedded-framework",
+                "group": "org.acme",
+                "version": "2.*|<2.5.8|regex:3\\.[ab].*",
+            },
+            "set": {"copyright": "2000 Acme Inc"},
+        },
+        {
+            "id": {
+                "name": "embedded-framework",
+                "group": "org.acme",
+                "version": "regex:(unsupported-schema)3\\.[ab].*",
+            },
+            "set": {"copyright": "2000 Acme Inc"},
+        },
+    ]
+
+##### Uploading of own versions
+
+It is possible to upload lists of custom software versions the program can then parse and perform set with version ranges on it.
+For this use the `--custom-versions` command to provide the path to file containing the versions.
+
+The file has to follow the format:
+
+    [
+        {
+            "version_schema": "some identifier",
+            "version_list":[
+            version 1,
+            version 2,
+            version 3
+            ]
+        },
+        {
+            "version_schema": "some other identifier",
+            "version_list":[
+            first version,
+            second version,
+            third version
+            ]
+        }
+    ]
+
+The order of the versions has to be aligned with their index in the list.
+
 ## validate
 
 This command is used to validate the SBOM according to a specification.

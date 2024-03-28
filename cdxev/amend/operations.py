@@ -3,12 +3,13 @@ This module defines the amend operations which can be performed on an SBOM.
 It also declares a base class to inherit from when implementing new operations.
 """
 
+import datetime
 import importlib.resources
 import json
 import logging
 import uuid
 
-from cdxev.amend.process_license import process_license
+from cdxev.amend.process_license import delete_license_unknown, process_license
 
 logger = logging.getLogger(__name__)
 
@@ -223,8 +224,42 @@ class ProcessLicense(Operation):
             self.list_of_license_names,
             self.path_to_license_folder,
         )
+        delete_license_unknown(metadata["component"])
 
     def handle_component(self, component: dict) -> None:
         process_license(
             component, self.list_of_license_names, self.path_to_license_folder
         )
+        delete_license_unknown(component)
+
+
+class InferCopyright(Operation):
+    """
+    If neither a license nor a copyright is present in a component,
+    this function will create a 'copyright' field in the schema
+    'supplier.name year, all rights reserved'
+    """
+
+    def infer_copyright(self, component: dict) -> None:
+        if "copyright" in component.keys() or "licenses" in component.keys():
+            return
+
+        if "supplier" not in component.keys():
+            return
+
+        if "name" not in component.get("supplier", {}).keys():
+            return
+
+        year = datetime.date.today().year
+        supplier_name = component.get("supplier", {}).get("name", "")
+        copyright = f"Copyright (c) {year} {supplier_name}"
+        component["copyright"] = copyright
+
+    def handle_component(
+        self, component: dict, path_to_license_folder: str = ""
+    ) -> None:
+        self.infer_copyright(component)
+
+    def handle_metadata(self, metadata: dict) -> None:
+        component = metadata.get("component", {})
+        self.infer_copyright(component)

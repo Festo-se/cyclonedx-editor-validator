@@ -22,23 +22,23 @@ cdx-ev = "cdxev.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.9.0"
-python-dateutil = "2.8.2"
+python-dateutil = "2.9.0.post0"
 jsonschema = {version = "4.21.1", extras = ["format"]}
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "7.0.0"
-black = "24.2.0"
+black = "24.3.0"
 pep8-naming = "0.13.3"
-mypy = "1.8.0"
-types-python-dateutil = "2.8.19.20240106"
-types-jsonschema = "4.21.0.20240118"
-pytest = "8.0.2"
-coverage = "7.4.3"
+mypy = "1.9.0"
+types-python-dateutil = "2.9.0.20240316"
+types-jsonschema = "4.21.0.20240311"
+pytest = "8.1.1"
+coverage = "7.4.4"
 toml = "0.10.2"
 typing-extensions = "4.10.0"
-bandit = "1.7.7"
+bandit = "1.7.8"
 isort = "5.13.2"
-pre-commit = "3.6.2"
+pre-commit = "3.7.0"
 
 [build-system]
 requires = ["poetry-core"]

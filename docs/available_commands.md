@@ -310,7 +310,7 @@ Please pay attention to escape all the necessary characters to create a valid re
 
 There is no limitation on the version schema when regex or wildcard expressions are used.
 
-It is possible to use ordered and regex constrains together, but in that case, the version schema must be supported or the versions provided by the user.
+It is possible to use ordered and regex constraints together, but in that case, the version schema must be supported or the versions provided by the user.
 
 An example for a update file with version ranges:  
 

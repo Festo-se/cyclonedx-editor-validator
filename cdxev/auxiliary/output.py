@@ -6,9 +6,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
-from dateutil.parser import isoparse
-
 from cdxev import pkg
+from cdxev.auxiliary.filename_gen import generate_filename
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +41,7 @@ def write_sbom(
     else:
         # Output has been specified but might be a file, directory or non-existent.
         if destination.exists() and destination.is_dir():
-            filename = generate_output_filename(sbom)
+            filename = generate_filename(sbom)
             destination = destination.joinpath(filename)
             print("Writing output to: " + filename)
         elif not destination.exists() and not destination.parent.exists():
@@ -52,42 +51,6 @@ def write_sbom(
         file = destination.open("w")
 
     json.dump(sbom, file, indent=4)
-
-
-def generate_output_filename(sbom: dict) -> str:
-    """
-    Automatically generates a filename for the output file from the SBOM metadata.
-
-    :param dict sbom: The SBOM to generate a filename for.
-
-    :return: The filename.
-    """
-    name = sbom.get("metadata", {}).get("component", {}).get("name")
-    version = sbom.get("metadata", {}).get("component", {}).get("version")
-    timestamp_str: t.Union[str, None] = sbom.get("metadata", {}).get("timestamp")
-
-    if not name and not version and not timestamp_str:
-        return "bom.json"
-
-    try:
-        timestamp = isoparse(timestamp_str)  # type: ignore # because type errors are caught below
-        timestamp = timestamp.astimezone(timezone.utc)
-    except (ValueError, TypeError):
-        logger.info(
-            "SBOM has no or an unparsable timestamp. Using current time in filename."
-        )
-        timestamp = datetime.now(timezone.utc)
-
-    name = name or "unknown"
-    timestamp_str = timestamp.strftime("%Y%m%dT%H%M%S")
-
-    components = [name]
-    if version:
-        components.append(version)
-
-    components.append(timestamp_str)
-
-    return "_".join(components) + ".cdx.json"
 
 
 def update_timestamp(sbom: dict) -> None:

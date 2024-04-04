@@ -76,6 +76,28 @@ class OutputTestCase(unittest.TestCase):
 
         self.assertDictEqual(expected_sbom, sbom)
 
+    def test_add_tools_object(self):
+        sbom = self.minimal_sbom
+        sbom["specVersion"] = "1.5"
+
+        expected_sbom = copy.deepcopy(sbom)
+        expected_sbom["metadata"] = {
+            "tools": {
+                "components": [
+                    {
+                        "type": "application",
+                        "name": pkg.NAME,
+                        "publisher": pkg.VENDOR,
+                        "version": pkg.VERSION,
+                    }
+                ]
+            }
+        }
+
+        out.update_tools(sbom)
+
+        self.assertDictEqual(expected_sbom, sbom)
+
     def test_tool_already_present(self):
         sbom = self.minimal_sbom
         sbom["metadata"] = {

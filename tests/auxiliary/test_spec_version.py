@@ -55,6 +55,5 @@ class SpecVersionTestCase(unittest.TestCase):
     def test_compare(self):
         self.assertLessEqual(CycloneDXVersion.V1_0, CycloneDXVersion.V1_0)
         self.assertEqual(CycloneDXVersion.V1_0, CycloneDXVersion.V1_0)
-        self.assertEqual(CycloneDXVersion.V1_0, CycloneDXVersion.V1_0)
         self.assertLess(CycloneDXVersion.V1_0, CycloneDXVersion.V1_1)
         self.assertGreater(CycloneDXVersion.V1_1, CycloneDXVersion.V1_0)

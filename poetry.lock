@@ -54,6 +54,7 @@ colorama = {version = ">=0.3.9", markers = "platform_system == \"Windows\""}
 PyYAML = ">=5.3.1"
 rich = "*"
 stevedore = ">=1.20.0"
+tomli = {version = ">=1.1.0", optional = true, markers = "python_version < \"3.11\" and extra == \"toml\""}
 
 [package.extras]
 baseline = ["GitPython (>=3.1.30)"]
@@ -1173,4 +1174,4 @@ tests = ["coverage[toml]"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9.0"
-content-hash = "d9996dc3948489c44a2cb4e33096c341de4da34207a8f917780f0114c66049a4"
+content-hash = "b4539ffe6d2902dc53b68438af228325422ea3e750d5725b55fbb5a4cf5e2f47"

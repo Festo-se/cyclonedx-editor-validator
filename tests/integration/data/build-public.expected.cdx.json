@@ -176,6 +176,15 @@
     ],
     "compositions": [
         {
+            "aggregate": "complete",
+            "assemblies": [
+                "some-vendor/depB@1.2.3",
+                "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
+                "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
+                "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6"
+            ]
+        },
+        {
             "aggregate": "incomplete",
             "assemblies": [
                 "com.company.unit/depA@4.0.2",

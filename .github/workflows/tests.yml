@@ -30,11 +30,11 @@ jobs:
       - name: Run mypy
         run: poetry run mypy --install-types --non-interactive --config-file=pyproject.toml
       - name: Run bandit
-        run: poetry run bandit -r cdxev tests
+        run: poetry run bandit -c pyproject.toml -r cdxev
 
   pytest:
     runs-on: ubuntu-latest
-    
+
     needs: static_analysis
 
     steps:
@@ -69,4 +69,3 @@ jobs:
         junitxml-path: reports/unittest.xml
         pytest-xml-coverage-path: reports/py-coverage.cobertura.xml
         report-only-changed-files: true
-

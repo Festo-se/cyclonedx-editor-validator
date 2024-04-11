@@ -43,7 +43,7 @@ pytest = "8.2.2"
 coverage = "7.5.4"
 toml = "0.10.2"
 typing-extensions = "4.12.2"
-bandit = "1.7.9"
+bandit = {version = "1.7.9", extras = ["toml"]}
 isort = "5.13.2"
 pre-commit = "3.7.0"
 
@@ -72,3 +72,6 @@ source = ["cdxev"]
 omit = ["*__init__.py*"]
 
 [tool.black]
+
+[tool.bandit]
+exclude_dirs = ["tests"]

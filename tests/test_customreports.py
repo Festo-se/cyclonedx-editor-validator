@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+import os
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest import mock
 
 import cdxev.log as log
@@ -15,13 +17,18 @@ class WarningsNgTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         formatter = log.LogMessageFormatter()
         cls.logger = logging.getLogger(__name__)
-        cls.expected_file = "bom.json"
-        cls.expected_target = "issues.json"
+        cls.tempdir = TemporaryDirectory()
+        cls.expected_file = os.path.join(cls.tempdir.name, "bom.json")
+        cls.expected_target = os.path.join(cls.tempdir.name, "issues.json")
         warnings_ng_handler = WarningsNgReporter(
             Path(cls.expected_file), Path(cls.expected_target)
         )
         warnings_ng_handler.setFormatter(formatter)
         cls.logger.addHandler(warnings_ng_handler)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.tempdir.cleanup()
 
     def test_format_full(self) -> None:
         line_start = 10
@@ -30,8 +37,8 @@ class WarningsNgTestCase(unittest.TestCase):
         module_name = "module"
         msg_obj = log.LogMessage(message, description, module_name, line_start)
         self.logger.error(msg_obj)
-        self.assertEqual(self.logger.handlers[0].file_path.name, self.expected_file)
-        self.assertEqual(self.logger.handlers[0].target.name, self.expected_target)
+        self.assertEqual(str(self.logger.handlers[0].file_path), self.expected_file)
+        self.assertEqual(str(self.logger.handlers[0].target), self.expected_target)
         expected_buffer = {
             "origin": "CycloneDX Editor Validator",
             "fingerprint": "unknown",
@@ -39,7 +46,7 @@ class WarningsNgTestCase(unittest.TestCase):
             "category": "QA",
             "severity": "ERROR",
             "fileName": "bom.json",
-            "pathName": ".",
+            "pathName": self.tempdir.name,
             "lineStart": line_start,
             "message": message,
             "description": description,
@@ -56,8 +63,8 @@ class WarningsNgTestCase(unittest.TestCase):
         module_name = "module"
         msg_obj = log.LogMessage(message, description, module_name, line_start)
         self.logger.error(msg_obj)
-        self.assertEqual(self.logger.handlers[0].file_path.name, self.expected_file)
-        self.assertEqual(self.logger.handlers[0].target.name, self.expected_target)
+        self.assertEqual(str(self.logger.handlers[0].file_path), self.expected_file)
+        self.assertEqual(str(self.logger.handlers[0].target), self.expected_target)
         expected_buffer = {
             "origin": "CycloneDX Editor Validator",
             "fingerprint": "unknown",
@@ -65,7 +72,7 @@ class WarningsNgTestCase(unittest.TestCase):
             "category": "QA",
             "severity": "ERROR",
             "fileName": "bom.json",
-            "pathName": ".",
+            "pathName": self.tempdir.name,
             "message": message,
             "description": description,
             "moduleName": module_name,
@@ -82,8 +89,8 @@ class WarningsNgTestCase(unittest.TestCase):
         module_name = None
         msg_obj = log.LogMessage(message, description, module_name, line_start)
         self.logger.error(msg_obj)
-        self.assertEqual(self.logger.handlers[0].file_path.name, self.expected_file)
-        self.assertEqual(self.logger.handlers[0].target.name, self.expected_target)
+        self.assertEqual(str(self.logger.handlers[0].file_path), self.expected_file)
+        self.assertEqual(str(self.logger.handlers[0].target), self.expected_target)
         expected_buffer = {
             "origin": "CycloneDX Editor Validator",
             "fingerprint": "unknown",
@@ -91,7 +98,7 @@ class WarningsNgTestCase(unittest.TestCase):
             "category": "QA",
             "severity": "ERROR",
             "fileName": "bom.json",
-            "pathName": ".",
+            "pathName": self.tempdir.name,
             "lineStart": line_start,
             "message": message,
             "description": description,
@@ -132,7 +139,7 @@ class WarningsNgTestCase(unittest.TestCase):
         msg_obj = log.LogMessage(message, description, module_name, line_start)
         self.logger.error(msg_obj)
         self.assertIsNone(self.logger.handlers[0].file_path)
-        self.assertEqual(self.logger.handlers[0].target.name, self.expected_target)
+        self.assertEqual(str(self.logger.handlers[0].target), self.expected_target)
         expected_buffer = {
             "origin": "CycloneDX Editor Validator",
             "fingerprint": "unknown",

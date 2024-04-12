@@ -1,54 +1,67 @@
 import logging
+import typing as t
 
 from cdxev.auxiliary.sbomFunctions import walk_components
 
-from .operations import Operation, ProcessLicense
+from .operations import Operation
 
-__operations: list[Operation] = []
 logger = logging.getLogger(__name__)
 
 
-def register_operation(operation: Operation) -> None:
-    """
-    Registers an operation for the amend command.
-
-    This function is typically invoked in __init__.py.
-    """
-    __operations.append(operation)
+def get_all_operations() -> list[type[Operation]]:
+    return Operation.__subclasses__()
 
 
-def run(sbom: dict, path_to_license_folder: str = "") -> None:
+def create_operations(
+    operations: list[type[Operation]], config: dict[type[Operation], t.Any]
+) -> list["Operation"]:
+    instances = []
+    for op in operations:
+        options = config.get(op, {})
+        instances.append(op(**options))
+
+    return instances
+
+
+def run(
+    sbom: dict,
+    selected: t.Optional[list[type[Operation]]] = None,
+    config: dict[type[Operation], t.Any] = {},
+) -> None:
     """
     Runs the amend command on an SBOM. The SBOM is modified in-place.
 
     :param dict sbom: The SBOM model.
     :param str path_to_license_folder: Path to a folder with license texts.
     """
-    for operation in __operations:
-        if type(operation) is ProcessLicense:
-            operation.change_path_to_license_folder(path_to_license_folder)
-    _prepare(sbom)
-    _metadata(sbom)
-    walk_components(sbom, _do_amend, skip_meta=True)
+    # If no operations are selected, select the default operations.
+    if not selected:
+        selected = [op for op in get_all_operations() if hasattr(op, "_amendDefault")]
+
+    operations = create_operations(selected, config)
+
+    _prepare(operations, sbom)
+    _metadata(operations, sbom)
+    walk_components(sbom, _do_amend, operations, skip_meta=True)
 
 
-def _prepare(sbom: dict) -> None:
-    for operation in __operations:
+def _prepare(operations: list[Operation], sbom: dict) -> None:
+    for operation in operations:
         operation.prepare(sbom)
 
 
-def _metadata(sbom: dict) -> None:
+def _metadata(operations: list[Operation], sbom: dict) -> None:
     if "metadata" not in sbom:
         return
 
     logger.debug("Processing metadata")
     metadata = sbom["metadata"]
-    for operation in __operations:
+    for operation in operations:
         operation.handle_metadata(metadata)
 
 
-def _do_amend(component: dict) -> None:
-    for operation in __operations:
+def _do_amend(component: dict, operations: list[Operation]) -> None:
+    for operation in operations:
         logger.debug(
             "Processing component %s", (component.get("bom-ref", "<no bom-ref>"))
         )

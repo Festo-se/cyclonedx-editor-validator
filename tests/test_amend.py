@@ -7,13 +7,13 @@ import unittest
 from cdxev.amend import process_license
 from cdxev.amend.command import run as run_amend
 from cdxev.amend.operations import (
-    AddBomRefOperation,
-    CompositionsOperation,
-    DefaultAuthorOperation,
+    AddBomRef,
+    Compositions,
+    DefaultAuthor,
     InferCopyright,
     InferSupplier,
+    LicenseNameToId,
     Operation,
-    ProcessLicense,
 )
 from cdxev.error import AppError
 from tests.auxiliary.sbomFunctionsTests import compare_sboms
@@ -90,7 +90,7 @@ class CommandIntegrationTestCase(AmendTestCase):
 class CompositionsTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = CompositionsOperation()
+        self.operation = Compositions()
 
     def test_compositions_cleared(self) -> None:
         self.operation.prepare(self.sbom_fixture)
@@ -120,7 +120,7 @@ class CompositionsTestCase(AmendTestCase):
 class DefaultAuthorTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = DefaultAuthorOperation()
+        self.operation = DefaultAuthor()
 
     def test_default_author_added(self) -> None:
         self.operation.handle_metadata(self.sbom_fixture["metadata"])
@@ -264,7 +264,7 @@ class InferSupplierTestCase(AmendTestCase):
 class AddBomRefTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = AddBomRefOperation()
+        self.operation = AddBomRef()
 
     def test_add_bom_ref_to_metadata(self) -> None:
         metadata = {"component": {"type": "application", "name": "test"}}
@@ -296,7 +296,7 @@ class AddBomRefTestCase(AmendTestCase):
 class ProcessLicenseTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = ProcessLicense()
+        self.operation = LicenseNameToId()
 
     def test_replace_name_with_id(self) -> None:
         self.sbom_fixture["metadata"]["component"]["licenses"] = [
@@ -772,7 +772,7 @@ class TestInferCopyright(AmendTestCase):
     def test_set_copyright_from_supplier_in_metadata(self) -> None:
         year = datetime.date.today().year
         self.sbom_fixture["metadata"]["component"]["supplier"] = {"name": "Acme Inc."}
-        run_amend(self.sbom_fixture)
+        run_amend(self.sbom_fixture, selected=[InferCopyright])
         self.assertEqual(
             self.sbom_fixture["metadata"]["component"]["copyright"],
             f"Copyright (c) {year} Acme Inc.",
@@ -783,7 +783,7 @@ class TestInferCopyright(AmendTestCase):
         self.sbom_fixture["components"][0].pop("externalReferences")
         self.sbom_fixture["components"][0]["supplier"] = {"name": "Acme Inc."}
         year = datetime.date.today().year
-        run_amend(self.sbom_fixture)
+        run_amend(self.sbom_fixture, selected=[InferCopyright])
         company = self.sbom_fixture["components"][0]["supplier"]["name"]
         self.assertEqual(
             self.sbom_fixture["components"][0]["copyright"],

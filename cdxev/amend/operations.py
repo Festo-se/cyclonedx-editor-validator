@@ -1,6 +1,26 @@
 """
 This module defines the amend operations which can be performed on an SBOM.
-It also declares a base class to inherit from when implementing new operations.
+
+Implementation notes
+--------------------
+
+If you want to add additional operations to the amend command, do it like this:
+
+#. Add a new class whose name is succinct and distinctive. It will be used in the CLI.
+#. Subclass :py:class:`Operation`.
+#. Override the method defined in the base class, where necessary.
+#. Add a docstring to your class. Keep the first line short and clear. It will be used in the CLI
+   to describe your operation.
+#. If your operation requires additional options provided by the user, add an `__init__()` method.
+
+   * Add any option to `__init__()`'s parameter list. The parameter name will be used as a CLI
+     option.
+   * You MUST specify a default value.
+   * You MUST add a docstring to `__init__()` which describes the parameter. This description will
+     be visible in the command-line help text.
+
+#. If you want to add your operation to the list of default operations, add the :py:func:`default`
+   decorator.
 """
 
 import datetime
@@ -12,6 +32,17 @@ import uuid
 from cdxev.amend.process_license import delete_license_unknown, process_license
 
 logger = logging.getLogger(__name__)
+
+
+def default(cls: type["Operation"]) -> type["Operation"]:
+    """
+    Decorator to mark default operations.
+
+    Add this decorator to a suclass of `Operation` to make it run if no operations
+    are explicitly selected.
+    """
+    setattr(cls, "_amendDefault", True)
+    return cls
 
 
 class Operation:
@@ -38,7 +69,8 @@ class Operation:
         """
 
 
-class AddBomRefOperation(Operation):
+@default
+class AddBomRef(Operation):
     """
     Adds a 'bom-ref' to components which don't have one yet.
 
@@ -58,8 +90,11 @@ class AddBomRefOperation(Operation):
             component["bom-ref"] = str(uuid.uuid4())
 
 
-class CompositionsOperation(Operation):
+@default
+class Compositions(Operation):
     """
+    Declares all component compositions as 'incomplete'.
+
     According to https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf
     "known unknowns" should be stated, as we can't guarantee completeness,
     compositions should be marked as 'incomplete' for SBOMs.
@@ -104,10 +139,9 @@ class CompositionsOperation(Operation):
         self.__assemblies.append(bom_ref)
 
 
-class DefaultAuthorOperation(Operation):
-    """
-    If the SBOM metadata doesn't declare an author, this operation sets the field to 'automated'.
-    """
+@default
+class DefaultAuthor(Operation):
+    """Sets component author to 'automated', if missing."""
 
     def handle_metadata(self, metadata: dict) -> None:
         authors = metadata.setdefault("authors", [])
@@ -116,8 +150,11 @@ class DefaultAuthorOperation(Operation):
             authors.append({"name": "automated"})
 
 
+@default
 class InferSupplier(Operation):
     """
+    Attempts to infer component supplier from other fields.
+
     At least one of the 'author', 'supplier' or 'publisher' fields must be set on any component but
     the supplier field is desired.
     If not already present this function will, try to infer a 'supplier.name'
@@ -189,8 +226,11 @@ class InferSupplier(Operation):
         self.infer_supplier(component)
 
 
-class ProcessLicense(Operation):
+@default
+class LicenseNameToId(Operation):
     """
+    Attempts to infer SPDX ids from license names.
+
     If there are components in "metadata" or "components" containing
     licenses with the entry "name" instead of "id", this operation attempts
     to replace the name with an SPDX-ID, extracted from a provided list of possible license names
@@ -203,41 +243,40 @@ class ProcessLicense(Operation):
     and, if found, copies its content in the field "text".
     """
 
-    list_of_license_names_string = (
-        importlib.resources.files("cdxev.amend")
-        .joinpath("license_name_spdx_id_map.json")
-        .read_text(encoding="utf-8-sig")
-    )
-    list_of_license_names = json.loads(list_of_license_names_string)
-
-    def __init__(self) -> None:
-        self.path_to_license_folder = ""
-
-    def change_path_to_license_folder(self, path_to_license_folder: str) -> None:
-        self.path_to_license_folder = path_to_license_folder
+    def __init__(self, license_dir: str = "") -> None:
+        """
+        :param license_dir: Path to a folder with txt-files containing license texts to be
+                               copied in the SBOM.
+        """
+        license_names_file = (
+            importlib.resources.files(__spec__.parent) / "license_name_spdx_id_map.json"  # type: ignore[name-defined]  # noqa: E501
+        )
+        license_names_json = license_names_file.read_text(encoding="utf-8-sig")
+        self.license_names = json.loads(license_names_json)
+        self.license_dir = license_dir
 
     def handle_metadata(self, metadata: dict) -> None:
         if "component" not in metadata:
             return
         process_license(
             metadata["component"],
-            self.list_of_license_names,
-            self.path_to_license_folder,
+            self.license_names,
+            self.license_dir,
         )
         delete_license_unknown(metadata["component"])
 
     def handle_component(self, component: dict) -> None:
-        process_license(
-            component, self.list_of_license_names, self.path_to_license_folder
-        )
+        process_license(component, self.license_names, self.license_dir)
         delete_license_unknown(component)
 
 
 class InferCopyright(Operation):
     """
-    If neither a license nor a copyright is present in a component,
-    this function will create a 'copyright' field in the schema
-    'supplier.name year, all rights reserved'
+    Attempts to infer copyright claims from supplier.
+
+    If neither copyright nor license is present on a component but there is a supplier,
+    this operation generates the copyright field from the supplier in the format
+    `Copyright (c) <supplier.name> <year>, all rights reserved`.
     """
 
     def infer_copyright(self, component: dict) -> None:
@@ -255,9 +294,7 @@ class InferCopyright(Operation):
         copyright = f"Copyright (c) {year} {supplier_name}"
         component["copyright"] = copyright
 
-    def handle_component(
-        self, component: dict, path_to_license_folder: str = ""
-    ) -> None:
+    def handle_component(self, component: dict) -> None:
         self.infer_copyright(component)
 
     def handle_metadata(self, metadata: dict) -> None:

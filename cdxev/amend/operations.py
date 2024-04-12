@@ -1,6 +1,34 @@
 """
 This module defines the amend operations which can be performed on an SBOM.
 
+A few general rules for operations:
+
+One operation, one task. **Do not** make a single operation do lots of different things.
+This let's users of the tool decide for themselves which changes to make to their SBOM
+by selecting the operations to run.
+
+Be mindful of an operation's impact when deciding to add the :py:func:`default` decorator.
+Some operations are always safe to run. Others might introduce uncertainty to the SBOM. These are
+a judgment call. Others again might add potentially false claims if used without thought.
+**Do not** make these run by default.
+
+Examples:
+^^^^^^^^^
+
+* *:py:class:`AddBomRef` is safe.* It never does anything to an SBOM that could change its
+  meaning.
+* :py:class:`Compositions` introduces an intentional uncertainty about the completeness of the
+  SBOM's information. *We deem it okay to run by default because at worst it means the SBOM is
+  a little less expressive than it could be.*
+* :py:class:`DeleteAmbigiousLicenses` introduces uncertainty about the completeness of the
+  license claims made for each component. It is meant to eliminate essentially useless
+  clutter but consumers of the SBOM could take the absence of license claims in the SBOM as
+  a sign that the component is not licensed. *So it should be used with caution and does not run
+  by default.*
+* *:py:class:`InferCopyright` is dangerous*. It should only be used in controlled circumstances
+  - e.g., when it is known that no unintended components will be affected - because it could
+  add entirely false claims with legal relevance to the SBOM.
+
 Implementation notes
 --------------------
 
@@ -19,8 +47,9 @@ If you want to add additional operations to the amend command, do it like this:
    * You MUST add a docstring to `__init__()` which describes the parameter. This description will
      be visible in the command-line help text.
 
-#. If you want to add your operation to the list of default operations, add the :py:func:`default`
-   decorator.
+#. If you want to add your operation to the default set, add the :py:func:`default` decorator.
+   See above about important considerations before doing so.
+
 """
 
 import datetime
@@ -300,3 +329,33 @@ class InferCopyright(Operation):
     def handle_metadata(self, metadata: dict) -> None:
         component = metadata.get("component", {})
         self.infer_copyright(component)
+
+
+class DeleteAmbigiousLicenses(Operation):
+    """
+    Deletes license claims which are solely identified by the `name` property.
+
+    Because of the risk involved in accidentally removing important data,
+    this operation is disabled by default.
+    """
+
+    def _filter_licenses(self, component: dict) -> None:
+        if "licenses" not in component:
+            return
+
+        licenses = component["licenses"]
+        licenses = filter(
+            lambda lic: not (
+                "license" in lic and list(lic["license"].keys()) == ["name"]
+            ),
+            licenses,
+        )
+        component["licenses"] = list(licenses)
+
+    def handle_metadata(self, metadata: dict) -> None:
+        if "component" not in metadata:
+            return
+        self._filter_licenses(metadata["component"])
+
+    def handle_component(self, component: dict) -> None:
+        self._filter_licenses(component)

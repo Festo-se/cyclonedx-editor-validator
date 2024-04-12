@@ -10,6 +10,7 @@ from cdxev.amend.operations import (
     AddBomRef,
     Compositions,
     DefaultAuthor,
+    DeleteAmbigiousLicenses,
     InferCopyright,
     InferSupplier,
     LicenseNameToId,
@@ -789,6 +790,61 @@ class TestInferCopyright(AmendTestCase):
             self.sbom_fixture["components"][0]["copyright"],
             f"Copyright (c) {year} {company}",
         )
+
+
+class DeleteAmbigiousLicensesTestCase(AmendTestCase):
+    def setUp(self):
+        super().setUp()
+        self.operation = DeleteAmbigiousLicenses()
+        self.component = self.sbom_fixture["components"][0]
+
+    def test_delete_one_license_in_set(self):
+        self.component["licenses"] = [
+            {"license": {"id": "Apache-2.0"}},
+            {"license": {"name": "Some license"}},
+        ]
+        expected = copy.deepcopy(self.component)
+        expected["licenses"] = [{"license": {"id": "Apache-2.0"}}]
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_delete_sole_license(self):
+        self.component["licenses"] = [
+            {"license": {"name": "Some license"}},
+        ]
+        expected = copy.deepcopy(self.component)
+        expected["licenses"] = []
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_dont_delete_id(self):
+        self.component["licenses"] = [
+            {"license": {"id": "Apache-2.0"}},
+        ]
+        expected = copy.deepcopy(self.component)
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_dont_delete_expression(self):
+        self.component["licenses"] = [
+            {"expression": "Apache-2.0 AND (MIT OR GPL-2.0-only)"},
+        ]
+        expected = copy.deepcopy(self.component)
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_dont_delete_name_with_text(self):
+        self.component["licenses"] = [
+            {"license": {"name": "Some license", "text": {"content": "Full text"}}},
+        ]
+        expected = copy.deepcopy(self.component)
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
 
 
 if __name__ == "__main__":

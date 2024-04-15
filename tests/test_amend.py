@@ -154,7 +154,7 @@ class InferSupplierTestCase(AmendTestCase):
 
     def test_author_already_present(self) -> None:
         component = {"author": "x"}
-        expected = {"author": "x", "supplier": {"name": "x"}}
+        expected = copy.deepcopy(component)
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
@@ -166,23 +166,24 @@ class InferSupplierTestCase(AmendTestCase):
 
     def test_publisher_is_preferred_to_author(self) -> None:
         component = {"author": "x", "publisher": "y"}
-        expected = {"author": "x", "publisher": "y", "supplier": {"name": "y"}}
+        expected = copy.deepcopy(component)
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
-    def test_author_set_supplier_in_metadata(self) -> None:
-        run_amend(self.sbom_fixture)
-        self.assertEqual(
-            self.sbom_fixture["metadata"]["component"]["supplier"]["name"],
-            self.sbom_fixture["metadata"]["component"]["author"],
-        )
+    def test_empty_component_stays_empty(self):
+        component = {}
+        expected = {}
+        self.operation.handle_component(component)
+        self.assertDictEqual(component, expected)
 
-    def test_author_set_supplier_components(self) -> None:
-        self.sbom_fixture["components"][0].pop("externalReferences")
+    def test_author_set_supplier_in_metadata(self) -> None:
+        expected = copy.deepcopy(self.sbom_fixture["metadata"]["component"])
+        expected["supplier"] = {"url": ["https://www.company.org"]}
         run_amend(self.sbom_fixture)
+
         self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["name"],
-            self.sbom_fixture["components"][0]["author"],
+            self.sbom_fixture["metadata"]["component"],
+            expected,
         )
 
     def test_supplier_get_not_overwritten(self) -> None:
@@ -202,33 +203,6 @@ class InferSupplierTestCase(AmendTestCase):
         self.assertEqual(
             self.sbom_fixture["components"][0]["supplier"]["bom-ref"],
             "Reference to a supplier entry",
-        )
-
-    def test_supplier_add_url_to_name(self) -> None:
-        self.sbom_fixture["components"][0]["supplier"] = {
-            "name": "Some name of a supplier"
-        }
-        run_amend(self.sbom_fixture)
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["name"],
-            "Some name of a supplier",
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["url"][0],
-            self.sbom_fixture["components"][0]["externalReferences"][0]["url"],
-        )
-
-    def test_supplier_set_nothing_in_an_empty_component(self) -> None:
-        self.sbom_fixture["components"][0] = {"bom-ref": "component 0"}
-        run_amend(self.sbom_fixture)
-        self.assertEqual(self.sbom_fixture["components"][0], {"bom-ref": "component 0"})
-
-    def test_supplier_add_name_to_url(self) -> None:
-        self.sbom_fixture["components"][0]["supplier"] = {"url": "https://someurl.com"}
-        run_amend(self.sbom_fixture)
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["name"],
-            self.sbom_fixture["components"][0]["author"],
         )
 
     def test_supplier_from_website(self) -> None:

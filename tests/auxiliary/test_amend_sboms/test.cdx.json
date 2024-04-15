@@ -185,6 +185,12 @@
     {
       "aggregate": "incomplete",
       "assemblies": ["com.company.unit/depA@4.0.2"]
+    },
+    {
+      "aggregate": "not_specified",
+      "assemblies": [
+        "pkg:npm/test-app@1.0.0"
+      ]
     }
   ]
 }

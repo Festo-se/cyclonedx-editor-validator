@@ -124,10 +124,14 @@ class Compositions(Operation):
     """
     Declares all component compositions as 'incomplete'.
 
-    According to https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf
-    "known unknowns" should be stated, as we can't guarantee completeness,
-    compositions should be marked as 'incomplete' for SBOMs.
-    This operation erases existing compositions and then adds all components as 'incomplete'.
+    Any existing entries in 'compositions' are replaced by a single entry that marks all
+    components in the SBOM as 'incomplete'. This serves two goals:
+    - The NTIA recommends that known unknowns be made explicit.
+      https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf
+    - It is safer to err on the side of caution when making claims about completeness.
+
+    This excludes the metadata component because any SBOM supplier should be capable of providing
+    a complete list of first-level components.
     """
 
     __assemblies: list
@@ -138,21 +142,30 @@ class Compositions(Operation):
         assemblies.
         """
 
+        metacomp = sbom.get("metadata", {}).get("component", {}).get("bom-ref", None)
+        compositions = sbom.setdefault("compositions", [])
+
+        # Remember the old aggregate of the metadata component
+        metacomp_aggregate = None
+        if metacomp:
+            for composition in compositions:
+                if metacomp in composition.get("assemblies", []):
+                    metacomp_aggregate = composition["aggregate"]
+                    break
+
+        # Replace any existing compositions with a new, empty list
         if "compositions" in sbom:
             del sbom["compositions"]
-
         sbom["compositions"] = [{"aggregate": "incomplete", "assemblies": []}]
-
         self.__assemblies = sbom["compositions"][0]["assemblies"]
 
-    def handle_metadata(self, metadata: dict) -> None:
-        try:
-            self.__add_to_assemblies(metadata["component"]["bom-ref"])
-        except KeyError:
-            logger.debug(
-                "Cannot add meta-component to compositions because it has no bom-ref."
+        # Re-add the metadata component under the same aggregate as before
+        if metacomp_aggregate == "incomplete":
+            self.__assemblies.append(metacomp)
+        elif metacomp_aggregate is not None:
+            sbom["compositions"].append(
+                {"aggregate": metacomp_aggregate, "assemblies": [metacomp]}
             )
-            pass
 
     def handle_component(self, component: dict) -> None:
         try:

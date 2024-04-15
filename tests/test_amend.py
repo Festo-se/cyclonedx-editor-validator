@@ -103,9 +103,12 @@ class CompositionsTestCase(AmendTestCase):
     def test_meta_component_added(self) -> None:
         self.operation.prepare(self.sbom_fixture)
         self.operation.handle_metadata(self.sbom_fixture["metadata"])
-        self.assertSequenceEqual(
-            self.sbom_fixture["compositions"][0]["assemblies"],
-            ["pkg:npm/test-app@1.0.0"],
+        self.assertTrue(
+            any(
+                comp["aggregate"] == "not_specified"
+                and comp["assemblies"] == ["pkg:npm/test-app@1.0.0"]
+                for comp in self.sbom_fixture["compositions"]
+            )
         )
 
     def test_components_added(self) -> None:

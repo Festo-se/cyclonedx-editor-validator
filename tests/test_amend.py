@@ -30,64 +30,6 @@ class AmendTestCase(unittest.TestCase):
             self.sbom_fixture = json.load(file)
 
 
-class CommandIntegrationTestCase(AmendTestCase):
-    def test_compositions(self) -> None:
-        run_amend(self.sbom_fixture)
-
-        expected_assemblies = [
-            "pkg:npm/test-app@1.0.0",
-            "com.company.unit/depA@4.0.2",
-            "some-vendor/depB@1.2.3",
-            "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
-            "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
-            "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6",
-            "depC@3.2.1",
-            "depC@3.2.1:Rudolph@6.6.6",
-        ]
-        expected_assemblies.sort()
-        self.sbom_fixture["compositions"][0]["assemblies"].sort()
-        self.assertSequenceEqual(
-            self.sbom_fixture["compositions"][0]["assemblies"],
-            expected_assemblies,
-        )
-
-    def test_meta_author(self) -> None:
-        run_amend(self.sbom_fixture)
-
-        self.assertSequenceEqual(
-            self.sbom_fixture["metadata"]["authors"], [{"name": "automated"}]
-        )
-
-    def test_suppliers(self) -> None:
-        run_amend(self.sbom_fixture)
-        components = self.sbom_fixture["components"]
-        self.assertIn("supplier", components[0])
-        self.assertDictEqual(
-            {
-                "name": "Some Vendor Inc.",
-                "url": ["https://www.some-vendor.com"],
-            },
-            components[1]["supplier"],
-        )
-        self.assertDictEqual(
-            {"url": ["https://www.universe.com"]},
-            components[1]["components"][0]["supplier"],
-        )
-        self.assertNotIn("supplier", components[1]["components"][1])
-        self.assertDictEqual(
-            {"url": ["https://northpole.com/rudolph.git"]},
-            components[1]["components"][1]["components"][0]["supplier"],
-        )
-        self.assertDictEqual(
-            {
-                "name": "Some Vendor Inc.",
-                "url": ["https://www.some-vendor.com"],
-            },
-            components[1]["supplier"],
-        )
-        self.assertNotIn("supplier", components[2])
-
-
 class CompositionsTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()

@@ -58,7 +58,7 @@ import json
 import logging
 import uuid
 
-from cdxev.amend.process_license import delete_license_unknown, process_license
+from cdxev.amend.process_license import process_license
 
 logger = logging.getLogger(__name__)
 
@@ -292,11 +292,9 @@ class LicenseNameToId(Operation):
             self.license_names,
             self.license_dir,
         )
-        delete_license_unknown(metadata["component"])
 
     def handle_component(self, component: dict) -> None:
         process_license(component, self.license_names, self.license_dir)
-        delete_license_unknown(component)
 
 
 class InferCopyright(Operation):

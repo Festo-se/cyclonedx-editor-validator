@@ -184,6 +184,7 @@ class _AmendOperationDetails:
     cls: type[Operation]
     name: str
     short_description: str
+    long_description: str
     options: list[dict]
     is_default: bool
 
@@ -206,6 +207,7 @@ def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
     op_name = re.sub(_upper_case_letters_after_first, "-", cls.__name__).lower()
     op_doc = docstring_parser.parse(cls.__doc__)
     op_short_help = op_doc.short_description
+    op_long_help = op_doc.long_description
     op_is_default = getattr(cls, "_amendDefault", False)
     init_sig = inspect.signature(cls.__init__)
     init_params = {
@@ -235,6 +237,7 @@ def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
         cls=cls,
         name=op_name,
         short_description=op_short_help or "",
+        long_description=op_long_help or "",
         is_default=op_is_default,
         options=args,
     )
@@ -246,7 +249,7 @@ def create_amend_parser(
 ) -> argparse.ArgumentParser:
     description = (
         "The amend command splits its functionality into several operations.\n"
-        "You can select which operations run using the --operations option. "
+        "You can select which operations run using the --operation option. "
         "If you don't, operations marked [default] will run.\n"
         "The following operations are available:\n\n"
     )
@@ -255,14 +258,14 @@ def create_amend_parser(
     operation_details = [get_operation_details(op) for op in operations]
     operation_details = sorted(operation_details, key=lambda op: op.name)
 
-    operations_by_name: dict[str, type[Operation]] = {}
+    operations_by_name: dict[str, _AmendOperationDetails] = {}
     argument_groups: dict[str, list[dict]] = {}
-    default_operations: list[type[Operation]] = []
+    default_operations: list[str] = []
     for op in operation_details:
         setattr(op.cls, "_details", op)
 
         # Add operation to map
-        operations_by_name[op.name] = op.cls
+        operations_by_name[op.name] = op
 
         # Prepare options to add them to the parser later
         if op.options:
@@ -270,7 +273,7 @@ def create_amend_parser(
 
         # Add operation to help text
         if op.is_default:
-            default_operations.append(op.cls)
+            default_operations.append(op.name)
             description += f"    {op.name} [default]:\n"
         else:
             description += f"    {op.name}:\n"
@@ -283,17 +286,6 @@ def create_amend_parser(
         )
         description += desc + "\n\n"
 
-    # type converter for argparse to convert the option value to an operation class.
-    def operation_list(names: str) -> list[type[Operation]]:
-        name_list = names.replace(" ", ",").split(",")
-        name_list = list(filter(None, name_list))
-        operations = []
-        for name in name_list:
-            if name not in operations_by_name:
-                raise ValueError(f"Operation '{name}' not found.")
-            operations.append(operations_by_name[name])
-        return operations
-
     parser = subparsers.add_parser(
         "amend",
         help="Adds missing auto-generatable information to an existing SBOM",
@@ -305,16 +297,25 @@ def create_amend_parser(
         metavar="<input>",
         help="Path to the SBOM file.",
         type=Path,
+        default=None,
+        nargs="?",
     )
     parser.add_argument(
-        "--operations",
+        "--operation",
         help=(
-            "Select the operations to run. To run multiple operations at the same time, "
-            "separate them by comma. Example: "
-            ",".join(op.name for op in operation_details[0:2])
+            "Select an operation to run. Can be provided more than once to run multiple "
+            "operations in one run."
         ),
-        type=operation_list,
+        choices=list(operations_by_name.keys()),
+        metavar="<operation>",
         default=default_operations,
+        action="append",
+    )
+    parser.add_argument(
+        "--help-operation",
+        help="Displays details about an operation and exits afterwards.",
+        choices=list(operations_by_name.keys()),
+        metavar="<operation>",
     )
 
     # Add arguments for operation options
@@ -327,6 +328,7 @@ def create_amend_parser(
 
     add_output_argument(parser)
 
+    parser.set_defaults(operations_by_name=operations_by_name)
     parser.set_defaults(cmd_handler=invoke_amend)
     return parser
 
@@ -597,19 +599,30 @@ def create_build_public_bom_parser(
 
 
 def invoke_amend(args: argparse.Namespace) -> int:
+    if args.help_operation:
+        print(args.operations_by_name[args.help_operation].short_description)
+        print("\n")
+        print(args.operations_by_name[args.help_operation].long_description)
+        sys.exit()
+
+    if not args.input:
+        usage_error("<input> argument missing.")
+
     sbom, _ = read_sbom(args.input)
 
     # Prepare the operation options that were passed on the command-line
     config = {}
-    for op in args.operations:
-        details = getattr(op, "_details")
+    operations = []
+    for op in args.operation:
+        details = args.operations_by_name[op]
+        operations.append(details.cls)
         op_arguments = {}
         for opt in details.options:
             dest = opt["dest"]
             op_arguments[dest] = getattr(args, dest)
         config[op] = op_arguments
 
-    amend.run(sbom, args.operations, config)
+    amend.run(sbom, operations, config)
     write_sbom(sbom, args.output)
     return _STATUS_OK
 

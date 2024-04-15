@@ -36,9 +36,13 @@ If you want to add additional operations to the amend command, do it like this:
 
 #. Add a new class whose name is succinct and distinctive. It will be used in the CLI.
 #. Subclass :py:class:`Operation`.
-#. Override the method defined in the base class, where necessary.
-#. Add a docstring to your class. Keep the first line short and clear. It will be used in the CLI
-   to describe your operation.
+#. Override the methods defined in the base class, where necessary.
+#. Add a docstring to your class.
+
+   * It will be exposed on the CLI so **do not** add any formatting syntax. Stick to raw text.
+   * Keep the first line short and clear. It will be part of the general help for the *amend*
+     command.
+
 #. If your operation requires additional options provided by the user, add an `__init__()` method.
 
    * Add any option to `__init__()`'s parameter list. The parameter name will be used as a CLI
@@ -103,8 +107,8 @@ class AddBomRef(Operation):
     """
     Adds a 'bom-ref' to components which don't have one yet.
 
-    Since the operation isn't easily able to determine the position of the component
-    it processes in the component tree, it generates UUIDs for bom-refs.
+    This operation generates bom-refs comprising a single UUIDv4 for any component which doesn't
+    have an SBOM.
     """
 
     def handle_metadata(self, metadata: dict) -> None:
@@ -130,8 +134,8 @@ class Compositions(Operation):
       https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf
     - It is safer to err on the side of caution when making claims about completeness.
 
-    This excludes the metadata component because any SBOM supplier should be capable of providing
-    a complete list of first-level components.
+    This excludes the metadata component because any SBOM supplier should be able to state the
+    level of completenes of its first-level components.
     """
 
     __assemblies: list
@@ -183,7 +187,7 @@ class Compositions(Operation):
 
 @default
 class DefaultAuthor(Operation):
-    """Sets component author to 'automated', if missing."""
+    """Sets author of the metadata component to 'automated', if missing."""
 
     def handle_metadata(self, metadata: dict) -> None:
         authors = metadata.setdefault("authors", [])
@@ -323,7 +327,10 @@ class InferCopyright(Operation):
 
     If neither copyright nor license is present on a component but there is a supplier,
     this operation generates the copyright field from the supplier in the format
-    `Copyright (c) <supplier.name> <year>, all rights reserved`.
+    `Copyright (c) <supplier.name> <current year>, all rights reserved`.
+
+    Because of the risk of generating false copyright claims, this operation is disabled by
+    default.
     """
 
     def infer_copyright(self, component: dict) -> None:

@@ -346,9 +346,33 @@ class DeleteAmbigiousLicenses(Operation):
     """
     Deletes license claims which are solely identified by the `name` property.
 
-    Because of the risk involved in accidentally removing important data,
-    this operation is disabled by default.
+    Licenses that contain only a name property but no URL or text for context provide little
+    informational value beyond the fact that some form of license is present.
+    In certain cases it can therefore be beneficial to remove such clutter from an SBOM.
+
+    Because of the risk involved in accidentally removing important data, this operation is
+    disabled by default.
     """
+
+    def _has_text(self, license: dict) -> bool:
+        return license.get("text", {}).get("content", "") != ""
+
+    def _has_url(self, license: dict) -> bool:
+        return license.get("url", "") != ""
+
+    def _has_name_only(self, license: dict) -> bool:
+        # Any fields other than name, text, or url mean the license shouldn't be deleted.
+        if any(field not in ["name", "text", "url"] for field in license.keys()):
+            return False
+
+        # Make sure that, if name or url are present, they aren't empty.
+        return not (self._has_text(license) or self._has_url(license))
+
+    def _keep_license(self, license: dict) -> bool:
+        if "license" not in license:
+            return True
+
+        return not self._has_name_only(license["license"])
 
     def _filter_licenses(self, component: dict) -> None:
         if "licenses" not in component:
@@ -356,9 +380,7 @@ class DeleteAmbigiousLicenses(Operation):
 
         licenses = component["licenses"]
         licenses = filter(
-            lambda lic: not (
-                "license" in lic and list(lic["license"].keys()) == ["name"]
-            ),
+            self._keep_license,
             licenses,
         )
         component["licenses"] = list(licenses)

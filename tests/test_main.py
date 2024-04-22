@@ -99,7 +99,7 @@ class TestAmendCommand(unittest.TestCase):
             [
                 "",
                 "amend",
-                "--operations",
+                "--operation",
                 "license-name-to-id",
                 "fake_bom.cdx.json",
                 str(("--license-dir=" + path.as_posix() + "/auxiliary/licenses")),
@@ -116,8 +116,10 @@ class TestAmendCommand(unittest.TestCase):
             [
                 "",
                 "amend",
-                "--operations",
-                "add-bom-ref,infer-copyright",
+                "--operation",
+                "add-bom-ref",
+                "--operation",
+                "infer-copyright",
                 "fake_bom.cdx.json",
             ],
         ):

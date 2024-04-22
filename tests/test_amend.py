@@ -39,10 +39,10 @@ class CompositionsTestCase(AmendTestCase):
         self.operation.prepare(self.sbom_fixture)
         self.assertSequenceEqual(
             self.sbom_fixture["compositions"],
-            [{"aggregate": "incomplete", "assemblies": []}],
+            [{"aggregate": "unknown", "assemblies": []}],
         )
 
-    def test_meta_component_added(self) -> None:
+    def test_meta_component_keeps_aggregate(self) -> None:
         self.operation.prepare(self.sbom_fixture)
         self.operation.handle_metadata(self.sbom_fixture["metadata"])
         self.assertTrue(
@@ -53,10 +53,41 @@ class CompositionsTestCase(AmendTestCase):
             )
         )
 
+    def test_meta_component_keeps_unknown_aggregate(self) -> None:
+        self.sbom_fixture["compositions"][2]["aggregate"] = "unknown"
+        self.operation.prepare(self.sbom_fixture)
+        self.operation.handle_metadata(self.sbom_fixture["metadata"])
+
+        self.assertTrue(
+            self.sbom_fixture["metadata"]["component"]["bom-ref"]
+            in self.sbom_fixture["compositions"][0]["assemblies"]
+        )
+
+    def test_meta_component_missing(self) -> None:
+        del self.sbom_fixture["metadata"]["component"]
+        self.operation.prepare(self.sbom_fixture)
+        self.operation.handle_metadata(self.sbom_fixture["metadata"])
+
+        # Assert that all compositions are empty
+        self.assertFalse(
+            any(comp["assemblies"] for comp in self.sbom_fixture["compositions"])
+        )
+
+    def test_meta_component_not_in_compositions(self) -> None:
+        del self.sbom_fixture["compositions"][2]
+        self.operation.prepare(self.sbom_fixture)
+        self.operation.handle_metadata(self.sbom_fixture["metadata"])
+
+        # Assert that all compositions are empty
+        self.assertFalse(
+            any(comp["assemblies"] for comp in self.sbom_fixture["compositions"])
+        )
+
     def test_components_added(self) -> None:
         self.operation.prepare(self.sbom_fixture)
         flat_walk_components(self.operation, self.sbom_fixture["components"])
 
+        self.assertEqual(self.sbom_fixture["compositions"][0]["aggregate"], "unknown")
         self.assertSequenceEqual(
             self.sbom_fixture["compositions"][0]["assemblies"],
             ["com.company.unit/depA@4.0.2", "some-vendor/depB@1.2.3", "depC@3.2.1"],

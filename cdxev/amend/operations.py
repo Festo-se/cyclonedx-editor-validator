@@ -60,6 +60,7 @@ import datetime
 import importlib.resources
 import json
 import logging
+import typing as t
 import uuid
 
 from cdxev.amend.process_license import process_license
@@ -126,10 +127,10 @@ class AddBomRef(Operation):
 @default
 class Compositions(Operation):
     """
-    Declares all component compositions as 'incomplete'.
+    Declares all component compositions as 'unknown'.
 
     Any existing entries in 'compositions' are replaced by a single entry that marks all
-    components in the SBOM as 'incomplete'. This serves two goals:
+    components in the SBOM as 'unknown'. This serves two goals:
     - The NTIA recommends that known unknowns be made explicit.
       https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf
     - It is safer to err on the side of caution when making claims about completeness.
@@ -138,38 +139,53 @@ class Compositions(Operation):
     level of completenes of its first-level components.
     """
 
-    __assemblies: list
+    __compositions: list
+    __unknown_assemblies: list
+    __metacomp_aggregate: t.Optional[str]
 
     def prepare(self, sbom: dict) -> None:
         """
-        Clears any existing compositions and creates an empty composition for "incomplete"
+        Clears any existing compositions and creates an empty composition for "unknown"
         assemblies.
         """
 
         metacomp = sbom.get("metadata", {}).get("component", {}).get("bom-ref", None)
-        compositions = sbom.setdefault("compositions", [])
+        self.__compositions = sbom.setdefault("compositions", [])
 
         # Remember the old aggregate of the metadata component
-        metacomp_aggregate = None
-        if metacomp:
-            for composition in compositions:
-                if metacomp in composition.get("assemblies", []):
-                    metacomp_aggregate = composition["aggregate"]
-                    break
+        self.__metacomp_aggregate = next(
+            (
+                comp["aggregate"]
+                for comp in self.__compositions
+                if metacomp in comp.get("assemblies", [])
+            ),
+            None,
+        )
 
         # Replace any existing compositions with a new, empty list
-        if "compositions" in sbom:
-            del sbom["compositions"]
-        sbom["compositions"] = [{"aggregate": "incomplete", "assemblies": []}]
-        self.__assemblies = sbom["compositions"][0]["assemblies"]
+        self.__compositions.clear()
+        self.__compositions.append({"aggregate": "unknown", "assemblies": []})
+        self.__unknown_assemblies = self.__compositions[0]["assemblies"]
 
-        # Re-add the metadata component under the same aggregate as before
-        if metacomp_aggregate == "incomplete":
-            self.__assemblies.append(metacomp)
-        elif metacomp_aggregate is not None:
-            sbom["compositions"].append(
-                {"aggregate": metacomp_aggregate, "assemblies": [metacomp]}
+    def handle_metadata(self, metadata: dict) -> None:
+        metacomp = metadata.get("component", {}).get("bom-ref", None)
+        if not metacomp or not self.__metacomp_aggregate:
+            return
+
+        try:
+            composition = next(
+                comp
+                for comp in self.__compositions
+                if comp["aggregate"] == self.__metacomp_aggregate
             )
+            assemblies = composition.setdefault("assemblies", [])
+            assemblies.append(metacomp)
+        except StopIteration:
+            composition = {
+                "aggregate": self.__metacomp_aggregate,
+                "assemblies": [metacomp],
+            }
+            self.__compositions.append(composition)
 
     def handle_component(self, component: dict) -> None:
         try:
@@ -182,7 +198,7 @@ class Compositions(Operation):
 
     def __add_to_assemblies(self, bom_ref: str) -> None:
         logger.debug("Added %s to compositions.", bom_ref)
-        self.__assemblies.append(bom_ref)
+        self.__unknown_assemblies.append(bom_ref)
 
 
 @default

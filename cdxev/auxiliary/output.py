@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from cdxev import pkg
 from cdxev.auxiliary.filename_gen import generate_filename
+from cdxev.auxiliary.sbomFunctions import CycloneDXVersion, SpecVersion
 
 logger = logging.getLogger(__name__)
 
@@ -62,13 +63,38 @@ def update_timestamp(sbom: dict) -> None:
 def update_tools(sbom: dict) -> None:
     """Adds this tool to the list of tools in metadata."""
     metadata: dict = sbom.setdefault("metadata", {})
-    tools: list = metadata.setdefault("tools", [])
+    spec_version = SpecVersion.parse(sbom.get("specVersion", ""))
+    tools: t.Optional[t.Union[dict, list]] = metadata.get("tools", None)
 
-    this_tool = {
-        "name": pkg.NAME,
-        "vendor": pkg.VENDOR,
-        "version": pkg.VERSION,
-    }
+    # Starting in CycloneDX 1.5 tools should be a dict.
+    if tools is None:
+        if spec_version is not None and spec_version >= CycloneDXVersion.V1_5:
+            tools = {}
+        else:
+            tools = []
+        metadata["tools"] = tools
+
+    if isinstance(tools, dict):
+        this_tool = {
+            "type": "application",
+            "name": pkg.NAME,
+            "publisher": pkg.VENDOR,
+            "version": pkg.VERSION,
+        }
+        tools = tools.setdefault("components", [])
+    else:
+        this_tool = {
+            "name": pkg.NAME,
+            "vendor": pkg.VENDOR,
+            "version": pkg.VERSION,
+        }
+
+    if t.TYPE_CHECKING:
+        # At this point we can be sure that tools is definitely a list.
+        # This assertion is for mypy only and has no runtime relevance, because if tools isn't
+        # truly a list that would mean the SBOM is invalid in which case we're fine with letting
+        # the tool crash. Therefore, bandit error B101 is silenced.
+        assert isinstance(tools, list)  # nosec
 
     if any(tool for tool in tools if tool == this_tool):
         return

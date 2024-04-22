@@ -2,9 +2,80 @@
 # Module with functions for the work with sboms
 ###################################################
 
+import logging
+from dataclasses import dataclass
+from enum import Enum
+from functools import total_ordering
+from re import fullmatch
 from typing import Any, Callable, Literal, Optional, Sequence, Union
 
 from dateutil.parser import parse
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True, order=True)
+class SpecVersion:
+    """
+    Object representation of a simple version string comprised of a major and minor version.
+
+    Instances are immutable and totally orderable.
+    """
+
+    major: int
+    minor: int
+
+    @classmethod
+    def parse(cls, s: str) -> Optional["SpecVersion"]:
+        """
+        Creates a `SpecVersion` from a string, e.g. a CycloneDX specVersion field.
+
+        :param s: The string to parse.
+        :return: The parsed `SpecVersion`.
+        """
+        match = fullmatch("([0-9]+)\\.([0-9]+)", s)
+        if match is None:
+            logger.warning(f'"{s}" is not a valid specVersion')
+            return None
+
+        (major, minor) = (int(x) for x in match.group(1, 2))
+        return SpecVersion(major, minor)
+
+    def __str__(self) -> str:
+        return f"{self.major}.{self.minor}"
+
+
+@total_ordering
+class CycloneDXVersion(Enum):
+    """
+    Enumeration of known CycloneDX spec versions.
+
+    Enumeration members can be compared directly to `SpecVersion` instances.
+    """
+
+    V1_0 = SpecVersion(1, 0)
+    V1_1 = SpecVersion(1, 1)
+    V1_2 = SpecVersion(1, 2)
+    V1_3 = SpecVersion(1, 3)
+    V1_4 = SpecVersion(1, 4)
+    V1_5 = SpecVersion(1, 5)
+    V1_6 = SpecVersion(1, 6)
+
+    def __eq__(self, value: object) -> bool:
+        if isinstance(value, CycloneDXVersion):
+            return super().__eq__(value)
+        elif isinstance(value, SpecVersion):
+            return self.value.__eq__(value)
+        else:
+            return NotImplemented
+
+    def __lt__(self, value: object) -> bool:
+        if isinstance(value, CycloneDXVersion):
+            return self.value < value.value
+        elif isinstance(value, SpecVersion):
+            return self.value < value
+        else:
+            return NotImplemented
 
 
 def compare_components(first_component: dict, second_component: dict) -> bool:

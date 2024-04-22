@@ -59,6 +59,7 @@ class CycloneDXVersion(Enum):
     V1_3 = SpecVersion(1, 3)
     V1_4 = SpecVersion(1, 4)
     V1_5 = SpecVersion(1, 5)
+    V1_6 = SpecVersion(1, 6)
 
     def __eq__(self, value: object) -> bool:
         if isinstance(value, CycloneDXVersion):

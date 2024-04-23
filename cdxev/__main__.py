@@ -243,6 +243,31 @@ def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
     )
 
 
+def reflow_paragraphs(text: str, indent: int = 8) -> str:
+    """
+    Reformats a string comprised of several paragraphs to propertly output it to the console.
+
+    This function consideres double newlines ('\\n\\n') paragraph breaks will preserve them.
+    Any other whitespace, including single newlines will be collapsed.
+
+    The width of the final string is equal to the terminal width but capped at 160 characters.
+
+    :param text: The string to reformat.
+    :param indent: The number of spaces to add before each line.
+    :returns: The reformatted string.
+    """
+    max_width = min(shutil.get_terminal_size()[0], 160)
+    textwrapper = textwrap.TextWrapper(
+        width=max_width,
+        initial_indent=" " * indent,
+        subsequent_indent=" " * indent,
+    )
+    text = textwrap.dedent(text)
+    paragraphs = [textwrapper.fill(para) for para in text.split("\n\n")]
+
+    return "\n\n".join(paragraphs)
+
+
 # noinspection PyUnresolvedReferences,PyProtectedMember
 def create_amend_parser(
     subparsers: argparse._SubParsersAction,
@@ -278,12 +303,7 @@ def create_amend_parser(
         else:
             description += f"    {op.name}:\n"
 
-        desc = textwrap.fill(
-            op.short_description.replace("\n", " "),
-            width=shutil.get_terminal_size()[0],
-            initial_indent="        ",
-            subsequent_indent="        ",
-        )
+        desc = reflow_paragraphs(op.short_description)
         description += desc + "\n\n"
 
     parser = subparsers.add_parser(
@@ -600,9 +620,18 @@ def create_build_public_bom_parser(
 
 def invoke_amend(args: argparse.Namespace) -> int:
     if args.help_operation:
-        print(args.operations_by_name[args.help_operation].short_description)
-        print("\n")
-        print(args.operations_by_name[args.help_operation].long_description)
+        short_desc = args.operations_by_name[args.help_operation].short_description
+        long_desc = reflow_paragraphs(
+            args.operations_by_name[args.help_operation].long_description, indent=0
+        )
+
+        print()
+        print(short_desc)
+        print("-" * len(short_desc))
+        print()
+        print(long_desc)
+        print()
+
         sys.exit()
 
     if not args.input:

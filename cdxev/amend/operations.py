@@ -62,8 +62,15 @@ import json
 import logging
 import typing as t
 import uuid
+from functools import cache
+from pathlib import Path
 
-from cdxev.amend.process_license import process_license
+import charset_normalizer
+
+from cdxev.amend.license import foreach_license, license_has_id, license_has_text
+from cdxev.auxiliary.identity import ComponentIdentity
+from cdxev.error import AppError
+from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
 
@@ -300,41 +307,136 @@ class LicenseNameToId(Operation):
     """
     Attempts to infer SPDX ids from license names.
 
-    If there are components in "metadata" or "components" containing
-    licenses with the entry "name" instead of "id", this operation attempts
-    to replace the name with an SPDX-ID, extracted from a provided list of possible license names
-    with associated SPDX-ID.
+    For any license on a component or the metadata component that is declared with a name but no
+    id, this operation attempts to replace the name with a matching SPDX id. The operation
+    contains a lookup table of common license names to SPDX ids largely sourced from
+    https://github.com/CycloneDX/cyclonedx-core-java/ and https://spdx.org/licenses/.
 
-    If the license contains a name and
-    a path to a folder with txt files containing license descriptions with the
-    naming convention 'license name'.txt is provided,
-    the program searches for a file with matching name
-    and, if found, copies its content in the field "text".
+    Licenses that already have an id are skipped. If no corresponding id can be found, the license
+    is also skipped.
     """
 
-    def __init__(self, license_dir: str = "") -> None:
-        """
-        :param license_dir: Path to a folder with txt-files containing license texts to be
-                               copied in the SBOM.
-        """
-        license_names_file = (
+    license_map: dict[str, str] = {}
+
+    def prepare(self, sbom: dict) -> None:
+        license_mapping_file = (
             importlib.resources.files(__spec__.parent) / "license_name_spdx_id_map.json"  # type: ignore[name-defined]  # noqa: E501
         )
-        license_names_json = license_names_file.read_text(encoding="utf-8-sig")
-        self.license_names = json.loads(license_names_json)
-        self.license_dir = license_dir
+        license_mapping_json = license_mapping_file.read_text(encoding="utf-8-sig")
+        license_mapping = json.loads(license_mapping_json)
+        for mapping in license_mapping:
+            for name in mapping["names"]:
+                self.license_map[name.lower()] = mapping["exp"]
+
+    def _do_it(self, license: dict, component: dict) -> None:
+        if license_has_id(license):
+            return
+
+        name = license["name"].lower()
+        if name not in self.license_map:
+            return
+
+        id = self.license_map[name]
+        license["id"] = id
+        del license["name"]
+
+        component_id = ComponentIdentity.create(component, True)
+        logger.info(
+            LogMessage(
+                "License name replaced with id",
+                f"License '{name}' of component {component_id} replaced with id '{id}'",
+            )
+        )
 
     def handle_metadata(self, metadata: dict) -> None:
         if "component" not in metadata:
             return
-        process_license(
-            metadata["component"],
-            self.license_names,
-            self.license_dir,
-        )
+
+        foreach_license(self._do_it, metadata["component"])
 
     def handle_component(self, component: dict) -> None:
-        process_license(component, self.license_names, self.license_dir)
+        foreach_license(self._do_it, component)
+
+
+class AddLicenseText(Operation):
+    """
+    Adds user-provided license texts to licenses with a specific name (not id).
+
+    When using this operation, the user must also specify a directory where license texts are
+    stored.
+    Texts are expected in one file per license, where the filename must match the license name
+    declared in the SBOM. The filename's extension is ignored or might even be missing.
+
+    This operation skips licenses with an SPDX id as well as licenses which already contain a text.
+    """
+
+    license_files: dict[str, Path] = {}
+    """Maps filenames to path."""
+    aliases: dict[str, str] = {}
+    """Maps filename without extension to full filename."""
+
+    def __init__(self, license_dir: Path) -> None:
+        """
+        :param license_dir: Path to a folder with files containing license texts.
+        """
+        self.license_dir = license_dir
+
+    def _add_text(self, license: dict, text: str) -> None:
+        license["text"] = {"content": text}
+
+    @cache
+    def _find_text(self, license_name: str) -> t.Optional[str]:
+        if license_name in self.aliases:
+            license_name = self.aliases[license_name]
+
+        if license_name not in self.license_files:
+            return None
+
+        file = self.license_files[license_name]
+        match = charset_normalizer.from_path(file).best()
+        if match is None:
+            raise AppError("File encoding cannot be determined", module_name=str(file))
+        text = str(match)
+        # Escape string for inclusion in json. The slice is to remove the surrounding
+        # double-quotes added by json.dumps()
+        return json.dumps(text)[1:-1]
+
+    def _do_it(self, license: dict, component: dict) -> None:
+        if license_has_id(license) or license_has_text(license):
+            return
+
+        name = license["name"]
+        text = self._find_text(name.lower())
+        if text:
+            component_id = ComponentIdentity.create(component, True)
+            logger.info(
+                LogMessage(
+                    "License text added",
+                    f"Added text of license '{name}' to component {component_id}",
+                )
+            )
+            self._add_text(license, text)
+
+    def prepare(self, sbom: dict) -> None:
+        if not self.license_dir.is_dir():
+            raise AppError(
+                "License directory not found",
+                "Not found or not a directory: " + str(self.license_dir),
+            )
+
+        listing = (file for file in self.license_dir.glob("*") if file.is_file())
+        for file in listing:
+            self.license_files[file.name.lower()] = file
+            self.aliases[file.stem.lower()] = file.name.lower()
+
+    def handle_metadata(self, metadata: dict) -> None:
+        if "component" not in metadata:
+            return
+
+        foreach_license(self._do_it, metadata["component"])
+
+    def handle_component(self, component: dict) -> None:
+        foreach_license(self._do_it, component)
 
 
 class InferCopyright(Operation):

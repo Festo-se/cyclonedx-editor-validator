@@ -36,7 +36,7 @@ def validate_sbom(
                 file.name, filename_regex, sbom, schema_type
             )
             if filename_error:
-                if schema_type == "default":
+                if filename_regex == "" and schema_type == "default":
                     logger.warning(filename_error)
                 else:
                     errors.append("SBOM has the mistake: " + filename_error)

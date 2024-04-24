@@ -66,7 +66,7 @@ If a VEX section is contained, it will be merged as well, for details see merge-
 
 ## merge-vex
 
-[Deprecated] - DO NOT USE. The `merge-vex` command will be superseded by a new `vex` command in a future version. For further information refer to the [discussion](https://github.com/Festo-se/cyclonedx-editor-validator/issues/156#issuecomment-2058312043).
+[Deprecated] - The `merge-vex` command will be superseded by a new `vex` command in a future version. For further information refer to the [discussion](https://github.com/Festo-se/cyclonedx-editor-validator/issues/156#issuecomment-2058312043).
 
 This command requires two input files, a SBOM and a VEX file that shell be merged.
 The VEX file needs to be compatible with the SBOM.

@@ -230,7 +230,7 @@ def create_merge_vex_parser(
     parser = subparsers.add_parser(
         "merge-vex",
         help=(
-            "[Deprecated] - DO NOT USE. This will be removed in a future version."
+            "[Deprecated] - This command will be removed in a future version."
             "Note: The `merge-vex` command will be superseded by a new `vex` command."
             "Merges a VEX file into an SBOM."
         ),

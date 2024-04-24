@@ -1,5 +1,6 @@
 import logging
 import re
+import typing as t
 from pathlib import Path
 
 from jsonschema import Draft7Validator, FormatChecker
@@ -21,7 +22,7 @@ def validate_sbom(
     report_format: str,
     output: Path,
     schema_type: str = "default",
-    filename_regex: str = "",
+    filename_regex: t.Optional[str] = "",
     schema_path: str = "",
 ) -> int:
     errors = []
@@ -30,13 +31,15 @@ def validate_sbom(
             sbom, file, schema_type, schema_path
         )
 
-        if not filename_regex:
-            filename_regex = generate_validation_pattern(sbom)
-        if re.fullmatch(filename_regex, file.name) is None:
-            errors.append(
-                f"SBOM has the mistake: \
-                        filename doesn't match regular expression {filename_regex}"
+        if filename_regex is not None:
+            filename_error = validate_filename(
+                file.name, filename_regex, sbom, schema_type
             )
+            if filename_error:
+                if schema_type == "default":
+                    logger.warning(filename_error)
+                else:
+                    errors.append("SBOM has the mistake: " + filename_error)
 
         schema = Resource(
             sbom_schema, specification=DRAFT202012
@@ -169,3 +172,21 @@ def validate_sbom(
                 )
             )
         return 1
+
+
+def validate_filename(
+    filename: str,
+    regex: str,
+    sbom: dict,
+    schema_type: str,
+) -> t.Union[t.Literal[False], str]:
+    if not regex:
+        if schema_type == "default":
+            regex = "^(bom\\.json|.+\\.cdx\\.json)$"
+        else:
+            regex = generate_validation_pattern(sbom)
+
+    if re.fullmatch(regex, filename) is None:
+        return "filename doesn't match regular expression " + regex
+    else:
+        return False

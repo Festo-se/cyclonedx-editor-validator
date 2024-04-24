@@ -2,10 +2,10 @@ import json
 import os
 import unittest
 from pathlib import Path
-from unittest import mock
+from unittest.mock import Mock, patch
 
 from cdxev.error import AppError
-from cdxev.validator.validate import validate_sbom
+from cdxev.validator.validate import validate_filename, validate_sbom
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_validate_sboms/"
 
@@ -30,10 +30,10 @@ def search_for_word_issues(word: str, issue_list: list) -> bool:
     return is_valid
 
 
-@mock.patch("cdxev.validator.validate.logger")
+@patch("cdxev.validator.validate.logger")
 def validate_test(
     sbom: dict,
-    mock_logger: unittest.mock.Mock,
+    mock_logger: Mock,
     report_format: str = "stdout",
     filename_regex: str = "",
     schema_type: str = "custom",
@@ -1111,3 +1111,48 @@ class TestInternalMetaData(unittest.TestCase):
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("supplier", issues), True)
+
+
+class TestValidateFilename(unittest.TestCase):
+    def setUp(self) -> None:
+        self.sbom = get_test_sbom()
+
+    def test_valid_with_default_schema(self):
+        for filename in ["bom.json", "random.cdx.json", "-.cdx.json"]:
+            with self.subTest(filename=filename):
+                result = validate_filename(filename, "", self.sbom, "default")
+                self.assertFalse(result)
+
+    def test_invalid_with_default_schema(self):
+        for filename in ["bomjson", "bom.jso", "random.bom.json", ".cdx.json"]:
+            with self.subTest(filename=filename):
+                result = validate_filename(filename, "", self.sbom, "default")
+                self.assertIsInstance(result, str)
+
+    def test_valid_with_custom_schema(self):
+        for filename in [
+            "bom.json",
+            "Acme_Application_9.1.1_20220217T101458.cdx.json",
+            "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345.cdx.json",
+            "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json",
+        ]:
+            with self.subTest(filename=filename):
+                result = validate_filename(filename, "", self.sbom, "custom")
+                self.assertFalse(result)
+
+    def test_invalid_with_custom_schema(self):
+        for filename in [
+            "bomjson",
+            "bom.jso",
+            "random.bom.json",
+            ".cdx.json",
+            "Acme_Application_20220217T101458.cdx.json",
+            "unknown_9.1.1_ec7781220ec7781220ec778122012345.cdx.json",
+            "Acme_Application_9.1.1.cdx.json",
+            "Acme_Application.cdx.json",
+            "Acme_Application_9.1.1_20220217T101458.json",
+            "Acme_Application_9.1.1_20220217T101458.cdx",
+        ]:
+            with self.subTest(filename=filename):
+                result = validate_filename(filename, "", self.sbom, "custom")
+                self.assertIsInstance(result, str)

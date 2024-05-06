@@ -470,7 +470,7 @@ class DeleteAmbiguousLicensesTestCase(AmendTestCase):
             {"license": {"name": "Some license"}},
         ]
         expected = copy.deepcopy(self.component)
-        expected["licenses"] = []
+        del expected["licenses"]
 
         self.operation.handle_component(self.component)
         self.assertDictEqual(self.component, expected)

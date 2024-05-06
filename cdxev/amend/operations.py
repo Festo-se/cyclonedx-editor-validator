@@ -513,11 +513,16 @@ class DeleteAmbiguousLicenses(Operation):
             return
 
         licenses = component["licenses"]
-        licenses = filter(
-            self._keep_license,
-            licenses,
+        licenses = list(
+            filter(
+                self._keep_license,
+                licenses,
+            )
         )
-        component["licenses"] = list(licenses)
+        if licenses:
+            component["licenses"] = licenses
+        else:
+            del component["licenses"]
 
     def handle_metadata(self, metadata: dict) -> None:
         if "component" not in metadata:

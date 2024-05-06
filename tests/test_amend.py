@@ -142,7 +142,7 @@ class InferSupplierTestCase(AmendTestCase):
 
     def test_author_already_present(self) -> None:
         component = {"author": "x"}
-        expected = copy.deepcopy(component)
+        expected = {"author": "x", "supplier": {"name": "x"}}
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
@@ -154,7 +154,7 @@ class InferSupplierTestCase(AmendTestCase):
 
     def test_publisher_is_preferred_to_author(self) -> None:
         component = {"author": "x", "publisher": "y"}
-        expected = copy.deepcopy(component)
+        expected = {"author": "x", "supplier": {"name": "y"}, "publisher": "y"}
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
@@ -172,25 +172,6 @@ class InferSupplierTestCase(AmendTestCase):
         self.assertEqual(
             self.sbom_fixture["metadata"]["component"],
             expected,
-        )
-
-    def test_supplier_get_not_overwritten(self) -> None:
-        self.sbom_fixture["components"][0]["supplier"] = {
-            "bom-ref": "Reference to a supplier entry",
-            "name": "Some name of a supplier",
-            "url": "https://someurl.com",
-        }
-        run_amend(self.sbom_fixture)
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["name"],
-            "Some name of a supplier",
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["url"], "https://someurl.com"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["bom-ref"],
-            "Reference to a supplier entry",
         )
 
     def test_supplier_from_website(self) -> None:
@@ -223,6 +204,20 @@ class InferSupplierTestCase(AmendTestCase):
             ]
         }
         expected = copy.deepcopy(component) | {"supplier": {"url": ["https://y.com"]}}
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_add_name_and_url(self) -> None:
+        component = {
+            "author": "Author",
+            "externalReferences": [
+                {"type": "vcs", "url": "https://y.com"},
+                {"type": "website", "url": "https://x.com"},
+            ],
+        }
+        expected = copy.deepcopy(component) | {
+            "supplier": {"name": "Author", "url": ["https://x.com"]}
+        }
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 

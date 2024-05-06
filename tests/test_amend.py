@@ -11,7 +11,7 @@ from cdxev.amend.operations import (
     AddLicenseText,
     Compositions,
     DefaultAuthor,
-    DeleteAmbigiousLicenses,
+    DeleteAmbiguousLicenses,
     InferCopyright,
     InferSupplier,
     LicenseNameToId,
@@ -451,7 +451,7 @@ class InferCopyrightTestCase(AmendTestCase):
 class DeleteAmbigiousLicensesTestCase(AmendTestCase):
     def setUp(self):
         super().setUp()
-        self.operation = DeleteAmbigiousLicenses()
+        self.operation = DeleteAmbiguousLicenses()
         self.component = self.sbom_fixture["components"][0]
 
     def test_delete_one_license_in_set(self):

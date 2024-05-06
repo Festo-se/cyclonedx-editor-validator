@@ -20,7 +20,7 @@ Examples:
 * :py:class:`Compositions` introduces an intentional uncertainty about the completeness of the
   SBOM's information. *We deem it okay to run by default because at worst it means the SBOM is
   a little less expressive than it could be.*
-* :py:class:`DeleteAmbigiousLicenses` introduces uncertainty about the completeness of the
+* :py:class:`DeleteAmbiguousLicenses` introduces uncertainty about the completeness of the
   license claims made for each component. It is meant to eliminate essentially useless
   clutter but consumers of the SBOM could take the absence of license claims in the SBOM as
   a sign that the component is not licensed. *So it should be used with caution and does not run
@@ -79,7 +79,7 @@ def default(cls: type["Operation"]) -> type["Operation"]:
     """
     Decorator to mark default operations.
 
-    Add this decorator to a suclass of `Operation` to make it run if no operations
+    Add this decorator to a subclass of `Operation` to make it run if no operations
     are explicitly selected.
     """
     setattr(cls, "_amendDefault", True)
@@ -143,7 +143,7 @@ class Compositions(Operation):
     - It is safer to err on the side of caution when making claims about completeness.
 
     This excludes the metadata component because any SBOM supplier should be able to state the
-    level of completenes of its first-level components.
+    level of completeness of its first-level components.
     """
 
     __compositions: list
@@ -476,7 +476,7 @@ class InferCopyright(Operation):
         self.infer_copyright(component)
 
 
-class DeleteAmbigiousLicenses(Operation):
+class DeleteAmbiguousLicenses(Operation):
     """
     Deletes license claims which are solely identified by the `name` property.
 

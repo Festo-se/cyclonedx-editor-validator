@@ -245,9 +245,9 @@ def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
 
 def reflow_paragraphs(text: str, indent: int = 8) -> str:
     """
-    Reformats a string comprised of several paragraphs to propertly output it to the console.
+    Reformats a string comprised of several paragraphs to properly output it to the console.
 
-    This function consideres double newlines ('\\n\\n') paragraph breaks will preserve them.
+    This function considers double newlines ('\\n\\n') paragraph breaks and will preserve them.
     Any other whitespace, including single newlines will be collapsed.
 
     The width of the final string is equal to the terminal width but capped at 160 characters.

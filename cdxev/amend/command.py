@@ -13,7 +13,7 @@ def get_all_operations() -> list[type[Operation]]:
 
 
 def create_operations(
-    operations: list[type[Operation]], config: dict[type[Operation], t.Any]
+    operations: list[type[Operation]], config: dict[type[Operation], dict[str, t.Any]]
 ) -> list["Operation"]:
     instances = []
     for op in operations:
@@ -26,13 +26,15 @@ def create_operations(
 def run(
     sbom: dict,
     selected: t.Optional[list[type[Operation]]] = None,
-    config: dict[type[Operation], t.Any] = {},
+    config: dict[type[Operation], dict[str, t.Any]] = {},
 ) -> None:
     """
     Runs the amend command on an SBOM. The SBOM is modified in-place.
 
     :param dict sbom: The SBOM model.
-    :param str path_to_license_folder: Path to a folder with license texts.
+    :param selected: List of operation classes to run on the SBOM.
+    :param config: Arguments for the operations. They will be passed to the operation's
+                   __init__() method as kw-args.
     """
     # If no operations are selected, select the default operations.
     if not selected:

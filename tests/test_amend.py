@@ -448,7 +448,7 @@ class InferCopyrightTestCase(AmendTestCase):
         )
 
 
-class DeleteAmbigiousLicensesTestCase(AmendTestCase):
+class DeleteAmbiguousLicensesTestCase(AmendTestCase):
     def setUp(self):
         super().setUp()
         self.operation = DeleteAmbiguousLicenses()
@@ -471,6 +471,33 @@ class DeleteAmbigiousLicensesTestCase(AmendTestCase):
         ]
         expected = copy.deepcopy(self.component)
         expected["licenses"] = []
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_delete_multiple_licenses(self):
+        self.component["licenses"] = [
+            {"license": {"name": "Some license"}},
+            {"license": {"id": "Apache-2.0"}},
+            {
+                "license": {
+                    "name": "License with text",
+                    "text": {"content": "Full text"},
+                }
+            },
+            {"license": {"name": "Foo license"}},
+            {"license": {"name": "Bar license"}},
+        ]
+        expected = copy.deepcopy(self.component)
+        expected["licenses"] = [
+            {"license": {"id": "Apache-2.0"}},
+            {
+                "license": {
+                    "name": "License with text",
+                    "text": {"content": "Full text"},
+                }
+            },
+        ]
 
         self.operation.handle_component(self.component)
         self.assertDictEqual(self.component, expected)

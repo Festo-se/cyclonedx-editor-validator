@@ -465,6 +465,8 @@ class InferCopyright(Operation):
         supplier_name = component.get("supplier", {}).get("name", "")
         copyright = f"Copyright (c) {year} {supplier_name}"
         component["copyright"] = copyright
+        component_id = ComponentIdentity.create(component, True)
+        logger.info(f"Copyright claim '{copyright}' added to {component_id}.")
 
     def handle_component(self, component: dict) -> None:
         self.infer_copyright(component)

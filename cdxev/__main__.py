@@ -227,7 +227,14 @@ def create_merge_parser(
 def create_merge_vex_parser(
     subparsers: argparse._SubParsersAction,
 ) -> argparse.ArgumentParser:
-    parser = subparsers.add_parser("merge-vex", help="Merges a VEX file into an SBOM.")
+    parser = subparsers.add_parser(
+        "merge-vex",
+        help=(
+            "[Deprecated] - This command will be removed in a future version."
+            "Note: The `merge-vex` command will be superseded by a new `vex` command."
+            "Merges a VEX file into an SBOM."
+        ),
+    )
     parser.add_argument(
         "sbom_file",
         metavar="<sbom_file>",

@@ -29,7 +29,7 @@ Currently, the command adds or modifies the following pieces of information:
 
 ### Copy license texts from files
 
-The program can copy the text describing a license from a specific file into the SBOM, if a license name is given.  
+The program can copy the text describing a license from a specific file into the SBOM, if a license name is given.
 
 This is done by submitting the path to a folder containing txt-files with the license text via the command `--license-path`.
 If for example the license name "Apache License 1.0" is given, the program will search in the provided folder for the file "Apache License 1.0.txt" and copy its content in the `text` field.
@@ -65,6 +65,8 @@ for them will be merged so that no information will be lost.
 If a VEX section is contained, it will be merged as well, for details see merge-vex section
 
 ## merge-vex
+
+[Deprecated] - The `merge-vex` command will be superseded by a new `vex` command in a future version. For further information refer to the [discussion](https://github.com/Festo-se/cyclonedx-editor-validator/issues/156#issuecomment-2058312043).
 
 This command requires two input files, a SBOM and a VEX file that shell be merged.
 The VEX file needs to be compatible with the SBOM.
@@ -120,7 +122,7 @@ Conflicts arise when a target component already has a value for the specified pr
 4. If the tool is running in an interactive terminal, the user is prompted to decide whether to overwrite the old value.
 5. If none of the above applies, an error is thrown.
 
-Hawk-eyed readers will have spotted a little stumbling block in these rules. What if an array should be overwritten? A little trickery is needed here. The property must first be explicitly deleted by setting it to `null`, then re-added with the new value.  
+Hawk-eyed readers will have spotted a little stumbling block in these rules. What if an array should be overwritten? A little trickery is needed here. The property must first be explicitly deleted by setting it to `null`, then re-added with the new value.
 On the command-line this can be done in two subsequent invocations:
 
     # Overwrite an array-valued property
@@ -137,7 +139,7 @@ When passing the targets, names and values in a file, the file must conform to t
         {
             "id": {
                 # Could be any one of the identifying properties in CycloneDX.
-                # Multiple identifiers are not allowed (with the special exception of name, 
+                # Multiple identifiers are not allowed (with the special exception of name,
                 # group and version which are only valid together)
                 "cpe": "CPE of target component goes here"
             },
@@ -146,8 +148,8 @@ When passing the targets, names and values in a file, the file must conform to t
                 "copyright": "2022 Acme Inc",
                 # Deletes a property
                 "author": null,
-                # Sets an array array-valued property. If the property already exists on the target, 
-                # the new value will be appended to the existing one. 
+                # Sets an array array-valued property. If the property already exists on the target,
+                # the new value will be appended to the existing one.
                 "licenses": [
                     {
                         "license": {
@@ -187,7 +189,7 @@ You can control the usage of the specification with the flag `--schema-type`:
 
 With the `--schema-path` flag, users can supply their own schema to the validator.
 
-    cdx-ev validate bom.json --schema-path=C:\users\documents\sbom_schemas\example_schema.json  # uses a schema "example_schema.json" saved on the users computer to verify the sbom 
+    cdx-ev validate bom.json --schema-path=C:\users\documents\sbom_schemas\example_schema.json  # uses a schema "example_schema.json" saved on the users computer to verify the sbom
 
 ### Validation of file name
 
@@ -249,7 +251,7 @@ When passed to the command, this schema will remove any component whose `group` 
         "required": ["group"]
     }
 
-An extension of the above, the next schema will delete any component with that `group`, __unless__ it contains a property with the name `internal:public` and the value `true`.  
+An extension of the above, the next schema will delete any component with that `group`, __unless__ it contains a property with the name `internal:public` and the value `true`.
 *Note that the property itself will still be removed from the component, because its name starts with `internal:`.*
 
     {
@@ -314,5 +316,5 @@ The following schema is a little more involved. It will delete any component who
                 }
             }
         },
-        "required": ["licenses"] 
+        "required": ["licenses"]
     }

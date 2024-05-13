@@ -99,8 +99,28 @@ class TestAmendCommand(unittest.TestCase):
             [
                 "",
                 "amend",
+                "--operation",
+                "license-name-to-id",
                 "fake_bom.cdx.json",
-                str(("--license-path=" + path.as_posix() + "/auxiliary/licenses")),
+                str(("--license-dir=" + path.as_posix() + "/auxiliary/licenses")),
+            ],
+        ):
+            mock_read.return_value = ({}, "json")
+            result = main()
+            self.assertEqual(result, _STATUS_OK)
+
+    @unittest.mock.patch("cdxev.__main__.read_sbom")
+    def test_operation_selection(self, mock_read: unittest.mock.Mock) -> None:
+        with unittest.mock.patch(
+            "sys.argv",
+            [
+                "",
+                "amend",
+                "--operation",
+                "add-bom-ref",
+                "--operation",
+                "infer-copyright",
+                "fake_bom.cdx.json",
             ],
         ):
             mock_read.return_value = ({}, "json")

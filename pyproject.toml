@@ -24,6 +24,8 @@ cdx-ev = "cdxev.__main__:main"
 python = "^3.9.0"
 python-dateutil = "2.9.0.post0"
 jsonschema = {version = "4.22.0", extras = ["format"]}
+docstring-parser = "^0.16"
+charset-normalizer = "^3.3.2"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "7.0.0"

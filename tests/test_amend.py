@@ -3,114 +3,106 @@ import datetime
 import json
 import typing as t
 import unittest
+from pathlib import Path
 
-from cdxev.amend import process_license
 from cdxev.amend.command import run as run_amend
 from cdxev.amend.operations import (
-    AddBomRefOperation,
-    CompositionsOperation,
-    DefaultAuthorOperation,
+    AddBomRef,
+    AddLicenseText,
+    Compositions,
+    DefaultAuthor,
+    DeleteAmbiguousLicenses,
     InferCopyright,
     InferSupplier,
+    LicenseNameToId,
     Operation,
-    ProcessLicense,
 )
 from cdxev.error import AppError
-from tests.auxiliary.sbomFunctionsTests import compare_sboms
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_amend_sboms/"
 
 
 class AmendTestCase(unittest.TestCase):
+    operation: Operation
+
     def setUp(self) -> None:
         with open(
             path_to_folder_with_test_sboms + "test.cdx.json", encoding="utf_8"
         ) as file:
             self.sbom_fixture = json.load(file)
 
+    def test_no_metadata_component_doesnt_raise(self) -> None:
+        if not hasattr(self, "operation"):
+            self.skipTest("Skipped on abstract base test case")
 
-class CommandIntegrationTestCase(AmendTestCase):
-    def test_compositions(self) -> None:
-        run_amend(self.sbom_fixture)
+        del self.sbom_fixture["metadata"]["component"]
+        self.operation.handle_metadata(self.sbom_fixture["metadata"])
 
-        expected_assemblies = [
-            "pkg:npm/test-app@1.0.0",
-            "com.company.unit/depA@4.0.2",
-            "some-vendor/depB@1.2.3",
-            "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
-            "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
-            "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6",
-            "depC@3.2.1",
-            "depC@3.2.1:Rudolph@6.6.6",
-        ]
-        expected_assemblies.sort()
-        self.sbom_fixture["compositions"][0]["assemblies"].sort()
-        self.assertSequenceEqual(
-            self.sbom_fixture["compositions"][0]["assemblies"],
-            expected_assemblies,
-        )
+    def test_empty_component_doesnt_raise(self) -> None:
+        if not hasattr(self, "operation"):
+            self.skipTest("Skipped on abstract base test case")
 
-    def test_meta_author(self) -> None:
-        run_amend(self.sbom_fixture)
-
-        self.assertSequenceEqual(
-            self.sbom_fixture["metadata"]["authors"], [{"name": "automated"}]
-        )
-
-    def test_suppliers(self) -> None:
-        run_amend(self.sbom_fixture)
-        components = self.sbom_fixture["components"]
-        self.assertIn("supplier", components[0])
-        self.assertDictEqual(
-            {
-                "name": "Some Vendor Inc.",
-                "url": ["https://www.some-vendor.com"],
-            },
-            components[1]["supplier"],
-        )
-        self.assertDictEqual(
-            {"url": ["https://www.universe.com"]},
-            components[1]["components"][0]["supplier"],
-        )
-        self.assertNotIn("supplier", components[1]["components"][1])
-        self.assertDictEqual(
-            {"url": ["https://northpole.com/rudolph.git"]},
-            components[1]["components"][1]["components"][0]["supplier"],
-        )
-        self.assertDictEqual(
-            {
-                "name": "Some Vendor Inc.",
-                "url": ["https://www.some-vendor.com"],
-            },
-            components[1]["supplier"],
-        )
-        self.assertNotIn("supplier", components[2])
+        self.operation.handle_component({})
 
 
 class CompositionsTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = CompositionsOperation()
+        self.operation = Compositions()
 
     def test_compositions_cleared(self) -> None:
         self.operation.prepare(self.sbom_fixture)
         self.assertSequenceEqual(
             self.sbom_fixture["compositions"],
-            [{"aggregate": "incomplete", "assemblies": []}],
+            [{"aggregate": "unknown", "assemblies": []}],
         )
 
-    def test_meta_component_added(self) -> None:
+    def test_meta_component_keeps_aggregate(self) -> None:
         self.operation.prepare(self.sbom_fixture)
         self.operation.handle_metadata(self.sbom_fixture["metadata"])
-        self.assertSequenceEqual(
-            self.sbom_fixture["compositions"][0]["assemblies"],
-            ["pkg:npm/test-app@1.0.0"],
+        self.assertTrue(
+            any(
+                comp["aggregate"] == "not_specified"
+                and comp["assemblies"] == ["pkg:npm/test-app@1.0.0"]
+                for comp in self.sbom_fixture["compositions"]
+            )
+        )
+
+    def test_meta_component_keeps_unknown_aggregate(self) -> None:
+        self.sbom_fixture["compositions"][2]["aggregate"] = "unknown"
+        self.operation.prepare(self.sbom_fixture)
+        self.operation.handle_metadata(self.sbom_fixture["metadata"])
+
+        self.assertTrue(
+            self.sbom_fixture["metadata"]["component"]["bom-ref"]
+            in self.sbom_fixture["compositions"][0]["assemblies"]
+        )
+
+    def test_meta_component_missing(self) -> None:
+        del self.sbom_fixture["metadata"]["component"]
+        self.operation.prepare(self.sbom_fixture)
+        self.operation.handle_metadata(self.sbom_fixture["metadata"])
+
+        # Assert that all compositions are empty
+        self.assertFalse(
+            any(comp["assemblies"] for comp in self.sbom_fixture["compositions"])
+        )
+
+    def test_meta_component_not_in_compositions(self) -> None:
+        del self.sbom_fixture["compositions"][2]
+        self.operation.prepare(self.sbom_fixture)
+        self.operation.handle_metadata(self.sbom_fixture["metadata"])
+
+        # Assert that all compositions are empty
+        self.assertFalse(
+            any(comp["assemblies"] for comp in self.sbom_fixture["compositions"])
         )
 
     def test_components_added(self) -> None:
         self.operation.prepare(self.sbom_fixture)
         flat_walk_components(self.operation, self.sbom_fixture["components"])
 
+        self.assertEqual(self.sbom_fixture["compositions"][0]["aggregate"], "unknown")
         self.assertSequenceEqual(
             self.sbom_fixture["compositions"][0]["assemblies"],
             ["com.company.unit/depA@4.0.2", "some-vendor/depB@1.2.3", "depC@3.2.1"],
@@ -120,7 +112,7 @@ class CompositionsTestCase(AmendTestCase):
 class DefaultAuthorTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = DefaultAuthorOperation()
+        self.operation = DefaultAuthor()
 
     def test_default_author_added(self) -> None:
         self.operation.handle_metadata(self.sbom_fixture["metadata"])
@@ -162,69 +154,24 @@ class InferSupplierTestCase(AmendTestCase):
 
     def test_publisher_is_preferred_to_author(self) -> None:
         component = {"author": "x", "publisher": "y"}
-        expected = {"author": "x", "publisher": "y", "supplier": {"name": "y"}}
+        expected = {"author": "x", "supplier": {"name": "y"}, "publisher": "y"}
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
+    def test_empty_component_stays_empty(self):
+        component = {}
+        expected = {}
+        self.operation.handle_component(component)
+        self.assertDictEqual(component, expected)
+
     def test_author_set_supplier_in_metadata(self) -> None:
+        expected = copy.deepcopy(self.sbom_fixture["metadata"]["component"])
+        expected["supplier"] = {"url": ["https://www.company.org"]}
         run_amend(self.sbom_fixture)
-        self.assertEqual(
-            self.sbom_fixture["metadata"]["component"]["supplier"]["name"],
-            self.sbom_fixture["metadata"]["component"]["author"],
-        )
 
-    def test_author_set_supplier_components(self) -> None:
-        self.sbom_fixture["components"][0].pop("externalReferences")
-        run_amend(self.sbom_fixture)
         self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["name"],
-            self.sbom_fixture["components"][0]["author"],
-        )
-
-    def test_supplier_get_not_overwritten(self) -> None:
-        self.sbom_fixture["components"][0]["supplier"] = {
-            "bom-ref": "Reference to a supplier entry",
-            "name": "Some name of a supplier",
-            "url": "https://someurl.com",
-        }
-        run_amend(self.sbom_fixture)
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["name"],
-            "Some name of a supplier",
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["url"], "https://someurl.com"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["bom-ref"],
-            "Reference to a supplier entry",
-        )
-
-    def test_supplier_add_url_to_name(self) -> None:
-        self.sbom_fixture["components"][0]["supplier"] = {
-            "name": "Some name of a supplier"
-        }
-        run_amend(self.sbom_fixture)
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["name"],
-            "Some name of a supplier",
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["url"][0],
-            self.sbom_fixture["components"][0]["externalReferences"][0]["url"],
-        )
-
-    def test_supplier_set_nothing_in_an_empty_component(self) -> None:
-        self.sbom_fixture["components"][0] = {"bom-ref": "component 0"}
-        run_amend(self.sbom_fixture)
-        self.assertEqual(self.sbom_fixture["components"][0], {"bom-ref": "component 0"})
-
-    def test_supplier_add_name_to_url(self) -> None:
-        self.sbom_fixture["components"][0]["supplier"] = {"url": "https://someurl.com"}
-        run_amend(self.sbom_fixture)
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"]["name"],
-            self.sbom_fixture["components"][0]["author"],
+            self.sbom_fixture["metadata"]["component"],
+            expected,
         )
 
     def test_supplier_from_website(self) -> None:
@@ -260,11 +207,25 @@ class InferSupplierTestCase(AmendTestCase):
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
+    def test_add_name_and_url(self) -> None:
+        component = {
+            "author": "Author",
+            "externalReferences": [
+                {"type": "vcs", "url": "https://y.com"},
+                {"type": "website", "url": "https://x.com"},
+            ],
+        }
+        expected = copy.deepcopy(component) | {
+            "supplier": {"name": "Author", "url": ["https://x.com"]}
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
 
 class AddBomRefTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = AddBomRefOperation()
+        self.operation = AddBomRef()
 
     def test_add_bom_ref_to_metadata(self) -> None:
         metadata = {"component": {"type": "application", "name": "test"}}
@@ -293,59 +254,33 @@ class AddBomRefTestCase(AmendTestCase):
         self.assertEqual("already-present", component["bom-ref"])
 
 
-class ProcessLicenseTestCase(AmendTestCase):
+class LicenseNameToIdTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.operation = ProcessLicense()
+        self.operation = LicenseNameToId()
+        self.operation.prepare(self.sbom_fixture)
 
     def test_replace_name_with_id(self) -> None:
-        self.sbom_fixture["metadata"]["component"]["licenses"] = [
-            {"license": {"name": "Apache License"}}
-        ]
-        self.operation.handle_metadata(self.sbom_fixture["metadata"])
-        self.assertEqual(
-            self.sbom_fixture["metadata"]["component"]["licenses"][0]["license"]["id"],
-            "Apache-1.0",
-        )
-        self.sbom_fixture["components"][0]["licenses"] = [
-            {"license": {"name": "Apache License"}}
-        ]
+        component = {
+            "licenses": [
+                {"license": {"name": "Apache License"}},
+                {"license": {"name": "GNU Lesser General Public License, Version 2.1"}},
+                {"license": {"name": "Some random name"}},
+            ]
+        }
+        expected = {
+            "licenses": [
+                {"license": {"id": "Apache-1.0"}},
+                {"license": {"id": "LGPL-2.1-only"}},
+                {"license": {"name": "Some random name"}},
+            ]
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(component, expected)
+
+    def test_no_name_and_no_id_in_license_doesnt_raise(self) -> None:
+        self.sbom_fixture["components"][0]["licenses"] = [{}]
         self.operation.handle_component(self.sbom_fixture["components"][0])
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["licenses"][0]["license"]["id"],
-            "Apache-1.0",
-        )
-
-    def test_no_component_in_metadata(self) -> None:
-        exception_thrown = False
-        test_sbom = copy.deepcopy(self.sbom_fixture)
-        test_sbom["metadata"].pop("component")
-        try:
-            self.operation.handle_metadata(test_sbom["metadata"])
-        except KeyError:
-            exception_thrown = True
-        self.assertFalse(exception_thrown)
-
-    def test_no_name_and_no_id_in_license(self) -> None:
-        exception_thrown = False
-        test_sbom = copy.deepcopy(self.sbom_fixture)
-        test_sbom["components"][0]["licenses"] = [{}]
-        try:
-            self.operation.handle_component(test_sbom["components"][0])
-        except KeyError:
-            exception_thrown = True
-        self.operation.handle_component(test_sbom["components"][0])
-        self.assertFalse(exception_thrown)
-
-    def test_empty_component(self) -> None:
-        exception_thrown = False
-        test_sbom = copy.deepcopy(self.sbom_fixture)
-        test_sbom["components"] = [{}]
-        try:
-            self.operation.handle_component(test_sbom["components"][0])
-        except KeyError:
-            exception_thrown = True
-        self.assertFalse(exception_thrown)
 
 
 def flat_walk_components(
@@ -359,386 +294,103 @@ def flat_walk_components(
         operation.handle_component(c)
 
 
-class TestReplaceLicenseNameWithIdFunctions(unittest.TestCase):
-    def test_find_license_id(self) -> None:
-        with open(
-            (path_to_folder_with_test_sboms + "/example_list_with_license_names.json"),
-            "r",
-            encoding="utf-8-sig",
-        ) as my_file:
-            list_of_license_names = json.load(my_file)
-        for licenses in list_of_license_names:
-            license_id = licenses["exp"]
-            for names in licenses["names"]:
-                self.assertEqual(
-                    process_license.find_license_id(names, list_of_license_names),
-                    license_id,
-                )
+class AddLicenseTextTestCase(AmendTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        license_dir = Path("tests/auxiliary/licenses")
+        self.operation = AddLicenseText(license_dir)
+        self.operation.prepare(self.sbom_fixture)
 
-    def test_find_license_id_fail(self) -> None:
-        with open(
-            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
-            "r",
-            encoding="utf-8-sig",
-        ) as my_file:
-            list_of_license_names = json.load(my_file)
-        self.assertEqual(
-            process_license.find_license_id(10, list_of_license_names),  # type: ignore
-            "",
-        )
-        self.assertEqual(
-            process_license.find_license_id("no license", list_of_license_names), ""
-        )
-        self.assertEqual(
-            process_license.find_license_id({}, list_of_license_names),  # type: ignore
-            "",
-        )
-
-    def test_process_license_replace_name_with_id(self) -> None:
-        with open(
-            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
-            "r",
-            encoding="utf-8-sig",
-        ) as my_file:
-            list_of_license_names = json.load(my_file)
-        with open(
-            (path_to_folder_with_test_sboms + "bom_licenses_changed.json"),
-            "r",
-            encoding="utf-8-sig",
-        ) as my_file:
-            sbom = json.load(my_file)
-        with open(
-            (path_to_folder_with_test_sboms + "bom_licenses_changed_with_id.json"),
-            "r",
-            encoding="utf-8-sig",
-        ) as my_file:
-            sbom_with_id = json.load(my_file)
-        process_license.process_license(
-            sbom["metadata"]["component"], list_of_license_names
-        )
-        for component in sbom["components"]:
-            process_license.process_license(component, list_of_license_names)
-        self.assertTrue(compare_sboms(sbom, sbom_with_id))
-
-
-class GetLicenseTextFromFile(unittest.TestCase):
-    def test_get_license_text_from_folder(self) -> None:
-        path_to_license_folder = "tests/auxiliary/licenses"
-        license_text = process_license.get_license_text_from_folder(
-            "license_name", path_to_license_folder
-        )
-        self.assertEqual(license_text, "The text describing a license.")
-
-    def test_process_license_replace_license_text(self) -> None:
-        path_to_license_folder = "tests/auxiliary/licenses"
-        with open(
-            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
-            "r",
-            encoding="utf-8-sig",
-        ) as my_file:
-            list_of_license_names = json.load(my_file)
+    def test_add_text(self):
         component = {
-            "type": "library",
-            "bom-ref": "pkg:nuget/some name@1.3.3",
-            "publisher": "some publisher",
-            "name": "some name",
-            "version": "1.3.2",
-            "cpe": "",
-            "description": "some description",
-            "scope": "required",
-            "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
             "licenses": [
-                {"license": {"name": "license_name", "text": {"content": "other text"}}}
-            ],
-            "copyright": "Copyright 2000-2021 some name Contributors",
-            "purl": "pkg:nuget/some name@1.3.2",
+                {"license": {"id": "Apache-1.0"}},
+                {"license": {"name": "license_name"}},
+            ]
         }
-        process_license.process_license(
-            component, list_of_license_names, path_to_license_folder
-        )
-        self.assertEqual(
-            component["licenses"][0]["license"]["text"]["content"],  # type: ignore
-            "The text describing a license.",
-        )
-
-    def test_process_license_add_license_text(self) -> None:
-        path_to_license_folder = "tests/auxiliary/licenses"
-        with open(
-            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
-            "r",
-            encoding="utf-8-sig",
-        ) as my_file:
-            list_of_license_names = json.load(my_file)
-        component = {
-            "type": "library",
-            "bom-ref": "pkg:nuget/some name@1.3.3",
-            "publisher": "some publisher",
-            "name": "some name",
-            "version": "1.3.2",
-            "cpe": "",
-            "description": "some description",
-            "scope": "required",
-            "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
+        expected = {
             "licenses": [
+                {"license": {"id": "Apache-1.0"}},
                 {
                     "license": {
                         "name": "license_name",
+                        "text": {"content": "The text describing a license."},
                     }
-                }
-            ],
-            "copyright": "Copyright 2000-2021 some name Contributors",
-            "purl": "pkg:nuget/some name@1.3.2",
+                },
+            ]
         }
-        process_license.process_license(
-            component, list_of_license_names, path_to_license_folder
-        )
-        self.assertEqual(
-            component["licenses"][0]["license"]["text"]["content"],  # type: ignore
-            "The text describing a license.",
-        )
+        self.operation.handle_component(component)
+        self.assertDictEqual(component, expected)
 
-    def test_process_license_add_license_text_with_space(self) -> None:
-        path_to_license_folder = "tests/auxiliary/licenses"
-        with open(
-            (path_to_folder_with_test_sboms + "example_list_with_license_names.json"),
-            "r",
-            encoding="utf-8-sig",
-        ) as my_file:
-            list_of_license_names = json.load(my_file)
+    def test_keep_existing_text(self):
         component = {
-            "type": "library",
-            "bom-ref": "pkg:nuget/some name@1.3.3",
-            "publisher": "some publisher",
-            "name": "some name",
-            "version": "1.3.2",
-            "cpe": "",
-            "description": "some description",
-            "scope": "required",
-            "hashes": [{"alg": "SHA-512", "content": "5F6996E38A31861449A493B938"}],
+            "licenses": [
+                {"license": {"name": "license_name", "text": {"content": "My text."}}},
+            ]
+        }
+        expected = copy.deepcopy(component)
+        self.operation.handle_component(component)
+        self.assertDictEqual(component, expected)
+
+    def test_file_extension_ignored(self):
+        component = {
+            "licenses": [
+                {"license": {"name": "another license"}},
+                {"license": {"name": "license_name"}},
+            ]
+        }
+        expected = {
             "licenses": [
                 {
                     "license": {
                         "name": "another license",
+                        "text": {"content": "The text describing another license."},
                     }
-                }
-            ],
-            "copyright": "Copyright 2000-2021 some name Contributors",
-            "purl": "pkg:nuget/some name@1.3.2",
+                },
+                {
+                    "license": {
+                        "name": "license_name",
+                        "text": {"content": "The text describing a license."},
+                    }
+                },
+            ]
         }
-        process_license.process_license(
-            component, list_of_license_names, path_to_license_folder
-        )
-        self.assertEqual(
-            component["licenses"][0]["license"]["text"]["content"],  # type: ignore
-            "The text describing another license.",
-        )
+        self.operation.handle_component(component)
+        self.assertDictEqual(component, expected)
 
-    def test_error_messages_does_not_exist(self) -> None:
-        path_to_license_folder = "thispathdoesnotexist"
-        with self.assertRaises(AppError) as ae:
-            process_license.get_license_text_from_folder(
-                "license_name", path_to_license_folder
-            )
-            self.assertIn(
-                "The submitted path thispathdoesnotexist does not exist.",
-                ae.exception.details.description,
-            )
-
-    def test_error_messages_not_a_folder(self) -> None:
-        path_to_license_folder = "tests/test_amend.py"
-        with self.assertRaises(AppError) as ae:
-            process_license.get_license_text_from_folder(
-                "license_name", path_to_license_folder
-            )
-            self.assertIn(
-                "The submitted path (tests/test_amend.py) does not lead to a folder.",
-                ae.exception.details.description,
-            )
-
-
-class TestDeleteUnknownComponent(AmendTestCase):
-    def test_delete_unknown_component(self) -> None:
-        licenses = [
-            {"license": {"name": "unknown.something"}},
-            {"license": {"name": "whateverUnknown"}},
-            {"license": {"name": "unKnowN etc"}},
-            {"license": {"name": "AunknowNM", "text": {"content": ""}}},
-            {"license": {"name": "unknown", "text": {"content": "license text"}}},
-            {"license": {"name": "some license", "text": {"content": "license text"}}},
-            {"license": {"name": "some license"}},
-            {"license": {"name": ""}},
-        ]
-        component = {"licenses": copy.deepcopy(licenses)}
-        process_license.delete_license_unknown(component)
-        self.assertEqual(component["licenses"], licenses[4:])
-
-    def test_amend_delete_license_unknown(self) -> None:
-        sbom = {
-            "metadata": {
-                "component": {
-                    "bom-ref": "a bom-ref",
-                    "licenses": [
-                        {"license": {"name": "some_license"}},
-                        {"license": {"name": "license"}},
-                        {"license": {"name": "unknown", "text": {"content": ""}}},
-                        {
-                            "license": {
-                                "name": "unknown",
-                                "text": {"content": "some text"},
-                            }
-                        },
-                    ],
-                },
-                "authors": [{"name": "automated"}],
-            },
-            "components": [
-                {
-                    "bom-ref": "a second bom-ref",
-                    "licenses": [
-                        {"license": {"name": "some_license"}},
-                        {"license": {"name": "license"}},
-                    ],
-                },
-                {
-                    "bom-ref": "a third bom-ref",
-                    "licenses": [
-                        {"license": {"name": "some_unknown_license"}},
-                        {"license": {"name": "license"}},
-                        {
-                            "license": {
-                                "name": "unknown",
-                                "text": {"content": "some description"},
-                            }
-                        },
-                    ],
-                },
-                {"name": "test", "bom-ref": "reference"},
-            ],
-            "compositions": [
-                {
-                    "aggregate": "incomplete",
-                    "assemblies": ["a bom-ref", "a second bom-ref", "a third bom-ref"],
-                }
-            ],
+    def test_name_is_case_insensitive(self):
+        component = {
+            "licenses": [
+                {"license": {"name": "ANOTHER license"}},
+                {"license": {"name": "uppercase"}},
+            ]
         }
-        sbom_changed = {
-            "metadata": {
-                "component": {
-                    "bom-ref": "a bom-ref",
-                    "licenses": [
-                        {"license": {"name": "some_license"}},
-                        {"license": {"name": "license"}},
-                        {
-                            "license": {
-                                "name": "unknown",
-                                "text": {"content": "some text"},
-                            }
-                        },
-                    ],
-                },
-                "authors": [{"name": "automated"}],
-            },
-            "components": [
+        expected = {
+            "licenses": [
                 {
-                    "bom-ref": "a second bom-ref",
-                    "licenses": [
-                        {"license": {"name": "some_license"}},
-                        {"license": {"name": "license"}},
-                    ],
+                    "license": {
+                        "name": "ANOTHER license",
+                        "text": {"content": "The text describing another license."},
+                    }
                 },
                 {
-                    "bom-ref": "a third bom-ref",
-                    "licenses": [
-                        {"license": {"name": "license"}},
-                        {
-                            "license": {
-                                "name": "unknown",
-                                "text": {"content": "some description"},
-                            }
-                        },
-                    ],
+                    "license": {
+                        "name": "uppercase",
+                        "text": {"content": "UPPERCASE LICENSE"},
+                    }
                 },
-                {"name": "test", "bom-ref": "reference"},
-            ],
-            "compositions": [
-                {
-                    "aggregate": "incomplete",
-                    "assemblies": [
-                        "a bom-ref",
-                        "a second bom-ref",
-                        "a third bom-ref",
-                        "reference",
-                    ],
-                }
-            ],
+            ]
         }
-        run_amend(sbom)
-        self.assertEqual(sbom, sbom_changed)
+        self.operation.handle_component(component)
+        self.assertDictEqual(component, expected)
 
-    def test_amend_delete_single_license(self) -> None:
-        sbom = {
-            "metadata": {
-                "component": {
-                    "bom-ref": "a bom-ref",
-                    "licenses": [
-                        {"license": {"name": "unknown", "text": {"content": ""}}},
-                    ],
-                },
-                "authors": [{"name": "automated"}],
-            },
-            "components": [
-                {
-                    "bom-ref": "a second bom-ref",
-                    "licenses": [
-                        {"license": {"name": "some_license"}},
-                        {"license": {"name": "license"}},
-                    ],
-                },
-                {
-                    "bom-ref": "a third bom-ref",
-                    "licenses": [
-                        {"license": {"name": "some_unknown_license"}},
-                    ],
-                },
-            ],
-            "compositions": [
-                {
-                    "aggregate": "incomplete",
-                    "assemblies": ["a bom-ref", "a second bom-ref", "a third bom-ref"],
-                }
-            ],
-        }
-        sbom_changed = {
-            "metadata": {
-                "component": {
-                    "bom-ref": "a bom-ref",
-                },
-                "authors": [{"name": "automated"}],
-            },
-            "components": [
-                {
-                    "bom-ref": "a second bom-ref",
-                    "licenses": [
-                        {"license": {"name": "some_license"}},
-                        {"license": {"name": "license"}},
-                    ],
-                },
-                {
-                    "bom-ref": "a third bom-ref",
-                },
-            ],
-            "compositions": [
-                {
-                    "aggregate": "incomplete",
-                    "assemblies": ["a bom-ref", "a second bom-ref", "a third bom-ref"],
-                }
-            ],
-        }
-        run_amend(sbom)
-        self.assertEqual(sbom, sbom_changed)
+    def test_invalid_license_dir_raises(self):
+        operation = AddLicenseText(Path("somethingthatsurelydoesntexist"))
+        with self.assertRaises(AppError):
+            operation.prepare(self.sbom_fixture)
 
 
-class TestInferCopyright(AmendTestCase):
+class InferCopyrightTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.operation = InferCopyright()
@@ -772,7 +424,7 @@ class TestInferCopyright(AmendTestCase):
     def test_set_copyright_from_supplier_in_metadata(self) -> None:
         year = datetime.date.today().year
         self.sbom_fixture["metadata"]["component"]["supplier"] = {"name": "Acme Inc."}
-        run_amend(self.sbom_fixture)
+        run_amend(self.sbom_fixture, selected=[InferCopyright])
         self.assertEqual(
             self.sbom_fixture["metadata"]["component"]["copyright"],
             f"Copyright (c) {year} Acme Inc.",
@@ -783,12 +435,94 @@ class TestInferCopyright(AmendTestCase):
         self.sbom_fixture["components"][0].pop("externalReferences")
         self.sbom_fixture["components"][0]["supplier"] = {"name": "Acme Inc."}
         year = datetime.date.today().year
-        run_amend(self.sbom_fixture)
+        run_amend(self.sbom_fixture, selected=[InferCopyright])
         company = self.sbom_fixture["components"][0]["supplier"]["name"]
         self.assertEqual(
             self.sbom_fixture["components"][0]["copyright"],
             f"Copyright (c) {year} {company}",
         )
+
+
+class DeleteAmbiguousLicensesTestCase(AmendTestCase):
+    def setUp(self):
+        super().setUp()
+        self.operation = DeleteAmbiguousLicenses()
+        self.component = self.sbom_fixture["components"][0]
+
+    def test_delete_one_license_in_set(self):
+        self.component["licenses"] = [
+            {"license": {"id": "Apache-2.0"}},
+            {"license": {"name": "Some license"}},
+        ]
+        expected = copy.deepcopy(self.component)
+        expected["licenses"] = [{"license": {"id": "Apache-2.0"}}]
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_delete_sole_license(self):
+        self.component["licenses"] = [
+            {"license": {"name": "Some license"}},
+        ]
+        expected = copy.deepcopy(self.component)
+        del expected["licenses"]
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_delete_multiple_licenses(self):
+        self.component["licenses"] = [
+            {"license": {"name": "Some license"}},
+            {"license": {"id": "Apache-2.0"}},
+            {
+                "license": {
+                    "name": "License with text",
+                    "text": {"content": "Full text"},
+                }
+            },
+            {"license": {"name": "Foo license"}},
+            {"license": {"name": "Bar license"}},
+        ]
+        expected = copy.deepcopy(self.component)
+        expected["licenses"] = [
+            {"license": {"id": "Apache-2.0"}},
+            {
+                "license": {
+                    "name": "License with text",
+                    "text": {"content": "Full text"},
+                }
+            },
+        ]
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_dont_delete_id(self):
+        self.component["licenses"] = [
+            {"license": {"id": "Apache-2.0"}},
+        ]
+        expected = copy.deepcopy(self.component)
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_dont_delete_expression(self):
+        self.component["licenses"] = [
+            {"expression": "Apache-2.0 AND (MIT OR GPL-2.0-only)"},
+        ]
+        expected = copy.deepcopy(self.component)
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_dont_delete_name_with_text(self):
+        self.component["licenses"] = [
+            {"license": {"name": "Some license", "text": {"content": "Full text"}}},
+        ]
+        expected = copy.deepcopy(self.component)
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
 
 
 if __name__ == "__main__":

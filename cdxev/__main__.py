@@ -1,15 +1,22 @@
 import argparse
+import inspect
 import json
 import logging
 import os
 import re
+import shutil
 import sys
+import textwrap
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List, NoReturn, Optional, Tuple
+from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
 
+import docstring_parser
+
+import cdxev.amend.command as amend
 import cdxev.set
 from cdxev import pkg
-from cdxev.amend.command import run as amend
+from cdxev.amend.operations import Operation
 from cdxev.auxiliary.identity import Key, KeyType
 from cdxev.auxiliary.output import write_sbom
 from cdxev.build_public_bom import build_public_bom
@@ -172,29 +179,176 @@ def add_output_argument(parser: argparse.ArgumentParser) -> None:
     )
 
 
+@dataclass
+class _AmendOperationDetails:
+    cls: type[Operation]
+    name: str
+    short_description: str
+    long_description: str
+    options: list[dict]
+    is_default: bool
+
+
+_upper_case_letters_after_first = re.compile(r"(?<!^)(?=[A-Z])")
+
+
+def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
+    """
+    Gets details about an amend operation which are required for the argument parser.
+
+    :param cls: The operation class. Must be a subclass of :py:class:`Operation`.
+    :return: Details about the operation documentation and its options.
+    """
+    if TYPE_CHECKING:
+        # Shut up mypy. If these assertions don't hold,
+        # integration tests will break, so no problem at runtime.
+        assert cls.__doc__ is not None  # nosec B101
+        assert cls.__init__.__doc__ is not None  # nosec B101
+    op_name = re.sub(_upper_case_letters_after_first, "-", cls.__name__).lower()
+    op_doc = docstring_parser.parse(cls.__doc__)
+    op_short_help = op_doc.short_description
+    op_long_help = op_doc.long_description
+    op_is_default = getattr(cls, "_amendDefault", False)
+    init_sig = inspect.signature(cls.__init__)
+    init_params = {
+        name: param
+        for name, param in init_sig.parameters.items()
+        if name not in ("self", "args", "kwargs")
+    }
+    init_doc = docstring_parser.parse(cls.__init__.__doc__)
+
+    args = []
+    for name, param in init_params.items():
+        if name == "self":
+            continue
+
+        param_doc = next(p for p in init_doc.params if p.arg_name == name)
+        args.append(
+            {
+                "dest": name,
+                "name": "--" + name.replace("_", "-"),
+                "type": param.annotation,
+                "default": param.default,
+                "help": param_doc.description,
+            }
+        )
+
+    return _AmendOperationDetails(
+        cls=cls,
+        name=op_name,
+        short_description=op_short_help or "",
+        long_description=op_long_help or "",
+        is_default=op_is_default,
+        options=args,
+    )
+
+
+def reflow_paragraphs(text: str, indent: int = 8) -> str:
+    """
+    Reformats a string comprised of several paragraphs to properly output it to the console.
+
+    This function considers double newlines ('\\n\\n') paragraph breaks and will preserve them.
+    Any other whitespace, including single newlines will be collapsed.
+
+    The width of the final string is equal to the terminal width but capped at 160 characters.
+
+    :param text: The string to reformat.
+    :param indent: The number of spaces to add before each line.
+    :returns: The reformatted string.
+    """
+    max_width = min(shutil.get_terminal_size()[0], 160)
+    textwrapper = textwrap.TextWrapper(
+        width=max_width,
+        initial_indent=" " * indent,
+        subsequent_indent=" " * indent,
+    )
+    text = textwrap.dedent(text)
+    paragraphs = [textwrapper.fill(para) for para in text.split("\n\n")]
+
+    return "\n\n".join(paragraphs)
+
+
 # noinspection PyUnresolvedReferences,PyProtectedMember
 def create_amend_parser(
     subparsers: argparse._SubParsersAction,
 ) -> argparse.ArgumentParser:
+    description = (
+        "The amend command splits its functionality into several operations.\n"
+        "You can select which operations run using the --operation option. "
+        "If you don't, operations marked [default] will run.\n"
+        "The following operations are available:\n\n"
+    )
+
+    operations = amend.get_all_operations()
+    operation_details = [get_operation_details(op) for op in operations]
+    operation_details = sorted(operation_details, key=lambda op: op.name)
+
+    operations_by_name: dict[str, _AmendOperationDetails] = {}
+    argument_groups: dict[str, list[dict]] = {}
+    default_operations: list[str] = []
+    for op in operation_details:
+        setattr(op.cls, "_details", op)
+
+        # Add operation to map
+        operations_by_name[op.name] = op
+
+        # Prepare options to add them to the parser later
+        if op.options:
+            argument_groups[op.name] = op.options
+
+        # Add operation to help text
+        if op.is_default:
+            default_operations.append(op.name)
+            description += f"    {op.name} [default]:\n"
+        else:
+            description += f"    {op.name}:\n"
+
+        desc = reflow_paragraphs(op.short_description)
+        description += desc + "\n\n"
+
     parser = subparsers.add_parser(
         "amend",
         help="Adds missing auto-generatable information to an existing SBOM",
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "input",
         metavar="<input>",
         help="Path to the SBOM file.",
         type=Path,
+        default=None,
+        nargs="?",
     )
     parser.add_argument(
-        "--license-path",
-        metavar="<license-path>",
-        help="Path to a folder with txt-files containing license texts to be copied in the SBOM",
-        type=str,
-        default="",
+        "--operation",
+        help=(
+            "Select an operation to run. Can be provided more than once to run multiple "
+            "operations in one run."
+        ),
+        choices=list(operations_by_name.keys()),
+        metavar="<operation>",
+        default=default_operations,
+        action="append",
     )
+    parser.add_argument(
+        "--help-operation",
+        help="Displays details about an operation and exits afterwards.",
+        choices=list(operations_by_name.keys()),
+        metavar="<operation>",
+    )
+
+    # Add arguments for operation options
+    for group, args in argument_groups.items():
+        group_parser = parser.add_argument_group(f"Options for '{group}'")
+        for opt in args:
+            name = opt["name"]
+            del opt["name"]
+            group_parser.add_argument(name, **opt)
+
     add_output_argument(parser)
 
+    parser.set_defaults(operations_by_name=operations_by_name)
     parser.set_defaults(cmd_handler=invoke_amend)
     return parser
 
@@ -469,8 +623,39 @@ def create_build_public_bom_parser(
 
 
 def invoke_amend(args: argparse.Namespace) -> int:
+    if args.help_operation:
+        short_desc = args.operations_by_name[args.help_operation].short_description
+        long_desc = reflow_paragraphs(
+            args.operations_by_name[args.help_operation].long_description, indent=0
+        )
+
+        print()
+        print(short_desc)
+        print("-" * len(short_desc))
+        print()
+        print(long_desc)
+        print()
+
+        sys.exit()
+
+    if not args.input:
+        usage_error("<input> argument missing.")
+
     sbom, _ = read_sbom(args.input)
-    amend(sbom, args.license_path)
+
+    # Prepare the operation options that were passed on the command-line
+    config = {}
+    operations = []
+    for op in args.operation:
+        details = args.operations_by_name[op]
+        operations.append(details.cls)
+        op_arguments = {}
+        for opt in details.options:
+            dest = opt["dest"]
+            op_arguments[dest] = getattr(args, dest)
+        config[op] = op_arguments
+
+    amend.run(sbom, operations, config)
     write_sbom(sbom, args.output)
     return _STATUS_OK
 

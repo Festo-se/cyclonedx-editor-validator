@@ -8,24 +8,13 @@ Before use, please consider the [known limitations](https://festo-se.github.io/c
 
 ## amend
 
-This command accepts a single input file and will add any missing fields to it which can be automatically inferred.
+This command accepts a single input file and will apply one or multiple *operations* to it. Each operation modifies certain aspects of the SBOM. These modifications cannot be targetted at individual components in the SBOM which sets the *amend* command apart from *set*. It's use-case is ensuring an SBOM fulfils certain requirements in an automated fashion.
 
-Currently, the command adds or modifies the following pieces of information:
+See the command help with `cdx-ev amend --help` for a list of available operations. All operations marked `[default]` will run unless the command-line option `--operation` is provided.
 
-* If the SBOM metadata doesn't specify an *author* from the SBOM, it will be set to `{"name": "automated"}`.
-* The *compositions* array will be overwritten with a new one which specifies a single *incomplete* aggregate. This aggregate contains all components, including the metadata component.
-* If a component does have a publisher and/or author but does not have a *supplier*, the tool will try to infer the `supplier.name` from the fields (in order of precedence):
-  * *publisher*
-  * *author*
-* If a component contains externalReferences and no supplier.url is provided, the tool will try to infer the *supplier.url* from (in order of precedence):
-  * *externalReferences* of type *website*
-  * *externalReferences* of type *issue-tracker*
-  * *externalReferences* of type *vcs*
-* Generates a *bom-ref* for components which don't have one, yet. The *bom-ref* will be a GUID.
-* If the path to a folder with license text files is provided, the text will be included in the SBOM, if the license has the corresponding `name`.
-* If a `license.name` is similar to an SPDX-ID, it will be replaced, e.g. `{"license": {"name": "The Apache License, Version 2.0"}}` leads to `{"license": {"id": "Apache-2.0"}}`. For this purpose a [JSON-file](https://github.com/Festo-se/cyclonedx-editor-validator/blob/main/cdxev/amend/license_name_spdx_id_map.json) is used, where we provide a mapping of license names to SPDX-IDs, based on this [license-mapping](https://github.com/CycloneDX/cyclonedx-core-java/blob/master/src/main/resources/license-mapping.json).
-* If the SBOM contains a license which `name` includes any variation of the letter sequence "unknown" and no or an empty `text`, the license will be removed. Empty `licenses` fields will also be removed.
-* If neither `licenses` nor `copyright` exist but a `supplier.name` is present, the tool will create a `copyright` with the content "Copyright (c) `current year` `supplier.name`". For example "Copyright (c) 2024 Acme Inc." is created from the `{"supplier":{"name": "Acme Inc."}}` in the year 2024.
+For more information on a particular operation, use the `cdx-ev amend --help-operation <operation>` command.
+
+Note that the order of operations cannot be controlled. If you want to ensure two operations run in a certain order you must run the command twice, each time with a different set of operations.
 
 ### Copy license texts from files
 

@@ -191,23 +191,20 @@ With the `--schema-path` flag, users can supply their own schema to the validato
 
     cdx-ev validate bom.json --schema-path=C:\users\documents\sbom_schemas\example_schema.json  # uses a schema "example_schema.json" saved on the users computer to verify the sbom
 
-### Validation of file name
+### Validation of filename
 
-According to the [CycloneDX specification](https://cyclonedx.org/specification/overview/#recognized-file-patterns) there are commonly recognized file name patterns: `bom.json` and `*.cdx.json`.
+The tool, by default, also validates the filename of the SBOM. Which filenames are accepted depends on several command-line options:
 
-For unification this tool also validates the file name. Per default the following "regex" is validated:
+* `--no-filename-validation` completely disables validation.
+* Use `--filename-pattern` to provide a custom regex. The filename must be a full match, regex anchors (^ and $) are not required. Regex patterns often include special characters. Pay attention to escaping rules for your shell to ensure proper results.
+* In all other cases, the acceptable filenames depend on the `--schema-type` option:
+  * Using the `default` schema (i.e., vanilla CycloneDX), the validator accepts the two patterns recommended by the [CycloneDX specification](https://cyclonedx.org/specification/overview/#recognized-file-patterns): `bom.json` or `*.cdx.json`.
+  * Using the `custom` schema, filenames must match one of these patterns: `bom.json` or `<name>_<version>_<hash>|<timestamp>|<hash>_<timestamp>.cdx.json`. Read on for some clarifications.
 
-    ^name_version_(hash|timestamp|hash_timestamp).cdx.json$ | ^bom.json$
+`<name>` and `<version>` correspond to the respective fields in `metadata.component` in the SBOM.
 
-Where name, version, hash and timestamp are information of the `metadata` from a SBOM.
-
-If it is desired to have a different Regex, this can be done via the flag `--filename-pattern`, i.e.:
-
-    cdx-ev validate mybom.json --filename-pattern=".*" # every character allowed
-    cdx-ev validate mybom.json --filename-pattern="(^bom\.json$)" # only bom.json allowed
-
-Please note the usage uf quotation marks in the `--filename-pattern`. This is required for the escaping of special characters.
-Otherwise, this may lead to undesired results as your input is not sanitized.
+`<timestamp>` corresponds to `metadata.timestamp` and `<hash>` means any value in `metadata.component.hashes[].content`.  
+Either *timestamp* or *hash* must be present. If both are specified, *hash* must come first.
 
 ### Logging
 

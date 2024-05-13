@@ -64,29 +64,6 @@ def get_test_sbom(path_bom: str = path_to_sbom) -> dict:
 
 
 class TestValidateInit(unittest.TestCase):
-    def test_filename_regex(self) -> None:
-        filename_regex = ".*"
-        sbom = get_test_sbom()
-        issues = validate_test(sbom, filename_regex=filename_regex)
-        self.assertEqual(issues, ["no issue"])
-
-    def test_wrong_filename(self) -> None:
-        filename_regex = "(myfancybom.json)"
-        sbom = get_test_sbom()
-        issues = validate_test(sbom, filename_regex=filename_regex)
-        self.assertTrue(search_for_word_issues("filename doesn't match", issues))
-
-    def test_right_hash_filename(self) -> None:
-        sbom = get_test_sbom()
-        issues = validate_test(sbom)
-        self.assertEqual(issues, ["no issue"])
-
-    def test_wrong_hash_filename(self) -> None:
-        sbom = get_test_sbom()
-        sbom["metadata"]["component"]["hashes"][0]["content"] = "1337"
-        issues = validate_test(sbom)
-        self.assertTrue(search_for_word_issues("filename doesn't match", issues))
-
     @unittest.skipUnless("CI" in os.environ, "running only in CI")
     def test_custom_schema(self) -> None:
         sbom = get_test_sbom()

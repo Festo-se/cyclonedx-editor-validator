@@ -5,7 +5,8 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from cdxev.error import AppError
-from cdxev.validator.validate import validate_filename, validate_sbom
+from cdxev.validator.helper import validate_filename
+from cdxev.validator.validate import validate_sbom
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_validate_sboms/"
 

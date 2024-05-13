@@ -7,10 +7,9 @@ from jsonschema import Draft7Validator, FormatChecker
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 
-from cdxev.auxiliary.filename_gen import generate_validation_pattern
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
-from cdxev.validator.helper import load_spdx_schema, open_schema
+from cdxev.validator.helper import load_spdx_schema, open_schema, validate_filename
 
 logger = logging.getLogger(__name__)
 
@@ -172,21 +171,3 @@ def validate_sbom(
                 )
             )
         return 1
-
-
-def validate_filename(
-    filename: str,
-    regex: str,
-    sbom: dict,
-    schema_type: str,
-) -> t.Union[t.Literal[False], str]:
-    if not regex:
-        if schema_type == "default":
-            regex = "^(bom\\.json|.+\\.cdx\\.json)$"
-        else:
-            regex = generate_validation_pattern(sbom)
-
-    if re.fullmatch(regex, filename) is None:
-        return "filename doesn't match regular expression " + regex
-    else:
-        return False

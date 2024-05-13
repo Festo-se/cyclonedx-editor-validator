@@ -294,14 +294,16 @@ def create_validation_parser(
     parser.add_argument(
         "--filename-pattern",
         help=(
-            "Regex for validation of file name. If not specified, a default regex depending on "
+            "Regex for validation of filename. If not specified, a default regex depending on "
             "the schema-type is applied. To disable filename validation altogether, use "
-            "--no-filename."
+            "--no-filename-validation."
         ),
         default="",
     )
     parser.add_argument(
-        "--no-filename", help="Disable filename validation", action="store_true"
+        "--no-filename-validation",
+        help="Disable filename validation",
+        action="store_true",
     )
     parser.add_argument(
         "--schema-path",
@@ -621,7 +623,9 @@ def invoke_validate(args: argparse.Namespace) -> int:
             report_format=report_format,
             output=output,
             schema_type=args.schema_type,
-            filename_regex=None if args.no_filename else args.filename_pattern,
+            filename_regex=(
+                None if args.no_filename_validation else args.filename_pattern
+            ),
             schema_path=args.schema_path,
         )
         == _STATUS_OK

@@ -1,7 +1,10 @@
 import json
+import re
+import typing as t
 from importlib import resources
 from pathlib import Path
 
+from cdxev.auxiliary.filename_gen import generate_validation_pattern
 from cdxev.error import AppError
 
 
@@ -74,3 +77,21 @@ def get_external_schema(schema_path: Path) -> tuple[dict, Path]:
             "Could not load schema",
             ("Path to the provided schema does not exist"),
         )
+
+
+def validate_filename(
+    filename: str,
+    regex: str,
+    sbom: dict,
+    schema_type: str,
+) -> t.Union[t.Literal[False], str]:
+    if not regex:
+        if schema_type == "default":
+            regex = "^(bom\\.json|.+\\.cdx\\.json)$"
+        else:
+            regex = generate_validation_pattern(sbom)
+
+    if re.fullmatch(regex, filename) is None:
+        return "filename doesn't match regular expression " + regex
+    else:
+        return False

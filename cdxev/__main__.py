@@ -653,7 +653,7 @@ def invoke_amend(args: argparse.Namespace) -> int:
         for opt in details.options:
             dest = opt["dest"]
             op_arguments[dest] = getattr(args, dest)
-        config[op] = op_arguments
+        config[details.cls] = op_arguments
 
     amend.run(sbom, operations, config)
     write_sbom(sbom, args.output)

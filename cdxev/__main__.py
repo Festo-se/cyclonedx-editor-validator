@@ -328,7 +328,6 @@ def create_amend_parser(
         ),
         choices=list(operations_by_name.keys()),
         metavar="<operation>",
-        default=default_operations,
         action="append",
     )
     parser.add_argument(
@@ -349,6 +348,7 @@ def create_amend_parser(
     add_output_argument(parser)
 
     parser.set_defaults(operations_by_name=operations_by_name)
+    parser.set_defaults(default_operations=default_operations)
     parser.set_defaults(cmd_handler=invoke_amend)
     return parser
 
@@ -646,7 +646,7 @@ def invoke_amend(args: argparse.Namespace) -> int:
     # Prepare the operation options that were passed on the command-line
     config = {}
     operations = []
-    for op in args.operation:
+    for op in args.operation or args.default_operations:
         details = args.operations_by_name[op]
         operations.append(details.cls)
         op_arguments = {}

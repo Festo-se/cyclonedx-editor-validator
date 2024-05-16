@@ -60,18 +60,15 @@ The following things are to consider before submitting a pull request.
 
 ### Commit Message Format
 
-Git commit messages are important for several reasons:
+The message format was mainly inspired by the [guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines) of Angular.
 
-**Communication**: Commit messages serve as a form of communication between developers working on a project. They allow team members to understand the changes made in a commit without having to dig into the code. Clear and descriptive commit messages make it easier for everyone to understand the intent and context of the changes.
+Please use the following format:
 
-**Documentation**: Commit messages act as a form of documentation for a project's history. They provide a chronological record of changes made to the codebase, making it easier to track the evolution of the project over time. Well-written commit messages can help future developers understand the reasoning behind certain decisions or bug fixes.
+```format
+<type>: <subject>
+```
 
-**Collaboration**: They allow team members to coordinate their efforts, avoid conflicts, and understand the progress made by others. With informative commit messages, developers can easily identify which changes are related to a specific feature or bug fix, making it easier to merge code and resolve conflicts.
-
-#### Message content
-The message content was mainly inspired by the [guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines) of Angular.
-
-##### Type
+#### Type
 
 Must be one of the following:
 
@@ -82,7 +79,7 @@ Must be one of the following:
 - **tests**: Adding missing or correcting existing tests
 - **chore**: Changes to the build process or auxiliary tools and libraries such as documentation generation
 
-##### Subject
+#### Subject
 
 The subject contains succinct description of the change:
 
@@ -91,16 +88,9 @@ The subject contains succinct description of the change:
 - No dot (.) at the end
 - Do not describe the reason of the change, describe the content of the change (what, not why).
 
-#### Message format
-
-```format
-<type>: <subject>
-```
-
-##### Examples
+#### Examples
 `fix: do not add license option to default operations`
 
 `feat: add 'amend' option`
 
 `refactor: apply black`
-

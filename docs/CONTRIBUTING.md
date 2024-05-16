@@ -66,6 +66,8 @@ Please use the following format:
 
 ```format
 <type>: <subject>
+
+<optional footer with additional details>
 ```
 
 #### Type

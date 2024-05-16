@@ -21,7 +21,7 @@ Feel free to assign issues to yourself and make changes to our tool. Please cons
 - For compatibility reasons, the code should be compliant to python 3.9 or higher.
 - Make sure to use the latest code by performing a `git pull`.
 - For a major change it is recommended that you get in touch with us by [creating an issue](#create-issues) to discuss changes prior to dedicating time and resources. This process allows us to better coordinate our efforts and prevent duplication of work.
-- Commit your changes using a descriptive commit message that follows our [commit message format](##commit-message-format). This is required as we generate our release notes from these messages.
+- Commit your changes using a descriptive commit message that follows our [commit message format](##commit-message-format). The same applies for titles of PRs. This is required as we generate our release notes from these messages.
 - Otherwise, feel free to directly [submit a pull request](#submitting-pull-requests).
 
 ### Write new commands, options or arguments

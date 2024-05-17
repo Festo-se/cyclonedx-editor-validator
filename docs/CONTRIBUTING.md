@@ -20,7 +20,8 @@ Feel free to assign issues to yourself and make changes to our tool. Please cons
 
 - For compatibility reasons, the code should be compliant to python 3.9 or higher.
 - Make sure to use the latest code by performing a `git pull`.
-- For a major change it is recommended that you get in touch with us by [creating an issue](#create-issues) to discuss changes prior to dedicating time and resources.  This process allows us to better coordinate our efforts and prevent duplication of work.
+- For a major change it is recommended that you get in touch with us by [creating an issue](#create-issues) to discuss changes prior to dedicating time and resources. This process allows us to better coordinate our efforts and prevent duplication of work.
+- Commit your changes using a descriptive commit message that follows our [commit message format](##commit-message-format). The same applies for titles of PRs. This is required as we generate our release notes from these messages.
 - Otherwise, feel free to directly [submit a pull request](#submitting-pull-requests).
 
 ### Write new commands, options or arguments
@@ -56,3 +57,42 @@ The following things are to consider before submitting a pull request.
 [black]: https://black.readthedocs.io/en/stable/index.html
 [pep8]: https://www.python.org/dev/peps/pep-0008/
 [mypy]: https://www.mypy-lang.org/
+
+### Commit Message Format
+
+The message format was mainly inspired by the [guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines) of Angular.
+
+Please use the following format:
+
+```format
+<type>: <subject>
+
+<optional footer with additional details>
+```
+
+#### Type
+
+Must be one of the following:
+
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **refactor**: A code change that neither fixes a bug nor adds a feature. (e.g., style or performance changes)
+- **tests**: Adding missing or correcting existing tests
+- **chore**: Changes to the build process or auxiliary tools and libraries such as documentation generation
+
+#### Subject
+
+The subject contains succinct description of the change:
+
+- Use the imperative, present tense: "change" not "changed" nor "changes"
+- Don't capitalize first letter
+- No dot (.) at the end
+- Do not describe the reason of the change, describe the content of the change (what, not why).
+
+#### Examples
+`fix: do not add license option to default operations`
+
+`feat: add 'amend' option`
+
+`refactor: apply black`

@@ -4,7 +4,7 @@
     "specVersion": "1.4",
     "version": 2,
     "metadata": {
-        "timestamp": "2024-04-08T11:32:52+00:00",
+        "timestamp": "2024-05-23T13:35:20+00:00",
         "tools": [
             {
                 "vendor": "Company SE",
@@ -26,8 +26,7 @@
             "purl": "pkg:npm/test-app@1.0.0",
             "supplier": {
                 "name": "Company SE"
-            },
-            "copyright": "Copyright (c) 2024 Company SE"
+            }
         },
         "authors": [
             {
@@ -70,7 +69,6 @@
             "version": "1.2.3",
             "bom-ref": "some-vendor/depB@1.2.3",
             "author": "dude@some-vendor.com",
-            "copyright": "Some Vendor Inc.",
             "supplier": {
                 "name": "Some Vendor Inc.",
                 "url": [
@@ -228,9 +226,8 @@
     ],
     "compositions": [
         {
-            "aggregate": "incomplete",
+            "aggregate": "unknown",
             "assemblies": [
-                "pkg:npm/test-app@1.0.0",
                 "com.company.unit/depA@4.0.2",
                 "some-vendor/depB@1.2.3",
                 "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
@@ -241,5 +238,5 @@
             ]
         }
     ],
-    "serialNumber": "urn:uuid:b8230680-efa0-465d-b508-83c946d51122"
+    "serialNumber": "urn:uuid:f2d960f3-b714-4a73-b11a-cb2f51263b0d"
 }

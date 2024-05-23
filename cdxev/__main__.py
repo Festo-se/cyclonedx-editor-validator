@@ -426,16 +426,9 @@ def create_validation_parser(
         help="Path to the SBOM file to validate.",
         type=Path,
     )
-    parser.add_argument(
-        "--report-format",
-        help=(
-            "Write log output in a specified format. "
-            "If it's not specified, output is written to stdout."
-        ),
-        choices=["stdout", "warnings-ng", "gitlab-code-quality"],
-        default="stdout",
-    )
-    parser.add_argument(
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         "--schema-type",
         help=(
             "Decide whether to use the default specification of CycloneDX or a custom schema. "
@@ -445,21 +438,7 @@ def create_validation_parser(
         choices=["default", "strict", "custom"],
         default="default",
     )
-    parser.add_argument(
-        "--filename-pattern",
-        help=(
-            "Regex for validation of filename. If not specified, a default regex depending on "
-            "the schema-type is applied. To disable filename validation altogether, use "
-            "--no-filename-validation."
-        ),
-        default="",
-    )
-    parser.add_argument(
-        "--no-filename-validation",
-        help="Disable filename validation",
-        action="store_true",
-    )
-    parser.add_argument(
+    group.add_argument(
         "--schema-path",
         metavar="<schema-path>",
         help=(
@@ -468,6 +447,32 @@ def create_validation_parser(
             " to use one of the embedded schemata."
         ),
         type=str,
+    )
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--filename-pattern",
+        help=(
+            "Regex for validation of filename. If not specified, a default regex depending on "
+            "the schema-type is applied. To disable filename validation altogether, use "
+            "--no-filename-validation."
+        ),
+        default="",
+    )
+    group.add_argument(
+        "--no-filename-validation",
+        help="Disable filename validation",
+        action="store_true",
+    )
+
+    parser.add_argument(
+        "--report-format",
+        help=(
+            "Write log output in a specified format. "
+            "If it's not specified, output is written to stdout."
+        ),
+        choices=["stdout", "warnings-ng", "gitlab-code-quality"],
+        default="stdout",
     )
 
     add_output_argument(parser)

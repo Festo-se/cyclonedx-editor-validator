@@ -16,17 +16,130 @@ For more information on a particular operation, use the `cdx-ev amend --help-ope
 
 Note that the order of operations cannot be controlled. If you want to ensure two operations run in a certain order you must run the command twice, each time with a different set of operations.
 
-### Copy license texts from files
+### Insert license texts from files
 
-The program can copy the text describing a license from a specific file into the SBOM, if a license name is given.
+The operation `add-license-text` can be used to insert known full license texts for licenses identified by name. You can use this, for instance, in workflows where SBOMs are created or edited by hand - so a clutter-free JSON is preferred - then, in a last step, full texts are inserted using this operation.
 
-This is done by submitting the path to a folder containing txt-files with the license text via the command `--license-path`.
-If for example the license name "Apache License 1.0" is given, the program will search in the provided folder for the file "Apache License 1.0.txt" and copy its content in the `text` field.
-The txt-files in the folder must follow the naming convention name.txt.
+License texts are inserted only if:
 
-    cdx-ev amend bom.json" --license-path=C:\Documents\licenses
+* The license has a `name` field.
+* The license has no `id` field.
+* The license has no or an empty `text.content` field.
+* A matching file is found.
 
-If a `text` field already exists, its content will be replaced.
+You must provide one file per license text in a flat directory. The filename must match the license name specified in the SBOM. The filename's extension (anything after and including the last period) can be present in the license name but it doesn't need to.
+
+__Example:__
+Given this license in the input:
+
+    {
+        "license": {
+            "name": "My license"
+        }
+    }
+
+it would be filled with the text in any file named `My license`, `My license.txt`, `My license.md`, or any other extension.  
+However, the file `My license.2.txt` would be ignored, because with or without it's extension (`.txt`), it doesn't match the license name.
+
+## build-public
+
+This command creates a reduced version of an SBOM fit for publication. It:
+
+* deletes components matching a JSON schema provided by the user, and
+* removes any *property* (i.e., item in the `properties` array of a component) whose name starts with `internal:` from all components.
+
+The actions are performed in this order, meaning that *internal* properties will be taken into account when matching the JSON schema.
+
+The JSON schema must be formulated according to the Draft 7 specification.
+
+### Dependency-resolution
+
+Any components deleted by this command are equally removed from the dependency graph. Their dependencies are assigned as new dependencies to their dependents.
+
+![Dependencies of deleted components are assigned to their dependents.](img/dependency-resolution.svg)
+
+### Examples
+
+Here are some JSON schemata for common scenarios to get you started.
+
+When passed to the command, this schema will remove any component whose `group` is `com.acme.internal`.
+
+    {
+        "properties": {
+            "group": {
+                "const": "com.acme.internal"
+            }
+        },
+        "required": ["group"]
+    }
+
+An extension of the above, the next schema will delete any component with that `group`, __unless__ it contains a property with the name `internal:public` and the value `true`.
+*Note that the property itself will still be removed from the component, because its name starts with `internal:`.*
+
+    {
+        "properties": {
+            "group": {
+                "const": "com.acme.internal"
+            }
+        },
+        "required": ["group"],
+        "not": {
+            "properties": {
+                "properties": {
+                    "contains": {
+                        "properties": {
+                            "name": {
+                                "const": "internal:public"
+                            },
+                            "value": {
+                                "const": "true"
+                            }
+                        },
+                        "required": ["name", "value"]
+                    }
+                }
+            },
+            "required": ["properties"]
+        }
+    }
+
+This schema will delete the three components with the names `AcmeSecret`, `AcmeNotPublic` and `AcmeSensitive`:
+
+    {
+        "properties": {
+            "name": {
+                "enum": ["AcmeSecret", "AcmeNotPublic", "AcmeSensitive"]
+            }
+        },
+        "required": ["name"]
+    }
+
+The following schema is a little more involved. It will delete any component whose license text contains the string `This must not be made public`.
+
+    {
+        "properties": {
+            "licenses": {
+                "contains": {
+                    "properties": {
+                        "license": {
+                            "properties": {
+                                "text": {
+                                    "properties": {
+                                        "content": {
+                                            "pattern": "This must not be made public"
+                                        }
+                                    }
+                                }
+                            },
+                            "required": ["text"]
+                        }
+                    },
+                    "required": ["license"]
+                }
+            }
+        },
+        "required": ["licenses"]
+    }
 
 ## merge
 
@@ -187,7 +300,7 @@ The tool, by default, also validates the filename of the SBOM. Which filenames a
 * `--no-filename-validation` completely disables validation.
 * Use `--filename-pattern` to provide a custom regex. The filename must be a full match, regex anchors (^ and $) are not required. Regex patterns often include special characters. Pay attention to escaping rules for your shell to ensure proper results.
 * In all other cases, the acceptable filenames depend on the `--schema-type` option:
-  * Using the `default` schema (i.e., vanilla CycloneDX), the validator accepts the two patterns recommended by the [CycloneDX specification](https://cyclonedx.org/specification/overview/#recognized-file-patterns): `bom.json` or `*.cdx.json`.
+  * When no `--schema-type` is provided or it is explicitly set to `default` (i.e., vanilla CycloneDX), the validator accepts the two patterns recommended by the [CycloneDX specification](https://cyclonedx.org/specification/overview/#recognized-file-patterns): `bom.json` or `*.cdx.json`.
   * Using the `custom` schema, filenames must match one of these patterns: `bom.json` or `<name>_<version>_<hash>|<timestamp>|<hash>_<timestamp>.cdx.json`. Read on for some clarifications.
 
 `<name>` and `<version>` correspond to the respective fields in `metadata.component` in the SBOM.
@@ -211,109 +324,3 @@ Examples:
 
     # Write only a report in GitLab Code Quality format to cq.json
     cdx-ev --quiet validate bom.json --report-format=gitlab-code-quality --report-path=cq.json
-
-## build-public
-
-This command creates a reduced version of an SBOM fit for publication.
-
-If no JSON schema is provided the command:
-
-* removes any *property* (i.e., item in the `properties` array of a component) whose namespace starts with `internal:` from all components, according to [CycloneDX property namespace and name taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy#registered-top-level-namespaces).
-
-If the user provides a JSON schema with the `--schema_path` option, it:
-
-* deletes components matching a JSON schema provided by the user, and
-* removes any *property* (i.e., item in the `properties` array of a component) whose name starts with `internal:` from all components.
-
-The actions are performed in this order, meaning that *internal* properties will be taken into account when matching the JSON schema.
-
-The JSON schema must be formulated according to the Draft 7 specification.
-
-### Dependency-resolution
-
-Any components deleted by this command are equally removed from the dependency graph. Their dependencies are assigned as new dependencies to their dependents.
-
-![Dependencies of deleted components are assigned to their dependents.](img/dependency-resolution.svg)
-
-### Examples
-
-Here are some JSON schemata for common scenarios to get you started.
-
-When passed to the command, this schema will remove any component whose `group` is `com.acme.internal`.
-
-    {
-        "properties": {
-            "group": {
-                "const": "com.acme.internal"
-            }
-        },
-        "required": ["group"]
-    }
-
-An extension of the above, the next schema will delete any component with that `group`, __unless__ it contains a property with the name `internal:public` and the value `true`.
-*Note that the property itself will still be removed from the component, because its name starts with `internal:`.*
-
-    {
-        "properties": {
-            "group": {
-                "const": "com.acme.internal"
-            }
-        },
-        "required": ["group"],
-        "not": {
-            "properties": {
-                "properties": {
-                    "contains": {
-                        "properties": {
-                            "name": {
-                                "const": "internal:public"
-                            },
-                            "value": {
-                                "const": "true"
-                            }
-                        },
-                        "required": ["name", "value"]
-                    }
-                }
-            },
-            "required": ["properties"]
-        }
-    }
-
-This schema will delete the three components with the names `AcmeSecret`, `AcmeNotPublic` and `AcmeSensitive`:
-
-    {
-        "properties": {
-            "name": {
-                "enum": ["AcmeSecret", "AcmeNotPublic", "AcmeSensitive"]
-            }
-        },
-        "required": ["name"]
-    }
-
-The following schema is a little more involved. It will delete any component whose license text contains the string `This must not be made public`.
-
-    {
-        "properties": {
-            "licenses": {
-                "contains": {
-                    "properties": {
-                        "license": {
-                            "properties": {
-                                "text": {
-                                    "properties": {
-                                        "content": {
-                                            "pattern": "This must not be made public"
-                                        }
-                                    }
-                                }
-                            },
-                            "required": ["text"]
-                        }
-                    },
-                    "required": ["license"]
-                }
-            }
-        },
-        "required": ["licenses"]
-    }

@@ -277,21 +277,27 @@ So only a message that the component was not found and could not be updated is l
 
 ## validate
 
-This command is used to validate the SBOM according to a specification.
+This command is used to validate the SBOM against a JSON schema.
 
-### Use of different schemas
+### Schema selection
 
-The package is currently delivered with the specification for CycloneDX 1.3 and 1.4. Further, it is provided with a custom schema, which not only requires the minimum elements as defined by the [NTIA](https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf) but also some further recommended fields, e.g. licenses and stating the known unknowns (through the `compositions`-field).
-You can control the usage of the specification with the flag `--schema-type`:
+This tool can validate SBOMs against any user-provided JSON schema but for convenience, two schema types are built in:
 
-    cdx-ev validate bom.json --schema-type=custom # use provided custom schema in package
-    cdx-ev validate bom.json # default CycloneDX specification will be used
+* The *default* schema type validates against the [stock CycloneDX schema](https://github.com/CycloneDX/specification).
+* The *custom* schema type uses a more restrictive schema which accepts a subset of CycloneDX. Additional requirements incorporated into the schema mostly originate from the [NTIA](https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf) but also include some of the authors' recommendations.
 
-### Use of local schema
+You can select the schema with the `--schema-type` and `--schema-path` options:
 
-With the `--schema-path` flag, users can supply their own schema to the validator.
+    cdx-ev validate bom.json [--schema-type default]           # stock CycloneDX schema
+    cdx-ev validate bom.json --schema-type custom              # built-in custom schema
+    cdx-ev validate bom.json --schema-path <json_schema.json>  # your own schema
 
-    cdx-ev validate bom.json --schema-path=C:\users\documents\sbom_schemas\example_schema.json  # uses a schema "example_schema.json" saved on the users computer to verify the sbom
+For all built-in schemas, the tool attempts to determine the correct CycloneDX version from the input SBOM and falls back to version 1.3 if that fails. The following versions are currently supported:
+
+| Type | Supported CycloneDX versions |
+| ---- | ---------------------------- |
+| `default` | 1.2 to 1.5 |
+| `custom` | 1.3 to 1.5 |
 
 ### Validation of filename
 
@@ -299,9 +305,9 @@ The tool, by default, also validates the filename of the SBOM. Which filenames a
 
 * `--no-filename-validation` completely disables validation.
 * Use `--filename-pattern` to provide a custom regex. The filename must be a full match, regex anchors (^ and $) are not required. Regex patterns often include special characters. Pay attention to escaping rules for your shell to ensure proper results.
-* In all other cases, the acceptable filenames depend on the `--schema-type` option:
-  * When no `--schema-type` is provided or it is explicitly set to `default` (i.e., vanilla CycloneDX), the validator accepts the two patterns recommended by the [CycloneDX specification](https://cyclonedx.org/specification/overview/#recognized-file-patterns): `bom.json` or `*.cdx.json`.
-  * Using the `custom` schema, filenames must match one of these patterns: `bom.json` or `<name>_<version>_<hash>|<timestamp>|<hash>_<timestamp>.cdx.json`. Read on for some clarifications.
+* In all other cases, the acceptable filenames depend on the selected schema:
+  * When using the stock CycloneDX schema (`--schema-type default` or no option at all) or when using your own schema (`--schema-path` option), the validator accepts the two patterns recommended by the [CycloneDX specification](https://cyclonedx.org/specification/overview/#recognized-file-patterns): `bom.json` or `*.cdx.json`.
+  * When validating against the built-in custom schema (`--schema-type custom`), filenames must match one of these patterns: `bom.json` or `<name>_<version>_<hash>|<timestamp>|<hash>_<timestamp>.cdx.json`. Read on for some clarifications.
 
 `<name>` and `<version>` correspond to the respective fields in `metadata.component` in the SBOM.
 

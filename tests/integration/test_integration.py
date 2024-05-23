@@ -1,4 +1,5 @@
 import json
+from itertools import chain
 from pathlib import Path
 from typing import TypedDict
 
@@ -11,15 +12,23 @@ class TestAmend:
     class DataFixture(TypedDict):
         input: Path
         expected: dict
+        operations: list[str]
 
     @pytest.fixture(
         scope="class",
         params=[
             {
                 "input": "amend.input.cdx.json",
-                "expected": "amend.expected.cdx.json",
-            }
+                "expected": "amend.expected_default.cdx.json",
+                "operations": [],
+            },
+            {
+                "input": "amend.input.cdx.json",
+                "expected": "amend.expected_infer-copyright.cdx.json",
+                "operations": ["infer-copyright"],
+            },
         ],
+        ids=["default operations", "single operation"],
     )
     def data(self, data_dir, request) -> DataFixture:
         input_path = data_dir / request.param["input"]
@@ -29,10 +38,20 @@ class TestAmend:
         return self.DataFixture(
             input=input_path,
             expected=expected_json,
+            operations=request.param["operations"],
         )
 
     def test(self, data: DataFixture, argv, tmp_path, capsys):
-        argv("amend", "--output", str(tmp_path), str(data["input"]))
+        operations = chain.from_iterable(
+            ("--operation", op) for op in data["operations"]
+        )
+        argv(
+            "amend",
+            *operations,
+            "--output",
+            str(tmp_path),
+            str(data["input"]),
+        )
         (exit_code, output_file, _) = run_main(capsys, "filename")
 
         # Verify that command completed successfully

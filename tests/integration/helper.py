@@ -39,7 +39,7 @@ def _delete_tool_version(sbom: dict):
 
     cdxev_tool = next(tool for tool in tools if tool["name"] == cdxev.pkg.NAME)
 
-    if cdxev_tool is not None:
+    if cdxev_tool is not None and "version" in cdxev_tool:
         del cdxev_tool["version"]
 
 

@@ -27,13 +27,16 @@
             ],
             "copyright": "Company Legal 2022, all rights reserved"
         },
-        "tools": [
-            {
-                "name": "cyclonedx-editor-validator",
-                "vendor": "Festo SE & Co. KG",
-                "version": "0"
-            }
-        ]
+        "tools": {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "cyclonedx-editor-validator",
+                    "publisher": "Festo SE & Co. KG",
+                    "version": "0"
+                }
+            ]
+        }
     },
     "components": [
         {

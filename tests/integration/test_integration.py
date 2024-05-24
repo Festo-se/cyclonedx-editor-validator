@@ -10,7 +10,7 @@ import pytest
 import toml
 
 from cdxev.__main__ import Status
-from tests.integration.helper import delete_non_reproducible, load_sbom, run_main
+from tests.integration.helper import load_sbom, run_main
 
 
 def test_help(argv: Callable[..., None], capsys: pytest.CaptureFixture[str]):
@@ -134,7 +134,7 @@ class TestAmend:
         ],
         ids=["default operations", "single operation"],
     )
-    def data(self, data_dir, request) -> DataFixture:
+    def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
         input_path = data_dir / request.param["input"]
         expected_path = data_dir / request.param["expected"]
         expected_json = load_sbom(expected_path)
@@ -145,28 +145,60 @@ class TestAmend:
             operations=request.param["operations"],
         )
 
-    def test(self, data: DataFixture, argv, tmp_path, capsys):
+    def test(
+        self,
+        data: DataFixture,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
         operations = chain.from_iterable(
             ("--operation", op) for op in data["operations"]
         )
         argv(
             "amend",
             *operations,
-            "--output",
-            str(tmp_path),
             str(data["input"]),
         )
-        (exit_code, output_file, _) = run_main(capsys, "filename")
+        exit_code, actual, _ = run_main(capsys, "json")
 
         # Verify that command completed successfully
-        assert exit_code == 0
+        assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        output_path = tmp_path / output_file
-        with output_path.open() as f:
-            actual = json.load(f)
-        delete_non_reproducible(actual)
         assert actual == data["expected"]
+
+    def test_with_operation_arg(
+        self,
+        data_dir: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "amend",
+            "--operation",
+            "add-license-text",
+            "--license-dir",
+            str(data_dir / "license-texts"),
+            str(data_dir / "amend.input_licenses.cdx.json"),
+        )
+        exit_code, actual, _ = run_main(capsys, "json")
+
+        # Verify that command completed successfully
+        assert exit_code == Status.OK
+
+        expected = load_sbom(data_dir / "amend.expected_add-license-text.cdx.json")
+        assert actual == expected
+
+    def test_missing_operation_arg(
+        self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]
+    ):
+        argv("amend", "--operation", "add-license-text", "any.cdx.json")
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+        _, stderr = capsys.readouterr()
+        assert re.search(r"is required for operation", stderr)
 
 
 class TestSet:
@@ -185,7 +217,7 @@ class TestSet:
             }
         ],
     )
-    def data(self, data_dir, request) -> DataFixture:
+    def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
         input_path = data_dir / request.param["input"]
         set_file_path = data_dir / request.param["set_file"]
         expected_path = data_dir / request.param["expected"]
@@ -197,32 +229,39 @@ class TestSet:
             set_file=set_file_path,
         )
 
-    def test(self, data, argv, tmp_path, capsys):
+    def test(
+        self,
+        data: DataFixture,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
         argv(
             "set",
             "--force",
             "--from-file",
             str(data["set_file"]),
-            "--output",
-            str(tmp_path),
             str(data["input"]),
         )
-        (exit_code, output_file, _) = run_main(capsys, "filename")
+        exit_code, actual, _ = run_main(capsys, "json")
 
         # Verify that command completed successfully
-        assert exit_code == 0
+        assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        output_path = tmp_path / output_file
-        with output_path.open() as f:
-            actual = json.load(f)
-        delete_non_reproducible(actual)
         assert actual == data["expected"]
 
 
 class TestValidate:
     # This test function is parametrized by pytest_generate_tests in conftest.py.
-    def test(self, argv, capsys, input, schema_type, expected_result, expected_errors):
+    def test(
+        self,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+        input,
+        schema_type,
+        expected_result,
+        expected_errors,
+    ):
         argv(
             "validate",
             "--schema-type",
@@ -230,14 +269,82 @@ class TestValidate:
             str(input),
         )
         if expected_errors:
-            (exit_code, _, stderr) = run_main(capsys)
+            exit_code, _, stderr = run_main(capsys)
             for e in expected_errors:
                 assert e in stderr
         else:
-            (exit_code, _) = run_main()
+            exit_code, _ = run_main()
 
-        expected_exit_code = {"valid": 0, "invalid": 4}[expected_result]
+        expected_exit_code = {"valid": Status.OK, "invalid": Status.VALIDATION_ERROR}[
+            expected_result
+        ]
         assert exit_code == expected_exit_code
+
+    def test_warnings_ng(
+        self, argv: Callable[..., None], data_dir: Path, tmp_path: Path
+    ):
+        report_path = tmp_path / "issues.json"
+        argv(
+            "validate",
+            "--report-format",
+            "warnings-ng",
+            "--output",
+            str(report_path),
+            str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.VALIDATION_ERROR
+
+        # Assert that the report file exists and has the expected structure
+        assert report_path.is_file()
+        with open(report_path) as f:
+            report = json.load(f)
+        assert "issues" in report
+        assert len(report["issues"]) == 1
+        assert "origin" in report["issues"][0]
+
+    def test_gitlab_cq(self, argv: Callable[..., None], data_dir: Path, tmp_path: Path):
+        report_path = tmp_path / "issues.json"
+        argv(
+            "validate",
+            "--report-format",
+            "gitlab-code-quality",
+            "--output",
+            str(report_path),
+            str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.VALIDATION_ERROR
+
+        # Assert that the report file exists and has the expected structure
+        assert report_path.is_file()
+        with open(report_path) as f:
+            report = json.load(f)
+        assert len(report) == 1
+        assert "check_name" in report[0]
+
+    def test_custom_filename_pattern(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        caplog: pytest.LogCaptureFixture,
+    ):
+        argv(
+            "validate",
+            "--filename-pattern",
+            "fail",
+            str(data_dir / "validate" / "valid" / "default" / "laravel.cdx.json"),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.VALIDATION_ERROR
+        assert len(caplog.records) == 1
+        assert (
+            caplog.records[0].msg.description  # type: ignore
+            == "filename doesn't match regular expression fail"
+        )
 
 
 class TestBuildPublic:
@@ -256,7 +363,7 @@ class TestBuildPublic:
             }
         ],
     )
-    def data(self, data_dir, request) -> DataFixture:
+    def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
         input_path = data_dir / request.param["input"]
         schema_path = data_dir / request.param["schema"]
         expected_path = data_dir / request.param["expected"]
@@ -268,24 +375,23 @@ class TestBuildPublic:
             schema=schema_path,
         )
 
-    def test(self, data, argv, tmp_path, capsys):
+    def test(
+        self,
+        data: DataFixture,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
         argv(
             "build-public",
-            "--output",
-            str(tmp_path),
             str(data["input"]),
             str(data["schema"]),
         )
-        (exit_code, output_file, _) = run_main(capsys, "filename")
+        exit_code, actual, _ = run_main(capsys, "json")
 
         # Verify that command completed successfully
-        assert exit_code == 0
+        assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        output_path = tmp_path / output_file
-        with output_path.open() as f:
-            actual = json.load(f)
-        delete_non_reproducible(actual)
         assert actual == data["expected"]
 
 
@@ -303,7 +409,7 @@ class TestMerge:
             }
         ],
     )
-    def data(self, data_dir, request) -> DataFixture:
+    def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
         input_paths = [data_dir / p for p in request.param["inputs"]]
         expected_path = data_dir / request.param["expected"]
         expected_json = load_sbom(expected_path)
@@ -313,21 +419,20 @@ class TestMerge:
             expected=expected_json,
         )
 
-    def test(self, data, argv, tmp_path, capsys):
+    def test(
+        self,
+        data: DataFixture,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
         argv(
             "merge",
-            "--output",
-            str(tmp_path),
             *(str(p) for p in data["inputs"]),
         )
-        (exit_code, output_file, _) = run_main(capsys, "filename")
+        exit_code, actual, _ = run_main(capsys, "json")
 
         # Verify that command completed successfully
-        assert exit_code == 0
+        assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        output_path = tmp_path / output_file
-        with output_path.open() as f:
-            actual = json.load(f)
-        delete_non_reproducible(actual)
         assert actual == data["expected"]

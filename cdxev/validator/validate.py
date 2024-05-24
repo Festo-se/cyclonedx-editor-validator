@@ -175,6 +175,8 @@ def validate_sbom(
                 else:
                     errors.append(error_path + error.message)
     sorted_errors = set(sorted(errors))
+
+    report_handler: t.Optional[logging.Handler] = None
     if report_format == "warnings-ng":
         # The following cast is safe because the caller of this function made sure that
         # report_path is not None when report_format is not None.
@@ -198,4 +200,6 @@ def validate_sbom(
                     module_name=error_msg[0 : error_msg.find("has the mistake") - 1],
                 )
             )
+        if report_handler is not None:
+            report_handler.close()
         return 1

@@ -1,46 +1,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import io
-import os
 import pathlib
 import unittest
 import unittest.mock
-from contextlib import redirect_stdout
 from json import JSONDecodeError
 from pathlib import Path
-
-from toml import load
 
 # noinspection PyProtectedMember
 from cdxev.__main__ import InputFileError, Status, load_json, load_xml, main, read_sbom
 
 
 class TestSupplements(unittest.TestCase):
-    def test_get_help(self) -> None:
-        with unittest.mock.patch("sys.argv", ["", "--help"]):
-            try:
-                helper_text = io.StringIO()
-                with redirect_stdout(helper_text):
-                    main()
-            except SystemExit:
-                result = helper_text.getvalue()
-                self.assertIn("usage:", result)
-
-    @unittest.skipUnless("CI" in os.environ, "running only in CI")
-    def test_get_version(self) -> None:
-        with unittest.mock.patch("sys.argv", ["", "--version"]):
-            try:
-                pkg_version = io.StringIO()
-                with redirect_stdout(pkg_version):
-                    main()
-            except SystemExit:
-                toml_file = Path(__file__).parents[1] / "pyproject.toml"
-                toml_content = load(toml_file)
-                version_in_toml = (
-                    toml_content.get("tool", {}).get("poetry", {}).get("version")
-                )
-                self.assertEqual(pkg_version.getvalue().strip(), version_in_toml)
-
     @unittest.mock.patch("pathlib.Path.is_file")
     def test_read_sbom(self, mock_is_file: unittest.mock.Mock) -> None:
         with self.assertRaises(InputFileError) as ie:

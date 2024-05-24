@@ -10,17 +10,7 @@ from pathlib import Path
 from toml import load
 
 # noinspection PyProtectedMember
-from cdxev.__main__ import (
-    _STATUS_APP_ERROR,
-    _STATUS_OK,
-    _STATUS_USAGE_ERROR,
-    _STATUS_VALIDATION_ERROR,
-    InputFileError,
-    load_json,
-    load_xml,
-    main,
-    read_sbom,
-)
+from cdxev.__main__ import InputFileError, Status, load_json, load_xml, main, read_sbom
 
 
 class TestSupplements(unittest.TestCase):
@@ -89,7 +79,7 @@ class TestAmendCommand(unittest.TestCase):
         with unittest.mock.patch("sys.argv", ["", "amend", "fake_bom.cdx.json"]):
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
     @unittest.mock.patch("cdxev.__main__.read_sbom")
     def test_get_amend_license_from_folder(self, mock_read: unittest.mock.Mock) -> None:
@@ -107,7 +97,7 @@ class TestAmendCommand(unittest.TestCase):
         ):
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
     @unittest.mock.patch("cdxev.__main__.read_sbom")
     def test_operation_selection(self, mock_read: unittest.mock.Mock) -> None:
@@ -125,7 +115,7 @@ class TestAmendCommand(unittest.TestCase):
         ):
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
 
 class TestMergeCommand(unittest.TestCase):
@@ -140,13 +130,13 @@ class TestMergeCommand(unittest.TestCase):
             mock_merge.return_value = {}
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
     def test_merge_usage_error(self) -> None:
         with unittest.mock.patch("sys.argv", ["", "merge", "fake_bom_1.cdx.json"]):
             with self.assertRaises(SystemExit) as ex:
                 main()
-            self.assertEqual(ex.exception.code, _STATUS_USAGE_ERROR)
+            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
     @unittest.mock.patch("cdxev.__main__.read_sbom")
     @unittest.mock.patch("cdxev.__main__.merge")
@@ -166,7 +156,7 @@ class TestMergeCommand(unittest.TestCase):
             mock_merge.return_value = {}
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
     @unittest.mock.patch("cdxev.__main__.read_sbom")
     def test_merge_from_folder_false_path(self, mock_read: unittest.mock.Mock) -> None:
@@ -183,7 +173,7 @@ class TestMergeCommand(unittest.TestCase):
             with self.assertRaises(SystemExit) as ex:
                 mock_read.return_value = ({}, "json")
                 main()
-            self.assertEqual(ex.exception.code, _STATUS_USAGE_ERROR)
+            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
     @unittest.mock.patch("cdxev.__main__.read_sbom")
     def test_merge_from_folder_no_sboms_in_folder(
@@ -202,7 +192,7 @@ class TestMergeCommand(unittest.TestCase):
             with self.assertRaises(SystemExit) as ex:
                 mock_read.return_value = ({}, "json")
                 main()
-            self.assertEqual(ex.exception.code, _STATUS_USAGE_ERROR)
+            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
 
 class TestMergeVexCommand(unittest.TestCase):
@@ -217,7 +207,7 @@ class TestMergeVexCommand(unittest.TestCase):
             mock_merge_vex.return_value = {}
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
 
 class TestSetCommand(unittest.TestCase):
@@ -247,7 +237,7 @@ class TestSetCommand(unittest.TestCase):
             mock_set.return_value = {}
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
         with unittest.mock.patch(
             "sys.argv",
@@ -266,7 +256,7 @@ class TestSetCommand(unittest.TestCase):
             mock_set.return_value = {}
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
         with unittest.mock.patch(
             "sys.argv",
@@ -285,7 +275,7 @@ class TestSetCommand(unittest.TestCase):
             mock_set.return_value = {}
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
         with unittest.mock.patch(
             "sys.argv",
@@ -308,7 +298,7 @@ class TestSetCommand(unittest.TestCase):
             mock_set.return_value = {}
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
     @unittest.mock.patch("cdxev.__main__.read_sbom")
     @unittest.mock.patch("cdxev.set.run")
@@ -333,7 +323,7 @@ class TestSetCommand(unittest.TestCase):
                 "set": {"copyright": "2022 Acme Inc"},
             }
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
         with unittest.mock.patch(
             "sys.argv",
@@ -341,7 +331,7 @@ class TestSetCommand(unittest.TestCase):
         ):
             mock_json_load.side_effect = JSONDecodeError("test", "test", 0)
             result = main()
-            self.assertEqual(result, _STATUS_APP_ERROR)
+            self.assertEqual(result, Status.APP_ERROR)
 
     def test_set_usage_error(self) -> None:
         with unittest.mock.patch(
@@ -350,7 +340,7 @@ class TestSetCommand(unittest.TestCase):
         ):
             with self.assertRaises(SystemExit) as ex:
                 main()
-            self.assertEqual(ex.exception.code, _STATUS_USAGE_ERROR)
+            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
         with unittest.mock.patch(
             "sys.argv",
@@ -358,7 +348,7 @@ class TestSetCommand(unittest.TestCase):
         ):
             with self.assertRaises(SystemExit) as ex:
                 main()
-            self.assertEqual(ex.exception.code, _STATUS_USAGE_ERROR)
+            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
         with unittest.mock.patch(
             "sys.argv",
@@ -374,7 +364,7 @@ class TestSetCommand(unittest.TestCase):
         ):
             with self.assertRaises(SystemExit) as ex:
                 main()
-            self.assertEqual(ex.exception.code, _STATUS_USAGE_ERROR)
+            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
         with unittest.mock.patch(
             "sys.argv",
@@ -394,7 +384,7 @@ class TestSetCommand(unittest.TestCase):
         ):
             with self.assertRaises(SystemExit) as ex:
                 main()
-            self.assertEqual(ex.exception.code, _STATUS_USAGE_ERROR)
+            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
         with unittest.mock.patch(
             "sys.argv",
@@ -412,7 +402,7 @@ class TestSetCommand(unittest.TestCase):
         ):
             with self.assertRaises(SystemExit) as ex:
                 main()
-            self.assertEqual(ex.exception.code, _STATUS_USAGE_ERROR)
+            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
         with unittest.mock.patch(
             "sys.argv",
@@ -428,7 +418,7 @@ class TestSetCommand(unittest.TestCase):
         ):
             with self.assertRaises(SystemExit) as ex:
                 main()
-            self.assertEqual(ex.exception.code, _STATUS_USAGE_ERROR)
+            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
 
 class TestValidateCommand(unittest.TestCase):
@@ -441,19 +431,19 @@ class TestValidateCommand(unittest.TestCase):
             mock_validate.return_value = 0
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
         with unittest.mock.patch("sys.argv", ["", "validate", "fake_bom.cdx.json"]):
             mock_validate.return_value = 1
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_VALIDATION_ERROR)
+            self.assertEqual(result, Status.VALIDATION_ERROR)
         with unittest.mock.patch(
             "sys.argv", ["", "validate", "--schema-type=custom", "fake_bom.cdx.json"]
         ):
             mock_validate.return_value = 0
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
         with unittest.mock.patch(
             "sys.argv",
             [
@@ -469,7 +459,7 @@ class TestValidateCommand(unittest.TestCase):
             mock_validate.return_value = 0
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
         with unittest.mock.patch(
             "sys.argv",
             [
@@ -485,7 +475,7 @@ class TestValidateCommand(unittest.TestCase):
             mock_validate.return_value = 0
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)
 
 
 class TestBuildPublicCommand(unittest.TestCase):
@@ -500,4 +490,4 @@ class TestBuildPublicCommand(unittest.TestCase):
             mock_build_public.return_value = {}
             mock_read.return_value = ({}, "json")
             result = main()
-            self.assertEqual(result, _STATUS_OK)
+            self.assertEqual(result, Status.OK)

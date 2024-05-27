@@ -9,7 +9,7 @@ import sys
 import textwrap
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
+from typing import TYPE_CHECKING, NoReturn, Optional, Tuple
 
 import docstring_parser
 
@@ -675,10 +675,7 @@ def invoke_amend(args: argparse.Namespace) -> int:
 def invoke_merge(args: argparse.Namespace) -> int:
     global logger
 
-    inputs: List[dict] = []
-    for input in args.input:
-        sbom, _ = read_sbom(input)
-        inputs.append(sbom)
+    inputs = args.input
 
     if args.from_folder is not None:
         if not args.from_folder.is_dir():
@@ -699,15 +696,16 @@ def invoke_merge(args: argparse.Namespace) -> int:
             logger.warning(f"No additional SBOMs found in folder: {args.from_folder}")
 
         for input in folder_inputs:
-            logger.debug(f"Loading from folder: {input}")
-            sbom, _ = read_sbom(input)
-            inputs.append(sbom)
+            logger.debug(f"Found in folder: {input}")
+
+        inputs += folder_inputs
 
     if len(inputs) < 2:
         usage_error(
             f"Not enough inputs. Must be at least 2, you have provided {len(inputs)}."
         )
 
+    inputs = [sbom for (sbom, _) in (read_sbom(input) for input in inputs)]
     output = merge(inputs)
     write_sbom(output, args.output)
     return Status.OK

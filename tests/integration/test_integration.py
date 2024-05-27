@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import re
 from collections.abc import Callable
@@ -436,3 +437,82 @@ class TestMerge:
 
         # Verify that output matches what is expected
         assert actual == data["expected"]
+
+    def test_from_folder(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        caplog: pytest.LogCaptureFixture,
+        tmp_path: Path,
+    ):
+        output_file = tmp_path / "output.cdx.json"
+        argv(
+            "--verbose",
+            "merge",
+            str(data_dir / "merge.input_1.cdx.json"),
+            "--from-folder",
+            str(data_dir),
+            "--output",
+            str(output_file),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.OK
+
+        # Assert that several SBOMs have been loaded. The exact number is unimportant because we
+        # don't want to update this test whenever new SBOMs are added.
+        assert (
+            len([entry for entry in caplog.record_tuples if entry[1] == logging.DEBUG])
+            > 5
+        )
+
+        # We're not comparing the result against a known output because we don't want to update
+        # it whenever anything in the data directory changes.
+        # Instead, we're validating the result for correctness, that's all.
+        argv("validate", "--no-filename-validation", str(output_file))
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.OK
+
+    def test_not_enough_inputs(self, argv: Callable[..., None]):
+        argv("merge", "input1.cdx.json")
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+
+    def test_invalid_folder_path(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "merge",
+            str(data_dir / "merge.input_1.cdx.json"),
+            "--from-folder",
+            "doesnotexist",
+        )
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+        _, stderr = capsys.readouterr()
+        assert stderr.find("Path not found or is not a directory") >= 0
+
+    def test_empty_folder_path(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        tmp_path: Path,
+    ):
+        argv(
+            "merge",
+            str(data_dir / "merge.input_1.cdx.json"),
+            "--from-folder",
+            str(tmp_path),
+        )
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR

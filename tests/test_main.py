@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import pathlib
 import unittest
 import unittest.mock
 from json import JSONDecodeError
@@ -43,83 +42,6 @@ class TestSupplements(unittest.TestCase):
         with self.assertRaises(InputFileError) as ie:
             load_xml(Path("test.xml"))
         self.assertIn("XML files aren't supported", ie.exception.details.description)
-
-
-class TestMergeCommand(unittest.TestCase):
-    @unittest.mock.patch("cdxev.__main__.read_sbom")
-    @unittest.mock.patch("cdxev.__main__.merge")
-    def test_get_merge(
-        self, mock_merge: unittest.mock.Mock, mock_read: unittest.mock.Mock
-    ) -> None:
-        with unittest.mock.patch(
-            "sys.argv", ["", "merge", "fake_bom_1.cdx.json", "fake_bom_2.cdx.json"]
-        ):
-            mock_merge.return_value = {}
-            mock_read.return_value = ({}, "json")
-            result = main()
-            self.assertEqual(result, Status.OK)
-
-    def test_merge_usage_error(self) -> None:
-        with unittest.mock.patch("sys.argv", ["", "merge", "fake_bom_1.cdx.json"]):
-            with self.assertRaises(SystemExit) as ex:
-                main()
-            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
-
-    @unittest.mock.patch("cdxev.__main__.read_sbom")
-    @unittest.mock.patch("cdxev.__main__.merge")
-    def test_merge_from_folder(
-        self, mock_merge: unittest.mock.Mock, mock_read: unittest.mock.Mock
-    ) -> None:
-        path = pathlib.Path(__file__).parent.resolve()
-        with unittest.mock.patch(
-            "sys.argv",
-            [
-                "",
-                "merge",
-                "fake_bom_1.cdx.json",
-                ("--from-folder=" + path.as_posix() + "/auxiliary/test_amend_sboms"),
-            ],
-        ):
-            mock_merge.return_value = {}
-            mock_read.return_value = ({}, "json")
-            result = main()
-            self.assertEqual(result, Status.OK)
-
-    @unittest.mock.patch("cdxev.__main__.read_sbom")
-    def test_merge_from_folder_false_path(self, mock_read: unittest.mock.Mock) -> None:
-        path = pathlib.Path(__file__).parent.resolve()
-        with unittest.mock.patch(
-            "sys.argv",
-            [
-                "",
-                "merge",
-                "fake_bom_1.cdx.json",
-                ("--from-folder=" + path.as_posix() + "/NoPath"),
-            ],
-        ):
-            with self.assertRaises(SystemExit) as ex:
-                mock_read.return_value = ({}, "json")
-                main()
-            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
-
-    @unittest.mock.patch("cdxev.__main__.read_sbom")
-    def test_merge_from_folder_no_sboms_in_folder(
-        self, mock_read: unittest.mock.Mock
-    ) -> None:
-        path = pathlib.Path(__file__).parent.resolve()
-        with unittest.mock.patch(
-            "sys.argv",
-            [
-                "",
-                "merge",
-                "fake_bom_1.cdx.json",
-                ("--from-folder=" + path.as_posix()),
-            ],
-        ):
-            with self.assertRaises(SystemExit) as ex:
-                mock_read.return_value = ({}, "json")
-                main()
-            self.assertEqual(ex.exception.code, Status.USAGE_ERROR)
 
 
 class TestMergeVexCommand(unittest.TestCase):

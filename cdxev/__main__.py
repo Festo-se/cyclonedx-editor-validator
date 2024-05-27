@@ -825,15 +825,17 @@ def invoke_set(args: argparse.Namespace) -> int:
             )
 
         updates = []
-        with open(args.from_file) as from_file:
-            try:
+        try:
+            with open(args.from_file) as from_file:
                 updates = json.load(from_file)
-            except json.JSONDecodeError as ex:
-                raise InputFileError(
-                    "Invalid JSON passed to --from-file",
-                    None,
-                    ex.lineno,
-                ) from ex
+        except json.JSONDecodeError as ex:
+            raise InputFileError(
+                "Invalid JSON passed to --from-file",
+                None,
+                ex.lineno,
+            ) from ex
+        except FileNotFoundError as ex:
+            raise InputFileError(str(ex), None) from ex
 
     sbom, _ = read_sbom(args.input)
     cfg = cdxev.set.SetConfig(

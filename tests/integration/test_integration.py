@@ -202,152 +202,6 @@ class TestAmend:
         assert re.search(r"is required for operation", stderr)
 
 
-class TestSet:
-    class DataFixture(TypedDict):
-        input: Path
-        set_file: Path
-        expected: dict
-
-    @pytest.fixture(
-        scope="class",
-        params=[
-            {
-                "input": "set.input.cdx.json",
-                "set_file": "set.input.json",
-                "expected": "set.expected.cdx.json",
-            }
-        ],
-    )
-    def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
-        input_path = data_dir / request.param["input"]
-        set_file_path = data_dir / request.param["set_file"]
-        expected_path = data_dir / request.param["expected"]
-        expected_json = load_sbom(expected_path)
-
-        return self.DataFixture(
-            input=input_path,
-            expected=expected_json,
-            set_file=set_file_path,
-        )
-
-    def test(
-        self,
-        data: DataFixture,
-        argv: Callable[..., None],
-        capsys: pytest.CaptureFixture[str],
-    ):
-        argv(
-            "set",
-            "--force",
-            "--from-file",
-            str(data["set_file"]),
-            str(data["input"]),
-        )
-        exit_code, actual, _ = run_main(capsys, "json")
-
-        # Verify that command completed successfully
-        assert exit_code == Status.OK
-
-        # Verify that output matches what is expected
-        assert actual == data["expected"]
-
-
-class TestValidate:
-    # This test function is parametrized by pytest_generate_tests in conftest.py.
-    def test(
-        self,
-        argv: Callable[..., None],
-        capsys: pytest.CaptureFixture[str],
-        input,
-        schema_type,
-        expected_result,
-        expected_errors,
-    ):
-        argv(
-            "validate",
-            "--schema-type",
-            schema_type,
-            str(input),
-        )
-        if expected_errors:
-            exit_code, _, stderr = run_main(capsys)
-            for e in expected_errors:
-                assert e in stderr
-        else:
-            exit_code, _ = run_main()
-
-        expected_exit_code = {"valid": Status.OK, "invalid": Status.VALIDATION_ERROR}[
-            expected_result
-        ]
-        assert exit_code == expected_exit_code
-
-    def test_warnings_ng(
-        self, argv: Callable[..., None], data_dir: Path, tmp_path: Path
-    ):
-        report_path = tmp_path / "issues.json"
-        argv(
-            "validate",
-            "--report-format",
-            "warnings-ng",
-            "--output",
-            str(report_path),
-            str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
-        )
-        exit_code, *_ = run_main()
-
-        assert exit_code == Status.VALIDATION_ERROR
-
-        # Assert that the report file exists and has the expected structure
-        assert report_path.is_file()
-        with open(report_path) as f:
-            report = json.load(f)
-        assert "issues" in report
-        assert len(report["issues"]) == 1
-        assert "origin" in report["issues"][0]
-
-    def test_gitlab_cq(self, argv: Callable[..., None], data_dir: Path, tmp_path: Path):
-        report_path = tmp_path / "issues.json"
-        argv(
-            "validate",
-            "--report-format",
-            "gitlab-code-quality",
-            "--output",
-            str(report_path),
-            str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
-        )
-        exit_code, *_ = run_main()
-
-        assert exit_code == Status.VALIDATION_ERROR
-
-        # Assert that the report file exists and has the expected structure
-        assert report_path.is_file()
-        with open(report_path) as f:
-            report = json.load(f)
-        assert len(report) == 1
-        assert "check_name" in report[0]
-
-    def test_custom_filename_pattern(
-        self,
-        argv: Callable[..., None],
-        data_dir: Path,
-        caplog: pytest.LogCaptureFixture,
-    ):
-        argv(
-            "validate",
-            "--filename-pattern",
-            "fail",
-            str(data_dir / "validate" / "valid" / "default" / "laravel.cdx.json"),
-        )
-        exit_code, *_ = run_main()
-
-        assert exit_code == Status.VALIDATION_ERROR
-        assert len(caplog.records) == 1
-        assert (
-            caplog.records[0].msg.description  # type: ignore
-            == "filename doesn't match regular expression fail"
-        )
-
-
 class TestBuildPublic:
     class DataFixture(TypedDict):
         input: Path
@@ -516,3 +370,149 @@ class TestMerge:
             run_main()
 
         assert e.value.code == Status.USAGE_ERROR
+
+
+class TestSet:
+    class DataFixture(TypedDict):
+        input: Path
+        set_file: Path
+        expected: dict
+
+    @pytest.fixture(
+        scope="class",
+        params=[
+            {
+                "input": "set.input.cdx.json",
+                "set_file": "set.input.json",
+                "expected": "set.expected.cdx.json",
+            }
+        ],
+    )
+    def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
+        input_path = data_dir / request.param["input"]
+        set_file_path = data_dir / request.param["set_file"]
+        expected_path = data_dir / request.param["expected"]
+        expected_json = load_sbom(expected_path)
+
+        return self.DataFixture(
+            input=input_path,
+            expected=expected_json,
+            set_file=set_file_path,
+        )
+
+    def test(
+        self,
+        data: DataFixture,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            "--force",
+            "--from-file",
+            str(data["set_file"]),
+            str(data["input"]),
+        )
+        exit_code, actual, _ = run_main(capsys, "json")
+
+        # Verify that command completed successfully
+        assert exit_code == Status.OK
+
+        # Verify that output matches what is expected
+        assert actual == data["expected"]
+
+
+class TestValidate:
+    # This test function is parametrized by pytest_generate_tests in conftest.py.
+    def test(
+        self,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+        input,
+        schema_type,
+        expected_result,
+        expected_errors,
+    ):
+        argv(
+            "validate",
+            "--schema-type",
+            schema_type,
+            str(input),
+        )
+        if expected_errors:
+            exit_code, _, stderr = run_main(capsys)
+            for e in expected_errors:
+                assert e in stderr
+        else:
+            exit_code, _ = run_main()
+
+        expected_exit_code = {"valid": Status.OK, "invalid": Status.VALIDATION_ERROR}[
+            expected_result
+        ]
+        assert exit_code == expected_exit_code
+
+    def test_warnings_ng(
+        self, argv: Callable[..., None], data_dir: Path, tmp_path: Path
+    ):
+        report_path = tmp_path / "issues.json"
+        argv(
+            "validate",
+            "--report-format",
+            "warnings-ng",
+            "--output",
+            str(report_path),
+            str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.VALIDATION_ERROR
+
+        # Assert that the report file exists and has the expected structure
+        assert report_path.is_file()
+        with open(report_path) as f:
+            report = json.load(f)
+        assert "issues" in report
+        assert len(report["issues"]) == 1
+        assert "origin" in report["issues"][0]
+
+    def test_gitlab_cq(self, argv: Callable[..., None], data_dir: Path, tmp_path: Path):
+        report_path = tmp_path / "issues.json"
+        argv(
+            "validate",
+            "--report-format",
+            "gitlab-code-quality",
+            "--output",
+            str(report_path),
+            str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.VALIDATION_ERROR
+
+        # Assert that the report file exists and has the expected structure
+        assert report_path.is_file()
+        with open(report_path) as f:
+            report = json.load(f)
+        assert len(report) == 1
+        assert "check_name" in report[0]
+
+    def test_custom_filename_pattern(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        caplog: pytest.LogCaptureFixture,
+    ):
+        argv(
+            "validate",
+            "--filename-pattern",
+            "fail",
+            str(data_dir / "validate" / "valid" / "default" / "laravel.cdx.json"),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.VALIDATION_ERROR
+        assert len(caplog.records) == 1
+        assert (
+            caplog.records[0].msg.description  # type: ignore
+            == "filename doesn't match regular expression fail"
+        )

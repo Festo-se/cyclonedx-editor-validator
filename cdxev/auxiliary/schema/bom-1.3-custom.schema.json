@@ -600,8 +600,21 @@
             }
           },
           "then": {
-            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["copyright"]
+            "if":{
+              "not":{
+              "allOf":[ {
+                "required": ["licenses"]
+              },
+              {
+                "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } }
+              }
+            ]
+          }
+            },
+            "then":{
+                "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
+                "required": ["copyright"]
+            }
           }
         },
         {

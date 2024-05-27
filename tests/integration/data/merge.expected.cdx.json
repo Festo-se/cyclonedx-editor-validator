@@ -443,11 +443,6 @@
                     "license": {
                         "id": "GPL-3.0-only"
                     }
-                },
-                {
-                    "license": {
-                        "id": "tbd"
-                    }
                 }
             ]
         }

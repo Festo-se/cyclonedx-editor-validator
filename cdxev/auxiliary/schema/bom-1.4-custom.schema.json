@@ -647,10 +647,23 @@
             "required": ["copyright"]
           },
           "then": {
-            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-            "required": ["supplier"],
-            "dependencies": {
-              "supplier": {"properties": {"supplier": {"required": ["name"]}}}
+            "if":{
+              "not":{
+              "allOf":[ {
+                "required": ["licenses"]
+              },
+              {
+                "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } }
+              }
+            ]
+          }
+            },
+            "then":{
+              "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
+              "required": ["supplier"],
+              "dependencies": {
+                "supplier": {"properties": {"supplier": {"required": ["name"]}}}
+              }
             }
           }
         },

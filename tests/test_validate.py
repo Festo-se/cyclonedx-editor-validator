@@ -829,7 +829,31 @@ class TestInternalNameSchema(unittest.TestCase):
                 search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
             )
 
-    def test_copyright_festo_supplier_not(
+    def test_copyright_festo_supplier_not_no_licenses(
+        self,
+    ) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "author": "automated",
+                "supplier": {"name": "Acme SE & Co.KG"},
+                "group": "com.festo.internal",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "copyright": "festo",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(
+                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
+            )
+
+    def test_copyright_festo_supplier_not_with_licenses(
         self,
     ) -> None:
         for spec_version in list_of_spec_versions:
@@ -850,9 +874,7 @@ class TestInternalNameSchema(unittest.TestCase):
                 "copyright": "festo",
             }
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(issues, ["no issue"])
 
     def test_internal_component_copyright_festo_supplier_not(self) -> None:
         sbom = {

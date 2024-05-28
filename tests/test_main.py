@@ -15,7 +15,7 @@ class TestSupplements(unittest.TestCase):
         with self.assertRaises(InputFileError) as ie:
             mock_is_file.return_value = False
             read_sbom(Path("test.json"))
-        self.assertEqual("File not found.", ie.exception.details.description)
+        self.assertEqual("File not found: test.json", ie.exception.details.description)
         with self.assertRaises(InputFileError) as ie:
             mock_is_file.return_value = True
             read_sbom(Path("test.jason"))

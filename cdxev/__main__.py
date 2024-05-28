@@ -74,7 +74,7 @@ def read_sbom(sbom_file: Path, file_type: Optional[str] = None) -> Tuple[dict, s
     :raise FileTypeError: If *file_type* isn't specified and can't be guessed.
     """
     if not sbom_file.is_file():
-        raise InputFileError("File not found.")
+        raise InputFileError(f"File not found: {sbom_file}")
 
     if file_type is None:
         file_type = sbom_file.suffix[1:]
@@ -835,7 +835,7 @@ def invoke_set(args: argparse.Namespace) -> int:
                 ex.lineno,
             ) from ex
         except FileNotFoundError as ex:
-            raise InputFileError(str(ex), None) from ex
+            raise InputFileError(f"File not found: {args.from_file}", None) from ex
 
     sbom, _ = read_sbom(args.input)
     cfg = cdxev.set.SetConfig(

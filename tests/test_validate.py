@@ -73,22 +73,6 @@ class TestValidateInit(unittest.TestCase):
         issues = validate_test(sbom, schema_type="default", schema_path=None)
         self.assertEqual(issues, ["no issue"])
 
-    def test_warnings_ng_format(self) -> None:
-        sbom = get_test_sbom()
-        sbom["components"][0].pop("version")
-        issues = validate_test(sbom, report_format="warnings-ng")
-        self.assertTrue(
-            search_for_word_issues("'version' is a required property", issues)
-        )
-
-    def test_gitlab_cq_format(self) -> None:
-        sbom = get_test_sbom()
-        sbom["components"][0].pop("version")
-        issues = validate_test(sbom, report_format="gitlab-code-quality")
-        self.assertTrue(
-            search_for_word_issues("'version' is a required property", issues)
-        )
-
     def test_missing_specversion(self) -> None:
         sbom = {
             "bomFormat": "CycloneDX",

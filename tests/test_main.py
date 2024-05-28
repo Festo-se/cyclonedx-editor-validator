@@ -2,7 +2,6 @@
 
 import unittest
 import unittest.mock
-from json import JSONDecodeError
 from pathlib import Path
 
 # noinspection PyProtectedMember

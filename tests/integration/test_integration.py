@@ -11,6 +11,7 @@ import pytest
 import toml
 
 from cdxev.__main__ import Status
+from tests.auxiliary.sbomFunctionsTests import search_entry
 from tests.integration.helper import load_sbom, run_main
 
 
@@ -378,6 +379,10 @@ class TestSet:
         set_file: Path
         expected: dict
 
+    @pytest.fixture
+    def input_file(self, data_dir: Path) -> Path:
+        return data_dir / "set.input.cdx.json"
+
     @pytest.fixture(
         scope="class",
         params=[
@@ -400,7 +405,30 @@ class TestSet:
             set_file=set_file_path,
         )
 
-    def test(
+    def test_direct(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            str(input_file),
+            "--purl",
+            "pkg:npm/test-app@1.0.0",
+            "--key",
+            "copyright",
+            "--value",
+            '"ACME Inc."',
+        )
+        exit_code, actual, _ = run_main(capsys, "json")
+
+        assert exit_code == Status.OK
+        target_component = search_entry(actual, "purl", "pkg:npm/test-app@1.0.0")
+        assert target_component is not None
+        assert target_component["copyright"] == "ACME Inc."
+
+    def test_from_file(
         self,
         data: DataFixture,
         argv: Callable[..., None],
@@ -420,6 +448,171 @@ class TestSet:
 
         # Verify that output matches what is expected
         assert actual == data["expected"]
+
+    @pytest.mark.parametrize(
+        "use_only",
+        [
+            ["name", "purl", "key", "value"],
+            ["name", "swid", "key", "value"],
+            ["purl", "swid", "key", "value"],
+            ["name", "cpe", "key", "value"],
+            ["version", "group", "key", "value"],
+            ["key", "value"],
+            ["name", "key"],
+            ["name", "value"],
+            ["from-file", "name"],
+            ["from-file", "key", "value"],
+        ],
+        ids=lambda keys: "only: " + ", ".join(keys),
+    )
+    def test_invalid_option_combinations(
+        self, use_only: list[str], input_file: Path, argv: Callable[..., None]
+    ):
+        options = {
+            "name": "comp",
+            "version": "1.0.0",
+            "group": "acme",
+            "purl": "pkg:test/comp@1.0.0",
+            "swid": "foo",
+            "cpe": "cpe:2.3:a:acme:comp:*:*:*:*:*:*:*:*",
+            "key": "copyright",
+            "value": "ACME Inc.",
+            "from-file": "some-file.json",
+        }
+        filtered_options = {f"--{k}": v for (k, v) in options.items() if k in use_only}
+        argv("set", str(input_file), *filtered_options)
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "foobar",
+            "[1,2,3",
+        ],
+        ids=["string without quotes", "unclosed array"],
+    )
+    def test_invalid_json_value(
+        self, value, input_file: Path, argv: Callable[..., None]
+    ):
+        argv("set", str(input_file), "--name", "comp", "--key", "foo", "--value", value)
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+
+    def test_set_file_not_found(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv("set", str(input_file), "--from-file", "notfound")
+        exit_code, _, stderr = run_main(capsys)
+
+        assert exit_code == Status.APP_ERROR
+        assert stderr.find("File not found") >= 0
+
+    def test_input_not_found(
+        self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]
+    ):
+        argv(
+            "set",
+            "notfound",
+            "--name",
+            "comp",
+            "--key",
+            "copyright",
+            "--value",
+            '"ACME Inc."',
+        )
+        exit_code, _, stderr = run_main(capsys)
+
+        assert exit_code == Status.APP_ERROR
+        assert stderr.find("File not found: notfound") >= 0
+
+    def test_target_not_found(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            str(input_file),
+            "--name",
+            "comp",
+            "--key",
+            "copyright",
+            "--value",
+            '"ACME Inc."',
+        )
+        exit_code, _, stderr = run_main(capsys)
+
+        assert exit_code == Status.APP_ERROR
+        assert stderr.find('"COORDINATES[comp]" was not found') >= 0
+
+    def test_target_not_found_ignored(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            str(input_file),
+            "--name",
+            "comp",
+            "--key",
+            "copyright",
+            "--value",
+            '"ACME Inc."',
+            "--ignore-missing",
+        )
+        exit_code, _, stderr = run_main(capsys)
+
+        assert exit_code == Status.OK
+        assert stderr.find('"COORDINATES[comp]" was not found') >= 0
+
+    def test_allow_protected(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            str(input_file),
+            "--purl",
+            "pkg:npm/test-app@1.0.0",
+            "--key",
+            "version",
+            "--value",
+            '"2.0.0"',
+            "--force",
+        )
+        exit_code, _, stderr = run_main(capsys)
+
+        assert exit_code == Status.APP_ERROR
+        assert stderr.find("--allow-protected") >= 0
+
+        argv(
+            "set",
+            str(input_file),
+            "--purl",
+            "pkg:npm/test-app@1.0.0",
+            "--key",
+            "version",
+            "--value",
+            '"2.0.0"',
+            "--force",
+            "--allow-protected",
+        )
+        exit_code, *_ = run_main(capsys)
+
+        assert exit_code == Status.OK
 
 
 class TestValidate:

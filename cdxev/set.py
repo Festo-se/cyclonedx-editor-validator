@@ -349,12 +349,12 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
 
     try:
         _validate_update_list(updates, ctx)
-    except AppError:
-        msg = LogMessage(
+    except AppError as e:
+        raise AppError(
             "Set not performed",
-            f'Exception was raised while setting from file "{cfg.from_file}',
+            f"Invalid update record: {e.details.description}",
+            log_msg=e.details,
         )
-        raise AppError(log_msg=msg)
 
     ctx.component_map = _map_out_components(sbom)
 

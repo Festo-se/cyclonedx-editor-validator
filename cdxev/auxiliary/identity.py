@@ -4,9 +4,10 @@ import functools
 import json
 import re
 import typing as t
-import univers.version_range  # type:ignore
 from dataclasses import dataclass, field, fields
 from enum import Enum
+
+import univers.version_range  # type:ignore
 
 
 @functools.total_ordering

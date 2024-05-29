@@ -209,9 +209,9 @@ This data can either be passed directly on the command-line &mdash; in this case
 
 The *target component* can be identified through any of the identifiable properties defined by CycloneDX, specifically: *cpe*, *purl*, *swid* or the combination of *name*, *group* and/or *version* (collectively called *coordinates*).
 
-If coordinates are used it is possible to provide a range of versions following the [PURl specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst). For further Information on supported version ranges can be found here [univers documentation](https://pypi.org/project/univers/)
+If coordinates are used it is possible to provide a range of versions following the [PURl specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst). Further Information on supported version ranges can be found here [univers documentation](https://pypi.org/project/univers/)
 
-It is also possible to use a wildcard by setting the *version* as "*", in that case the version will be ignored and only *name*, *group* considered.
+It is also possible to use a wildcard by setting the *version* as "*", in that case the version will be ignored and only *name*and *group* will be considered.
 
 If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
@@ -299,8 +299,8 @@ When passing the targets, names and values in a file, the file must conform to t
             "id": {
                 "name": "web-framework",
                 "group": "org.acme",
-                # It is possible to provide a wildcard for the version
-                # if the version is set to "*" all versions are accepted
+                # It is also possible to provide a wildcard for the version
+                # if the version is set to "*" the version will be ignored
                 "version": "*",
             },
                 "set": {"copyright": "1990 Acme Inc"},

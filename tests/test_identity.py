@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
 import univers.version_range  # type:ignore
 
 from cdxev.auxiliary.identity import ComponentIdentity, Key, KeyType
@@ -162,7 +161,7 @@ class IdentityTestCase(unittest.TestCase):
         self.assertEqual(key.key.version_type, univers.versions.PypiVersion)
         self.assertEqual(
             key.key.version_range,
-            univers.version_range.VersionRange.from_string("vers:pypi/>=1.2.4"),
+            univers.version_range.VersionRange.from_string("vers:pypi/>=1.2.4")
         )
 
     def test_id_equality(self) -> None:
@@ -245,7 +244,7 @@ class IdentityTestCase(unittest.TestCase):
         component_base = {
             "name": "some name",
             "group": "some group",
-            "version": "vers:pypi/>=1.2",
+            "version": "vers:pypi/>=1.2"
         }
 
         component_version_in = dict(component_base)

@@ -6,7 +6,7 @@ import sys
 import typing as t
 from dataclasses import dataclass, field
 
-from cdxev.auxiliary.identity import ComponentIdentity, CoordinatesWithVersionRange, Key
+from cdxev.auxiliary.identity import ComponentIdentity, Key, CoordinatesWithVersionRange
 from cdxev.auxiliary.sbomFunctions import walk_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage

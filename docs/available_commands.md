@@ -211,7 +211,7 @@ The *target component* can be identified through any of the identifiable propert
 
 If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
-In *coordinates* it is possible to provide a range of versions following the [PURl specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst) as referenced by [CycloneDX](https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range). Further Information on the supported versions can be found here [univers documentation](https://pypi.org/project/univers/)
+In *coordinates* it is also possible to provide a range of versions following the [PURl specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst) as referenced by [CycloneDX](https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range). Further Information on the supported versioning schemas can be found here [univers documentation](https://pypi.org/project/univers/).
 
 It is also possible to use a wildcard by setting the *version* as "*", in that case the version will be ignored and only *name*and *group* will be considered.
 
@@ -268,7 +268,7 @@ When passing the targets, names and values in a file, the file must conform to t
             "id": {
                 # Could be any one of the identifying properties in CycloneDX.
                 # Multiple identifiers are not allowed (with the special exception of name,
-                # group and version which are only valid together)
+                # group and version or version range which are only valid together)
                 "cpe": "CPE of target component goes here"
             },
             "set": {
@@ -287,7 +287,8 @@ When passing the targets, names and values in a file, the file must conform to t
                 ]
             },
         },
-        {
+        # Example for the use of version ranges
+        {   
             "id": {
                 "name": "web-framework",
                 "group": "org.acme",

@@ -618,18 +618,6 @@ def create_set_parser(
         metavar="<version>",
         help="Version of target component. If specified, name must also be specified.",
     )
-    parser.add_argument(
-        "--custom-versions",
-        metavar="<file>",
-        type=Path,
-        help=(
-            "If a version schema is not supported by the tool "
-            "(i.e. not according to '[N!]N(.N)*[{a|b|rc}N][.postN][.devN]')"
-            "a list of versions can be submitted using this flag and providing the"
-            " path to a file containing those versions"
-            " complying with the schema described in the documentation"
-        ),
-    )
 
     parser.set_defaults(cmd_handler=invoke_set, parser=parser)
     return parser
@@ -848,7 +836,6 @@ def invoke_set(args: argparse.Namespace) -> int:
         [args.input],
         args.from_file,
         args.ignore_missing,
-        args.custom_versions,
     )
     cdxev.set.run(sbom, updates, cfg)
     write_sbom(sbom, args.output)

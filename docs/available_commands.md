@@ -209,6 +209,10 @@ This data can either be passed directly on the command-line &mdash; in this case
 
 The *target component* can be identified through any of the identifiable properties defined by CycloneDX, specifically: *cpe*, *purl*, *swid* or the combination of *name*, *group* and/or *version* (collectively called *coordinates*).
 
+If coordinates are used it is possible to provide a range of versions following the [PURl specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst). For further Information on supported version ranges can be found here [univers documentation](https://pypi.org/project/univers/)
+
+It is also possible to use a wildcard by setting the *version* as "*", in that case the version will be ignored and only *name*, *group* considered.
+
 If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
 If the target component isn't found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the `--ignore-missing` flag.
@@ -279,7 +283,27 @@ When passing the targets, names and values in a file, the file must conform to t
                         }
                     }
                 ]
-            }
+            },
+        },
+        {
+            "id": {
+                "name": "web-framework",
+                "group": "org.acme",
+                # It is possible to provide a version range
+                # the format must comply with the PURL specification for version ranges  
+                "version": "vers:pypi/>=1.0.2|<2.0.0",
+            },
+                "set": {"copyright": "1990 Acme Inc"},
+        },
+        {
+            "id": {
+                "name": "web-framework",
+                "group": "org.acme",
+                # It is possible to provide a wildcard for the version
+                # if the version is set to "*" all versions are accepted
+                "version": "*",
+            },
+                "set": {"copyright": "1990 Acme Inc"},
         },
         ...
     ]
@@ -294,80 +318,6 @@ This can be disabled with the `--ignore-missing` command.
 So only a message that the component was not found and could not be updated is logged.
 
     cdx-ev set bom.json --from-file mysetfile.json --ignore-missing
-
-#### set for version ranges
-
-To perform set on a range of versions "name", "version" and, if it exists, group have to be used as "id".
-The version constraints can then be specified with a list of single versions or with the use of the order operators >, <, >=, <=,
-and be separated with a |. An example for a version range string would be ">1.1.1|<1.5.6|2.0.0".
-
-The program is able to parse ordered restraints (> and <) for versions following the MAJOR.MINOR.PATCH schema matching the regular expression "\[N!\]N(.N)\*\[{a|b|rc}N\]\[.postN\]\[.devN\]", for other version schemas see upload of custom versions.
-
-It is possible to use a wildcard with "\*". So would "\*" include all versions and "1.\*" all versions that begin with "1.".
-
-It is also possible to provide a regular expression. For this, the constraint has to begin with the key phrase "regex:" followed by the expression that shell be used.
-Please pay attention to escape all the necessary characters to create a valid regex string, fo example "regex:3\\.\[ab\].*".
-
-There is no limitation on the version schema when regex or wildcard expressions are used.
-
-It is possible to use ordered and regex constraints together, but in that case, the version schema must be supported or the versions provided by the user.
-
-An example for a update file with version ranges:  
-
-    [
-        {
-            "id": {
-                "name": "web-framework",
-                "group": "org.acme",
-                "version": "<3.0.0|>3.2.0|<4.0.0|5.0.0",
-            },
-            "set": {"copyright": "1990 Acme Inc"},
-        },
-        {
-            "id": {
-                "name": "embedded-framework",
-                "group": "org.acme",
-                "version": "2.*|<2.5.8|regex:3\\.[ab].*",
-            },
-            "set": {"copyright": "2000 Acme Inc"},
-        },
-        {
-            "id": {
-                "name": "embedded-framework",
-                "group": "org.acme",
-                "version": "regex:(unsupported-schema)3\\.[ab].*",
-            },
-            "set": {"copyright": "2000 Acme Inc"},
-        },
-    ]
-
-##### Uploading of own versions
-
-It is possible to upload lists of custom software versions the program can then parse and perform set with version ranges on it.
-For this use the `--custom-versions` command to provide the path to file containing the versions.
-
-The file has to follow the format:
-
-    [
-        {
-            "version_schema": "some identifier",
-            "version_list":[
-            version 1,
-            version 2,
-            version 3
-            ]
-        },
-        {
-            "version_schema": "some other identifier",
-            "version_list":[
-            first version,
-            second version,
-            third version
-            ]
-        }
-    ]
-
-The order of the versions has to be aligned with their index in the list.
 
 ## validate
 

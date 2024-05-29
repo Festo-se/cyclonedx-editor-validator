@@ -2,11 +2,12 @@
 
 import functools
 import json
+import re
 import typing as t
-from dataclasses import dataclass
+from dataclasses import dataclass, field, fields
 from enum import Enum
 
-from cdxev.auxiliary.version_processing import VersionRange, is_version_range
+import univers.version_range  # type:ignore
 
 
 @functools.total_ordering
@@ -69,7 +70,17 @@ class Key:
         group: t.Optional[str] = None,
         version: t.Optional[str] = None,
     ) -> "Key":
-        coordinates = Coordinates(name, group, version)
+        coordinates: Coordinates
+        if version is not None and re.fullmatch("vers:.+/.+", version) is not None:
+            version_range = univers.version_range.VersionRange.from_string(version)
+            version_type = version_range.version_class
+            coordinates = CoordinatesWithVersionRange(
+                name, group, version, version_range, version_type
+            )
+        elif version == "*":
+            coordinates = CoordinatesWithVersionRange(name, group, version, None, None)
+        else:
+            coordinates = Coordinates(name, group, version)
         return cls(KeyType.COORDINATES, coordinates)
 
 
@@ -188,111 +199,32 @@ class ComponentIdentity:
         return ComponentIdentity(cpe, purl, swid, coordinates)
 
 
-@dataclass(frozen=True)
-class UpdateIdentity(ComponentIdentity):
-    _version_range: t.Union[VersionRange, None]
-    has_version_range: bool
-
-    def __init__(
-        self, *keys: t.Optional[Key], version_range: t.Optional[VersionRange] = None
-    ):
-        filtered = (key for key in keys if key is not None)
-        sorted_keys = sorted(filtered, key=lambda k: k.type)
-        keyset = tuple(sorted_keys)
-        has_version_range = False
-        if version_range is not None:
-            has_version_range = True
-        object.__setattr__(self, "_keys", keyset)
-        object.__setattr__(self, "_version_range", version_range)
-        object.__setattr__(self, "has_version_range", has_version_range)
-
-    @classmethod
-    def create(
-        cls, update: t.Mapping[str, t.Any], allow_unsafe: bool = False
-    ) -> "UpdateIdentity":
-        """
-        Creates a :py:class:`.UpdateIdentity` for the given update.
-
-        The identity will contain all keys specified on the update.
-
-        If the `allow_unsafe` argument is set to `True`, then component properties will be taken
-        into account for identification which might not enforce strict identity.
-        This is necessary for the use of version ranges.
-
-        This function considers as *safe*:
-
-        * *purl*
-        * *cpe*
-        * *swid*
-
-        The following are considered *unsafe*:
-
-        * package coordinates, i.e. the combination of *name*, *group* and *version*
-
-        :param update: one update dictionary for a component.
-
-        :param bool allow_unsafe: If set to true, *unsafe* keys will also be added to the returned
-                                    identity.
-
-        :returns: The `UpdateIdentity`.
-        """
-        cpe = Key.from_cpe(update["cpe"]) if "cpe" in update else None
-        purl = Key.from_purl(update["purl"]) if "purl" in update else None
-        swid = Key.from_swid(update["swid"]) if "swid" in update else None
-
-        if allow_unsafe and "name" in update:
-            coordinates = Key.from_coordinates(
-                name=update["name"],
-                group=update.get("group"),
-                version=update.get("version"),
-            )
-        else:
-            coordinates = None
-
-        version_range = None
-        version_str = update.get("version", "")
-        if is_version_range(version_str):
-            version_range = VersionRange(version_str)
-
-        return UpdateIdentity(cpe, purl, swid, coordinates, version_range=version_range)
-
-    def __str__(self) -> str:
-        return str(self._keys[0]) if len(self) > 0 else ""
+@dataclass(init=True, frozen=True)
+class CoordinatesWithVersionRange(Coordinates):
+    version_range: univers.version_range.VersionRange = field(
+        default_factory=univers.version_range
+    )
+    version_type: univers.versions = field(default_factory=univers.versions)
 
     def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, UpdateIdentity)
-            and any(k in self._keys for k in other._keys)
-            and self._version_range == other._version_range
-        )
-
-    def is_target_in_version_range(self, identity: Key) -> bool:
-        if self._version_range is None:
-            try:
-                if identity.key.version == self.__getitem__(0).key.version:
-                    return True
-                else:
+        if isinstance(other, CoordinatesWithVersionRange):
+            for field_ in fields(self):
+                if getattr(self, field_.name) != getattr(other, field_.name):
                     return False
-            except:
-                return False
-        # only one identity specifier is allowed, so its has to be Coordinates, if it exists
-        update_name = self.__getitem__(0).key.name
-        update_group = self.__getitem__(0).key.group
-        if identity.type == KeyType.COORDINATES:
-            component_name = identity.key.name
-            component_group = identity.key.group
-            component_version = identity.key.version
-        else:
-            return False
+            return True
 
-        if update_name != component_name:
-            return False
+        if isinstance(other, Coordinates):
+            for field_ in fields(other):
+                if field_.name != "version" and getattr(self, field_.name) != getattr(
+                    other, field_.name
+                ):
+                    return False
 
-        if update_group != component_group and update_group is not None:
-            return False
+            if self.version == "*":
+                return True
 
-        version_range = self._version_range
-        if not version_range.version_string_is_in_range(component_version):
-            return False
+            if other.version is not None:
+                if self.version_type(other.version) in self.version_range:
+                    return True
 
-        return True
+        return False

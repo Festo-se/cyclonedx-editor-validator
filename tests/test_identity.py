@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+import univers.version_range  # type:ignore
 
-from cdxev.auxiliary.identity import ComponentIdentity, Key, KeyType, UpdateIdentity
+from cdxev.auxiliary.identity import ComponentIdentity, Key, KeyType
 
 
 class IdentityTestCase(unittest.TestCase):
@@ -139,6 +140,30 @@ class IdentityTestCase(unittest.TestCase):
             ),
         )
 
+    def test_coordinates_with_version_range_creation(self) -> None:
+
+        key = Key.from_coordinates(
+            name=self.sample_coordinates["name"],
+            group=self.sample_coordinates["group"],
+            version="vers:pypi/>=1.2.4",
+        )
+
+        self.assertEqual(key.type, KeyType.COORDINATES)
+        self.assertEqual(
+            str(key),
+            "COORDINATES[%s/%s@%s]"
+            % (
+                self.sample_coordinates["group"],
+                self.sample_coordinates["name"],
+                "vers:pypi/>=1.2.4",
+            ),
+        )
+        self.assertEqual(key.key.version_type, univers.versions.PypiVersion)
+        self.assertEqual(
+            key.key.version_range,
+            univers.version_range.VersionRange.from_string("vers:pypi/>=1.2.4"),
+        )
+
     def test_id_equality(self) -> None:
         component_base = {
             "type": "library",
@@ -172,16 +197,24 @@ class IdentityTestCase(unittest.TestCase):
         del component_with_coords["purl"]
         del component_with_coords["swid"]
 
+        component_with_range = dict(component_base)
+        del component_with_range["cpe"]
+        del component_with_range["purl"]
+        del component_with_range["swid"]
+        component_with_range["version"] = "vers:pypi/>=9.0.0"
+
         id_base = ComponentIdentity.create(component_base, True)
         id_cpe = ComponentIdentity.create(component_with_cpe, True)
         id_purl = ComponentIdentity.create(component_with_purl, True)
         id_swid = ComponentIdentity.create(component_with_swid, True)
         id_coords = ComponentIdentity.create(component_with_coords, True)
+        id_range = ComponentIdentity.create(component_with_range, True)
 
         self.assertEqual(id_base, id_cpe)
         self.assertEqual(id_base, id_purl)
         self.assertEqual(id_base, id_swid)
         self.assertEqual(id_base, id_coords)
+        self.assertTrue(id_range, id_base)
 
     def test_key_in_id(self) -> None:
         component = {
@@ -207,135 +240,28 @@ class IdentityTestCase(unittest.TestCase):
         self.assertTrue(coordinates_key in component_id)
         self.assertFalse(swid_key in component_id)
 
+    def test_version_range(self) -> None:
+        component_base = {
+            "name": "some name",
+            "group": "some group",
+            "version": "vers:pypi/>=1.2",
+        }
 
-class TestUpdateIdentity(unittest.TestCase):
-    sample_cpe = "cpe:/a:example:mylibrary:1.0.0"
-    sample_purl = "pkg:maven/org.apache.tomcat/tomcat-catalina@9.0.14"
-    sample_swid = {
-        "tagId": "swidgen-242eb18a-503e-ca37-393b-cf156ef09691_9.1.1",
-        "name": "Acme Application",
-        "version": "9.1.1",
-        "text": {
-            "contentType": "text/xml",
-            "encoding": "base64",
-            "content": (
-                "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiID8+"
-                "CjxTb2Z0d2FyZUlkZW50aXR5IHhtbDpsYW5nPSJFTiIgbmFtZT0i"
-                "QWNtZSBBcHBsaWNhdGlvbiIgdmVyc2lvbj0iOS4xLjEiIAogdmVy"
-                "c2lvblNjaGVtZT0ibXVsdGlwYXJ0bnVtZXJpYyIgCiB0YWdJZD0i"
-                "c3dpZGdlbi1iNTk1MWFjOS00MmMwLWYzODItM2YxZS1iYzdhMmE0"
-                "NDk3Y2JfOS4xLjEiIAogeG1sbnM9Imh0dHA6Ly9zdGFuZGFyZHMu"
-                "aXNvLm9yZy9pc28vMTk3NzAvLTIvMjAxNS9zY2hlbWEueHNkIj4g"
-                "CiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1M"
-                "U2NoZW1hLWluc3RhbmNlIiAKIHhzaTpzY2hlbWFMb2NhdGlvbj0i"
-                "aHR0cDovL3N0YW5kYXJkcy5pc28ub3JnL2lzby8xOTc3MC8tMi8y"
-                "MDE1LWN1cnJlbnQvc2NoZW1hLnhzZCBzY2hlbWEueHNkIiA+CiAg"
-                "PE1ldGEgZ2VuZXJhdG9yPSJTV0lEIFRhZyBPbmxpbmUgR2VuZXJh"
-                "dG9yIHYwLjEiIC8+IAogIDxFbnRpdHkgbmFtZT0iQWNtZSwgSW5j"
-                "LiIgcmVnaWQ9ImV4YW1wbGUuY29tIiByb2xlPSJ0YWdDcmVhdG9y"
-                "IiAvPiAKPC9Tb2Z0d2FyZUlkZW50aXR5Pg=="
-            ),
-        },
-    }
-    sample_coordinates = {"name": "mylibrary", "group": "acme", "version": "0.2.4"}
+        component_version_in = dict(component_base)
+        component_version_in["version"] = "1.2.1"
 
-    def test_comparison(self) -> None:
-        component = {
-            "type": "library",
-            "bom-ref": "some bom-ref",
-            "author": "Company Unit",
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": self.sample_coordinates["version"],
-            "cpe": self.sample_cpe,
-            "purl": self.sample_purl,
-            "swid": self.sample_swid,
-        }
-        component.pop("purl")
-        component.pop("swid")
-        update_1 = UpdateIdentity.create(component)
-        component["cpe"] = "some cpe"
-        update_2 = UpdateIdentity.create(component)
-        self.assertFalse(update_1 == update_2)
-        component.pop("cpe")
-        update_1 = UpdateIdentity.create(component, allow_unsafe=True)
-        update_2 = UpdateIdentity.create(component, allow_unsafe=True)
-        self.assertTrue(update_1 == update_2)
-        update_1 = UpdateIdentity.create(component, allow_unsafe=True)
-        component["name"] = "another name"
-        update_2 = UpdateIdentity.create(component, allow_unsafe=True)
-        self.assertFalse(update_1 == update_2)
-        component["group"] = "new group"
-        update_2 = UpdateIdentity.create(component, allow_unsafe=True)
-        self.assertFalse(update_1 == update_2)
+        component_version_not_in = dict(component_base)
+        component_version_not_in["version"] = "1.1.9"
 
-    def test_submit_version_range(self) -> None:
-        update_id = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": "<6.0.0",
-        }
-        update_1 = UpdateIdentity.create(update_id, allow_unsafe=True)
-        self.assertTrue(update_1.has_version_range)
+        component_version_wildcard = dict(component_base)
+        component_version_wildcard["version"] = "*"
 
-    def test_print(self) -> None:
-        update_id = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": "<6.0.0",
-        }
-        update = UpdateIdentity.create(update_id, allow_unsafe=True)
-        self.assertEqual(update.__str__(), "COORDINATES[acme/mylibrary@<6.0.0]")
+        id_range = ComponentIdentity.create(component_base, True)
+        id_version_in = ComponentIdentity.create(component_version_in, True)
+        id_version_not_in = ComponentIdentity.create(component_version_not_in, True)
+        id_wildcard = ComponentIdentity.create(component_version_wildcard, True)
 
-    def test_get_version_range(self) -> None:
-        update_id = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": "<6.0.0|>6.0.0",
-        }
-        component_1 = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": "5.0.0",
-        }
-        component_2 = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": "6.0.0",
-        }
-        component_3 = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": "6.1.0",
-        }
-        identity_1 = ComponentIdentity.create(component_1, allow_unsafe=True)
-        identity_2 = ComponentIdentity.create(component_2, allow_unsafe=True)
-        identity_3 = ComponentIdentity.create(component_3, allow_unsafe=True)
-        update = UpdateIdentity.create(update_id, allow_unsafe=True)
-        self.assertTrue(update.is_target_in_version_range(identity_1._keys[0]))
-        self.assertFalse(update.is_target_in_version_range(identity_2._keys[0]))
-        self.assertTrue(update.is_target_in_version_range(identity_3._keys[0]))
-
-    def test_no_range_is_in_range_function(self) -> None:
-        component_1 = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": "5.0.0",
-        }
-        component_2 = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "version": "8.0.0",
-        }
-        component_3 = {
-            "name": self.sample_coordinates["name"],
-            "group": self.sample_coordinates["group"],
-            "purl": self.sample_purl,
-        }
-        identity_1 = ComponentIdentity.create(component_1, allow_unsafe=True)
-        identity_2 = ComponentIdentity.create(component_2, allow_unsafe=True)
-        identity_3 = ComponentIdentity.create(component_3)
-        update = UpdateIdentity.create(component_1, allow_unsafe=True)
-        self.assertTrue(update.is_target_in_version_range(identity_1._keys[0]))
-        self.assertFalse(update.is_target_in_version_range(identity_2._keys[0]))
-        self.assertFalse(update.is_target_in_version_range(identity_3._keys[0]))
+        self.assertEqual(id_wildcard, id_version_in)
+        self.assertEqual(id_wildcard, id_version_not_in)
+        self.assertEqual(id_range, id_version_in)
+        self.assertNotEqual(id_range, id_version_not_in)

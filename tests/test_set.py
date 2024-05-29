@@ -1,11 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import copy
 import json
 import pathlib
 import typing as t
 import unittest
-from typing import Any, Sequence
 
 import cdxev.error
 import cdxev.set
@@ -510,6 +508,7 @@ class SetTestCase(unittest.TestCase):
                 "set": {"name": "new name"},
             },
         ]
+
         cfg = cdxev.set.SetConfig(
             True,
             True,
@@ -518,7 +517,7 @@ class SetTestCase(unittest.TestCase):
             True,
         )
 
-        cdxev.set.run(self.sbom_fixture, copy.deepcopy(updates), cfg)
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
 
         cfg = cdxev.set.SetConfig(
             True,
@@ -553,7 +552,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "Acme_Application",
                     "group": "com.acme.internal",
-                    "version": "9.1.1|8.1.1",
+                    "version": "vers:pypi/9.1.1|8.1.1",
                 },
                 "set": {"copyright": "2022 Acme Inc"},
             }
@@ -591,7 +590,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "<6.0.0",
+                    "version": "vers:pypi/<6.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             }
@@ -618,7 +617,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": ">3.0.0",
+                    "version": "vers:pypi/>3.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             }
@@ -647,12 +646,12 @@ class TestVersionRange(unittest.TestCase):
         )
 
     def test_add_copyright_to_all_several_updates(self) -> None:
-        updates: Sequence[dict[str, Any]] = [
+        updates: t.Sequence[dict[str, t.Any]] = [
             {
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": ">3.0.0",
+                    "version": "vers:pypi/>3.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             },
@@ -660,7 +659,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "<=3.0.0",
+                    "version": "vers:pypi/<=3.0.0",
                 },
                 "set": {"copyright": "2000 Acme Inc"},
             },
@@ -668,7 +667,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "<2.0.0|>4.0.0",
+                    "version": "vers:pypi/<2.0.0|>4.0.0",
                 },
                 "set": {
                     "supplier": {"name": "New supplier"},
@@ -718,8 +717,27 @@ class TestVersionRange(unittest.TestCase):
             self.sbom_fixture["components"][5]["supplier"], {"name": "New supplier"}
         )
 
-    def test_custom_versions(self) -> None:
-        path_to_version_file = pathlib.Path("tests/auxiliary/custom_version_list.json")
+    def test_wildcard_updates(self) -> None:
+        updates: t.Sequence[dict[str, t.Any]] = [
+            {
+                "id": {
+                    "name": "web-framework",
+                    "group": "org.acme",
+                    "version": "*",
+                },
+                "set": {"copyright": "2000 Acme Inc"},
+            },
+            {
+                "id": {
+                    "name": "web-framework",
+                    "group": "org.acme",
+                    "version": "*",
+                },
+                "set": {
+                    "supplier": {"name": "New supplier"},
+                },
+            },
+        ]
         cfg = cdxev.set.SetConfig(
             True,
             False,
@@ -730,49 +748,44 @@ class TestVersionRange(unittest.TestCase):
                 )
             ],
             None,
-            False,
-            custom_versions=path_to_version_file,
         )
-        updates = [
-            {
-                "id": {
-                    "name": "web-framework",
-                    "group": "org.acme",
-                    "version": ">=Natty Narwhal",
-                },
-                "set": {"copyright": "1990 Acme Inc"},
-            }
-        ]
-        version_names = [
-            "Bionic Beaver",
-            "Maverick Meerkat",
-            "Natty Narwhal",
-            "Oneiric Ocelot",
-            "Precise Pangolin",
-            "Intrepid Ibex",
-        ]
-        self.sbom_fixture["components"][5]["copyright"] = "Public domain"
-        self.sbom_fixture["components"][1]["copyright"] = "Public domain"
-        for index, component in enumerate(self.sbom_fixture["components"]):
-            component["version"] = version_names[index]
 
         cdxev.set.run(self.sbom_fixture, updates, cfg)
         self.assertEqual(
-            self.sbom_fixture["components"][0]["copyright"], "1990 Acme Inc"
+            self.sbom_fixture["components"][0]["copyright"], "2000 Acme Inc"
         )
         self.assertEqual(
-            self.sbom_fixture["components"][1]["copyright"], "Public domain"
+            self.sbom_fixture["components"][1]["copyright"], "2000 Acme Inc"
         )
         self.assertEqual(
-            self.sbom_fixture["components"][2]["copyright"], "1990 Acme Inc"
+            self.sbom_fixture["components"][2]["copyright"], "2000 Acme Inc"
         )
 
         self.assertEqual(
-            self.sbom_fixture["components"][3]["copyright"], "1990 Acme Inc"
+            self.sbom_fixture["components"][3]["copyright"], "2000 Acme Inc"
         )
         self.assertEqual(
-            self.sbom_fixture["components"][4]["copyright"], "1990 Acme Inc"
+            self.sbom_fixture["components"][4]["copyright"], "2000 Acme Inc"
         )
         self.assertEqual(
-            self.sbom_fixture["components"][5]["copyright"], "Public domain"
+            self.sbom_fixture["components"][5]["copyright"], "2000 Acme Inc"
+        )
+
+        self.assertEqual(
+            self.sbom_fixture["components"][0]["supplier"], {"name": "New supplier"}
+        )
+        self.assertEqual(
+            self.sbom_fixture["components"][1]["supplier"], {"name": "New supplier"}
+        )
+        self.assertEqual(
+            self.sbom_fixture["components"][2]["supplier"], {"name": "New supplier"}
+        )
+        self.assertEqual(
+            self.sbom_fixture["components"][3]["supplier"], {"name": "New supplier"}
+        )
+        self.assertEqual(
+            self.sbom_fixture["components"][4]["supplier"], {"name": "New supplier"}
+        )
+        self.assertEqual(
+            self.sbom_fixture["components"][5]["supplier"], {"name": "New supplier"}
         )

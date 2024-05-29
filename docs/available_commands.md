@@ -287,7 +287,11 @@ When passing the targets, names and values in a file, the file must conform to t
                 ]
             },
         },
-        # Example for the use of version ranges
+    ]
+
+Example for the use of version ranges:
+
+    [
         {   
             "id": {
                 "name": "web-framework",

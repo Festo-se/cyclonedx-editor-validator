@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
 import univers.version_range  # type:ignore
 
 from cdxev.auxiliary.identity import ComponentIdentity, Key, KeyType

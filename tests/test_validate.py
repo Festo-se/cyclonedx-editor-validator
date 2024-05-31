@@ -400,6 +400,7 @@ class TestValidateComponents(unittest.TestCase):
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][-1].pop("copyright")
+            sbom["components"][-1].pop("licenses")
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("copyright", issues), True)
 
@@ -766,7 +767,28 @@ class TestValidateUseSchemaType(unittest.TestCase):
 
 
 class TestInternalNameSchema(unittest.TestCase):
-    def test_components_supplier_festo_no_copyright(self) -> None:
+    def test_components_supplier_festo_copyright_not_no_licenses(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "supplier": {"name": "Festo SE & Co.KG"},
+                "group": "",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "copyright": "3rd Party",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(
+                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
+            )
+
+    def test_components_supplier_festo_no_copyright_with_licenses(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -783,9 +805,9 @@ class TestInternalNameSchema(unittest.TestCase):
                 "licenses": [{"license": {"id": "Apache-2.0"}}],
             }
             issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("copyright", issues), True)
+            self.assertEqual(issues, ["no issue"])
 
-    def test_components_supplier_festo_copyright_not(self) -> None:
+    def test_components_supplier_festo_copyright_not_with_licenses(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -807,7 +829,31 @@ class TestInternalNameSchema(unittest.TestCase):
                 search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
             )
 
-    def test_copyright_festo_supplier_not(
+    def test_copyright_festo_supplier_not_no_licenses(
+        self,
+    ) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0] = {
+                "type": "application",
+                "bom-ref": "someprogramm application",
+                "author": "automated",
+                "supplier": {"name": "Acme SE & Co.KG"},
+                "group": "com.festo.internal",
+                "name": "someprogramm",
+                "version": "T4.0.1.30",
+                "hashes": [
+                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
+                ],
+                "copyright": "festo",
+            }
+            issues = validate_test(sbom)
+            self.assertEqual(
+                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
+            )
+
+    def test_copyright_festo_supplier_not_with_licenses(
         self,
     ) -> None:
         for spec_version in list_of_spec_versions:
@@ -828,9 +874,7 @@ class TestInternalNameSchema(unittest.TestCase):
                 "copyright": "festo",
             }
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(issues, ["no issue"])
 
     def test_internal_component_copyright_festo_supplier_not(self) -> None:
         sbom = {

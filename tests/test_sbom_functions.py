@@ -1,6 +1,7 @@
 import unittest
-from cdxev.auxiliary import sbomFunctions as sbF
 from typing import Sequence
+
+from cdxev.auxiliary import sbomFunctions as sbF
 
 
 class TestComponentFunctions(unittest.TestCase):

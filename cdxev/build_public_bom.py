@@ -151,14 +151,19 @@ def build_public_bom(sbom: dict, path_to_schema: Path) -> dict:
     ) = remove_component_tagged_internal(components, path_to_schema)
     for bom_ref in list_of_removed_components:
         dependencies = merge_dependency_for_removed_component(bom_ref, dependencies)
-    new_compositions = get_ref_from_components(cleared_components)
+    kept_bom_refs = get_ref_from_components(cleared_components, only_top_level=False)
     remove_internal_information_from_properties(
         sbom.get("metadata", {}).get("component", {})
     )
     sbom["components"] = cleared_components
     sbom["dependencies"] = dependencies
-    compositions = [{"aggregate": "incomplete", "assemblies": new_compositions}]
-    sbom["compositions"] = compositions
+    print(kept_bom_refs)
+    for composition in sbom.get("compositions", []):
+        new_assemblies = []
+        for bom_ref in composition.get("assemblies"):
+            if bom_ref in kept_bom_refs:
+                new_assemblies.append(bom_ref)
+        composition["assemblies"] = new_assemblies
     return sbom
 
 

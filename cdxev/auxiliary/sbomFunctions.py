@@ -187,8 +187,7 @@ def get_bom_refs_from_dependencies(dependencies: Sequence[dict]) -> list[str]:
 
 
 def get_ref_from_components(
-        list_of_components: Sequence[dict],
-        only_top_level: bool = True
+    list_of_components: Sequence[dict], only_top_level: bool = True
 ) -> list[str]:
     """
     Function that returns a list of bom-refs from a list of components.

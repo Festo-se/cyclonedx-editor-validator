@@ -709,3 +709,43 @@ class TestValidate:
             caplog.records[0].msg.description  # type: ignore
             == "filename doesn't match regular expression fail"
         )
+
+    def test_custom_schema(self, argv, data_dir, caplog):
+        argv(
+            "validate",
+            "--schema-path",
+            str(data_dir / "validate.custom_schema.json"),
+            str(data_dir / "validate" / "valid" / "default" / "laravel.cdx.json"),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.VALIDATION_ERROR
+
+        assert len(caplog.records) == 1
+        assert caplog.records[0].msg.description.endswith("is not of type 'array'")
+
+    def test_invalid_option_combinations(self, argv):
+        argv(
+            "validate",
+            "--filename-pattern",
+            "test",
+            "--no-filename-validation",
+            "foo.cdx.json",
+        )
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+
+        argv(
+            "validate",
+            "--schema-type",
+            "default",
+            "--schema-path",
+            "myschema.json",
+            "foo.cdx.json",
+        )
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR

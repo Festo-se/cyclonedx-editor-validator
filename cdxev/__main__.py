@@ -664,7 +664,7 @@ def invoke_amend(args: argparse.Namespace) -> int:
         print(long_desc)
         print()
 
-        sys.exit()
+        return Status.OK
 
     if not args.input:
         usage_error("<input> argument missing.", args.parser)

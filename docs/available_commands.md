@@ -8,7 +8,7 @@ Before use, please consider the [known limitations](https://festo-se.github.io/c
 
 ## amend
 
-This command accepts a single input file and will apply one or multiple *operations* to it. Each operation modifies certain aspects of the SBOM. These modifications cannot be targetted at individual components in the SBOM which sets the *amend* command apart from *set*. It's use-case is ensuring an SBOM fulfils certain requirements in an automated fashion.
+This command accepts a single input file and will apply one or multiple *operations* to it. Each operation modifies certain aspects of the SBOM. These modifications cannot be targeted at individual components in the SBOM which sets the *amend* command apart from *set*. It's use-case is ensuring an SBOM fulfils certain requirements in an automated fashion.
 
 See the command help with `cdx-ev amend --help` for a list of available operations. All operations marked `[default]` will run unless the command-line option `--operation` is provided.
 
@@ -39,7 +39,7 @@ Given this license in the input:
     }
 
 it would be filled with the text in any file named `My license`, `My license.txt`, `My license.md`, or any other extension.  
-However, the file `My license.2.txt` would be ignored, because with or without it's extension (`.txt`), it doesn't match the license name.
+However, the file `My license.2.txt` would be ignored, because with or without its extension (`.txt`), it doesn't match the license name.
 
 ## build-public
 

@@ -11,6 +11,7 @@ import pytest
 import toml
 
 from cdxev.__main__ import Status
+from cdxev.amend.operations import AddLicenseText
 from tests.auxiliary.sbomFunctionsTests import search_entry
 from tests.integration.helper import load_sbom, run_main
 
@@ -201,6 +202,22 @@ class TestAmend:
         assert e.value.code == Status.USAGE_ERROR
         _, stderr = capsys.readouterr()
         assert re.search(r"is required for operation", stderr)
+
+    def test_help_operation(
+        self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]
+    ):
+        argv("amend", "--help-operation", "add-license-text")
+        exit_code, stdout, _ = run_main(capsys=capsys)
+
+        assert exit_code == Status.OK
+
+        # Compare stdout to operation class docstring, stripping out any non-alphanumeric
+        # characters. These might differ due to formatting.
+        non_alnum = re.compile(r"[\W]+")
+        expected = non_alnum.sub("", AddLicenseText.__doc__)  # type: ignore
+        actual = non_alnum.sub("", stdout)
+
+        assert actual == expected
 
 
 class TestBuildPublic:
@@ -495,7 +512,10 @@ class TestSet:
         ids=["string without quotes", "unclosed array"],
     )
     def test_invalid_json_value(
-        self, value, input_file: Path, argv: Callable[..., None]
+        self,
+        value,
+        input_file: Path,
+        argv: Callable[..., None],
     ):
         argv("set", str(input_file), "--name", "comp", "--key", "foo", "--value", value)
         with pytest.raises(SystemExit) as e:
@@ -710,7 +730,12 @@ class TestValidate:
             == "filename doesn't match regular expression fail"
         )
 
-    def test_custom_schema(self, argv, data_dir, caplog):
+    def test_custom_schema(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        caplog: pytest.LogCaptureFixture,
+    ):
         argv(
             "validate",
             "--schema-path",
@@ -722,9 +747,9 @@ class TestValidate:
         assert exit_code == Status.VALIDATION_ERROR
 
         assert len(caplog.records) == 1
-        assert caplog.records[0].msg.description.endswith("is not of type 'array'")
+        assert caplog.records[0].msg.description.endswith("is not of type 'array'")  # type: ignore
 
-    def test_invalid_option_combinations(self, argv):
+    def test_invalid_option_combinations(self, argv: Callable[..., None]):
         argv(
             "validate",
             "--filename-pattern",

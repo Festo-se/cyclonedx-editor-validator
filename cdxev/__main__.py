@@ -1,4 +1,5 @@
 import argparse
+import enum
 import inspect
 import json
 import logging
@@ -27,10 +28,13 @@ from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
 
 logger: logging.Logger
-_STATUS_OK = 0
-_STATUS_APP_ERROR = 2
-_STATUS_USAGE_ERROR = 3
-_STATUS_VALIDATION_ERROR = 4
+
+
+class Status(enum.IntEnum):
+    OK = 0
+    USAGE_ERROR = 2
+    APP_ERROR = 3
+    VALIDATION_ERROR = 4
 
 
 def main() -> int:
@@ -47,7 +51,7 @@ def main() -> int:
         return args.cmd_handler(args)
     except AppError as ex:
         logger.error(ex.details, exc_info=True)
-        return _STATUS_APP_ERROR
+        return Status.APP_ERROR
 
 
 def read_sbom(sbom_file: Path, file_type: Optional[str] = None) -> Tuple[dict, str]:
@@ -101,10 +105,16 @@ def load_xml(path: Path) -> dict:
     )
 
 
-def usage_error(msg: str) -> NoReturn:
-    print(msg, file=sys.stderr)
-    print("Use --help for info on how to use this program.")
-    sys.exit(_STATUS_USAGE_ERROR)
+def usage_error(
+    message: str, parser: Optional[argparse.ArgumentParser] = None
+) -> NoReturn:
+    if parser is not None:
+        parser.print_usage(file=sys.stderr)
+
+    print("error: " + message, file=sys.stderr)
+    print(file=sys.stderr)
+    print("Use --help for info on how to use this program.", file=sys.stderr)
+    sys.exit(Status.USAGE_ERROR)
 
 
 def parse_cli() -> argparse.Namespace:
@@ -347,9 +357,12 @@ def create_amend_parser(
 
     add_output_argument(parser)
 
-    parser.set_defaults(operations_by_name=operations_by_name)
-    parser.set_defaults(default_operations=default_operations)
-    parser.set_defaults(cmd_handler=invoke_amend)
+    parser.set_defaults(
+        cmd_handler=invoke_amend,
+        parser=parser,
+        operations_by_name=operations_by_name,
+        default_operations=default_operations,
+    )
     return parser
 
 
@@ -373,7 +386,7 @@ def create_merge_parser(
     )
     add_output_argument(parser)
 
-    parser.set_defaults(cmd_handler=invoke_merge)
+    parser.set_defaults(cmd_handler=invoke_merge, parser=parser)
     return parser
 
 
@@ -409,7 +422,7 @@ def create_merge_vex_parser(
     )
     add_output_argument(parser)
 
-    parser.set_defaults(cmd_handler=invoke_merge_vex)
+    parser.set_defaults(cmd_handler=invoke_merge_vex, parser=parser)
     return parser
 
 
@@ -477,7 +490,7 @@ def create_validation_parser(
 
     add_output_argument(parser)
 
-    parser.set_defaults(cmd_handler=invoke_validate)
+    parser.set_defaults(cmd_handler=invoke_validate, parser=parser)
     return parser
 
 
@@ -596,7 +609,7 @@ def create_set_parser(
         help="Version of target component. If specified, name must also be specified.",
     )
 
-    parser.set_defaults(cmd_handler=invoke_set)
+    parser.set_defaults(cmd_handler=invoke_set, parser=parser)
     return parser
 
 
@@ -623,7 +636,7 @@ def create_build_public_bom_parser(
         type=Path,
     )
     add_output_argument(parser)
-    parser.set_defaults(cmd_handler=invoke_build_public_bom)
+    parser.set_defaults(cmd_handler=invoke_build_public_bom, parser=parser)
     return parser
 
 
@@ -644,7 +657,7 @@ def invoke_amend(args: argparse.Namespace) -> int:
         sys.exit()
 
     if not args.input:
-        usage_error("<input> argument missing.")
+        usage_error("<input> argument missing.", args.parser)
 
     sbom, _ = read_sbom(args.input)
 
@@ -662,14 +675,15 @@ def invoke_amend(args: argparse.Namespace) -> int:
 
     amend.run(sbom, operations, config)
     write_sbom(sbom, args.output)
-    return _STATUS_OK
+    return Status.OK
 
 
 def invoke_merge(args: argparse.Namespace) -> int:
     if len(args.input) < 2 and args.from_folder is None:
         usage_error(
             "At least two input files, or a input file"
-            " and an folder path must be specified."
+            " and an folder path must be specified.",
+            args.parser,
         )
     inputs: List[dict] = []
     for input in args.input:
@@ -677,7 +691,7 @@ def invoke_merge(args: argparse.Namespace) -> int:
         inputs.append(sbom)
     if args.from_folder is not None:
         if not os.path.exists(args.from_folder):
-            usage_error("Path to folder does not exist")
+            usage_error("Path to folder does not exist", args.parser)
         path_to_folder = args.from_folder
         name_governing_sbom = os.path.basename(os.path.normpath(args.input[0]))
         list_folder_content = os.listdir(path_to_folder)
@@ -694,11 +708,11 @@ def invoke_merge(args: argparse.Namespace) -> int:
                 new_sbom, _ = read_sbom(Path(os.path.join(path_to_folder, file_name)))
                 inputs.append(new_sbom)
         if len(inputs) == 1:
-            usage_error("Provided folder does not contain any sboms files")
+            usage_error("Provided folder does not contain any SBOM files", args.parser)
 
     output = merge(inputs)
     write_sbom(output, args.output)
-    return _STATUS_OK
+    return Status.OK
 
 
 def invoke_merge_vex(args: argparse.Namespace) -> int:
@@ -707,7 +721,7 @@ def invoke_merge_vex(args: argparse.Namespace) -> int:
 
     output = merge_vex(sbom, vex)
     write_sbom(output, args.output)
-    return _STATUS_OK
+    return Status.OK
 
 
 # noinspection PyTypeChecker,PyUnboundLocalVariable
@@ -722,11 +736,19 @@ def invoke_set(args: argparse.Namespace) -> int:
 
     if args.from_file is None:
         if not has_target():
-            usage_error("<target> is required, unless the --from-file option is used.")
+            usage_error(
+                "<target> is required, unless the --from-file option is used.",
+                args.parser,
+            )
         elif args.key is None:
-            usage_error("--key is required, unless the --from-file option is used.")
+            usage_error(
+                "--key is required, unless the --from-file option is used.", args.parser
+            )
         elif args.value is None:
-            usage_error("--value is required, unless the --from-file option is used.")
+            usage_error(
+                "--value is required, unless the --from-file option is used.",
+                args.parser,
+            )
 
         possible_targets = [
             args.swid,
@@ -742,7 +764,7 @@ def invoke_set(args: argparse.Namespace) -> int:
         ]
         actual_targets = [x for x in possible_targets if x is not None]
         if len(actual_targets) > 1:
-            usage_error("Cannot specify more than one <target>.")
+            usage_error("Cannot specify more than one <target>.", args.parser)
 
         target: Key = actual_targets[0]
         try:
@@ -750,7 +772,8 @@ def invoke_set(args: argparse.Namespace) -> int:
         except json.JSONDecodeError:
             usage_error(
                 "<value> is not valid JSON. Possibly missing double quotes around a string?\n"
-                f"Value:\t{args.value}"
+                f"Value:\t{args.value}",
+                args.parser,
             )
 
         updates = [{"id": {}, "set": {args.key: value}}]
@@ -770,7 +793,8 @@ def invoke_set(args: argparse.Namespace) -> int:
     else:
         if has_target() or args.key is not None or args.value is not None:
             usage_error(
-                "--from-file cannot be combined with <target>, --key or --value."
+                "--from-file cannot be combined with <target>, --key or --value.",
+                args.parser,
             )
 
         updates = []
@@ -794,7 +818,7 @@ def invoke_set(args: argparse.Namespace) -> int:
     )
     cdxev.set.run(sbom, updates, cfg)
     write_sbom(sbom, args.output)
-    return _STATUS_OK
+    return Status.OK
 
 
 def invoke_validate(args: argparse.Namespace) -> int:
@@ -805,7 +829,7 @@ def invoke_validate(args: argparse.Namespace) -> int:
         output = args.output
     report_format = args.report_format
     return (
-        _STATUS_OK
+        Status.OK
         if validate_sbom(
             sbom=sbom,
             input_format=file_type,
@@ -818,8 +842,8 @@ def invoke_validate(args: argparse.Namespace) -> int:
             ),
             schema_path=args.schema_path,
         )
-        == _STATUS_OK
-        else _STATUS_VALIDATION_ERROR
+        == Status.OK
+        else Status.VALIDATION_ERROR
     )
 
 
@@ -827,7 +851,7 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
     sbom, _ = read_sbom(args.input)
     output = build_public_bom(sbom, args.schema_path)
     write_sbom(output, args.output)
-    return _STATUS_OK
+    return Status.OK
 
 
 if __name__ == "__main__":  # pragma: no cover

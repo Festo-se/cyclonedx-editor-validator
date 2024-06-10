@@ -4,6 +4,7 @@
 ##################################################
 
 from cdxev import merge
+from cdxev.auxiliary.sbomFunctions import get_ref_from_components
 
 
 def get_refs_from_vex(vex: dict) -> list:
@@ -44,8 +45,8 @@ def get_refs_from_sbom(sbom: dict) -> list:
         List with the bom-refs used in the sbom
     """
     references = [sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")]
-    for components in sbom.get("components", []):
-        references.append(components.get("bom-ref", ""))
+    component_refs = get_ref_from_components(sbom.get("components", []), only_top_level=False)
+    references += component_refs
     return references
 
 

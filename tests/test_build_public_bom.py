@@ -37,7 +37,6 @@ relative_path_to_example_schema_2 = (
 )
 path_to_example_schema_2 = Path(os.path.abspath(relative_path_to_example_schema_2))
 
-
 relative_path_to_documentation_schema_1 = (
     "tests/auxiliary/test_build_public_bom_sboms/schema/documentation_schema_1.json"
 )
@@ -155,6 +154,8 @@ class TestCreateExternalBom(unittest.TestCase):
         sbom = get_test_sbom()
         public_sbom = get_public_sbom()
         external_bom = b_p_b.build_public_bom(sbom, path_to_example_schema_1)
+        dumpsbom(public_sbom, "public.json")
+        dumpsbom(external_bom, "external.json")
         self.assertDictEqual(public_sbom, external_bom)
 
     def test_build_public_group_is_internal_name_contained_is_public(self) -> None:

@@ -12,7 +12,7 @@ from typing import Sequence
 
 from jsonschema import Draft7Validator, FormatChecker
 
-from cdxev.auxiliary.sbomFunctions import get_ref_from_components, extract_components
+from cdxev.auxiliary.sbomFunctions import extract_components, get_ref_from_components
 
 
 def remove_internal_information_from_properties(component: dict) -> None:

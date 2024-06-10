@@ -8,7 +8,7 @@ from cdxev.auxiliary.sbomFunctions import (
     compare_time_flag_from_vulnerabilities,
     compare_vulnerabilities,
     copy_ratings,
-    get_bom_refs_from_components,
+    get_ref_from_components,
     get_bom_refs_from_dependencies,
     get_corresponding_reference_to_component,
     get_dependency_by_ref,
@@ -36,7 +36,7 @@ def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[di
     """
     list_of_merged_components = governing_sbom.get("components", [])
     list_of_added_components = sbom_to_be_merged.get("components", [])
-    list_of_merged_bom_refs = get_bom_refs_from_components(list_of_merged_components)
+    list_of_merged_bom_refs = get_ref_from_components(list_of_merged_components)
     for component in list_of_added_components:
         is_in_list, bom_ref_from_list = get_corresponding_reference_to_component(
             component, list_of_merged_components
@@ -70,7 +70,7 @@ def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[di
             else:
                 # if the bom-ref already exists in the components, add a incrementing number to
                 # the bom-ref
-                list_of_bom_refs_to_be_added = get_bom_refs_from_components(
+                list_of_bom_refs_to_be_added = get_ref_from_components(
                     sbom_to_be_merged.get("components", [])
                 )
                 list_of_bom_refs_to_be_added.append(
@@ -413,7 +413,7 @@ def replace_ref_in_sbom(
         True if replacement succesfull, false, if the new_reference
         already exists in the sbom
     """
-    list_of_bom_refs = get_bom_refs_from_components(sbom.get("components", []))
+    list_of_bom_refs = get_ref_from_components(sbom.get("components", []))
     list_of_bom_refs.append(
         sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")
     )

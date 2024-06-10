@@ -179,6 +179,7 @@ def get_ref_from_components(
 
     Input:
     list_of_components: list with dicts of components
+    only_top_level: bool describing if only top level components shall be considered
 
     Output:
     list_of_bom_refs: List of bom-refs from the components in the submitted list

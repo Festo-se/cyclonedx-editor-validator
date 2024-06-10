@@ -142,9 +142,14 @@
     {
       "ref": "comp1",
       "dependsOn": [
+        "sub_comp1",
         "comp2",
         "comp4"
       ]
+    },
+    {
+      "ref": "sub_comp1",
+      "dependsOn": []
     },
     {
       "ref": "comp2",

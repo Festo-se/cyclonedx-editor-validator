@@ -192,10 +192,14 @@ def get_ref_from_components(
     list_of_components: Sequence[dict], only_top_level: bool = True
 ) -> list[str]:
     """
-    Function that returns a list of bom-refs from a list of components
+    Function that returns a list of bom-refs from a list of components.
+    Per default only the references of top level components will be retrieved,
+    if the flag 'only_top_level' is set to false,
+    the references of nested components will also be retrieved.
 
     Input:
     list_of_components: list with dicts of components
+    only_top_level: bool describing if only top level components shall be considered
 
     Output:
     list_of_bom_refs: List of bom-refs from the components in the submitted list

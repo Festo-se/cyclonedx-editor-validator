@@ -452,7 +452,7 @@ class TestValidateCommand(unittest.TestCase):
                 "fake_bom.cdx.json",
                 "--report-format",
                 "warnings-ng",
-                "--output",
+                "--report-path",
                 "issues_file.json",
             ],
         ):
@@ -466,8 +466,6 @@ class TestValidateCommand(unittest.TestCase):
                 "",
                 "validate",
                 "fake_bom.cdx.json",
-                "--output",
-                "issues_file.json",
                 "--filename-pattern",
                 ".*",
             ],

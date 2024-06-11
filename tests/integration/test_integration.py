@@ -672,7 +672,7 @@ class TestValidate:
             "validate",
             "--report-format",
             "warnings-ng",
-            "--output",
+            "--report-path",
             str(report_path),
             str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
         )
@@ -694,7 +694,7 @@ class TestValidate:
             "validate",
             "--report-format",
             "gitlab-code-quality",
-            "--output",
+            "--report-path",
             str(report_path),
             str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
         )
@@ -768,6 +768,28 @@ class TestValidate:
             "default",
             "--schema-path",
             "myschema.json",
+            "foo.cdx.json",
+        )
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+
+        argv(
+            "validate",
+            "--report-format",
+            "warnings-ng",
+            "foo.cdx.json",
+        )
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+
+        argv(
+            "validate",
+            "--report-path",
+            "report.json",
             "foo.cdx.json",
         )
         with pytest.raises(SystemExit) as e:

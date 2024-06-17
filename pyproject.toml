@@ -28,7 +28,7 @@ docstring-parser = "^0.16"
 charset-normalizer = "^3.3.2"
 
 [tool.poetry.group.dev.dependencies]
-flake8 = "7.0.0"
+flake8 = "7.1.0"
 black = "24.4.2"
 pep8-naming = "0.14.1"
 mypy = "1.10.0"

@@ -362,6 +362,7 @@ typing = ["typing-extensions (>=4.8)"]
 [[package]]
 name = "flake8"
 version = "7.1.0"
+version = "7.1.0"
 description = "the modular source code checker: pep8 pyflakes and co"
 optional = false
 python-versions = ">=3.8.1"

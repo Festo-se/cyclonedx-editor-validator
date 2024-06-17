@@ -234,6 +234,7 @@
   {
       "exp": "LGPL-3.0-only",
       "names": [
+          "LGPL v3",
           "LGPL 3.0",
           "LGPL v3.0",
           "LGPL-3.0",
@@ -249,6 +250,7 @@
       "names": [
           "GNU Lesser General Public License (LGPL), version 3 or later",
           "GNU Lesser General Public License (LGPL), version 3.0 or later",
+          "GNU Lesser General Public License v3 or later",
           "GNU Lesser General Public License v3.0 or later",
           "Lesser General Public License, version 3 or greater"
       ]
@@ -1632,7 +1634,8 @@
   {
       "exp": "GPL-3.0-only",
       "names": [
-          "GNU General Public License v3.0 only"
+          "GNU General Public License v3.0 only",
+          "GPL v3"
       ]
   },
   {

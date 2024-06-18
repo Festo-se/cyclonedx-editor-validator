@@ -7,7 +7,7 @@ authors = [
     "Christian Beck <christian.beck@festo.com>",
     "Moritz Marseu <moritz.marseu@festo.com>"
 ]
-license = "GPL-3.0-only"
+license = "GPL-3.0-or-later"
 readme = "README.md"
 packages = [{include = "cdxev"}]
 

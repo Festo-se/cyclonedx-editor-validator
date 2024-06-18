@@ -26,6 +26,11 @@ python-dateutil = "2.9.0.post0"
 jsonschema = {version = "4.22.0", extras = ["format"]}
 docstring-parser = "^0.16"
 charset-normalizer = "^3.3.2"
+pyicu = [
+    {version = "^2.13.1", platform = "darwin"},
+    {version = "^2.13.1", platform = "linux"}
+    ]
+natsort = "^8.4.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "7.1.0"

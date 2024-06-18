@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, NoReturn, Optional, Tuple
 
 import docstring_parser
+from natsort import os_sorted
 
 import cdxev.amend.command as amend
 import cdxev.set
@@ -695,7 +696,7 @@ def invoke_merge(args: argparse.Namespace) -> int:
             folder_inputs.append(args.from_folder / "bom.json")
 
         # Remove any paths which have already been provided as an explicit input
-        folder_inputs = sorted(p for p in folder_inputs if p not in args.input)
+        folder_inputs = os_sorted(p for p in folder_inputs if p not in args.input)
 
         if len(folder_inputs) == 0:
             logger.warning(f"No additional SBOMs found in folder: {args.from_folder}")

@@ -375,7 +375,7 @@ def create_merge_parser(
         "input",
         metavar="<input>",
         help="Paths to SBOM files to merge. You must specify at least two paths.",
-        nargs="+",
+        nargs="*",
         type=Path,
     )
     parser.add_argument(

@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import re
 from collections.abc import Callable
@@ -310,43 +309,91 @@ class TestMerge:
         # Verify that output matches what is expected
         assert actual == data["expected"]
 
+    def test_direct(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ):
+        input_folder = data_dir / "merge-from-folder"
+
+        input_1 = input_folder / "merge.input_1.cdx.json"
+        input_2 = input_folder / "merge.input_2.cdx.json"
+        input_3 = input_folder / "merge.input_3.cdx.json"
+
+        argv("merge", str(input_1), str(input_2), str(input_3))
+        exit_code, output, _ = run_main(capsys=capsys, parse_output="json")
+
+        assert exit_code == Status.OK
+
+        expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
+        assert output == expected
+
+    def test_order(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ):
+        input_folder = data_dir / "merge-from-folder"
+
+        input_1 = input_folder / "merge.input_1.cdx.json"
+        input_2 = input_folder / "merge.input_2.cdx.json"
+        input_3 = input_folder / "merge.input_3.cdx.json"
+
+        argv("merge", str(input_2), str(input_1), str(input_3))
+        exit_code, output, _ = run_main(capsys=capsys, parse_output="json")
+
+        assert exit_code == Status.OK
+
+        # Since we changed the input order, we expect the output to NOT match the contents of the
+        # file. We don't care what the output is truly, only that it's different from the regular
+        # test.
+        not_expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
+        assert output != not_expected
+
     def test_from_folder(
         self,
         argv: Callable[..., None],
         data_dir: Path,
-        caplog: pytest.LogCaptureFixture,
-        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
     ):
-        output_file = tmp_path / "output.cdx.json"
-        argv(
-            "--verbose",
-            "merge",
-            str(data_dir / "merge.input_1.cdx.json"),
-            "--from-folder",
-            str(data_dir),
-            "--output",
-            str(output_file),
-        )
-        exit_code, *_ = run_main()
+        input_folder = data_dir / "merge-from-folder"
+
+        argv("merge", "--from-folder", str(input_folder))
+        exit_code, output, _ = run_main(capsys=capsys, parse_output="json")
 
         assert exit_code == Status.OK
 
-        # Assert that several SBOMs have been loaded. The exact number is unimportant because we
-        # don't want to update this test whenever new SBOMs are added.
-        assert (
-            len([entry for entry in caplog.record_tuples if entry[1] == logging.DEBUG])
-            > 5
-        )
+        expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
+        assert output == expected
 
-        # We're not comparing the result against a known output because we don't want to update
-        # it whenever anything in the data directory changes.
-        # Instead, we're validating the result for correctness, that's all.
-        argv("validate", "--no-filename-validation", str(output_file))
-        exit_code, *_ = run_main()
+    def test_mixed(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ):
+
+        input_folder = data_dir / "merge-from-folder"
+
+        input_1 = input_folder / "merge.input_1.cdx.json"
+
+        argv("merge", "--from-folder", str(input_folder), str(input_1))
+        exit_code, output, _ = run_main(capsys=capsys, parse_output="json")
 
         assert exit_code == Status.OK
+
+        expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
+        assert output == expected
 
     def test_not_enough_inputs(self, argv: Callable[..., None]):
+        argv("merge")
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+
         argv("merge", "input1.cdx.json")
         with pytest.raises(SystemExit) as e:
             run_main()
@@ -356,12 +403,10 @@ class TestMerge:
     def test_invalid_folder_path(
         self,
         argv: Callable[..., None],
-        data_dir: Path,
         capsys: pytest.CaptureFixture[str],
     ):
         argv(
             "merge",
-            str(data_dir / "merge.input_1.cdx.json"),
             "--from-folder",
             "doesnotexist",
         )
@@ -375,12 +420,10 @@ class TestMerge:
     def test_empty_folder_path(
         self,
         argv: Callable[..., None],
-        data_dir: Path,
         tmp_path: Path,
     ):
         argv(
             "merge",
-            str(data_dir / "merge.input_1.cdx.json"),
             "--from-folder",
             str(tmp_path),
         )

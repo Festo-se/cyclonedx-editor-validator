@@ -1,0 +1,600 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2022-10-17T19:59:12",
+    "authors": [
+      {
+        "name": "automated"
+      }
+    ],
+    "component": {
+      "type": "library",
+      "bom-ref": "sub_program",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "name": "sub_program",
+      "version": "T5.0.3.96",
+      "licenses": [
+        {
+          "license": {
+            "name": "company internal"
+          }
+        }
+      ],
+      "copyright": "Company Legal 2022, all rights reserved"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "sp_first_component",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "name": "sp_first_component",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "e84ec5567d56d2dcf963ed2e454c106d9a9f323b"
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_second_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_second_component",
+      "version": "5.16.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "some name OS-01264"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_fifteenth_component",
+      "supplier": {
+        "name": "The first component Contributors"
+      },
+      "name": "gp_first_component",
+      "version": "3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_fourth_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_fourth_component",
+      "version": "5.16.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "some name OS-01267"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_fifth_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_fifth_component",
+      "version": "3.42.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "some name IP-00443"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_sixth_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_sixth_component",
+      "version": "5.14.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "some name FS-00766"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_seventh_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_seventh_component",
+      "version": "1.02h",
+      "licenses": [
+        {
+          "license": {
+            "name": "some name MODB-00197"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_eight_component",
+      "supplier": {
+        "name": "some electronics"
+      },
+      "name": "sp_eight_component",
+      "version": "1.14.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "IJG"
+          }
+        },
+        {
+          "license": {
+            "name": "ST SLA0044"
+          }
+        },
+        {
+          "license": {
+            "name": "ST Proprietary"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_ninth_component",
+      "supplier": {
+        "name": "some electronics"
+      },
+      "name": "sp_ninth_component",
+      "version": "1.8.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "IJG"
+          }
+        },
+        {
+          "license": {
+            "name": "ST SLA0044"
+          }
+        },
+        {
+          "license": {
+            "name": "ST Proprietary"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_tenth_component",
+      "supplier": {
+        "name": "some electronics"
+      },
+      "name": "sp_tenth_component",
+      "version": "1.4.0-1",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "IJG"
+          }
+        },
+        {
+          "license": {
+            "name": "ST SLA0044"
+          }
+        },
+        {
+          "license": {
+            "name": "ST Proprietary"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_eleventh_component",
+      "supplier": {
+        "name": "some stuff"
+      },
+      "name": "sp_eleventh_component",
+      "version": "6.15.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_twelfth_component",
+      "supplier": {
+        "name": " a supplier"
+      },
+      "name": "sp_twelfth_component",
+      "version": "1.12",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-4-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "ISC"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-1-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "Zlib"
+          }
+        },
+        {
+          "license": {
+            "id": "OFL-1.1"
+          }
+        },
+        {
+          "license": {
+            "name": "MCD-ST Liberty SW License Agreement V2"
+          }
+        },
+        {
+          "license": {
+            "name": "PJRC.COM"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-3.0-only"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_thirteenth_component",
+      "supplier": {
+        "name": " another supplier"
+      },
+      "name": "sp_thirteenth_component",
+      "version": "3.8.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_fourteenth_component",
+      "supplier": {
+        "name": "leg"
+      },
+      "name": "GNU Tools for Arm Embedded Processors",
+      "version": "9-2019-q4-major",
+      "copyright": "Arm Limited"
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_sixteenth_component",
+      "supplier": {
+        "name": "Free Software Foundation, Inc."
+      },
+      "name": "sp_sixteenth_component",
+      "version": "9.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-3.0-only"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_seventeenth_component",
+      "supplier": {
+        "name": "some website"
+      },
+      "name": "sp_seventeenth_component",
+      "version": "3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-3.0-only"
+          }
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "sub_program",
+      "dependsOn": [
+        "sp_first_component",
+        "sp_second_component",
+        "sp_fourth_component",
+        "sp_fifth_component",
+        "sp_sixth_component",
+        "sp_seventh_component",
+        "sp_eight_component",
+        "sp_ninth_component",
+        "sp_tenth_component",
+        "sp_eleventh_component",
+        "sp_twelfth_component",
+        "sp_thirteenth_component",
+        "sp_fourteenth_component",
+        "sp_fifteenth_component"
+      ]
+    },
+    {
+      "ref": "sp_first_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_second_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fourth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fifth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_sixth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_seventh_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_eight_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_ninth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_tenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_eleventh_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_twelfth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_thirteenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fourteenth_component",
+      "dependsOn": [
+        "sp_sixteenth_component",
+        "sp_seventeenth_component"
+      ]
+    },
+    {
+      "ref": "sp_sixteenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_seventeenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fifteenth_component",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "complete",
+      "assemblies": [
+        "sp_first_component",
+        "sp_second_component",
+        "sp_fourth_component"
+      ]
+    },
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "sp_fifth_component",
+        "sp_sixth_component",
+        "sp_seventh_component",
+        "sp_eight_component",
+        "sp_ninth_component",
+        "sp_tenth_component",
+        "sp_eleventh_component",
+        "sp_twelfth_component",
+        "sp_thirteenth_component",
+        "sp_fourteenth_component",
+        "sp_sixteenth_component",
+        "sp_seventeenth_component",
+        "sp_fifteenth_component"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_fifteenth_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ]
+}

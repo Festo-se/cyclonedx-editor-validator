@@ -1,0 +1,204 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2022-12-21T09:41:59.744Z",
+    "tools": [
+      {
+        "vendor": "Company SE",
+        "name": "some-tool",
+        "version": "3.0.0"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "name": "test-app",
+      "version": "1.0.0",
+      "bom-ref": "pkg:npm/test-app@1.0.0",
+      "author": "Company SE",
+      "purl": "pkg:npm/test-app@1.0.0"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "depA",
+      "group": "com.company.unit",
+      "version": "4.0.2",
+      "bom-ref": "com.company.unit/depA@4.0.2",
+      "author": "Company Unit SE",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://www.company.com"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "depB",
+      "group": "some-vendor",
+      "version": "1.2.3",
+      "bom-ref": "some-vendor/depB@1.2.3",
+      "author": "dude@some-vendor.com",
+      "supplier": {
+        "name": "Some Vendor Inc.",
+        "url": [
+          "https://www.some-vendor.com"
+        ]
+      },
+      "components": [
+        {
+          "type": "library",
+          "name": "gravity",
+          "group": "physics",
+          "version": "0.0.1",
+          "bom-ref": "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT"
+              }
+            }
+          ],
+          "externalReferences": [
+            {
+              "type": "vcs",
+              "url": "https://github.com/physics/gravity.git"
+            },
+            {
+              "type": "website",
+              "url": "https://www.universe.com"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "x-ray",
+          "group": "physics",
+          "version": "18.9.5",
+          "bom-ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
+          "author": "Acme Inc",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT"
+              }
+            }
+          ],
+          "externalReferences": [
+            {
+              "type": "vcs",
+              "url": "git://not-a-browsable-url.com/x-ray.git"
+            }
+          ],
+          "components": [
+            {
+              "type": "library",
+              "name": "Rudolph",
+              "version": "6.6.6",
+              "bom-ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6",
+              "copyright": "2000 Santa Claus",
+              "externalReferences": [
+                {
+                  "type": "vcs",
+                  "url": "https://northpole.com/rudolph.git"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "depC",
+      "version": "3.2.1",
+      "bom-ref": "depC@3.2.1",
+      "author": "Acme Inc",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "Rudolph",
+          "version": "6.6.6",
+          "bom-ref": "depC@3.2.1:Rudolph@6.6.6",
+          "copyright": "2000 Santa Claus",
+          "externalReferences": [
+            {
+              "type": "vcs",
+              "url": "https://northpole.com/rudolph.git"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "com.company.unit/depA@4.0.2",
+      "dependsOn": [
+        "some-vendor/depB@1.2.3",
+        "depC@3.2.1"
+      ]
+    },
+    {
+      "ref": "some-vendor/depB@1.2.3",
+      "dependsOn": [
+        "some-vendor/depB@1.2.3:physics/gravity@0.0.1"
+      ]
+    },
+    {
+      "ref": "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
+      "dependsOn": [
+        "depC@3.2.1"
+      ]
+    },
+    {
+      "ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
+      "dependsOn": [
+        "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6"
+      ]
+    },
+    {
+      "ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "depC@3.2.1",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "complete",
+      "assemblies": [
+        "some-vendor/depB@1.2.3",
+        "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
+        "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
+        "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6"
+      ]
+    },
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "com.company.unit/depA@4.0.2"
+      ]
+    }
+  ]
+}

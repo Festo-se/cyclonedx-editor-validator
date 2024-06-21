@@ -481,15 +481,18 @@ def create_validation_parser(
     parser.add_argument(
         "--report-format",
         help=(
-            "Write results to a file in the specified format. Must be combined with the --output "
-            "option."
+            "Write results to a file in the specified format. Must be combined with the "
+            "--report-path option."
         ),
         choices=["warnings-ng", "gitlab-code-quality"],
     )
     parser.add_argument(
         "--report-path",
         metavar="<file>",
-        help="The path to where the report file should be written.",
+        help=(
+            "The path to where the report file should be written. Must be combined with the "
+            "--report-format option."
+        ),
         type=Path,
     )
 

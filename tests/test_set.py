@@ -7,6 +7,7 @@ import unittest
 
 import cdxev.error
 import cdxev.set
+from cdxev.auxiliary.identity import ComponentIdentity, Key
 
 
 class SetTestCase(unittest.TestCase):
@@ -546,13 +547,90 @@ class TestVersionRange(unittest.TestCase):
         ) as file:
             self.sbom_fixture = json.load(file)
 
+    def test_keyversionrange_comparison(self) -> None:
+        all_versions_key = cdxev.set.UpdateIdentity._from_coordinates(
+            name="component_name",
+            group="group",
+            version_range="vers:generic/*",
+        )
+        one_version_key = cdxev.set.UpdateIdentity._from_coordinates(
+            name="component_name",
+            group="group",
+            version_range="vers:generic/<1.5.1",
+        )
+        regular_key_1 = Key.from_coordinates(
+            name="component_name", group="group", version="1.1.1"
+        )
+        regular_key_2 = Key.from_coordinates(
+            name="component_name", group="group", version="1.5.2"
+        )
+        regular_key_other_name = Key.from_coordinates(
+            name="component_other_name", group="group", version="1.1.1"
+        )
+        self.assertEqual(all_versions_key, regular_key_1)
+        self.assertEqual(all_versions_key, regular_key_2)
+        self.assertNotEqual(all_versions_key, regular_key_other_name)
+
+        self.assertEqual(one_version_key, regular_key_1)
+        self.assertNotEqual(one_version_key, regular_key_2)
+        self.assertNotEqual(one_version_key, regular_key_other_name)
+
+    def test_version_range(self) -> None:
+        component_base = {
+            "name": "some name",
+            "group": "some group",
+            "version": "1.2",
+        }
+        update = {
+            "name": "some name",
+            "group": "some group",
+            "version_range": "vers:generic/>=1.2",
+        }
+
+        component_version_in = dict(component_base)
+        component_version_in["version"] = "1.2.1"
+
+        component_version_not_in = dict(component_base)
+        component_version_not_in["version"] = "1.1.9"
+
+        component_different_name = dict(component_base)
+        component_different_name["version"] = "1.1.9"
+        component_different_name["name"] = "another name"
+
+        component_different_group = dict(component_base)
+        component_different_group["version"] = "1.1.9"
+        component_different_group["group"] = "another group"
+
+        update_all_versions = dict(update)
+        update_all_versions["version_range"] = "vers:generic/*"
+
+        id_update = cdxev.set.UpdateIdentity.create(update, True)
+        id_update_all_versions = cdxev.set.UpdateIdentity.create(
+            update_all_versions, True
+        )
+
+        id_version_in = ComponentIdentity.create(component_version_in, True)
+        id_version_not_in = ComponentIdentity.create(component_version_not_in, True)
+        id_different_name = ComponentIdentity.create(component_different_name, True)
+        id_different_group = ComponentIdentity.create(component_different_group, True)
+
+        self.assertEqual(id_update, id_version_in)
+        self.assertEqual(id_update_all_versions, id_version_not_in)
+        self.assertEqual(id_update_all_versions, id_version_in)
+
+        self.assertNotEqual(id_update, id_version_not_in)
+        self.assertNotEqual(id_update, id_different_name)
+        self.assertNotEqual(id_update, id_different_group)
+        self.assertNotEqual(id_update_all_versions, id_different_name)
+        self.assertNotEqual(id_update_all_versions, id_different_group)
+
     def test_add_copyright_to_one_component_with_version_range(self) -> None:
         updates = [
             {
                 "id": {
                     "name": "Acme_Application",
                     "group": "com.acme.internal",
-                    "version": "vers:pypi/9.1.1|8.1.1",
+                    "version_range": "vers:pypi/9.1.1|8.1.1",
                 },
                 "set": {"copyright": "2022 Acme Inc"},
             }
@@ -590,7 +668,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "vers:pypi/<6.0.0",
+                    "version_range": "vers:pypi/<6.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             }
@@ -617,7 +695,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "vers:pypi/>3.0.0",
+                    "version_range": "vers:pypi/>3.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             }
@@ -651,7 +729,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "vers:pypi/>3.0.0",
+                    "version_range": "vers:pypi/>3.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             },
@@ -659,7 +737,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "vers:pypi/<=3.0.0",
+                    "version_range": "vers:pypi/<=3.0.0",
                 },
                 "set": {"copyright": "2000 Acme Inc"},
             },
@@ -667,7 +745,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "vers:pypi/<2.0.0|>4.0.0",
+                    "version_range": "vers:pypi/<2.0.0|>4.0.0",
                 },
                 "set": {
                     "supplier": {"name": "New supplier"},
@@ -723,7 +801,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "*",
+                    "version_range": "vers:generic/*",
                 },
                 "set": {"copyright": "2000 Acme Inc"},
             },
@@ -731,7 +809,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version": "*",
+                    "version_range": "vers:generic/*",
                 },
                 "set": {
                     "supplier": {"name": "New supplier"},

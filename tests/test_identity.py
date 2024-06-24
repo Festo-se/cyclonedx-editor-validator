@@ -2,8 +2,6 @@
 
 import unittest
 
-import univers.version_range  # type:ignore
-
 from cdxev.auxiliary.identity import ComponentIdentity, Key, KeyType
 
 
@@ -141,30 +139,6 @@ class IdentityTestCase(unittest.TestCase):
             ),
         )
 
-    def test_coordinates_with_version_range_creation(self) -> None:
-
-        key = Key.from_coordinates(
-            name=self.sample_coordinates["name"],
-            group=self.sample_coordinates["group"],
-            version="vers:pypi/>=1.2.4",
-        )
-
-        self.assertEqual(key.type, KeyType.COORDINATES)
-        self.assertEqual(
-            str(key),
-            "COORDINATES[%s/%s@%s]"
-            % (
-                self.sample_coordinates["group"],
-                self.sample_coordinates["name"],
-                "vers:pypi/>=1.2.4",
-            ),
-        )
-        self.assertEqual(key.key.version_type, univers.versions.PypiVersion)
-        self.assertEqual(
-            key.key.version_range,
-            univers.version_range.VersionRange.from_string("vers:pypi/>=1.2.4"),
-        )
-
     def test_id_equality(self) -> None:
         component_base = {
             "type": "library",
@@ -198,24 +172,16 @@ class IdentityTestCase(unittest.TestCase):
         del component_with_coords["purl"]
         del component_with_coords["swid"]
 
-        component_with_range = dict(component_base)
-        del component_with_range["cpe"]
-        del component_with_range["purl"]
-        del component_with_range["swid"]
-        component_with_range["version"] = "vers:pypi/>=9.0.0"
-
         id_base = ComponentIdentity.create(component_base, True)
         id_cpe = ComponentIdentity.create(component_with_cpe, True)
         id_purl = ComponentIdentity.create(component_with_purl, True)
         id_swid = ComponentIdentity.create(component_with_swid, True)
         id_coords = ComponentIdentity.create(component_with_coords, True)
-        id_range = ComponentIdentity.create(component_with_range, True)
 
         self.assertEqual(id_base, id_cpe)
         self.assertEqual(id_base, id_purl)
         self.assertEqual(id_base, id_swid)
         self.assertEqual(id_base, id_coords)
-        self.assertTrue(id_range, id_base)
 
     def test_key_in_id(self) -> None:
         component = {
@@ -240,29 +206,3 @@ class IdentityTestCase(unittest.TestCase):
         self.assertTrue(purl_key in component_id)
         self.assertTrue(coordinates_key in component_id)
         self.assertFalse(swid_key in component_id)
-
-    def test_version_range(self) -> None:
-        component_base = {
-            "name": "some name",
-            "group": "some group",
-            "version": "vers:pypi/>=1.2",
-        }
-
-        component_version_in = dict(component_base)
-        component_version_in["version"] = "1.2.1"
-
-        component_version_not_in = dict(component_base)
-        component_version_not_in["version"] = "1.1.9"
-
-        component_version_wildcard = dict(component_base)
-        component_version_wildcard["version"] = "*"
-
-        id_range = ComponentIdentity.create(component_base, True)
-        id_version_in = ComponentIdentity.create(component_version_in, True)
-        id_version_not_in = ComponentIdentity.create(component_version_not_in, True)
-        id_wildcard = ComponentIdentity.create(component_version_wildcard, True)
-
-        self.assertEqual(id_wildcard, id_version_in)
-        self.assertEqual(id_wildcard, id_version_not_in)
-        self.assertEqual(id_range, id_version_in)
-        self.assertNotEqual(id_range, id_version_not_in)

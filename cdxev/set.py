@@ -4,9 +4,11 @@ import logging
 import pathlib
 import sys
 import typing as t
-from dataclasses import dataclass, field
+import re
+import univers.version_range  # type:ignore
+from dataclasses import dataclass, field, fields
 
-from cdxev.auxiliary.identity import ComponentIdentity, CoordinatesWithVersionRange, Key
+from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
 from cdxev.auxiliary.sbomFunctions import walk_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
@@ -28,6 +30,85 @@ class Context:
     config: "SetConfig"
     component_map: dict[Key, list[dict]] = field(init=False)
     sbom: dict
+
+
+@dataclass(init=True, frozen=True)
+class CoordinatesWithVersionRange(Coordinates):
+    version_range: univers.version_range.VersionRange
+    version_type: univers.versions
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, CoordinatesWithVersionRange):
+            for field_ in fields(self):
+                if getattr(self, field_.name) != getattr(other, field_.name):
+                    return False
+            return True
+
+        if isinstance(other, Coordinates):
+            for field_ in fields(other):
+                if field_.name != "version" and getattr(self, field_.name) != getattr(
+                    other, field_.name
+                ):
+                    return False
+
+            if other.version is not None:
+                if self.version_type(other.version) in self.version_range:
+                    return True
+
+        return False
+
+
+@dataclass(frozen=True)
+class UpdateIdentity(ComponentIdentity):
+    """
+    Represents the component identity as a set of identifying keys.
+
+    A component can have more than one key. For two identities to be considered equal, at least
+    one of their keys must be equal.
+    An empty identity (which doesn't contain any keys) can never be equal to any other identity,
+    even another empty one.
+
+    Instances of this class are immutable.
+    """
+
+    def __init__(self, *keys: t.Optional[Key]):
+        super().__init__(*keys)
+
+    def __eq__(self, other: object) -> bool:
+        return (isinstance(other, ComponentIdentity) or isinstance(other, UpdateIdentity)) and any(
+            k in self._keys for k in other._keys
+        )
+
+    @classmethod
+    def create(
+        cls, component: t.Mapping[str, t.Any], allow_unsafe: bool = False
+    ) -> "ComponentIdentity":
+
+        if "version_range" in component and "version" not in component:
+            coordinates = cls._from_coordinates(
+                name=component["name"],
+                group=component.get("group"),
+                version_range=component.get("version_range", ""),
+            )
+            return UpdateIdentity(coordinates)  # type:ignore
+
+        else:
+            return super().create(component, allow_unsafe)
+
+    @staticmethod
+    def _from_coordinates(
+        name: str,
+        group: t.Optional[str] = None,
+        version_range: t.Optional[str] = None,
+    ) -> "Key":
+        coordinates = Coordinates(name, group, None)
+        if version_range is not None and re.fullmatch("vers:.+/.+", version_range) is not None:
+            version_range_object = univers.version_range.VersionRange.from_string(version_range)
+            version_type = version_range_object.version_class
+            coordinates = CoordinatesWithVersionRange(
+                name, group, None, version_range_object, version_type
+            )
+        return Key(KeyType.COORDINATES, coordinates)
 
 
 _IDENTIFIERS = {"cpe", "purl", "swid", "name", "version", "group"}
@@ -180,7 +261,7 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
             raise AppError(
                 "Invalid set file", "An update object is missing the 'id' property."
             )
-        component_id = ComponentIdentity.create(upd["id"], True)
+        component_id = UpdateIdentity.create(upd["id"], True)
         upd["id"] = component_id
 
         if len(component_id) == 0:
@@ -225,12 +306,12 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
         target_list: list[dict] = []
         try:
             update_id = update["id"]
-            if isinstance(update_id._keys[0].key, CoordinatesWithVersionRange):
+            if isinstance(update_id[0].key, CoordinatesWithVersionRange):
                 for key in ctx.component_map.keys():
-                    if update_id._keys[0] == key:
+                    if update_id[0] == key:
                         target_list += ctx.component_map[key]
             else:
-                target_list = ctx.component_map[update["id"][0]]
+                target_list = ctx.component_map[update_id[0]]
             for target in target_list:
                 _do_update(target, update, ctx)
         except KeyError:

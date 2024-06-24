@@ -2,12 +2,9 @@
 
 import functools
 import json
-import re
 import typing as t
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass
 from enum import Enum
-
-import univers.version_range  # type:ignore
 
 
 @functools.total_ordering
@@ -70,17 +67,7 @@ class Key:
         group: t.Optional[str] = None,
         version: t.Optional[str] = None,
     ) -> "Key":
-        coordinates: Coordinates
-        if version is not None and re.fullmatch("vers:.+/.+", version) is not None:
-            version_range = univers.version_range.VersionRange.from_string(version)
-            version_type = version_range.version_class
-            coordinates = CoordinatesWithVersionRange(
-                name, group, version, version_range, version_type
-            )
-        elif version == "*":
-            coordinates = CoordinatesWithVersionRange(name, group, version, None, None)
-        else:
-            coordinates = Coordinates(name, group, version)
+        coordinates = Coordinates(name, group, version)
         return cls(KeyType.COORDINATES, coordinates)
 
 
@@ -197,34 +184,3 @@ class ComponentIdentity:
             coordinates = None
 
         return ComponentIdentity(cpe, purl, swid, coordinates)
-
-
-@dataclass(init=True, frozen=True)
-class CoordinatesWithVersionRange(Coordinates):
-    version_range: univers.version_range.VersionRange = field(
-        default_factory=univers.version_range
-    )
-    version_type: univers.versions = field(default_factory=univers.versions)
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, CoordinatesWithVersionRange):
-            for field_ in fields(self):
-                if getattr(self, field_.name) != getattr(other, field_.name):
-                    return False
-            return True
-
-        if isinstance(other, Coordinates):
-            for field_ in fields(other):
-                if field_.name != "version" and getattr(self, field_.name) != getattr(
-                    other, field_.name
-                ):
-                    return False
-
-            if self.version == "*":
-                return True
-
-            if other.version is not None:
-                if self.version_type(other.version) in self.version_range:
-                    return True
-
-        return False

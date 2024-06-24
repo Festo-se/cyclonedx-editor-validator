@@ -36,7 +36,6 @@ class Context:
 @dataclass(init=True, frozen=True)
 class CoordinatesWithVersionRange(Coordinates):
     version_range: univers.version_range.VersionRange
-    version_type: univers.versions
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, CoordinatesWithVersionRange):
@@ -53,7 +52,7 @@ class CoordinatesWithVersionRange(Coordinates):
                     return False
 
             if other.version is not None:
-                if self.version_type(other.version) in self.version_range:
+                if self.version_range.version_class(other.version) in self.version_range:
                     return True
 
         return False
@@ -61,17 +60,6 @@ class CoordinatesWithVersionRange(Coordinates):
 
 @dataclass(frozen=True)
 class UpdateIdentity(ComponentIdentity):
-    """
-    Represents the component identity as a set of identifying keys.
-
-    A component can have more than one key. For two identities to be considered equal, at least
-    one of their keys must be equal.
-    An empty identity (which doesn't contain any keys) can never be equal to any other identity,
-    even another empty one.
-
-    Instances of this class are immutable.
-    """
-
     def __init__(self, *keys: t.Optional[Key]):
         super().__init__(*keys)
 
@@ -110,9 +98,8 @@ class UpdateIdentity(ComponentIdentity):
             version_range_object = univers.version_range.VersionRange.from_string(
                 version_range
             )
-            version_type = version_range_object.version_class
             coordinates = CoordinatesWithVersionRange(
-                name, group, None, version_range_object, version_type
+                name, group, None, version_range_object
             )
         return Key(KeyType.COORDINATES, coordinates)
 

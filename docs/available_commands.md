@@ -270,7 +270,7 @@ When passing the targets, names and values in a file, the file must conform to t
             "id": {
                 # Could be any one of the identifying properties in CycloneDX.
                 # Multiple identifiers are not allowed (with the special exception of name,
-                # group and version or version range which are only valid together)
+                # group and version or version_range which are only valid together)
                 "cpe": "CPE of target component goes here"
             },
             "set": {

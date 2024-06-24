@@ -310,27 +310,27 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
 
     for update in updates:
         target_list: list[dict] = []
-        update_id = update["id"]
         try:
-            if isinstance(update_id[0].key, CoordinatesWithVersionRange):
+            update_key = update["id"][0]
+            if isinstance(update_key.key, CoordinatesWithVersionRange):
                 for key in ctx.component_map.keys():
-                    if update_id[0] == key:
+                    if update_key == key:
                         target_list += ctx.component_map[key]
             else:
-                target_list = ctx.component_map[update_id[0]]
+                target_list = ctx.component_map[update_key]
             for target in target_list:
                 _do_update(target, update, ctx)
         except KeyError:
             if not cfg.ignore_missing:
                 msg = LogMessage(
                     "Set not performed",
-                    f'The component "{update_id}" was not found and could not be updated.',
+                    f'The component "{update["id"]}" was not found and could not be updated.',
                 )
                 raise AppError(log_msg=msg)
             else:
                 logger.info(
                     LogMessage(
                         "Set not performed",
-                        f'The component "{update_id}" was not found and could not be updated.',
+                        f'The component "{update["id"]}" was not found and could not be updated.',
                     )
                 )

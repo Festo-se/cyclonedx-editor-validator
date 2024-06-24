@@ -35,6 +35,18 @@ class Context:
 
 @dataclass(init=True, frozen=True)
 class CoordinatesWithVersionRange(Coordinates):
+    """
+    This class extends from cdxev.auxiliary.identity.Coordinates
+    to be able to handle version ranges.
+    It achieves this by introducing the attribute 'version_range'
+    of type univers.version_range.VersionRange.
+
+    This class's comparator is compatible with Coordinates objects.
+    If the 'name' and 'group' match,
+    it will check if the provided version of the coordinates object
+    is contained in this class instance's 'version_range'
+    and return True or False depending on the result."
+    """
     version_range: univers.version_range.VersionRange
 
     def __eq__(self, other: object) -> bool:
@@ -60,6 +72,18 @@ class CoordinatesWithVersionRange(Coordinates):
 
 @dataclass(frozen=True)
 class UpdateIdentity(ComponentIdentity):
+    """
+    Represents the identity of components the set command shall apply an update to apply to.
+
+    This class inherits from cdxev.auxiliary.identity.ComponentIdentity and
+    extends its functionality to allow CoordinatesWithVersionRange objects
+    as keys of the type coordinate.
+
+    This classes comparator is compatible with UpdateIdentity objects.
+
+    Instances of this class are immutable.
+    """
+
     def __init__(self, *keys: t.Optional[Key]):
         super().__init__(*keys)
 
@@ -71,7 +95,7 @@ class UpdateIdentity(ComponentIdentity):
     @classmethod
     def create(
         cls, component: t.Mapping[str, t.Any], allow_unsafe: bool = False
-    ) -> "ComponentIdentity":
+    ) -> "t.Union[UpdateIdentity, ComponentIdentity]":
 
         if "version_range" in component and "version" not in component:
             coordinates = cls._from_coordinates(

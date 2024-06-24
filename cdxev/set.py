@@ -2,11 +2,12 @@
 
 import logging
 import pathlib
+import re
 import sys
 import typing as t
-import re
-import univers.version_range  # type:ignore
 from dataclasses import dataclass, field, fields
+
+import univers.version_range  # type:ignore
 
 from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
 from cdxev.auxiliary.sbomFunctions import walk_components
@@ -75,9 +76,9 @@ class UpdateIdentity(ComponentIdentity):
         super().__init__(*keys)
 
     def __eq__(self, other: object) -> bool:
-        return (isinstance(other, ComponentIdentity) or isinstance(other, UpdateIdentity)) and any(
-            k in self._keys for k in other._keys
-        )
+        return (
+            isinstance(other, ComponentIdentity) or isinstance(other, UpdateIdentity)
+        ) and any(k in self._keys for k in other._keys)
 
     @classmethod
     def create(
@@ -102,8 +103,13 @@ class UpdateIdentity(ComponentIdentity):
         version_range: t.Optional[str] = None,
     ) -> "Key":
         coordinates = Coordinates(name, group, None)
-        if version_range is not None and re.fullmatch("vers:.+/.+", version_range) is not None:
-            version_range_object = univers.version_range.VersionRange.from_string(version_range)
+        if (
+            version_range is not None
+            and re.fullmatch("vers:.+/.+", version_range) is not None
+        ):
+            version_range_object = univers.version_range.VersionRange.from_string(
+                version_range
+            )
             version_type = version_range_object.version_class
             coordinates = CoordinatesWithVersionRange(
                 name, group, None, version_range_object, version_type

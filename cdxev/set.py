@@ -47,6 +47,7 @@ class CoordinatesWithVersionRange(Coordinates):
     is contained in this class instance's 'version_range'
     and return True or False depending on the result."
     """
+
     version_range: univers.version_range.VersionRange
 
     def __eq__(self, other: object) -> bool:
@@ -64,7 +65,10 @@ class CoordinatesWithVersionRange(Coordinates):
                     return False
 
             if other.version is not None:
-                if self.version_range.version_class(other.version) in self.version_range:
+                if (
+                    self.version_range.version_class(other.version)
+                    in self.version_range
+                ):
                     return True
 
         return False

@@ -36,8 +36,8 @@ class Context:
 @dataclass(init=True, frozen=True)
 class CoordinatesWithVersionRange(Coordinates):
     """
-    This class extends from cdxev.auxiliary.identity.Coordinates
-    to be able to handle version ranges.
+    This class inherits from cdxev.auxiliary.identity.Coordinates
+    and extends it to be able to handle version ranges.
     It achieves this by introducing the attribute 'version_range'
     of type univers.version_range.VersionRange.
 

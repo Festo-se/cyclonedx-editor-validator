@@ -211,9 +211,11 @@ The *target component* can be identified through any of the identifiable propert
 
 If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
-In *coordinates* it is also possible to provide a range of versions following the [PURl specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst) as referenced by [CycloneDX](https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range). Further Information on the supported versioning schemas can be found here [univers documentation](https://pypi.org/project/univers/).
+In *coordinates* it is also possible to provide a range of versions using *version_range* parameter instead *version* following the [PURl specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst) as referenced by [CycloneDX](https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range). 
 
-It is also possible to use a wildcard by setting the *version* as "*", in that case the version will be ignored and only *name*and *group* will be considered.
+Further Information on the supported versioning schemas can be found here [univers documentation](https://pypi.org/project/univers/). Note that for every schema it is possible to provide a wildcard like *vers:generic/\** to allow all versions of the given schema.
+
+If *version* and *version_range* are provided, *version_range* will be ignored.
 
 If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
@@ -298,7 +300,7 @@ Example for the use of version ranges:
                 "group": "org.acme",
                 # It is possible to provide a version range
                 # the format must comply with the PURL specification for version ranges  
-                "version": "vers:pypi/>=1.0.2|<2.0.0",
+                "version_range": "vers:pypi/>=1.0.2|<2.0.0",
             },
                 "set": {"copyright": "1990 Acme Inc"},
         },
@@ -307,8 +309,8 @@ Example for the use of version ranges:
                 "name": "web-framework",
                 "group": "org.acme",
                 # It is also possible to provide a wildcard for the version
-                # if the version is set to "*" the version will be ignored
-                "version": "*",
+                # if the version is set to "*" all versions of the specified schema are passed
+                "version_range": "vers:pypi/*",
             },
                 "set": {"copyright": "1990 Acme Inc"},
         },

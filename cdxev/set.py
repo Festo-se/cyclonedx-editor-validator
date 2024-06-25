@@ -88,7 +88,7 @@ class CoordinatesWithVersionRange(Coordinates):
                         for version in possible_versions:
                             version_is_of += version + ", "
                         version_is_of = version_is_of[:-2]
-                    logger.info(
+                    logger.warning(
                         LogMessage(
                             "Set not performed",
                             f'The update targeted at "{self} {self.version_range}"'
@@ -106,7 +106,7 @@ class CoordinatesWithVersionRange(Coordinates):
 @dataclass(frozen=True)
 class UpdateIdentity(ComponentIdentity):
     """
-    Represents the identity of components the set command shall apply an update to apply to.
+    Represents the identity of components the set command shall apply an update to.
 
     This class inherits from cdxev.auxiliary.identity.ComponentIdentity and
     extends its functionality to allow CoordinatesWithVersionRange objects
@@ -131,7 +131,7 @@ class UpdateIdentity(ComponentIdentity):
     ) -> "t.Union[UpdateIdentity, ComponentIdentity]":
 
         if "version_range" in component:
-            coordinates = cls._from_coordinates(
+            coordinates = cls.from_coordinates(
                 name=component["name"],
                 group=component.get("group"),
                 version_range=component.get("version_range", ""),
@@ -142,12 +142,13 @@ class UpdateIdentity(ComponentIdentity):
             return super().create(component, allow_unsafe)
 
     @staticmethod
-    def _from_coordinates(
+    def from_coordinates(
         name: str,
         group: t.Optional[str] = None,
+        version: t.Optional[str] = None,
         version_range: t.Optional[str] = None,
     ) -> "Key":
-        coordinates = Coordinates(name, group, None)
+        coordinates = Coordinates(name, group, version)
         if (
             version_range is not None
             and re.fullmatch("vers:.+/.+", version_range) is not None

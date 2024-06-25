@@ -548,12 +548,12 @@ class TestVersionRange(unittest.TestCase):
             self.sbom_fixture = json.load(file)
 
     def test_keyversionrange_comparison(self) -> None:
-        all_versions_key = cdxev.set.UpdateIdentity._from_coordinates(
+        all_versions_key = cdxev.set.UpdateIdentity.from_coordinates(
             name="component_name",
             group="group",
             version_range="vers:generic/*",
         )
-        one_version_key = cdxev.set.UpdateIdentity._from_coordinates(
+        one_version_key = cdxev.set.UpdateIdentity.from_coordinates(
             name="component_name",
             group="group",
             version_range="vers:generic/<1.5.1",

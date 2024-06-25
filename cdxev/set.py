@@ -78,7 +78,7 @@ class CoordinatesWithVersionRange(Coordinates):
                         try:
                             if version_type.is_valid(other.version):
                                 possible_versions.append(str(version_type.__name__))
-                        except:
+                        except univers.versions.nuget.InvalidNuGetVersion:
                             pass
                     version_is_of = " which is valid under the schemas of: "
 

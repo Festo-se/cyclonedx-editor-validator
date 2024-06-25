@@ -53,7 +53,7 @@ def create_notice_file(sbom: dict) -> str:
             component_information += component_copyright_information + "\n"
             component_information += component_license_information
 
-        text_body += component_information 
+        text_body += component_information
 
     notice_file = header
     if text_body:
@@ -104,16 +104,22 @@ def create_notice_file_fancy(sbom: dict) -> str:
             component_information += " - No license or copyright information available"
 
         elif component_copyright_information and not component_license_information:
-            component_information += " - Copyright: " + component_copyright_information + "\n"
+            component_information += (
+                " - Copyright: " + component_copyright_information + "\n"
+            )
 
         elif not component_copyright_information and component_license_information:
-            component_information += " - License: " + component_license_information + "\n"
+            component_information += (
+                " - License: " + component_license_information + "\n"
+            )
 
         else:
-            component_information += " - Copyright: " + component_copyright_information + "\n"
+            component_information += (
+                " - Copyright: " + component_copyright_information + "\n"
+            )
             component_information += " - License: " + component_license_information
 
-        text_body += component_information 
+        text_body += component_information
 
     notice_file = header
     if text_body:

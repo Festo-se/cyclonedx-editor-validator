@@ -91,9 +91,9 @@ class CoordinatesWithVersionRange(Coordinates):
                     logger.warning(
                         LogMessage(
                             "Incompatible version ranges",
-                            f'The component {other} matches the target {self}'
-                            f' in the name and group keys but has a different versioning'
-                            f' schema. The target has versioning schema'
+                            f"The component {other} matches the target {self}"
+                            f" in the name and group keys but has a different versioning"
+                            f" schema. The target has versioning schema"
                             f' "{self.version_range.version_class.__name__}"'
                             f' this is incompatible with the version "{other.version}"'
                             + version_is_of,

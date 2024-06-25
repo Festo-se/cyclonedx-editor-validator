@@ -21,13 +21,14 @@ import cdxev.set
 from cdxev import pkg
 from cdxev.amend.operations import Operation
 from cdxev.auxiliary.identity import Key, KeyType
-from cdxev.auxiliary.output import write_sbom
+from cdxev.auxiliary.output import write_sbom, write_notice_file
 from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
 from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
+from cdxev.create_notice_file import create_license_list
 
 logger: logging.Logger
 
@@ -171,6 +172,7 @@ def create_parser() -> argparse.ArgumentParser:
     create_validation_parser(subparsers)
     create_set_parser(subparsers)
     create_build_public_bom_parser(subparsers)
+    create_notice_file_parser(subparsers)
 
     return parser
 
@@ -659,6 +661,26 @@ def create_build_public_bom_parser(
     return parser
 
 
+def create_notice_file_parser(
+    subparsers: argparse._SubParsersAction,
+) -> argparse.ArgumentParser:
+    parser = subparsers.add_parser(
+        "create-notice-file",
+        help=(
+            "Creates a notice file with the licenses and copyright"
+            " statements of the components extracted from the provided SBOM."
+        ),
+    )
+    parser.add_argument(
+        "input",
+        help="Path to a SBOM file.",
+        type=Path,
+    )
+    add_output_argument(parser)
+    parser.set_defaults(cmd_handler=invoke_create_notice_file, parser=parser)
+    return parser
+
+
 def invoke_amend(args: argparse.Namespace) -> int:
     if args.help_operation:
         short_desc = args.operations_by_name[args.help_operation].short_description
@@ -889,6 +911,14 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
     sbom, _ = read_sbom(args.input)
     output = build_public_bom(sbom, args.schema_path)
     write_sbom(output, args.output)
+    return Status.OK
+
+
+def invoke_create_notice_file(args: argparse.Namespace) -> int:
+    sbom, _ = read_sbom(args.input)
+    output = create_license_list(sbom)
+    write_notice_file(output, args.output, sbom)
+
     return Status.OK
 
 

@@ -59,6 +59,9 @@ class CoordinatesWithVersionRange(Coordinates):
             return True
 
         if isinstance(other, Coordinates):
+            version_range_object = univers.version_range.VersionRange.from_string(
+                self.version_range
+            )
             for field_ in fields(other):
                 if field_.name != "version" and getattr(self, field_.name) != getattr(
                     other, field_.name
@@ -68,8 +71,8 @@ class CoordinatesWithVersionRange(Coordinates):
             if other.version is not None:
                 try:
                     if (
-                        self.version_range.version_class(other.version)
-                        in self.version_range
+                        version_range_object.version_class(other.version)
+                        in version_range_object
                     ):
                         return True
                 except univers.versions.InvalidVersion:
@@ -94,7 +97,7 @@ class CoordinatesWithVersionRange(Coordinates):
                             f"The component {other} matches the target {self}"
                             f" in the name and group keys but has a different versioning"
                             f" schema. The target has versioning schema"
-                            f' "{self.version_range.version_class.__name__}"'
+                            f' "{version_range_object.version_class.__name__}"'
                             f' this is incompatible with the version "{other.version}"'
                             + version_is_of,
                         )
@@ -154,12 +157,7 @@ class UpdateIdentity(ComponentIdentity):
             version_range is not None
             and re.fullmatch("vers:.+/.+", version_range) is not None
         ):
-            version_range_object = univers.version_range.VersionRange.from_string(
-                version_range
-            )
-            coordinates = CoordinatesWithVersionRange(
-                name, group, None, version_range_object
-            )
+            coordinates = CoordinatesWithVersionRange(name, group, None, version_range)
         return Key(KeyType.COORDINATES, coordinates)
 
 

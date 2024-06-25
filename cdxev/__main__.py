@@ -822,7 +822,7 @@ def invoke_set(args: argparse.Namespace) -> int:
                 isinstance(target.key, cdxev.set.CoordinatesWithVersionRange)
                 and target.key.version_range is not None
             ):
-                updates[0]["id"]["version_range"] = target.key.version
+                updates[0]["id"]["version_range"] = target.key.version_range
 
     else:
         if has_target() or args.key is not None or args.value is not None:

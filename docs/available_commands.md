@@ -211,7 +211,7 @@ The *target component* can be identified through any of the identifiable propert
 
 If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
-In *coordinates* it is also possible to provide a range of versions using *version_range* parameter instead of *version* following the [PURL specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst) as referenced by [CycloneDX](https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range).
+In *coordinates* it is also possible to provide a range of versions using the *version_range* parameter instead of *version* following the [PURL specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst) as referenced by [CycloneDX](https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range).
 
 Further Information on the supported versioning schemas can be found here [univers documentation](https://pypi.org/project/univers/). Note that for every schema it is possible to provide a wildcard like *vers:generic/\** to allow all versions of the given schema.
 

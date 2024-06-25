@@ -7,7 +7,7 @@ import sys
 import typing as t
 from dataclasses import dataclass, field, fields
 
-import univers.version_range
+import univers.version_range  # type:ignore
 import univers.versions  # type:ignore
 
 from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
@@ -80,7 +80,7 @@ class CoordinatesWithVersionRange(Coordinates):
                                 possible_versions.append(str(version_type.__name__))
                         except:
                             continue
-                    version_is_of = " which might is valid under the schemas of: "
+                    version_is_of = " which is valid under the schemas of: "
 
                     if not possible_versions:
                         version_is_of = "which versioning schema is not supported"

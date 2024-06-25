@@ -42,18 +42,25 @@ def write_sbom(
         # No output file specified.
         file = sys.stdout
     else:
-        # Output has been specified but might be a file, directory or non-existent.
-        if destination.exists() and destination.is_dir():
-            filename = generate_filename(sbom)
-            destination = destination.joinpath(filename)
-            print("Writing output to: " + filename)
-        elif not destination.exists() and not destination.parent.exists():
-            # If the destination doesn't exist we should create it as a file. So first we
-            # make sure its parent directory exists.
-            destination.parent.mkdir(parents=True)
+        destination = create_destination_path(destination, sbom, generate_filename)
         file = destination.open("w")
 
     json.dump(sbom, file, indent=4)
+
+
+def create_destination_path(
+    destination: Path, sbom: dict, generate_filename: t.Callable
+) -> Path:
+    # Destination has been specified but might be a file, directory or non-existent.
+    if destination.exists() and destination.is_dir():
+        filename = generate_filename(sbom)
+        destination = destination.joinpath(filename)
+        print("Writing output to: " + filename)
+    elif not destination.exists() and not destination.parent.exists():
+        # If the destination doesn't exist we should create it as a file. So first we
+        # make sure its parent directory exists.
+        destination.parent.mkdir(parents=True)
+    return destination
 
 
 def update_timestamp(sbom: dict) -> None:
@@ -114,3 +121,22 @@ def update_version(sbom: dict) -> None:
     version = sbom.setdefault("version", 0)
     version += 1
     sbom["version"] = version
+
+
+def write_notice_file(
+    notice_file: str, destination: t.Optional[Path], sbom: dict
+) -> None:
+
+    def create_notice_file_filename(sbom: dict) -> str:
+        return "notice_file_" + generate_filename(sbom) + ".txt"
+
+    file: t.TextIO
+    if destination is None:
+        # No output file specified.
+        file = sys.stdout
+    else:
+        destination = create_destination_path(
+            destination, sbom, create_notice_file_filename
+        )
+        file = destination.open("w")
+    file.write(notice_file)

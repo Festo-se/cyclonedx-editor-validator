@@ -578,7 +578,11 @@ class TestVersionRange(unittest.TestCase):
     def test_version_and_version_range_error(self) -> None:
         updates = [
             {
-                "id": {"name": "pkg", "version": "1.1.1", "version_range": "vers:generic/*"},
+                "id": {
+                    "name": "pkg",
+                    "version": "1.1.1",
+                    "version_range": "vers:generic/*",
+                },
                 "set": {"author": "Another author"},
             }
         ]
@@ -588,7 +592,9 @@ class TestVersionRange(unittest.TestCase):
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
-        self.assertRaises(cdxev.error.AppError, cdxev.set._validate_update_list, updates, cfg)
+        self.assertRaises(
+            cdxev.error.AppError, cdxev.set._validate_update_list, updates, cfg
+        )
 
     def test_version_range(self) -> None:
         component_base = {

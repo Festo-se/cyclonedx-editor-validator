@@ -80,7 +80,7 @@ class CoordinatesWithVersionRange(Coordinates):
                                 possible_versions.append(str(version_type.__name__))
                         except univers.versions.nuget.InvalidNuGetVersion:
                             pass
-                    version_is_of = " which is valid under the schemas of: "
+                    version_is_of = " which is valid under the schemas: "
 
                     if not possible_versions:
                         version_is_of = "which versioning schema is not supported"
@@ -90,11 +90,12 @@ class CoordinatesWithVersionRange(Coordinates):
                         version_is_of = version_is_of[:-2]
                     logger.warning(
                         LogMessage(
-                            "Set not performed",
-                            f'The update targeted at "{self} {self.version_range}"'
-                            f' has versioning schema "{self.version_range.version_class.__name__}"'
+                            "Incompatible version ranges",
+                            f'The component {other} matches the target {self}'
+                            f' in the name and group keys but has a different versioning'
+                            f' schema. The target has versioning schema'
+                            f' "{self.version_range.version_class.__name__}"'
                             f' this is incompatible with the version "{other.version}"'
-                            f' of the otherwise matching component "{other}"'
                             + version_is_of,
                         )
                     )

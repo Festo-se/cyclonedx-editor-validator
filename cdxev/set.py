@@ -7,7 +7,8 @@ import sys
 import typing as t
 from dataclasses import dataclass, field, fields
 
-import univers.version_range  # type:ignore
+import univers.version_range
+import univers.versions  # type:ignore
 
 from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
 from cdxev.auxiliary.sbomFunctions import walk_components
@@ -65,11 +66,39 @@ class CoordinatesWithVersionRange(Coordinates):
                     return False
 
             if other.version is not None:
-                if (
-                    self.version_range.version_class(other.version)
-                    in self.version_range
-                ):
-                    return True
+                try:
+                    if (
+                        self.version_range.version_class(other.version)
+                        in self.version_range
+                    ):
+                        return True
+                except univers.versions.InvalidVersion:
+                    possible_versions = []
+                    for version_type in univers.versions.AVAILABLE_VERSIONS:
+                        try:
+                            if version_type.is_valid(other.version):
+                                possible_versions.append(str(version_type.__name__))
+                        except:
+                            continue
+                    version_is_of = " which might is valid under the schemas of: "
+
+                    if not possible_versions:
+                        version_is_of = "which versioning schema is not supported"
+                    else:
+                        for version in possible_versions:
+                            version_is_of += version + ", "
+                        version_is_of = version_is_of[:-2]
+                    logger.info(
+                        LogMessage(
+                            "Set not performed",
+                            f'The update targeted at "{self} {self.version_range}"'
+                            f' has versioning schema "{self.version_range.version_class.__name__}"'
+                            f' this is incompatible with the version "{other.version}"'
+                            f' of the otherwise matching component "{other}"'
+                            + version_is_of
+                        )
+                    )
+                    return False
 
         return False
 
@@ -101,7 +130,7 @@ class UpdateIdentity(ComponentIdentity):
         cls, component: t.Mapping[str, t.Any], allow_unsafe: bool = False
     ) -> "t.Union[UpdateIdentity, ComponentIdentity]":
 
-        if "version_range" in component and "version" not in component:
+        if "version_range" in component:
             coordinates = cls._from_coordinates(
                 name=component["name"],
                 group=component.get("group"),
@@ -281,6 +310,12 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
         if "id" not in upd:
             raise AppError(
                 "Invalid set file", "An update object is missing the 'id' property."
+            )
+        if "version" in upd["id"] and "version_range" in upd["id"]:
+            raise AppError(
+                "Invalid set file",
+                "An update object for"
+                "contains a 'version' and 'version_range' but only one of them is permitted"
             )
         component_id = UpdateIdentity.create(upd["id"], True)
         upd["id"] = component_id

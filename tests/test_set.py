@@ -575,6 +575,21 @@ class TestVersionRange(unittest.TestCase):
         self.assertNotEqual(one_version_key, regular_key_2)
         self.assertNotEqual(one_version_key, regular_key_other_name)
 
+    def test_version_and_version_range_error(self) -> None:
+        updates = [
+            {
+                "id": {"name": "pkg", "version": "1.1.1", "version_range": "vers:generic/*"},
+                "set": {"author": "Another author"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+        self.assertRaises(cdxev.error.AppError, cdxev.set._validate_update_list, updates, cfg)
+
     def test_version_range(self) -> None:
         component_base = {
             "name": "some name",

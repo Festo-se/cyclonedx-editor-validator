@@ -222,8 +222,8 @@ class TestCreateExternalBom(unittest.TestCase):
                     "comp4",
                     "internalcomp1",
                     "internalcomp2",
-                    "internalcomp3"
-                ]
+                    "internalcomp3",
+                ],
             }
         ]
         self.assertDictEqual(external_bom, public_sbom)

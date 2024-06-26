@@ -684,5 +684,37 @@ Examples:
 
 This command creates a notice file from a provided SBOM.
 
-It extracts all copyrigth and license information from the SBOM and lists it below the according component.
-If a component does not contain copyright or license information it will still be listed with the note "No license or copyright information available"
+It extracts all copyright and license information from the SBOM and lists it below the according component.
+If a component does not contain copyright or license information it will still be listed with the note "No license or copyright information available".
+The resulting document is .txt file in the Format:
+
+    Product name
+    Copyright of the product
+
+
+    This product includes material developed by third parties: 
+
+    Component 1:  # if copyright and license(s) are provided
+    Copyright
+    License 1
+    License 2
+    ...
+
+    Component 2:  # if only copyright is provided
+    Copyright
+
+    Component 3:  # if only license(s) are provided
+    License 1
+    License 2
+    ...
+
+    Component 3:  # if nether copyright nor license(s) are provided
+    No license or copyright information available
+
+If the command is called only providing the path to a SBOM, the results are written to stdout.
+If the path to a folder is provided via the `--output` option, a file named "notice_file_'filename of the sbom'.txt" will be saved in the provided folder.
+If a file is specified via the `--output` option, the result will be written to this file.
+
+    cdx-ev create-notice-file bom.json  # results will be written to stdout
+    cdx-ev create-notice-file bom.json -output=path_to_folder/notice_file.txt  # results are saved in the file "notice_file.txt"
+    cdx-ev create-notice-file bom.json -output=path_to_folder  # a file "notice_file_bom.json.txt" is created in the provided folder

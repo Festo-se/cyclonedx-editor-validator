@@ -8,7 +8,7 @@ Before use, please consider the [known limitations](https://festo-se.github.io/c
 
 ## amend
 
-This command accepts a single input file and will apply one or multiple *operations* to it. Each operation modifies certain aspects of the SBOM. These modifications cannot be targeted at individual components in the SBOM which sets the *amend* command apart from *set*. It's use-case is ensuring an SBOM fulfils certain requirements in an automated fashion.
+This command accepts a single input file and will apply one or multiple *operations* to it. Each operation modifies certain aspects of the SBOM. These modifications cannot be targeted at individual components in the SBOM which sets the *amend* command apart from *set*. Its use-case is ensuring an SBOM fulfils certain requirements in an automated fashion.
 
 See the command help with `cdx-ev amend --help` for a list of available operations. All operations marked `[default]` will run unless the command-line option `--operation` is provided.
 

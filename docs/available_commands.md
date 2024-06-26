@@ -712,9 +712,13 @@ The resulting document is .txt file in the Format:
     No license or copyright information available
 
 If the command is called only providing the path to a SBOM, the results are written to stdout.
-If the path to a folder is provided via the `--output` option, a file named "notice_file_'filename of the sbom'.txt" will be saved in the provided folder.
-If a file is specified via the `--output` option, the result will be written to this file.
 
     cdx-ev create-notice-file bom.json  # results will be written to stdout
+
+If the path to a folder is provided via the `--output` option, a file named "notice_file_'filename of the sbom'.txt" will be saved in the provided folder.
+
     cdx-ev create-notice-file bom.json -output=path_to_folder/notice_file.txt  # results are saved in the file "notice_file.txt"
+
+If a file is specified via the `--output` option, the result will be written to this file.
+
     cdx-ev create-notice-file bom.json -output=path_to_folder  # a file "notice_file_bom.json.txt" is created in the provided folder

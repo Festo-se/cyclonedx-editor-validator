@@ -1,3 +1,6 @@
+from cdxev.auxiliary.sbomFunctions import extract_components
+
+
 def print_license(license: dict) -> str:
     if license.get("expression", ""):
         return license.get("expression", "")
@@ -29,7 +32,8 @@ def create_notice_file(sbom: dict) -> str:
         header.rstrip(",")
 
     text_body = ""
-    for component in sbom.get("components", []):
+    components = extract_components(sbom.get("components", []))
+    for component in components:
         component_information = component.get("name", "") + ":" + "\n"
         component_license_information = ""
         component_copyright_information = ""

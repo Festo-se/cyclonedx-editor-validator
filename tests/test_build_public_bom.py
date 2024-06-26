@@ -202,7 +202,6 @@ class TestCreateExternalBom(unittest.TestCase):
         sbom = get_test_sbom()
         sbom = get_test_sbom()
         public_sbom = get_test_sbom()
-
         public_sbom["metadata"]["component"]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(2)
@@ -211,18 +210,20 @@ class TestCreateExternalBom(unittest.TestCase):
         public_sbom["components"][2]["properties"].pop(0)
         public_sbom["components"][5]["properties"].pop(0)
         external_bom = b_p_b.build_public_bom(sbom, None)
+
         public_sbom["compositions"] = [
             {
                 "aggregate": "incomplete",
                 "assemblies": [
                     "comp1",
+                    "sub_comp1",
                     "comp2",
-                    "internalcomp2",
                     "comp3",
                     "comp4",
-                    "internalcomp3",
                     "internalcomp1",
-                ],
+                    "internalcomp2",
+                    "internalcomp3"
+                ]
             }
         ]
         self.assertDictEqual(external_bom, public_sbom)

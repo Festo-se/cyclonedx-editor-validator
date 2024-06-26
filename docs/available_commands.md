@@ -711,8 +711,12 @@ The resulting document is .txt file in the Format:
     Component 3:  # if nether copyright nor license(s) are provided
     No license or copyright information available
 
-  If the path to a folder is provided via the `--output` option, a file with the naming convention"notice_file_`metadata.component.name`\_`metadata.component.version`\_\[`hash`, `metadata.timestamp`\].cdx.json.txt" (where ether `hash` or `metadata.timestamp` can be used) will be saved in the provided folder.
-For example the sbom of a product with the `name` Acme_Application in `version` 9.1.1 that has the `timestamp` would be saved as "notice_file_Acme_Application_9.1.1_20220217T101458.cdx.json.txt"
+If the path to a folder is provided via the `--output` option, a file with the naming convention
+  
+  "notice_file_`metadata.component.name`\_`metadata.component.version`\_\[`hash`, `metadata.timestamp`\].cdx.json.txt"
+  
+will be saved in the provided folder.
+For example the sbom of a product with the `name` "Acme_Application" in `version` "9.1.1" that has the `timestamp` "20220217T101458" would be saved as "notice_file_Acme_Application_9.1.1_20220217T101458.cdx.json.txt"
 
     cdx-ev create-notice-file bom.json -output=path_to_folder  # a file "notice_file_Acme_Application_9.1.1_20220217T101458.cdx.json.txt" is created in the provided folder    
 

@@ -79,7 +79,7 @@ def remove_component_tagged_internal(
         validator_for_being_internal = create_internal_validator(path_to_schema)
         for component in components:
             # if it is a internal component, the whole component will be removed,
-            # if not, only the only the property within namespace internal will be removed
+            # if not, the property within namespace internal will be removed
             if validator_for_being_internal.is_valid(component):
                 list_of_removed_component_bom_refs.append(component.get("bom-ref", ""))
             else:

@@ -317,3 +317,10 @@ The following schema is a little more involved. It will delete any component who
         },
         "required": ["licenses"]
     }
+
+## create-notice-file
+
+This command creates a notice file from a provided SBOM.
+
+It extracts all copyrigth and license information from the SBOM and lists it below the according component.
+If a component does not contain copyright or license information it will still be listed with the note "No license or copyright information available"

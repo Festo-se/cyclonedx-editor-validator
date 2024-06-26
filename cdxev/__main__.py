@@ -28,7 +28,7 @@ from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
-from cdxev.create_notice_file import create_notice_file, create_notice_file_fancy
+from cdxev.create_notice_file import create_notice_file
 
 logger: logging.Logger
 
@@ -917,8 +917,6 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
 def invoke_create_notice_file(args: argparse.Namespace) -> int:
     sbom, _ = read_sbom(args.input)
     output = create_notice_file(sbom)
-    #
-    # output = create_notice_file_fancy(sbom)
     write_notice_file(output, args.output, sbom)
 
     return Status.OK

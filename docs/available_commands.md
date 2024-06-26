@@ -211,7 +211,7 @@ This command creates a reduced version of an SBOM fit for publication.
 
 If no JSON schema is provided the command:
 
-* removes any *property* (i.e., item in the `properties` array of a component) whose name starts with `internal:` from all components.
+* removes any *property* (i.e., item in the `properties` array of a component) whose namespace starts with `internal:` from all components, according to [cyclonedx-property-taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy#registered-top-level-namespaces).
 
 If the user provides a JSON schema with the `--schema_path` option, it:
 

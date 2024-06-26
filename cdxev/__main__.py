@@ -632,7 +632,10 @@ def create_build_public_bom_parser(
     parser.add_argument(
         "--schema-path",
         metavar="<schema path>",
-        help="Path to a json schema, defining when a sbom is considered internal",
+        help=(
+            "Path to a json schema, "
+            "defining when the information in an SBOM is considered internal"
+        ),
         default=None,
         type=Path,
     )

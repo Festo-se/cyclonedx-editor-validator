@@ -483,14 +483,20 @@ def create_validation_parser(
     parser.add_argument(
         "--report-format",
         help=(
-            "Write log output in a specified format. "
-            "If it's not specified, output is written to stdout."
+            "Write results to a file in the specified format. Must be combined with the "
+            "--report-path option."
         ),
-        choices=["stdout", "warnings-ng", "gitlab-code-quality"],
-        default="stdout",
+        choices=["warnings-ng", "gitlab-code-quality"],
     )
-
-    add_output_argument(parser)
+    parser.add_argument(
+        "--report-path",
+        metavar="<file>",
+        help=(
+            "The path to where the report file should be written. Must be combined with the "
+            "--report-format option."
+        ),
+        type=Path,
+    )
 
     parser.set_defaults(cmd_handler=invoke_validate, parser=parser)
     return parser
@@ -835,20 +841,22 @@ def invoke_set(args: argparse.Namespace) -> int:
 
 
 def invoke_validate(args: argparse.Namespace) -> int:
+    if bool(args.report_format) != bool(args.report_path):
+        # This means exactly one of both arguments was passed but not both.
+        usage_error(
+            "Cannot use --report-format without --report-path or vice-versa.",
+            args.parser,
+        )
+
     sbom, file_type = read_sbom(args.input)
-    if args.output is None:
-        output = Path("./issues.json")
-    else:
-        output = args.output
-    report_format = args.report_format
     return (
         Status.OK
         if validate_sbom(
             sbom=sbom,
             input_format=file_type,
             file=Path(args.input),
-            report_format=report_format,
-            output=output,
+            report_format=args.report_format,
+            report_path=args.report_path,
             schema_type=args.schema_type,
             filename_regex=(
                 None if args.no_filename_validation else args.filename_pattern

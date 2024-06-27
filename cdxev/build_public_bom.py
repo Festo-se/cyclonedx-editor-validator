@@ -164,7 +164,6 @@ def build_public_bom(sbom: dict, path_to_schema: t.Union[Path, None]) -> dict:
     )
     sbom["components"] = cleared_components
     sbom["dependencies"] = dependencies
-    print(kept_bom_refs)
     for composition in sbom.get("compositions", []):
         new_assemblies = []
         for bom_ref in composition.get("assemblies"):

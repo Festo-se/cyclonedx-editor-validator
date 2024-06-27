@@ -236,15 +236,16 @@ def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
             continue
 
         param_doc = next(p for p in init_doc.params if p.arg_name == name)
-        args.append(
-            {
-                "dest": name,
-                "name": "--" + name.replace("_", "-"),
-                "type": param.annotation,
-                "default": param.default,
-                "help": param_doc.description,
-            }
-        )
+        arg = {
+            "dest": name,
+            "name": "--" + name.replace("_", "-"),
+            "type": param.annotation,
+            "help": param_doc.description,
+        }
+        if param.default != inspect.Parameter.empty:
+            arg["default"] = param.default
+
+        args.append(arg)
 
     return _AmendOperationDetails(
         cls=cls,
@@ -355,8 +356,9 @@ def create_amend_parser(
         group_parser = parser.add_argument_group(f"Options for '{group}'")
         for opt in args:
             name = opt["name"]
-            del opt["name"]
-            group_parser.add_argument(name, **opt)
+            group_parser.add_argument(
+                name, **{k: v for k, v in opt.items() if k != "name"}
+            )
 
     add_output_argument(parser)
 
@@ -633,9 +635,13 @@ def create_build_public_bom_parser(
         type=Path,
     )
     parser.add_argument(
-        "schema_path",
+        "--schema-path",
         metavar="<schema path>",
-        help="Path to a json schema, defining when a sbom is considered internal",
+        help=(
+            "Path to a json schema, "
+            "defining when the information in an SBOM is considered internal"
+        ),
+        default=None,
         type=Path,
     )
     add_output_argument(parser)
@@ -662,8 +668,6 @@ def invoke_amend(args: argparse.Namespace) -> int:
     if not args.input:
         usage_error("<input> argument missing.", args.parser)
 
-    sbom, _ = read_sbom(args.input)
-
     # Prepare the operation options that were passed on the command-line
     config = {}
     operations = []
@@ -673,8 +677,17 @@ def invoke_amend(args: argparse.Namespace) -> int:
         op_arguments = {}
         for opt in details.options:
             dest = opt["dest"]
-            op_arguments[dest] = getattr(args, dest)
+            op_argument = getattr(args, dest)
+            if op_argument is None:
+                usage_error(
+                    f"Option {opt['name']} is required for operation {details.name}.",
+                    args.parser,
+                )
+            op_arguments[dest] = op_argument
+
         config[details.cls] = op_arguments
+
+    sbom, _ = read_sbom(args.input)
 
     amend.run(sbom, operations, config)
     write_sbom(sbom, args.output)

@@ -214,7 +214,13 @@ Examples:
 
 ## build-public
 
-This command creates a reduced version of an SBOM fit for publication. It:
+This command creates a reduced version of an SBOM fit for publication.
+
+If no JSON schema is provided the command:
+
+* removes any *property* (i.e., item in the `properties` array of a component) whose namespace starts with `internal:` from all components, according to [CycloneDX property namespace and name taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy#registered-top-level-namespaces).
+
+If the user provides a JSON schema with the `--schema_path` option, it:
 
 * deletes components matching a JSON schema provided by the user, and
 * removes any *property* (i.e., item in the `properties` array of a component) whose name starts with `internal:` from all components.

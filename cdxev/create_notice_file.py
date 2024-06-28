@@ -59,7 +59,7 @@ def create_notice_file(sbom: dict) -> str:
 
         text_body += component_information
 
-    text_body = text_body.removesuffix('\n')
+    text_body = text_body.removesuffix("\n")
     notice_file = header
     if text_body:
         notice_file += (

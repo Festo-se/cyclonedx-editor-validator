@@ -22,15 +22,15 @@ import cdxev.set
 from cdxev import pkg
 from cdxev.amend.operations import Operation
 from cdxev.auxiliary.identity import Key, KeyType
-from cdxev.auxiliary.output import write_sbom, write_notice_file
+from cdxev.auxiliary.output import write_notice_file, write_sbom
 from cdxev.build_public_bom import build_public_bom
+from cdxev.create_notice_file import create_notice_file
 from cdxev.error import AppError, InputFileError
 from cdxev.initialize_sbom import initialize_sbom
 from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
-from cdxev.create_notice_file import create_notice_file
 
 logger: logging.Logger
 

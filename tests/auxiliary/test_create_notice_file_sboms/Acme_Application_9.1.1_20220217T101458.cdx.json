@@ -131,15 +131,15 @@
       "version": "9.0.14",
       "licenses": [
         {
-			"license": {
-				"id": "Apache-2.0"
-			}
+			    "license": {
+				    "id": "Apache-2.0"
+			    }
         },
         {
           "license": {
             "id": "Apache-1.0"
           }
-            }
+        }
       ]
     },
     {
@@ -154,6 +154,12 @@
       "licenses": [
         {
           "expression": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0"
+        },
+        {
+          "license":{
+            "name": "A licenses name of card verifier",
+            "text": "Text describing the license"
+          }
         }
       ]
     },
@@ -169,6 +175,11 @@
       "licenses": [
         {
           "expression": "Example, Inc. Commercial License"
+        },
+        {
+          "license": {
+            "id": "Apache-1.0"
+          }
         }
       ],
       "cpe": "cpe:2.3:a:*:util:2.0.0:*:*:*:*:*:*:*"

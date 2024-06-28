@@ -20,8 +20,8 @@ def validate_sbom(
     sbom: dict,
     input_format: str,
     file: Path,
-    report_format: str,
-    output: Path,
+    report_format: t.Optional[str],
+    report_path: t.Optional[Path],
     schema_type: str = "default",
     filename_regex: t.Optional[str] = "",
     schema_path: str = "",
@@ -153,10 +153,13 @@ def validate_sbom(
                     errors.append(error_path + error.message)
     sorted_errors = set(sorted(errors))
     if report_format == "warnings-ng":
-        warnings_ng_handler = WarningsNgReporter(file, output)
+        # The following cast is safe because the caller of this function made sure that
+        # report_path is not None when report_format is not None.
+        warnings_ng_handler = WarningsNgReporter(file, t.cast(Path, report_path))
         logger.addHandler(warnings_ng_handler)
     elif report_format == "gitlab-code-quality":
-        gitlab_cq_handler = GitLabCQReporter(file, output)
+        # See comment above
+        gitlab_cq_handler = GitLabCQReporter(file, t.cast(Path, report_path))
         logger.addHandler(gitlab_cq_handler)
     if len(sorted_errors) == 0:
         logger.info("SBOM is compliant to the provided specification schema")

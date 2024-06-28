@@ -48,7 +48,7 @@ def validate_test(
         input_format="json",
         file=Path(path_to_sbom),
         report_format=report_format,
-        output=Path(""),
+        report_path=Path(""),
         schema_type=schema_type,
         filename_regex=filename_regex,
         schema_path=schema_path,

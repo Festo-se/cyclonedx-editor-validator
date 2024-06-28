@@ -1,6 +1,7 @@
-import cdxev.create_notice_file as NoticeFile
 import json
 import unittest
+
+import cdxev.create_notice_file as NoticeFile
 
 path_to_sbom = (
     "tests/auxiliary/test_create_notice_file_sboms/"

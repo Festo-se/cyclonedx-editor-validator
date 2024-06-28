@@ -1,7 +1,7 @@
 import json
 import unittest
 
-import cdxev.create_notice_file as NoticeFile
+import cdxev.create_notice_file as noticefile
 
 path_to_sbom = (
     "tests/auxiliary/test_create_notice_file_sboms/"
@@ -9,13 +9,13 @@ path_to_sbom = (
 )
 
 
-def get_test_sbom(pathsbom: str = path_to_sbom) -> dict:
-    with open(pathsbom, "r") as read_file:
+def get_test_sbom(path_sbom: str = path_to_sbom) -> dict:
+    with open(path_sbom, "r") as read_file:
         sbom = json.load(read_file)
     return sbom
 
 
-class TestCreateNoticeFile(unittest.TestCase):
+class TestCreatenoticefile(unittest.TestCase):
     def test_extract_license(self) -> None:
         expression = "Example, Inc. Commercial License"
         id = "Apache-1.0"
@@ -23,10 +23,10 @@ class TestCreateNoticeFile(unittest.TestCase):
         license_expression = {"expression": expression}
         license_id = {"license": {"id": id}}
         license_name = {"license": {"name": name}}
-        extracted_expression = NoticeFile.extract_license(license_expression)
-        extracted_id = NoticeFile.extract_license(license_id)
-        extracted_name = NoticeFile.extract_license(license_name)
-        extracted_empty_license = NoticeFile.extract_license({})
+        extracted_expression = noticefile.extract_license(license_expression)
+        extracted_id = noticefile.extract_license(license_id)
+        extracted_name = noticefile.extract_license(license_name)
+        extracted_empty_license = noticefile.extract_license({})
 
         self.assertEqual(extracted_expression, expression)
         self.assertEqual(extracted_id, id)
@@ -35,8 +35,8 @@ class TestCreateNoticeFile(unittest.TestCase):
 
     def test_create_notice_file(self) -> None:
         sbom = get_test_sbom()
-        notice_file = NoticeFile.create_notice_file(sbom)
-        components = NoticeFile.extract_components(sbom.get("components", []))
+        notice_file = noticefile.create_notice_file(sbom)
+        components = noticefile.extract_components(sbom.get("components", []))
         notice_file_licenses = notice_file[
             notice_file.find(
                 "This product includes material developed by third parties: \n"
@@ -64,7 +64,7 @@ class TestCreateNoticeFile(unittest.TestCase):
                 ):
                     continue
                 for license in component.get("licenses", []):
-                    license_content = NoticeFile.extract_license(license)
+                    license_content = noticefile.extract_license(license)
                     if license_content not in license_list:
                         continue
 

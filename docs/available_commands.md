@@ -195,15 +195,22 @@ The tool, by default, also validates the filename of the SBOM. Which filenames a
 `<timestamp>` corresponds to `metadata.timestamp` and `<hash>` means any value in `metadata.component.hashes[].content`.  
 Either *timestamp* or *hash* must be present. If both are specified, *hash* must come first.
 
-### Logging
+### Output
 
-Per default the command only writes to stdout. However, for supporting integration into CI/CD, other formats shall be supported, too. This can be controlled via the flag `--report-format`.
+By default, the command writes human-readable validation results to *stderr* only. For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the `--report-format` option and an output path using the `--report-path` option.
 
-Currently, two formats are supported: The [warnings-ng-plugin](https://github.com/jenkinsci/warnings-ng-plugin) and [GitLab Code Quality Report](https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool). They can be used as followed:
+These formats are currently supported:
 
-    cdx-ev validate bom.json --report-format=warnings-ng" # writes issues to a file "issues.json" and stdout
-    cdx-ev validate bom.json --report-format=warnings-ng --output=myfile.json" # write issues to a file "myfile.json" and stdout
-    cdx-ev validate bom.json --report-format=gitlab-code-quality # writes issues to a file "issues.json" and stdout
+* [Jenkins warnings-ng-plugin](https://github.com/jenkinsci/warnings-ng-plugin)
+* [GitLab Code Quality](https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool)
+
+Examples:
+
+    # Write human-readable messages to stderr and a report in warnings-ng format to report.json
+    cdx-ev validate bom.json --report-format=warnings-ng --report-path=report.json
+
+    # Write only a report in GitLab Code Quality format to cq.json
+    cdx-ev --quiet validate bom.json --report-format=gitlab-code-quality --report-path=cq.json
 
 ## build-public
 

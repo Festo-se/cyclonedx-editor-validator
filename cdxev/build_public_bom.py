@@ -1,8 +1,4 @@
-#################################################
-# Function to remove internal components based on
-# a provided JSON schema, that contains the
-# requirements for a component to be considered internal.
-#################################################
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
 import re

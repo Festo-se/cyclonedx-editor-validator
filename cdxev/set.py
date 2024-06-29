@@ -46,7 +46,7 @@ class CoordinatesWithVersionRange(Coordinates):
     If the 'name' and 'group' match,
     it will check if the provided version of the coordinates object
     is contained in this class instance's 'version_range'
-    and return True or False depending on the result."
+    and return True or False depending on the result.
     """
 
     version_range: univers.version_range.VersionRange

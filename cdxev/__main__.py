@@ -619,7 +619,7 @@ def create_set_parser(
         help="Version of target component. If specified, name must also be specified.",
     )
     identifiers.add_argument(
-        "--version_range",
+        "--version-range",
         metavar="<version>",
         help="Version range of target components. If specified, name must also be specified.",
     )

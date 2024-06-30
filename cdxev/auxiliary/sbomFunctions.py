@@ -1,6 +1,4 @@
-##################################################
-# Module with functions for the work with sboms
-###################################################
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 from dataclasses import dataclass

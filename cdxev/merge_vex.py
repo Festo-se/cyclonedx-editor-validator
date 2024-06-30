@@ -1,7 +1,4 @@
-##################################################
-# Function to merge a Software Bill of Materials
-# and a vex file
-##################################################
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from cdxev import merge
 

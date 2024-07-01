@@ -11,10 +11,10 @@ from cdxev.error import AppError
 
 
 def open_schema(
-    sbom: dict, file: Path, schema_type: str, schema_path: str
+    sbom: dict, file: Path, schema_type: str, schema_path: t.Optional[Path]
 ) -> tuple[dict, Path]:
     if schema_path:
-        sbom_schema, used_schema_path = get_external_schema(Path(schema_path))
+        sbom_schema, used_schema_path = get_external_schema(schema_path)
     else:
         path_to_embedded_schema = resources.files("cdxev.auxiliary") / "schema"
         with resources.as_file(path_to_embedded_schema) as path:

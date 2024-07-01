@@ -501,8 +501,10 @@ class TestValidateUseOwnSchema(unittest.TestCase):
             "",
             Path(""),
             schema_path=(
-                str(Path(__file__).parent.resolve())
-                + "/auxiliary/test_validate_sboms/test_schema.json"
+                Path(__file__).parent.resolve()
+                / "auxiliary"
+                / "test_validate_sboms"
+                / "test_schema.json"
             ),
         )
         self.assertEqual(v, 0)
@@ -510,7 +512,7 @@ class TestValidateUseOwnSchema(unittest.TestCase):
     def test_use_own_schema_path_does_not_exist(self) -> None:
         sbom = get_test_sbom()
         with self.assertRaises(AppError) as ap:
-            validate_test(sbom, schema_path="No_Path")
+            validate_test(sbom, schema_path=Path("No_Path"))
         self.assertIn(
             "Path to the provided schema does not exist",
             ap.exception.details.description,
@@ -519,7 +521,7 @@ class TestValidateUseOwnSchema(unittest.TestCase):
     def test_use_own_schema_invalid_json(self) -> None:
         sbom = get_test_sbom()
         with self.assertRaises(AppError) as ap:
-            validate_test(sbom, schema_path="cdxev/auxiliary/schema")
+            validate_test(sbom, schema_path=Path("cdxev/auxiliary/schema"))
         self.assertIn(
             (
                 "The submitted schema is not a valid"

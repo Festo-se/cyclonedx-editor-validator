@@ -24,7 +24,7 @@ def validate_sbom(
     report_path: t.Optional[Path],
     schema_type: str = "default",
     filename_regex: t.Optional[str] = "",
-    schema_path: str = "",
+    schema_path: t.Optional[Path] = None,
 ) -> int:
     errors = []
     if input_format == "json":

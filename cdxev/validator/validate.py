@@ -180,12 +180,12 @@ def validate_sbom(
     if report_format == "warnings-ng":
         # The following cast is safe because the caller of this function made sure that
         # report_path is not None when report_format is not None.
-        warnings_ng_handler = WarningsNgReporter(file, t.cast(Path, report_path))
-        logger.addHandler(warnings_ng_handler)
+        report_handler = WarningsNgReporter(file, t.cast(Path, report_path))
+        logger.addHandler(report_handler)
     elif report_format == "gitlab-code-quality":
         # See comment above
-        gitlab_cq_handler = GitLabCQReporter(file, t.cast(Path, report_path))
-        logger.addHandler(gitlab_cq_handler)
+        report_handler = GitLabCQReporter(file, t.cast(Path, report_path))
+        logger.addHandler(report_handler)
     if len(sorted_errors) == 0:
         logger.info("SBOM is compliant to the provided specification schema")
         return 0

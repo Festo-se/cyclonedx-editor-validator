@@ -336,7 +336,7 @@ Example for the use of version ranges:
         },
         {
             "id": {
-                "name": "web-framework",
+                "name": "firmware-framework",
                 "group": "org.acme",
                 # It is also possible to provide a wildcard for the version
                 # if the version is set to "*" all versions of the specified schema are passed
@@ -346,6 +346,24 @@ Example for the use of version ranges:
         },
         ...
     ]
+
+The above provided example would set the ``copyright`` in the component
+
+    {
+        "name": "web-framework"
+        "group": "org.acme","group": "org.acme",
+        "version":"1.5.0"
+    }
+
+while it would leave the component
+
+    {
+        "name": "web-framework"
+        "group": "org.acme","group": "org.acme",
+        "version":"2.0.0"
+    }
+
+unchanged.
 
 This file can then be applied as the following example shows:
 

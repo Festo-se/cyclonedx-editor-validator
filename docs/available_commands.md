@@ -236,11 +236,11 @@ to target all versions to target all versions higher than and not including 2.0.
 
     vers:generic/>2.0.0|<=4.5.0|5.0.0
 
-Further information on the supported versions can be found here [univers documentation](https://pypi.org/project/univers/). Note that instead of specific version constraints it is possible to provide a wildcard *\** to allow all versions.
-
-So to target all versions the provided version range would be
+Note that instead of specific version constraints it is possible to provide a wildcard *\** to allow all versions. So to target all versions the provided version range would be
 
     vers:generic/*
+
+Further information on the supported versions can be found here [univers documentation](https://pypi.org/project/univers/).
 
 If the target component isn't found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the `--ignore-missing` flag.
 

@@ -330,7 +330,7 @@ Example for the use of version ranges:
                 "group": "org.acme",
                 # It is possible to provide a version range
                 # the format must comply with the PURL specification for version ranges  
-                "version_range": "vers:generic/>=1.0.2|<2.0.0",
+                "version-range": "vers:generic/>=1.0.2|<2.0.0",
             },
                 "set": {"copyright": "1990 Acme Inc"},
         },
@@ -340,7 +340,7 @@ Example for the use of version ranges:
                 "group": "org.acme",
                 # It is also possible to provide a wildcard for the version
                 # if the version is set to "*" all versions of the specified schema are passed
-                "version_range": "vers:generic/*",
+                "version-range": "vers:generic/*",
             },
                 "set": {"copyright": "1990 Acme Inc"},
         },

@@ -315,7 +315,7 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
             raise AppError(
                 "Invalid set file",
                 "An update object for"
-                "contains a 'version' and 'version_range' but only one of them is permitted",
+                "contains a 'version' and 'version-range' but only one of them is permitted",
             )
         component_id = UpdateIdentity.create(upd["id"], True)
         upd["id"] = component_id

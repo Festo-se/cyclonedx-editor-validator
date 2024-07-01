@@ -16,7 +16,24 @@ For more information on a particular operation, use the `cdx-ev amend --help-ope
 
 Note that the order of operations cannot be controlled. If you want to ensure two operations run in a certain order you must run the command twice, each time with a different set of operations.
 
-### Insert license texts from files
+__Example:__
+
+    # Run all default operations on an SBOM.
+    cdx-ev amend bom.json
+
+    # Run only the default-author and add-bom-ref operations.
+    cdx-ev amend --operation default-author --operation add-bom-ref bom.json
+
+    # Run the add-license-text operation. License texts are stored in a directory named 'license_texts'.
+    # Afterwards, run the delete-ambiguous-licenses operation.
+    cdx-ev amend --operation add-license-text --license-dir ./license_texts bom.json --output bom.json
+    cdx-ev amend --operation delete-ambiguous-licenses bom.json
+
+### Operations
+
+This section details the more complex operations which require further explanation beyond the help text provided by `--help-operation <operation>`.
+
+#### add-license-text
 
 The operation `add-license-text` can be used to insert known full license texts for licenses identified by name. You can use this, for instance, in workflows where SBOMs are created or edited by hand - so a clutter-free JSON is preferred - then, in a last step, full texts are inserted using this operation.
 

@@ -213,7 +213,7 @@ If *coordinates* are used to identify the target, they must match the component 
 
 In *coordinates* it is also possible to provide a range of versions using the *version-range* parameter instead of *version* following the [PURL specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst) as referenced by [CycloneDX](https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range).
 
-The version range is provided in the format
+The version range has the format
 
     vers:<versioning-scheme>/<version-constraint>|<version-constraint>|...
 

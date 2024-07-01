@@ -1195,4 +1195,4 @@ tests = ["coverage[toml]"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9.0"
-content-hash = "9f710f86fcbf1fd83ebc0d61cb4ba18a3387755f5330ae4194c80b002d8b2034"
+content-hash = "9ef780956ee21e5e82f90221a5769125c0b6892688b8a15088088501683dd577"

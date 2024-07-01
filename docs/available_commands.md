@@ -27,10 +27,11 @@ License texts are inserted only if:
 * The license has no or an empty `text.content` field.
 * A matching file is found.
 
-You must provide one file per license text in a flat directory. The filename must match the license name specified in the SBOM. The filename's extension (anything after and including the last period) can be present in the license name but it doesn't need to.
+You must provide one file per license text in a flat directory. The stem of the filename, that is everything up to the extension (i.e., up to but not including the last period), must match the license name specified in the SBOM.
 
 __Example:__
-Given this license in the input:
+
+Given this license in the input SBOM:
 
     {
         "license": {
@@ -38,15 +39,15 @@ Given this license in the input:
         }
     }
 
-it would be filled with the text in any file named `My license`, `My license.txt`, `My license.md`, or any other extension.  
-However, the file `My license.2.txt` would be ignored, because with or without its extension (`.txt`), it doesn't match the license name.
+the operation would search the full license text in any file named `My license`, `My license.txt`, `My license.md`, or any other extension.
+However, the file `My license.2.txt` would be disregarded, because its stem (`My license.2`) doesn't match the license name.
 
 ## build-public
 
-This command creates a reduced version of an SBOM fit for publication. It:
+This command creates a redacted version of an SBOM fit for publication. It
 
-* deletes components matching a JSON schema provided by the user, and
-* removes any *property* (i.e., item in the `properties` array of a component) whose name starts with `internal:` from all components.
+* can optionally delete entire components matching a JSON schema provided by the user, and it
+* deletes any *property* (i.e., item in the `properties` array of a component) whose name starts with `internal:` from all components.
 
 The actions are performed in this order, meaning that *internal* properties will be taken into account when matching the JSON schema.
 
@@ -193,6 +194,8 @@ The *target component* can be identified through any of the identifiable propert
 
 If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
+If the target component isn't found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the `--ignore-missing` flag.
+
 #### Protected fields
 
 Some fields are protected and cannot be set by default. The full list of protected properties is:
@@ -269,12 +272,6 @@ This file can then be applied as the following example shows:
     # Perform several operations on properties using set-command
     cdx-ev set bom.json --from-file mysetfile.json
 
-If the file contains a component not present in the SBOM, a error is thrown.
-This can be disabled with the `--ignore-missing` command.
-So only a message that the component was not found and could not be updated is logged.
-
-    cdx-ev set bom.json --from-file mysetfile.json --ignore-missing
-
 ## validate
 
 This command is used to validate the SBOM against a JSON schema.
@@ -326,7 +323,7 @@ These formats are currently supported:
 Examples:
 
     # Write human-readable messages to stderr and a report in warnings-ng format to report.json
-    cdx-ev validate bom.json --report-format=warnings-ng --report-path=report.json
+    cdx-ev validate bom.json --report-format warnings-ng --report-path report.json
 
     # Write only a report in GitLab Code Quality format to cq.json
-    cdx-ev --quiet validate bom.json --report-format=gitlab-code-quality --report-path=cq.json
+    cdx-ev --quiet validate bom.json --report-format gitlab-code-quality --report-path cq.json

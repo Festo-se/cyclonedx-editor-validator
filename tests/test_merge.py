@@ -5,7 +5,7 @@ import unittest
 
 from cdxev import merge
 from cdxev.auxiliary import sbomFunctions as sbF
-from tests.auxiliary import helper as sbFT
+from tests.auxiliary import helper as helper
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
 
@@ -124,17 +124,17 @@ class TestVulnerabilitiesIsIn(unittest.TestCase):
 
     def test_copy_ratings(self) -> None:
         self.assertTrue(
-            sbFT.compare_list_content(
+            helper.compare_list_content(
                 sbF.copy_ratings(ratings_dict["ratings1"]), ratings_dict["ratings1"]
             )
         )
         self.assertTrue(
-            sbFT.compare_list_content(
+            helper.compare_list_content(
                 sbF.copy_ratings(ratings_dict["ratings2"]), ratings_dict["ratings2"]
             )
         )
         self.assertTrue(
-            sbFT.compare_list_content(
+            helper.compare_list_content(
                 sbF.copy_ratings(ratings_dict["ratings3"]), ratings_dict["ratings3"]
             )
         )
@@ -145,7 +145,7 @@ class TestVulnerabilitiesIsIn(unittest.TestCase):
             ratings_dict["merged_ratings_1_and_ratings_2"],
         )
         self.assertTrue(
-            sbFT.compare_list_content(
+            helper.compare_list_content(
                 merge.merge_ratings(
                     ratings_dict["ratings3"], ratings_dict["ratings4"], 0
                 ),
@@ -153,7 +153,7 @@ class TestVulnerabilitiesIsIn(unittest.TestCase):
             )
         )
         self.assertTrue(
-            sbFT.compare_list_content(
+            helper.compare_list_content(
                 merge.merge_ratings(
                     ratings_dict["ratings3"], ratings_dict["ratings4"], 1
                 ),
@@ -161,7 +161,7 @@ class TestVulnerabilitiesIsIn(unittest.TestCase):
             )
         )
         self.assertTrue(
-            sbFT.compare_list_content(
+            helper.compare_list_content(
                 merge.merge_ratings(
                     ratings_dict["ratings3"], ratings_dict["ratings4"], 2
                 ),
@@ -178,12 +178,12 @@ class TestCompareSboms(unittest.TestCase):
             encoding="utf-8-sig",
         ) as my_file:
             sbom1 = json.load(my_file)
-        self.assertTrue(sbFT.compare_sboms(sbom1, sbom1))
+        self.assertTrue(helper.compare_sboms(sbom1, sbom1))
 
     def test_unequal(self) -> None:
         sbom1 = load_governing_program()
         sbom2 = load_sub_program()
-        self.assertFalse(sbFT.compare_sboms(sbom1, sbom2))
+        self.assertFalse(helper.compare_sboms(sbom1, sbom2))
 
 
 class TestTimeFunctions(unittest.TestCase):
@@ -262,7 +262,7 @@ class TestMergeSboms(unittest.TestCase):
         sbom1 = load_governing_program()
         sbom2 = load_sub_program()
         sbom_merged = load_governing_program_merged_sub_program()
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_vulnerabilities_in_the_second(self) -> None:
         sbom1 = load_governing_program()
@@ -275,7 +275,7 @@ class TestMergeSboms(unittest.TestCase):
         sbom_merged["vulnerabilities"] = dictionary_with_stuff[
             "sub_program_with_vulnerabilities"
         ]
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_vulnerabilities_in_the_first(self) -> None:
         sbom1 = load_governing_program()
@@ -289,7 +289,7 @@ class TestMergeSboms(unittest.TestCase):
         sbom_merged["vulnerabilities"] = dictionary_with_stuff[
             "merged_governing_program_with_vul_without"
         ]
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_vulnerabilities_same_component(self) -> None:
         dictionary_with_stuff = load_sections_for_test_sbom()
@@ -313,7 +313,7 @@ class TestMergeSboms(unittest.TestCase):
         sbom_merged["vulnerabilities"] = dictionary_with_stuff[
             "vulnerabilities_tls_equal"
         ]
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_vulnerabilities_different_component(self) -> None:
         sbom1 = load_governing_program()
@@ -330,7 +330,7 @@ class TestMergeSboms(unittest.TestCase):
         sbom_merged["vulnerabilities"] = dictionary_with_stuff[
             "merged_governing_program_with_vul_tls_unequal"
         ]
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
         # in the compare function, the order of the affected in the list is also compared
 
@@ -348,7 +348,7 @@ class TestMergeSboms(unittest.TestCase):
         sbom_merged["vulnerabilities"] = dictionary_with_stuff[
             "merged_with_vulnerabilities_several_affect_references"
         ]
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_merge_sboms_same_sbom(self) -> None:
         dictionary_with_stuff = load_sections_for_test_sbom()
@@ -370,12 +370,12 @@ class TestMergeSboms(unittest.TestCase):
         ]
         sbom4 = load_sub_program()
         sbom4["components"][2]["version"] = "2.24.0"
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom1]), sbom1))
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom2, sbom2]), sbom2))
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom3, sbom3]), sbom3))
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom4, sbom4]), sbom4))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom1]), sbom1))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom2, sbom2]), sbom2))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom3, sbom3]), sbom3))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom4, sbom4]), sbom4))
         self.assertTrue(
-            sbFT.compare_sboms(merge.merge([sbom_merged, sbom_merged]), sbom_merged)
+            helper.compare_sboms(merge.merge([sbom_merged, sbom_merged]), sbom_merged)
         )
 
     def test_get_component_by_ref(self) -> None:
@@ -396,7 +396,7 @@ class TestMergeSboms(unittest.TestCase):
         ]
         sbom_merged = load_governing_program_merged_sub_program()
         sbom_merged["vulnerabilities"] = dictionary_with_stuff["merged_new_ratings"]
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_with_only_published(self) -> None:
         dictionary_with_stuff = load_sections_for_test_sbom()
@@ -410,7 +410,7 @@ class TestMergeSboms(unittest.TestCase):
         ]
         sbom_merged = load_governing_program_merged_sub_program()
         sbom_merged["vulnerabilities"] = dictionary_with_stuff["merged_published"]
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_with_updated(self) -> None:
         dictionary_with_stuff = load_sections_for_test_sbom()
@@ -424,7 +424,7 @@ class TestMergeSboms(unittest.TestCase):
         ]
         sbom_merged = load_governing_program_merged_sub_program()
         sbom_merged["vulnerabilities"] = dictionary_with_stuff["merged_updated"]
-        self.assertTrue(sbFT.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_same_bom_ref_different_component(self) -> None:
         sbom1 = load_governing_program()
@@ -444,14 +444,14 @@ class TestMergeSboms(unittest.TestCase):
         sbom_merged = load_governing_program_merged_sub_program()
         merged_sbom = merge.merge([sbom1, sbom2])
         sbom_merged.pop("compositions")
-        self.assertTrue(sbFT.compare_sboms(merged_sbom, sbom_merged))
+        self.assertTrue(helper.compare_sboms(merged_sbom, sbom_merged))
 
     def test_one_loop_for_renaming(self) -> None:
         sbom1 = load_additional_sbom_dict()["sub_sub_program"]
         sbom2 = load_additional_sbom_dict()["sub_sub_program_2"]
         goal_sbom = load_additional_sbom_dict()["merged_sub_sub_programs"]
         merged_bom = merge.merge([sbom1, sbom2])
-        self.assertTrue(sbFT.compare_sboms(merged_bom, goal_sbom))
+        self.assertTrue(helper.compare_sboms(merged_bom, goal_sbom))
 
 
 class TestCompareComponents(unittest.TestCase):
@@ -654,7 +654,7 @@ class TestMergeSeveralSboms(unittest.TestCase):
         sub_sub_program = load_additional_sbom_dict()["sub_sub_program"]
         goal_sbom = load_additional_sbom_dict()["merge_goverment_sub_sub_sub"]
         merged_bom = merge.merge([governing_program, sub_program, sub_sub_program])
-        self.assertTrue(sbFT.compare_sboms(merged_bom, goal_sbom))
+        self.assertTrue(helper.compare_sboms(merged_bom, goal_sbom))
 
     def test_merge_4_sboms(self) -> None:
         governing_program = load_governing_program()
@@ -667,7 +667,7 @@ class TestMergeSeveralSboms(unittest.TestCase):
         merged_bom = merge.merge(
             [governing_program, sub_program, sub_sub_program, sub_sub_program_2]
         )
-        self.assertTrue(sbFT.compare_sboms(merged_bom, goal_sbom))
+        self.assertTrue(helper.compare_sboms(merged_bom, goal_sbom))
 
 
 class TestReplaceBomRefs(unittest.TestCase):
@@ -689,7 +689,7 @@ class TestReplaceBomRefs(unittest.TestCase):
         for bom_ref in list_of_bom_refs:
             new_reference = bom_ref + "_replaced"
             merge.replace_ref_in_sbom(new_reference, bom_ref, sbom)
-        self.assertTrue(sbFT.compare_sboms(sbom, sbom_bom_refs_replaced))
+        self.assertTrue(helper.compare_sboms(sbom, sbom_bom_refs_replaced))
 
     def test_new_license_already_exists(self) -> None:
         sbom = load_governing_program_merged_sub_program()
@@ -717,7 +717,7 @@ class TestMergeComponents(unittest.TestCase):
         ]
         merge.merge_components(sub_sub_program, sub_sub_program_sub_sub)
         self.assertTrue(
-            sbFT.compare_sboms(
+            helper.compare_sboms(
                 sub_sub_program_sub_program_modified, sub_sub_program_sub_sub
             )
         )
@@ -731,7 +731,7 @@ class TestMergeCompositions(unittest.TestCase):
         merged_sbom = merge.merge([governing_program, sub_program])
         goal_sbom = load_governing_program_merged_sub_program()
         goal_sbom["compositions"] = governing_program["compositions"]
-        self.assertTrue(sbFT.compare_sboms(merged_sbom, goal_sbom))
+        self.assertTrue(helper.compare_sboms(merged_sbom, goal_sbom))
 
     def test_only_second_sbom_contains_compositions(self) -> None:
         compositions_2 = [

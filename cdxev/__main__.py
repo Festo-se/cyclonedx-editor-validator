@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import argparse
 import enum
 import inspect
@@ -233,15 +235,16 @@ def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
             continue
 
         param_doc = next(p for p in init_doc.params if p.arg_name == name)
-        args.append(
-            {
-                "dest": name,
-                "name": "--" + name.replace("_", "-"),
-                "type": param.annotation,
-                "default": param.default,
-                "help": param_doc.description,
-            }
-        )
+        arg = {
+            "dest": name,
+            "name": "--" + name.replace("_", "-"),
+            "type": param.annotation,
+            "help": param_doc.description,
+        }
+        if param.default != inspect.Parameter.empty:
+            arg["default"] = param.default
+
+        args.append(arg)
 
     return _AmendOperationDetails(
         cls=cls,
@@ -352,8 +355,9 @@ def create_amend_parser(
         group_parser = parser.add_argument_group(f"Options for '{group}'")
         for opt in args:
             name = opt["name"]
-            del opt["name"]
-            group_parser.add_argument(name, **opt)
+            group_parser.add_argument(
+                name, **{k: v for k, v in opt.items() if k != "name"}
+            )
 
     add_output_argument(parser)
 
@@ -481,14 +485,20 @@ def create_validation_parser(
     parser.add_argument(
         "--report-format",
         help=(
-            "Write log output in a specified format. "
-            "If it's not specified, output is written to stdout."
+            "Write results to a file in the specified format. Must be combined with the "
+            "--report-path option."
         ),
-        choices=["stdout", "warnings-ng", "gitlab-code-quality"],
-        default="stdout",
+        choices=["warnings-ng", "gitlab-code-quality"],
     )
-
-    add_output_argument(parser)
+    parser.add_argument(
+        "--report-path",
+        metavar="<file>",
+        help=(
+            "The path to where the report file should be written. Must be combined with the "
+            "--report-format option."
+        ),
+        type=Path,
+    )
 
     parser.set_defaults(cmd_handler=invoke_validate, parser=parser)
     return parser
@@ -630,9 +640,13 @@ def create_build_public_bom_parser(
         type=Path,
     )
     parser.add_argument(
-        "schema_path",
+        "--schema-path",
         metavar="<schema path>",
-        help="Path to a json schema, defining when a sbom is considered internal",
+        help=(
+            "Path to a json schema, "
+            "defining when the information in an SBOM is considered internal"
+        ),
+        default=None,
         type=Path,
     )
     add_output_argument(parser)
@@ -659,8 +673,6 @@ def invoke_amend(args: argparse.Namespace) -> int:
     if not args.input:
         usage_error("<input> argument missing.", args.parser)
 
-    sbom, _ = read_sbom(args.input)
-
     # Prepare the operation options that were passed on the command-line
     config = {}
     operations = []
@@ -670,8 +682,17 @@ def invoke_amend(args: argparse.Namespace) -> int:
         op_arguments = {}
         for opt in details.options:
             dest = opt["dest"]
-            op_arguments[dest] = getattr(args, dest)
+            op_argument = getattr(args, dest)
+            if op_argument is None:
+                usage_error(
+                    f"Option {opt['name']} is required for operation {details.name}.",
+                    args.parser,
+                )
+            op_arguments[dest] = op_argument
+
         config[details.cls] = op_arguments
+
+    sbom, _ = read_sbom(args.input)
 
     amend.run(sbom, operations, config)
     write_sbom(sbom, args.output)
@@ -824,20 +845,22 @@ def invoke_set(args: argparse.Namespace) -> int:
 
 
 def invoke_validate(args: argparse.Namespace) -> int:
+    if bool(args.report_format) != bool(args.report_path):
+        # This means exactly one of both arguments was passed but not both.
+        usage_error(
+            "Cannot use --report-format without --report-path or vice-versa.",
+            args.parser,
+        )
+
     sbom, file_type = read_sbom(args.input)
-    if args.output is None:
-        output = Path("./issues.json")
-    else:
-        output = args.output
-    report_format = args.report_format
     return (
         Status.OK
         if validate_sbom(
             sbom=sbom,
             input_format=file_type,
             file=Path(args.input),
-            report_format=report_format,
-            output=output,
+            report_format=args.report_format,
+            report_path=args.report_path,
             schema_type=args.schema_type,
             filename_regex=(
                 None if args.no_filename_validation else args.filename_pattern

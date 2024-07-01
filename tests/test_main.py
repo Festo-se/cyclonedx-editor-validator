@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import io
 import os
 import pathlib
@@ -452,7 +454,7 @@ class TestValidateCommand(unittest.TestCase):
                 "fake_bom.cdx.json",
                 "--report-format",
                 "warnings-ng",
-                "--output",
+                "--report-path",
                 "issues_file.json",
             ],
         ):
@@ -466,8 +468,6 @@ class TestValidateCommand(unittest.TestCase):
                 "",
                 "validate",
                 "fake_bom.cdx.json",
-                "--output",
-                "issues_file.json",
                 "--filename-pattern",
                 ".*",
             ],
@@ -485,7 +485,32 @@ class TestBuildPublicCommand(unittest.TestCase):
         self, mock_build_public: unittest.mock.Mock, mock_read: unittest.mock.Mock
     ) -> None:
         with unittest.mock.patch(
-            "sys.argv", ["", "build-public", "fake_bom.cdx.json", "fake_schema.json"]
+            "sys.argv",
+            [
+                "",
+                "build-public",
+                "fake_bom.cdx.json",
+                "--schema-path",
+                "fake_schema.json",
+            ],
+        ):
+            mock_build_public.return_value = {}
+            mock_read.return_value = ({}, "json")
+            result = main()
+            self.assertEqual(result, Status.OK)
+
+    @unittest.mock.patch("cdxev.__main__.read_sbom")
+    @unittest.mock.patch("cdxev.__main__.build_public_bom")
+    def test_get_build_public_bom_no_schema(
+        self, mock_build_public: unittest.mock.Mock, mock_read: unittest.mock.Mock
+    ) -> None:
+        with unittest.mock.patch(
+            "sys.argv",
+            [
+                "",
+                "build-public",
+                "fake_bom.cdx.json",
+            ],
         ):
             mock_build_public.return_value = {}
             mock_read.return_value = ({}, "json")

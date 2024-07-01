@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 This module defines the amend operations which can be performed on an SBOM.
 

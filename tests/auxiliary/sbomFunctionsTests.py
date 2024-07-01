@@ -1,6 +1,4 @@
-##################################################
-# Module with functions for the work with sboms
-###################################################
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 
 def compare_sboms(first_sbom: dict, second_sbom: dict) -> bool:

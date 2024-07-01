@@ -1,8 +1,4 @@
-#################################################
-# Function to remove internal components based on
-# a provided JSON schema, that contains the
-# requirements for a component to be considered internal.
-#################################################
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
 import re
@@ -44,7 +40,7 @@ def remove_internal_information_from_properties(component: dict) -> None:
 
 
 def remove_component_tagged_internal(
-    components: Sequence[dict], path_to_schema: Path
+    components: Sequence[dict], path_to_schema: t.Union[Path, None]
 ) -> t.Tuple[t.List[str], t.List[dict]]:
     """
     Removes the components marked as internal,
@@ -72,17 +68,24 @@ def remove_component_tagged_internal(
         "internal"
     """
     # create validator, to check if a component is internal
-    validator_for_being_internal = create_internal_validator(path_to_schema)
     list_of_removed_component_bom_refs = []
     cleared_components = []
-    for component in components:
-        # if it is a internal component, the whole component will be removed,
-        # if not, only the internal information in properties will be removed
-        if validator_for_being_internal.is_valid(component):
-            list_of_removed_component_bom_refs.append(component.get("bom-ref", ""))
-        else:
+
+    if path_to_schema is not None:
+        validator_for_being_internal = create_internal_validator(path_to_schema)
+        for component in components:
+            # if it is a internal component, the whole component will be removed,
+            # if not, the property within namespace internal will be removed
+            if validator_for_being_internal.is_valid(component):
+                list_of_removed_component_bom_refs.append(component.get("bom-ref", ""))
+            else:
+                remove_internal_information_from_properties(component)
+                cleared_components.append(component)
+    else:
+        for component in components:
             remove_internal_information_from_properties(component)
             cleared_components.append(component)
+
     return list_of_removed_component_bom_refs, cleared_components
 
 
@@ -125,7 +128,7 @@ def merge_dependency_for_removed_component(
     return new_dependencies
 
 
-def build_public_bom(sbom: dict, path_to_schema: Path) -> dict:
+def build_public_bom(sbom: dict, path_to_schema: t.Union[Path, None]) -> dict:
     """
     Removes the components with the property internal
     from a sbom and resolves the dependencies

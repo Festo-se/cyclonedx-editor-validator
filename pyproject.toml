@@ -7,7 +7,7 @@ authors = [
     "Christian Beck <christian.beck@festo.com>",
     "Moritz Marseu <moritz.marseu@festo.com>"
 ]
-license = "GPL-3.0-only"
+license = "GPL-3.0-or-later"
 readme = "README.md"
 packages = [{include = "cdxev"}]
 
@@ -36,11 +36,11 @@ natsort = "^8.4.0"
 flake8 = "7.1.0"
 black = "24.4.2"
 pep8-naming = "0.14.1"
-mypy = "1.10.0"
+mypy = "1.10.1"
 types-python-dateutil = "2.9.0.20240316"
 types-jsonschema = "4.22.0.20240610"
 pytest = "8.2.2"
-coverage = "7.5.3"
+coverage = "7.5.4"
 toml = "0.10.2"
 typing-extensions = "4.12.2"
 bandit = "1.7.9"

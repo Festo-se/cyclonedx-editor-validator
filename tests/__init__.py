@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 Required for Visual Studio as otherwise it does not recognize the tests in the test folder,
 for reference see

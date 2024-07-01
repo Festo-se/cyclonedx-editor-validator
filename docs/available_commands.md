@@ -220,23 +220,23 @@ The version range is provided in the format
 beginning with the `vers` identifier. Following this the versioning-scheme is specified, in the case of semantic versioning this would be `semver` or `generic`. Following this a list of constraints divided by an `|` can be provided, to specify which versions are in scope.
 A few examples:
 
-to target all versions higher than and not including 2.0.0 the version range to provide would be
+To target all versions higher than and not including 2.0.0 the version range to provide would be:
 
     vers:generic/>2.0.0
 
-to target all versions higher than and not including 2.0.0 that are smaller than and including 4.5.0 the version range to provide would be
+To target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 the version range to provide would be:
 
     vers:generic/>2.0.0|<=4.5.0
 
-to target all versions higher than and not including 2.0.0 that are smaller than and including 4.5.0 except the single version 4.1.1 version range to provide would be
+To target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 except the single version 4.1.1 the version range to provide would be:
 
     vers:generic/>2.0.0|!=4.1.1|<=4.5.0
 
-to target all versions to target all versions higher than and not including 2.0.0 that are smaller than and including 4.5.0 and the additional version 5.0.0 the version range to provide would be
+To target all versions to target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 as well as the additional version 5.0.0 the version range to provide would be:
 
     vers:generic/>2.0.0|<=4.5.0|5.0.0
 
-Note that instead of specific version constraints it is possible to provide a wildcard *\** to allow all versions. So to target all versions the provided version range would be
+Note that instead of specific version constraints it is possible to provide a wildcard *\** to allow all versions. So to target all versions the provided version range would be:
 
     vers:generic/*
 

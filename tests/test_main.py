@@ -312,7 +312,7 @@ class TestSetCommand(unittest.TestCase):
                 "<target-name>",
                 "--group",
                 "<target-group",
-                "--version_range",
+                "--version-range",
                 "vers:generic/*",
                 "--key",
                 "copyright",

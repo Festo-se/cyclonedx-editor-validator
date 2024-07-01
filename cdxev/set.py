@@ -134,11 +134,11 @@ class UpdateIdentity(ComponentIdentity):
         cls, component: t.Mapping[str, t.Any], allow_unsafe: bool = False
     ) -> "t.Union[UpdateIdentity, ComponentIdentity]":
 
-        if "version_range" in component:
+        if "version-range" in component:
             coordinates = cls.from_coordinates(
                 name=component["name"],
                 group=component.get("group"),
-                version_range=component.get("version_range", ""),
+                version_range=component.get("version-range", ""),
             )
             return UpdateIdentity(coordinates)  # type:ignore
 
@@ -311,7 +311,7 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
             raise AppError(
                 "Invalid set file", "An update object is missing the 'id' property."
             )
-        if "version" in upd["id"] and "version_range" in upd["id"]:
+        if "version" in upd["id"] and "version-range" in upd["id"]:
             raise AppError(
                 "Invalid set file",
                 "An update object for"

@@ -581,7 +581,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "pkg",
                     "version": "1.1.1",
-                    "version_range": "vers:generic/*",
+                    "version-range": "vers:generic/*",
                 },
                 "set": {"author": "Another author"},
             }
@@ -605,7 +605,7 @@ class TestVersionRange(unittest.TestCase):
         update = {
             "name": "some name",
             "group": "some group",
-            "version_range": "vers:generic/>=1.2",
+            "version-range": "vers:generic/>=1.2",
         }
 
         component_version_in = dict(component_base)
@@ -623,7 +623,7 @@ class TestVersionRange(unittest.TestCase):
         component_different_group["group"] = "another group"
 
         update_all_versions = dict(update)
-        update_all_versions["version_range"] = "vers:generic/*"
+        update_all_versions["version-range"] = "vers:generic/*"
 
         id_update = cdxev.set.UpdateIdentity.create(update, True)
         id_update_all_versions = cdxev.set.UpdateIdentity.create(
@@ -651,7 +651,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "Acme_Application",
                     "group": "com.acme.internal",
-                    "version_range": "vers:pypi/9.1.1|8.1.1",
+                    "version-range": "vers:pypi/9.1.1|8.1.1",
                 },
                 "set": {"copyright": "2022 Acme Inc"},
             }
@@ -689,7 +689,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version_range": "vers:pypi/<6.0.0",
+                    "version-range": "vers:pypi/<6.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             }
@@ -716,7 +716,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version_range": "vers:pypi/>3.0.0",
+                    "version-range": "vers:pypi/>3.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             }
@@ -750,7 +750,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version_range": "vers:pypi/>3.0.0",
+                    "version-range": "vers:pypi/>3.0.0",
                 },
                 "set": {"copyright": "1990 Acme Inc"},
             },
@@ -758,7 +758,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version_range": "vers:pypi/<=3.0.0",
+                    "version-range": "vers:pypi/<=3.0.0",
                 },
                 "set": {"copyright": "2000 Acme Inc"},
             },
@@ -766,7 +766,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version_range": "vers:pypi/<2.0.0|>4.0.0",
+                    "version-range": "vers:pypi/<2.0.0|>4.0.0",
                 },
                 "set": {
                     "supplier": {"name": "New supplier"},
@@ -822,7 +822,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version_range": "vers:generic/*",
+                    "version-range": "vers:generic/*",
                 },
                 "set": {"copyright": "2000 Acme Inc"},
             },
@@ -830,7 +830,7 @@ class TestVersionRange(unittest.TestCase):
                 "id": {
                     "name": "web-framework",
                     "group": "org.acme",
-                    "version_range": "vers:generic/*",
+                    "version-range": "vers:generic/*",
                 },
                 "set": {
                     "supplier": {"name": "New supplier"},

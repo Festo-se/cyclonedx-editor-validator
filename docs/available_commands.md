@@ -298,6 +298,7 @@ This command is used to validate the SBOM against a JSON schema.
 This tool can validate SBOMs against any user-provided JSON schema but for convenience, two schema types are built in:
 
 * The *default* schema type validates against the [stock CycloneDX schema](https://github.com/CycloneDX/specification).
+* The *strict* schema type refers to the strict variants of the stock CycloneDX schema which were discontinued after version 1.3.
 * The *custom* schema type uses a more restrictive schema which accepts a subset of CycloneDX. Additional requirements incorporated into the schema mostly originate from the [NTIA](https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf).
 
 You can select the schema with the `--schema-type` and `--schema-path` options:
@@ -311,6 +312,7 @@ For all built-in schemas, the tool attempts to determine the correct CycloneDX v
 | Type | Supported CycloneDX versions |
 | ---- | ---------------------------- |
 | `default` | 1.2 to 1.5 |
+| `strict` | 1.2 to 1.3 |
 | `custom` | 1.3 to 1.5 |
 
 ### Validation of filename

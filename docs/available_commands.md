@@ -218,21 +218,21 @@ The version range is provided in the schema
     vers:<versioning-scheme>/<version-constraint>|<version-constraint>|...
 
 beginning with the ``vers`` identifier. Following this the versioning-scheme is specified, in the case of semantic versioning this would be ``semver`` or ``generic``. Following this a list of constraints divided by an ``|`` can be provided, to specify which versions are in scope.
-A fe examples:
+A few examples:
 
-to target all versions ``>2.0.0`` the provided version range would be
+to target all versions ``>2.0.0`` the version range to provide would be
 
     vers:generic/>2.0.0
 
-to target all versions ``>2.0.0`` and ``<=4.5.0`` the provided version range would be
+to target all versions ``>2.0.0`` and ``<=4.5.0`` the version range to provide would be
 
     vers:generic/>2.0.0|<=4.5.0
 
-to target all versions ``>2.0.0`` and ``<=4.5.0`` except ``4.1.1`` the provided version range would be
+to target all versions ``>2.0.0`` and ``<=4.5.0`` except ``4.1.1`` version range to provide would be
 
     vers:generic/>2.0.0|<=4.5.0|>4.1.1|<4.1.1
 
-to target all versions ``>2.0.0`` and ``<=4.5.0`` and ``5.0.0`` the provided version range would be
+to target all versions ``>2.0.0`` and ``<=4.5.0`` and ``5.0.0`` version range to provide would be
 
     vers:generic/>2.0.0|<=4.5.0|5.0.0
 

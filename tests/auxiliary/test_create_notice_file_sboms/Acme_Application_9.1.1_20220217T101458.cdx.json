@@ -19,17 +19,7 @@
 		},
         "name": "Acme_Application",
         "version": "9.1.1",
-        "copyright": "Company Legal 2022, all rights reserved",
-        "properties": [
-          {
-            "name": "notinternal:stuff",
-            "value": "something"
-          },
-          {
-            "name": "internal:component:status",
-            "value": "internal"
-          }
-        ]
+        "copyright": "Company Legal 2022, all rights reserved"
      }
   },
   "components": [
@@ -59,9 +49,19 @@
           },
           "licenses": [
             {
-          "license": {
-            "id": "Apache-1.0"
-          }
+              "license": {
+                "id": "Apache-1.0"
+              }
+            },
+            {
+              "license": {
+                "id": "Apache-2.0"
+              }
+            },
+            {
+              "license": {
+                "id": "Apache-3.0"
+              }
             }
           ],	  
           "group": "org.acme",
@@ -73,6 +73,18 @@
     },
     {
       "type": "library",
+      "bom-ref": "comp_index_1",
+      "supplier": {
+         "name": "Acme, Inc."
+      },
+      "licenses": [{"expression": "(CDDL-1.0 OR GPL-2.0-with-classpath-exception)"}], 
+      "group": "org.acme",
+      "name": "Component index 1",
+	  "version": "1.0.0",
+      "purl": "pkg:maven/org.acme/web-framework@1.0.0"
+    },
+    {
+      "type": "library",
       "bom-ref": "comp2",
       "supplier": {
          "name": "Acme, Inc."
@@ -80,24 +92,6 @@
       "group": "com.something",
       "name": "persistence",
       "version": "3.1.0",
-      "properties": [
-        {
-          "name": "the Other",
-          "value": "something"
-        },
-        {
-          "name": "internal:stuff",
-          "value": "should be gone"
-        },
-        {
-          "name": "not:internal:stuff",
-          "value": "should be in"
-        },
-        {
-          "name": "internal:otherstuff",
-          "value": "should also be gone"
-        }
-      ],
       "purl": "pkg:maven/org.acme/persistence@3.1.0",
 	  "licenses": [
         {
@@ -113,12 +107,6 @@
       "supplier": {
          "name": "Acme, Inc."
       },
-      "properties": [
-        {
-              "name": "internal:component:status",
-              "value": "internal"
-        }
-      ],
       "licenses": [
         {
 			"license": {
@@ -138,19 +126,19 @@
          "name": "Acme, Inc."
       },
       "group": "com.acme",
+      "copyright": "Copyright tomcat-catalina",
       "name": "tomcat-catalina",
       "version": "9.0.14",
-      "properties": [
-        {
-              "name": "internal:buildstuff",
-              "value": "stuff"
-        }
-      ],
       "licenses": [
         {
-			"license": {
-				"id": "Apache-2.0"
-			}
+			    "license": {
+				    "id": "Apache-2.0"
+			    }
+        },
+        {
+          "license": {
+            "id": "Apache-1.0"
+          }
         }
       ]
     },
@@ -166,18 +154,18 @@
       "licenses": [
         {
           "expression": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0"
+        },
+        {
+          "license":{
+            "name": "A licenses name of card verifier",
+            "text": "Text describing the license"
+          }
         }
       ]
     },
     {
       "type": "library",
       "bom-ref": "internalcomp3",
-      "properties": [
-        {
-              "name": "internal:component:status",
-              "value": "internal"
-        }
-      ],
       "supplier": {
          "name": "Example, Inc."
       },
@@ -187,6 +175,11 @@
       "licenses": [
         {
           "expression": "Example, Inc. Commercial License"
+        },
+        {
+          "license": {
+            "id": "Apache-1.0"
+          }
         }
       ],
       "cpe": "cpe:2.3:a:*:util:2.0.0:*:*:*:*:*:*:*"
@@ -213,13 +206,10 @@
           }
         }
       ],
-      "copyright": "Company Legal 2022, all rights reserved",
-	  "properties": [
-		{
-          "name": "internal:component:status",
-          "value": "internal"
-        }
-	   ]
+      "copyright": "Company Legal 2022, all rights reserved"
+    },
+    {
+      "name": "license and copyright less component"
     }
   ],
   "dependencies": [

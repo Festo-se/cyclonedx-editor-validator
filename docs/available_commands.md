@@ -317,3 +317,51 @@ The following schema is a little more involved. It will delete any component who
         },
         "required": ["licenses"]
     }
+
+## create-notice-file
+
+This command creates a notice file from a provided SBOM.
+
+It extracts all copyright and license information from the SBOM and lists it below the according component.
+If a component does not contain copyright or license information it will still be listed with the note "No license or copyright information available".
+The resulting document is .txt file in the Format:
+
+    Product name
+    Copyright of the product
+
+
+    This product includes material developed by third parties: 
+
+    Component 1:  # if copyright and license(s) are provided
+    Copyright
+    License 1
+    License 2
+    ...
+
+    Component 2:  # if only copyright is provided
+    Copyright
+
+    Component 3:  # if only license(s) are provided
+    License 1
+    License 2
+    ...
+
+    Component 3:  # if nether copyright nor license(s) are provided
+    No license or copyright information available
+
+If the path to a folder is provided via the `--output` option, a file with the naming convention
+  
+  "notice_file_`metadata.component.name`\_`metadata.component.version`\_\[`hash`, `metadata.timestamp`\].cdx.json.txt"
+  
+will be saved in the provided folder.
+For example the notice file of extracted from a sbom with the `name` "Acme_Application" in `version` "9.1.1" that has the `timestamp` "20220217T101458" would be saved as "notice_file_Acme_Application_9.1.1_20220217T101458.cdx.json.txt".
+
+    cdx-ev create-notice-file bom.json -output=path_to_folder  # a file "notice_file_metadata.component.name\_metadata.component.version\_\[hash, metadata.timestamp\].cdx.json.txt" is created in the provided folder    
+
+If the command is called only providing the path to a SBOM, the results are written to stdout.
+
+    cdx-ev create-notice-file bom.json  # results will be written to stdout
+
+If a file is specified via the `--output` option, the result will be written to this file.
+
+    cdx-ev create-notice-file bom.json -output=path_to_folder/notice_file.txt  # results are saved in the file "notice_file.txt"

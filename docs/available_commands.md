@@ -213,26 +213,26 @@ If *coordinates* are used to identify the target, they must match the component 
 
 In *coordinates* it is also possible to provide a range of versions using the *version-range* parameter instead of *version* following the [PURL specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst) as referenced by [CycloneDX](https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range).
 
-The version range is provided in the schema
+The version range is provided in the format
 
     vers:<versioning-scheme>/<version-constraint>|<version-constraint>|...
 
-beginning with the ``vers`` identifier. Following this the versioning-scheme is specified, in the case of semantic versioning this would be ``semver`` or ``generic``. Following this a list of constraints divided by an ``|`` can be provided, to specify which versions are in scope.
+beginning with the `vers` identifier. Following this the versioning-scheme is specified, in the case of semantic versioning this would be `semver` or `generic`. Following this a list of constraints divided by an `|` can be provided, to specify which versions are in scope.
 A few examples:
 
-to target all versions ``>2.0.0`` the version range to provide would be
+to target all versions higher than and not including 2.0.0 the version range to provide would be
 
     vers:generic/>2.0.0
 
-to target all versions ``>2.0.0`` and ``<=4.5.0`` the version range to provide would be
+to target all versions higher than and not including 2.0.0 that are smaller than and including 4.5.0 the version range to provide would be
 
     vers:generic/>2.0.0|<=4.5.0
 
-to target all versions ``>2.0.0`` and ``<=4.5.0`` except ``4.1.1`` version range to provide would be
+to target all versions higher than and not including 2.0.0 that are smaller than and including 4.5.0 except the single version 4.1.1 version range to provide would be
 
-    vers:generic/>2.0.0|<=4.5.0|>4.1.1|<4.1.1
+    vers:generic/>2.0.0|!=4.1.1|<=4.5.0
 
-to target all versions ``>2.0.0`` and ``<=4.5.0`` and ``5.0.0`` version range to provide would be
+to target all versions to target all versions higher than and not including 2.0.0 that are smaller than and including 4.5.0 and the additional version 5.0.0 the version range to provide would be
 
     vers:generic/>2.0.0|<=4.5.0|5.0.0
 
@@ -241,10 +241,6 @@ Further information on the supported versions can be found here [univers documen
 So to target all versions the provided version range would be
 
     vers:generic/*
-
-If *version* and *version_range* are provided, *version_range* will be ignored.
-
-If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
 If the target component isn't found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the `--ignore-missing` flag.
 
@@ -300,7 +296,7 @@ When passing the targets, names and values in a file, the file must conform to t
             "id": {
                 # Could be any one of the identifying properties in CycloneDX.
                 # Multiple identifiers are not allowed (with the special exception of name,
-                # group and version/version_range which are only valid together)
+                # group and version which are only valid together)
                 "cpe": "CPE of target component goes here"
             },
             "set": {
@@ -317,8 +313,9 @@ When passing the targets, names and values in a file, the file must conform to t
                         }
                     }
                 ]
-            },
+            }
         },
+        ...
     ]
 
 Example for the use of version ranges:
@@ -347,7 +344,7 @@ Example for the use of version ranges:
         ...
     ]
 
-The above provided example would set the ``copyright`` in the component
+The above provided example would set the `copyright` in the component
 
     {
         "name": "web-framework"
@@ -369,12 +366,6 @@ This file can then be applied as the following example shows:
 
     # Perform several operations on properties using set-command
     cdx-ev set bom.json --from-file mysetfile.json
-
-If the file contains a component not present in the SBOM, a error is thrown.
-This can be disabled with the `--ignore-missing` command.
-So only a message that the component was not found and could not be updated is logged.
-
-    cdx-ev set bom.json --from-file mysetfile.json --ignore-missing
 
 ## validate
 

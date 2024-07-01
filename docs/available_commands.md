@@ -236,11 +236,11 @@ to target all versions ``>2.0.0`` and ``<=4.5.0`` and ``5.0.0`` version range to
 
     vers:generic/>2.0.0|<=4.5.0|5.0.0
 
-Further Information on the supported versions can be found here [univers documentation](https://pypi.org/project/univers/). Note that instead of specific version constraints it is possible to provide a wildcard *\** to allow all versions.
+Further information on the supported versions can be found here [univers documentation](https://pypi.org/project/univers/). Note that instead of specific version constraints it is possible to provide a wildcard *\** to allow all versions.
 
 So to target all versions the provided version range would be
 
-    *vers:generic/\**
+    vers:generic/*
 
 If *version* and *version_range* are provided, *version_range* will be ignored.
 

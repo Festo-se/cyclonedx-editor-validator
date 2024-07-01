@@ -8,7 +8,7 @@ Before use, please consider the [known limitations](https://festo-se.github.io/c
 
 ## amend
 
-This command accepts a single input file and will apply one or multiple *operations* to it. Each operation modifies certain aspects of the SBOM. These modifications cannot be targetted at individual components in the SBOM which sets the *amend* command apart from *set*. It's use-case is ensuring an SBOM fulfils certain requirements in an automated fashion.
+This command accepts a single input file and will apply one or multiple *operations* to it. Each operation modifies certain aspects of the SBOM. These modifications cannot be targeted at individual components in the SBOM which sets the *amend* command apart from *set*. It's use-case is ensuring an SBOM fulfils certain requirements in an automated fashion.
 
 See the command help with `cdx-ev amend --help` for a list of available operations. All operations marked `[default]` will run unless the command-line option `--operation` is provided.
 
@@ -35,7 +35,7 @@ If both positional arguments and the `--from-folder` option are used, then the p
 
 When using the `--from-folder` option, the program looks for files matching either of the [recommended CycloneDX naming schemes](https://cyclonedx.org/specification/overview/#recognized-file-patterns): `bom.json` or `*.cdx.json`.
 
-**Note on merge order:**  
+__Note on merge order:__  
 Input files in the folder provided to the `--from-folder` option are sorted in a platform-specific way. In other words, they are merged in the same order they appear in your operating system's file browser (e.g., Windows Explorer).
 
 The process runs iteratively, merging two SBOMs in each iteration. In the first round, the second submitted SBOM is merged into the first. In the second round the third would be merged into the result of the first round and so on.  
@@ -44,7 +44,7 @@ In mathematical terms: `output = (((input_1 x input_2) x input_3) x input_4 ...)
 A few noted on the merge algorithm:
 
 * The `metadata` field is always retained from the first input and never changed through a merge with the exception of the `timestamp`.
-* Components are merged into the result in the order they **first** appear in the inputs. If any subsequent input specifies the same component (sameness in this case being defined as having identical identifying attributes such as `name`, `version`, `purl`, etc.), the later instance of the component will be dropped with a warning. **This command cannot be used to merge information inside components.**
+* Components are merged into the result in the order they __first__ appear in the inputs. If any subsequent input specifies the same component (sameness in this case being defined as having identical identifying attributes such as `name`, `version`, `purl`, etc.), the later instance of the component will be dropped with a warning. __This command cannot be used to merge information inside components.__
 * The resulting dependency graph will reflect all dependencies from all inputs. Dependencies from later inputs are always added to the result, even if the component is dropped as a duplicate as described above.
 * Uniqueness of *bom-refs* will be ensured.
 * If the inputs contain VEX information in the form of a `vulnerabilities` field, this will be merged as well. For details see section on the `merge-vex` command.
@@ -66,7 +66,7 @@ of the same method contain a different rating, the newer one will be kept.
 
 This command sets properties on specified components to specified values. If a component in an SBOM is missing a particular property or the property is present but has a wrong value, this command can be used to modify just the affected properties without changing the rest of the SBOM.
 
-For this command to work, three bits of information must be provided by the user: The **target** component(s) to modify as well as the **name** and **new value** of each property to set on the target component.
+For this command to work, three bits of information must be provided by the user: The __target__ component(s) to modify as well as the __name__ and __new value__ of each property to set on the target component.
 
 This data can either be passed directly on the command-line &mdash; in this case only a single update can be performed per invocation &mdash; or in a JSON file &mdash; this allows performing an unlimited number of updates in a single invocation.
 
@@ -74,7 +74,7 @@ This data can either be passed directly on the command-line &mdash; in this case
 
 The *target component* can be identified through any of the identifiable properties defined by CycloneDX, specifically: *cpe*, *purl*, *swid* or the combination of *name*, *group* and/or *version* (collectively called *coordinates*).
 
-If *coordinates* are used to identify the target, they must match the component fully. In other words, if **only** *name* is given, it will **only match** components with that name which do **not** contain *version* or *group* fields.
+If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
 #### Protected fields
 
@@ -233,7 +233,7 @@ When passed to the command, this schema will remove any component whose `group` 
         "required": ["group"]
     }
 
-An extension of the above, the next schema will delete any component with that `group`, **unless** it contains a property with the name `internal:public` and the value `true`.
+An extension of the above, the next schema will delete any component with that `group`, __unless__ it contains a property with the name `internal:public` and the value `true`.
 *Note that the property itself will still be removed from the component, because its name starts with `internal:`.*
 
     {

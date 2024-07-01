@@ -4,7 +4,7 @@ import json
 import unittest
 
 from cdxev import merge_vex
-from tests.auxiliary.sbomFunctionsTests import compare_sboms
+from tests.auxiliary.helper import compare_sboms
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_vex_sboms/"
 

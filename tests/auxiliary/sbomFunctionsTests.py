@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import typing as t
+
 
 def compare_sboms(first_sbom: dict, second_sbom: dict) -> bool:
     """
@@ -63,3 +65,30 @@ def compare_list_content(first_list: list, second_list: list) -> bool:
     else:
         is_equal = False
     return is_equal
+
+
+def search_entry(haystack: dict, key: t.Any, value: t.Any) -> t.Optional[dict]:
+    """
+    Recursively searches a dict of dicts for a specific key/value pair.
+
+    :param haystack: A dict of dicts (any other values).
+    :param key: The key of the entry to search.
+    :param value: The value of the entry to search.
+    :return: The sub-dict of haystack which contains the key/value pair or None if not found.
+    """
+
+    def _recurse(d: dict) -> t.Optional[dict]:
+        for k, v in d.items():
+            if key == k and value == v:
+                return d
+            elif isinstance(v, dict):
+                return _recurse(v)
+            elif isinstance(v, list):
+                for i in v:
+                    if isinstance(i, dict):
+                        found = _recurse(i)
+                        if found is not None:
+                            return found
+        return None
+
+    return _recurse(haystack)

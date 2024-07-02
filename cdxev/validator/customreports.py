@@ -21,7 +21,7 @@ class WarningsNgReporter(logging.Handler):
         self,
         file_path: pathlib.Path,
         target: t.Union[t.TextIO, pathlib.Path],
-        buffer: dict[str, list] = {"issues": []},
+        buffer: t.Optional[dict[str, list]] = None,
     ):
         """
         Creates a new handler with the given target.
@@ -29,7 +29,7 @@ class WarningsNgReporter(logging.Handler):
         :param target: The target can be either a path to a file or a text stream object.
         """
         super().__init__(logging.ERROR)
-        self.buffer = buffer
+        self.buffer = buffer if buffer is not None else {"issues": []}
         self.target = target
         self.file_path = file_path
 
@@ -110,7 +110,7 @@ class GitLabCQReporter(logging.Handler):
         self,
         file_path: pathlib.Path,
         target: t.Union[t.TextIO, pathlib.Path],
-        buffer: list = [],
+        buffer: t.Optional[list] = None,
     ):
         """
         Creates a new handler with the given target.
@@ -118,7 +118,8 @@ class GitLabCQReporter(logging.Handler):
         :param target: The target can be either a path to a file or a text stream object.
         """
         super().__init__(logging.ERROR)
-        self.buffer = buffer
+
+        self.buffer = buffer if buffer is not None else []
         self.target = target
         self.file_path = file_path
 

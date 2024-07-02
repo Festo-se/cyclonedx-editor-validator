@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
+import logging
 import re
 import typing as t
 from importlib import resources
@@ -9,43 +10,52 @@ from pathlib import Path
 from cdxev.auxiliary.filename_gen import generate_validation_pattern
 from cdxev.error import AppError
 
+logger = logging.getLogger(__name__)
+
 
 def open_schema(
-    sbom: dict, file: Path, schema_type: str, schema_path: t.Optional[Path]
-) -> tuple[dict, Path]:
-    if schema_path:
-        sbom_schema, used_schema_path = get_external_schema(schema_path)
-    else:
-        path_to_embedded_schema = resources.files("cdxev.auxiliary") / "schema"
-        with resources.as_file(path_to_embedded_schema) as path:
-            used_schema_path = path
-        # open json schema, default to 1.3 if specVersion not found
-        if schema_type != "default":
-            required_schema = (
-                "bom-"
-                + str(sbom.get("specVersion", 1.3))
-                + "-"
-                + schema_type
-                + ".schema.json"
-            )
+    spec_version: str,
+    schema_type: t.Optional[str],
+    schema_path: t.Optional[Path],
+) -> dict:
+    try:
+        if schema_type:
+            return _get_builtin_schema(schema_type, spec_version)
         else:
-            required_schema = (
-                "bom-" + str(sbom.get("specVersion", 1.3)) + ".schema.json"
-            )
-        for scheme_path in resources.files("cdxev.auxiliary.schema").iterdir():
-            if required_schema in scheme_path.name:
-                with scheme_path.open() as sbom_schema_f:
-                    sbom_schema = json.load(sbom_schema_f)
-                break
-    if "sbom_schema" not in locals():
+            # Convince mypy that schema_path isn't None, because the caller made sure of this
+            schema_path = t.cast(Path, schema_path)
+
+            if not schema_path.is_file():
+                raise AppError(
+                    "Schema not loaded",
+                    "Path does not exist or is not a file: " + str(schema_path),
+                )
+            with schema_path.open() as fp:
+                return json.load(fp)
+    except OSError as e:
+        raise AppError("Schema not loaded", str(e)) from e
+    except json.JSONDecodeError as e:
         raise AppError(
-            message="Schema not found",
-            description="Unable to load schema for specVersion "
-            + sbom.get("specVersion", "not specified"),
-            module_name=file.name,
-        )
+            "Schema not loaded",
+            "Invalid JSON in schema file " + str(schema_path),
+        ) from e
+
+
+def _get_builtin_schema(schema_type: str, spec_version: str) -> dict:
+    schema_dir = resources.files("cdxev.auxiliary") / "schema"
+    if schema_type == "default":
+        schema_file = schema_dir / f"bom-{spec_version}.schema.json"
     else:
-        return sbom_schema, used_schema_path
+        schema_file = schema_dir / f"bom-{spec_version}-{schema_type}.schema.json"
+
+    if not schema_file.is_file():
+        raise AppError(
+            "Schema not loaded",
+            f"No built-in schema found for CycloneDX version {spec_version} and "
+            f"schema type '{schema_type}'.",
+        )
+    schema_json = schema_file.read_text()
+    return json.loads(schema_json)
 
 
 def load_spdx_schema() -> dict:
@@ -56,36 +66,11 @@ def load_spdx_schema() -> dict:
         return json.load(f)
 
 
-def get_external_schema(schema_path: Path) -> tuple[dict, Path]:
-    if schema_path.exists():
-        try:
-            if not schema_path.is_absolute():
-                used_schema_path = Path.cwd() / schema_path
-            else:
-                used_schema_path = schema_path
-            with used_schema_path.open() as sbom_schema_f:
-                sbom_schema = json.load(sbom_schema_f)
-            return sbom_schema, used_schema_path
-        except:
-            raise AppError(
-                "Schema not a valid json",
-                (
-                    "The submitted schema is not a valid"
-                    " JSON file and could not be loaded"
-                ),
-            )
-    else:
-        raise AppError(
-            "Could not load schema",
-            ("Path to the provided schema does not exist"),
-        )
-
-
 def validate_filename(
     filename: str,
     regex: str,
     sbom: dict,
-    schema_type: str,
+    schema_type: t.Optional[str],
 ) -> t.Union[t.Literal[False], str]:
     if not regex:
         if schema_type == "default":

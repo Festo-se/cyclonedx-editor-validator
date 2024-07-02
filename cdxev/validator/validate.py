@@ -7,7 +7,7 @@ from pathlib import Path
 
 from jsonschema import Draft7Validator, FormatChecker
 from referencing import Registry, Resource
-from referencing.jsonschema import DRAFT202012
+from referencing.jsonschema import DRAFT202012, Schema
 
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
@@ -22,15 +22,24 @@ def validate_sbom(
     file: Path,
     report_format: t.Optional[str],
     report_path: t.Optional[Path],
-    schema_type: str = "default",
-    filename_regex: t.Optional[str] = "",
-    schema_path: t.Optional[Path] = None,
+    schema_type: t.Optional[str],
+    filename_regex: t.Optional[str],
+    schema_path: t.Optional[Path],
 ) -> int:
     errors = []
-    if input_format == "json":
-        sbom_schema, used_schema_path = open_schema(
-            sbom, file, schema_type, schema_path
+    if (schema_path is not None) == bool(schema_type):
+        raise AssertionError(
+            "Exactly one of schema_path or schema_type must be non-None"
         )
+
+    if input_format == "json":
+        try:
+            spec_version = sbom["specVersion"]
+        except KeyError:
+            logger.info("SBOM doesn't specify CycloneDX version. Assuming version 1.3.")
+            spec_version = "1.3"
+
+        sbom_schema = open_schema(spec_version, schema_type, schema_path)
 
         if filename_regex is not None:
             filename_error = validate_filename(
@@ -42,21 +51,15 @@ def validate_sbom(
                 else:
                     errors.append("SBOM has the mistake: " + filename_error)
 
-        schema = Resource(
-            sbom_schema, specification=DRAFT202012
-        )  # type: ignore[call-arg, var-annotated]
-        schema_spdx = Resource(
-            load_spdx_schema(), specification=DRAFT202012
-        )  # type: ignore[call-arg, var-annotated]
-        registry = Registry().with_resources(
-            [
-                (f"{used_schema_path.as_uri()}/", schema),
-                ("spdx.schema.json", schema_spdx),
-            ]
-        )  # type: ignore[var-annotated]
+        schema_spdx = Resource.from_contents(
+            contents=load_spdx_schema(), default_specification=DRAFT202012
+        )
+        registry: Registry[Schema] = Registry().with_resource(
+            uri="spdx.schema.json", resource=schema_spdx
+        )
         v = Draft7Validator(
             schema=sbom_schema, registry=registry, format_checker=FormatChecker()
-        )  # type: ignore[call-arg]
+        )
         for error in sorted(v.iter_errors(sbom), key=str):
             try:
                 if len(error.absolute_path) > 3:

@@ -45,7 +45,27 @@
       "group": "org.acme",
       "name": "web-framework",
 	  "version": "1.0.0",
-      "purl": "pkg:maven/org.acme/web-framework@1.0.0"
+      "purl": "pkg:maven/org.acme/web-framework@1.0.0",
+      "components": [
+        {
+          "type": "library",
+          "bom-ref": "sub_comp1",
+          "supplier": {
+            "name": "Acme, Inc."
+          },
+          "licenses": [
+            {
+          "license": {
+            "id": "Apache-1.0"
+          }
+            }
+          ],	  
+          "group": "org.acme",
+          "name": "sub_web-framework",
+          "version": "1.0.0",
+          "purl": "pkg:maven/org.acme/sub_web-framework@1.0.0"
+        }
+      ]
     },
     {
       "type": "library",
@@ -151,6 +171,7 @@
         "aggregate": "incomplete",
         "assemblies": [
            "comp1",
+           "sub_comp1",
            "comp2",
            "comp3",
            "comp4"

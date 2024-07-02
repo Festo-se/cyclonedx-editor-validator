@@ -618,6 +618,11 @@ def create_set_parser(
         metavar="<version>",
         help="Version of target component. If specified, name must also be specified.",
     )
+    identifiers.add_argument(
+        "--version-range",
+        metavar="<version>",
+        help="Version range of target components. If specified, name must also be specified.",
+    )
 
     parser.set_defaults(cmd_handler=invoke_set, parser=parser)
     return parser
@@ -778,8 +783,11 @@ def invoke_set(args: argparse.Namespace) -> int:
             args.purl,
             args.cpe,
             (
-                Key.from_coordinates(
-                    name=args.name, version=args.version, group=args.group
+                cdxev.set.UpdateIdentity.from_coordinates(
+                    name=args.name,
+                    version=args.version,
+                    group=args.group,
+                    version_range=args.version_range,
                 )
                 if args.name is not None
                 else None
@@ -812,6 +820,11 @@ def invoke_set(args: argparse.Namespace) -> int:
                 updates[0]["id"]["group"] = target.key.group
             if target.key.version is not None:
                 updates[0]["id"]["version"] = target.key.version
+            if (
+                isinstance(target.key, cdxev.set.CoordinatesWithVersionRange)
+                and target.key.version_range is not None
+            ):
+                updates[0]["id"]["version_range"] = target.key.version_range
 
     else:
         if has_target() or args.key is not None or args.value is not None:

@@ -2,11 +2,15 @@
 
 import logging
 import pathlib
+import re
 import sys
 import typing as t
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 
-from cdxev.auxiliary.identity import ComponentIdentity, Key
+import univers.version_range  # type:ignore
+import univers.versions  # type:ignore
+
+from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
 from cdxev.auxiliary.sbomFunctions import walk_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
@@ -28,6 +32,133 @@ class Context:
     config: "SetConfig"
     component_map: dict[Key, list[dict]] = field(init=False)
     sbom: dict
+
+
+@dataclass(init=True, frozen=True)
+class CoordinatesWithVersionRange(Coordinates):
+    """
+    This class inherits from cdxev.auxiliary.identity.Coordinates
+    and extends it to be able to handle version ranges.
+    It achieves this by introducing the attribute 'version_range'
+    of type univers.version_range.VersionRange.
+
+    This class's comparator is compatible with Coordinates objects.
+    If the 'name' and 'group' match,
+    it will check if the provided version of the coordinates object
+    is contained in this class instance's 'version_range'
+    and return True or False depending on the result.
+    """
+
+    version_range: univers.version_range.VersionRange
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, CoordinatesWithVersionRange):
+            for field_ in fields(self):
+                if getattr(self, field_.name) != getattr(other, field_.name):
+                    return False
+            return True
+
+        if isinstance(other, Coordinates):
+            version_range_object = univers.version_range.VersionRange.from_string(
+                self.version_range
+            )
+            for field_ in fields(other):
+                if field_.name != "version" and getattr(self, field_.name) != getattr(
+                    other, field_.name
+                ):
+                    return False
+
+            if other.version is not None:
+                try:
+                    if (
+                        version_range_object.version_class(other.version)
+                        in version_range_object
+                    ):
+                        return True
+                except univers.versions.InvalidVersion:
+                    possible_versions = []
+                    for version_type in univers.versions.AVAILABLE_VERSIONS:
+                        try:
+                            if version_type.is_valid(other.version):
+                                possible_versions.append(str(version_type.__name__))
+                        except univers.versions.nuget.InvalidNuGetVersion:
+                            pass
+                    version_is_of = " which is valid under the schemas: "
+
+                    if not possible_versions:
+                        version_is_of = "which versioning schema is not supported"
+                    else:
+                        for version in possible_versions:
+                            version_is_of += version + ", "
+                        version_is_of = version_is_of[:-2]
+                    logger.warning(
+                        LogMessage(
+                            "Incompatible version ranges",
+                            f"The component {other} matches the target {self}"
+                            f" in the name and group keys but has a different versioning"
+                            f" schema. The target has versioning schema"
+                            f' "{version_range_object.version_class.__name__}"'
+                            f' this is incompatible with the version "{other.version}"'
+                            + version_is_of,
+                        )
+                    )
+                    return False
+
+        return False
+
+
+@dataclass(frozen=True)
+class UpdateIdentity(ComponentIdentity):
+    """
+    Represents the identity of components the set command shall apply an update to.
+
+    This class inherits from cdxev.auxiliary.identity.ComponentIdentity and
+    extends its functionality to allow CoordinatesWithVersionRange objects
+    as keys of the type coordinate.
+
+    This classes comparator is compatible with UpdateIdentity objects.
+
+    Instances of this class are immutable.
+    """
+
+    def __init__(self, *keys: t.Optional[Key]):
+        super().__init__(*keys)
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, ComponentIdentity) or isinstance(other, UpdateIdentity)
+        ) and any(k in self._keys for k in other._keys)
+
+    @classmethod
+    def create(
+        cls, component: t.Mapping[str, t.Any], allow_unsafe: bool = False
+    ) -> "t.Union[UpdateIdentity, ComponentIdentity]":
+
+        if "version-range" in component:
+            coordinates = cls.from_coordinates(
+                name=component["name"],
+                group=component.get("group"),
+                version_range=component.get("version-range", ""),
+            )
+            return UpdateIdentity(coordinates)  # type:ignore
+
+        else:
+            return super().create(component, allow_unsafe)
+
+    @staticmethod
+    def from_coordinates(
+        name: str,
+        group: t.Optional[str] = None,
+        version: t.Optional[str] = None,
+        version_range: t.Optional[str] = None,
+    ) -> "Key":
+        coordinates = Coordinates(name, group, version)
+        if (
+            version_range is not None
+            and re.fullmatch("vers:.+/.+", version_range) is not None
+        ):
+            coordinates = CoordinatesWithVersionRange(name, group, None, version_range)
+        return Key(KeyType.COORDINATES, coordinates)
 
 
 _IDENTIFIERS = {"cpe", "purl", "swid", "name", "version", "group"}
@@ -180,7 +311,13 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
             raise AppError(
                 "Invalid set file", "An update object is missing the 'id' property."
             )
-        component_id = ComponentIdentity.create(upd["id"], True)
+        if "version" in upd["id"] and "version-range" in upd["id"]:
+            raise AppError(
+                "Invalid set file",
+                "An update object for"
+                "contains a 'version' and 'version-range' but only one of them is permitted",
+            )
+        component_id = UpdateIdentity.create(upd["id"], True)
         upd["id"] = component_id
 
         if len(component_id) == 0:
@@ -222,9 +359,15 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
     ctx.component_map = _map_out_components(sbom)
 
     for update in updates:
-        target_list: list[dict]
+        target_list: list[dict] = []
         try:
-            target_list = ctx.component_map[update["id"][0]]
+            update_key = update["id"][0]
+            if isinstance(update_key.key, CoordinatesWithVersionRange):
+                for key in ctx.component_map.keys():
+                    if update_key == key:
+                        target_list += ctx.component_map[key]
+            else:
+                target_list = ctx.component_map[update_key]
             for target in target_list:
                 _do_update(target, update, ctx)
         except KeyError:

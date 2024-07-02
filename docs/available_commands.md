@@ -348,7 +348,7 @@ The above provided example would set the `copyright` in the component
 
     {
         "name": "web-framework"
-        "group": "org.acme","group": "org.acme",
+        "group": "org.acme",
         "version":"1.5.0"
     }
 
@@ -356,7 +356,7 @@ while it would leave the component
 
     {
         "name": "web-framework"
-        "group": "org.acme","group": "org.acme",
+        "group": "org.acme",
         "version":"2.0.0"
     }
 

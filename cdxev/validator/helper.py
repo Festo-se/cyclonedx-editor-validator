@@ -73,10 +73,10 @@ def validate_filename(
     schema_type: t.Optional[str],
 ) -> t.Union[t.Literal[False], str]:
     if not regex:
-        if schema_type == "default":
-            regex = "^(bom\\.json|.+\\.cdx\\.json)$"
-        else:
+        if schema_type == "custom":
             regex = generate_validation_pattern(sbom)
+        else:
+            regex = "^(bom\\.json|.+\\.cdx\\.json)$"
 
     if re.fullmatch(regex, filename) is None:
         return "filename doesn't match regular expression " + regex

@@ -2,6 +2,7 @@
 
 import json
 import os
+import typing as t
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -40,7 +41,7 @@ def validate_test(
     report_format: str = "stdout",
     filename_regex: str = "",
     schema_type: str = "custom",
-    schema_path: str = "",
+    schema_path: t.Optional[Path] = None,
 ) -> list:
     mock_logger.error.call_args_list = []
     errors_occurred = validate_sbom(
@@ -69,7 +70,7 @@ class TestValidateInit(unittest.TestCase):
     @unittest.skipUnless("CI" in os.environ, "running only in CI")
     def test_custom_schema(self) -> None:
         sbom = get_test_sbom()
-        issues = validate_test(sbom, schema_type="default")
+        issues = validate_test(sbom, schema_type="default", schema_path=None)
         self.assertEqual(issues, ["no issue"])
 
     def test_warnings_ng_format(self) -> None:
@@ -236,7 +237,7 @@ class TestValidateMetadata(unittest.TestCase):
         with self.assertRaises(AppError) as ae:
             validate_test(sbom)
         self.assertIn(
-            "Unable to load schema for specVersion " + sbom["specVersion"],
+            "No built-in schema found for CycloneDX version " + sbom["specVersion"],
             ae.exception.details.description,
         )
 
@@ -501,30 +502,33 @@ class TestValidateUseOwnSchema(unittest.TestCase):
             "",
             Path(""),
             schema_path=(
-                str(Path(__file__).parent.resolve())
-                + "/auxiliary/test_validate_sboms/test_schema.json"
+                Path(__file__).parent.resolve()
+                / "auxiliary"
+                / "test_validate_sboms"
+                / "test_schema.json"
             ),
+            schema_type=None,
+            filename_regex=None,
         )
         self.assertEqual(v, 0)
 
     def test_use_own_schema_path_does_not_exist(self) -> None:
         sbom = get_test_sbom()
         with self.assertRaises(AppError) as ap:
-            validate_test(sbom, schema_path="No_Path")
+            validate_test(sbom, schema_path=Path("No_Path"), schema_type=None)
         self.assertIn(
-            "Path to the provided schema does not exist",
+            "Path does not exist or is not a file",
             ap.exception.details.description,
         )
 
     def test_use_own_schema_invalid_json(self) -> None:
         sbom = get_test_sbom()
         with self.assertRaises(AppError) as ap:
-            validate_test(sbom, schema_path="cdxev/auxiliary/schema")
+            validate_test(
+                sbom, schema_path=Path("cdxev/auxiliary/schema"), schema_type=None
+            )
         self.assertIn(
-            (
-                "The submitted schema is not a valid"
-                " JSON file and could not be loaded"
-            ),
+            "Path does not exist or is not a file",
             ap.exception.details.description,
         )
 
@@ -764,6 +768,8 @@ class TestValidateUseSchemaType(unittest.TestCase):
             "",
             Path(""),
             schema_type="default",
+            schema_path=None,
+            filename_regex=None,
         )
         self.assertEqual(v, 0)
 

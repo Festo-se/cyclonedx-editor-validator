@@ -70,7 +70,7 @@ class TestValidateInit(unittest.TestCase):
     @unittest.skipUnless("CI" in os.environ, "running only in CI")
     def test_custom_schema(self) -> None:
         sbom = get_test_sbom()
-        issues = validate_test(sbom, schema_type="default")
+        issues = validate_test(sbom, schema_type="default", schema_path=None)
         self.assertEqual(issues, ["no issue"])
 
     def test_warnings_ng_format(self) -> None:
@@ -768,6 +768,8 @@ class TestValidateUseSchemaType(unittest.TestCase):
             "",
             Path(""),
             schema_type="default",
+            schema_path=None,
+            filename_regex=None,
         )
         self.assertEqual(v, 0)
 

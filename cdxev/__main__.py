@@ -5,16 +5,16 @@ import enum
 import inspect
 import json
 import logging
-import os
 import re
 import shutil
 import sys
 import textwrap
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
+from typing import TYPE_CHECKING, NoReturn, Optional, Tuple
 
 import docstring_parser
+from natsort import os_sorted
 
 import cdxev.amend.command as amend
 import cdxev.set
@@ -379,7 +379,7 @@ def create_merge_parser(
         "input",
         metavar="<input>",
         help="Paths to SBOM files to merge. You must specify at least two paths.",
-        nargs="+",
+        nargs="*",
         type=Path,
     )
     parser.add_argument(
@@ -705,37 +705,39 @@ def invoke_amend(args: argparse.Namespace) -> int:
 
 
 def invoke_merge(args: argparse.Namespace) -> int:
-    if len(args.input) < 2 and args.from_folder is None:
-        usage_error(
-            "At least two input files, or a input file"
-            " and an folder path must be specified.",
-            args.parser,
-        )
-    inputs: List[dict] = []
-    for input in args.input:
-        sbom, _ = read_sbom(input)
-        inputs.append(sbom)
+    global logger
+
+    inputs = args.input
+
     if args.from_folder is not None:
-        if not os.path.exists(args.from_folder):
-            usage_error("Path to folder does not exist", args.parser)
-        path_to_folder = args.from_folder
-        name_governing_sbom = os.path.basename(os.path.normpath(args.input[0]))
-        list_folder_content = os.listdir(path_to_folder)
-        # use python sorted function to sort the names of the files, the
-        # names are compared in lowercase to adhere to alphabetical order
-        list_folder_content_sorted = sorted(list_folder_content, key=str.lower)
+        if not args.from_folder.is_dir():
+            usage_error(
+                "Path not found or is not a directory: " + str(args.from_folder),
+                args.parser,
+            )
 
-        for file_name in list_folder_content_sorted:
-            if (
-                re.search(r"^bom\.json$|.*\.cdx\.json", file_name)  # noqa: W605
-                and file_name != name_governing_sbom
-            ):
-                print(file_name)
-                new_sbom, _ = read_sbom(Path(os.path.join(path_to_folder, file_name)))
-                inputs.append(new_sbom)
-        if len(inputs) == 1:
-            usage_error("Provided folder does not contain any SBOM files", args.parser)
+        # Find all SBOMs in source folder (filenames: bom.json or *.cdx.json)
+        folder_inputs: list[Path] = list(args.from_folder.glob("*.cdx.json"))
+        if (args.from_folder / "bom.json").is_file():
+            folder_inputs.append(args.from_folder / "bom.json")
 
+        # Remove any paths which have already been provided as an explicit input
+        folder_inputs = os_sorted(p for p in folder_inputs if p not in args.input)
+
+        if len(folder_inputs) == 0:
+            logger.warning(f"No additional SBOMs found in folder: {args.from_folder}")
+
+        for input in folder_inputs:
+            logger.debug(f"Found in folder: {input}")
+
+        inputs += folder_inputs
+
+    if len(inputs) < 2:
+        usage_error(
+            f"Not enough inputs. Must be at least 2, you have provided {len(inputs)}."
+        )
+
+    inputs = [sbom for (sbom, _) in (read_sbom(input) for input in inputs)]
     output = merge(inputs)
     write_sbom(output, args.output)
     return Status.OK

@@ -10,7 +10,7 @@ Before use, please consider the [known limitations](https://festo-se.github.io/c
 
 This command accepts a single input file and will apply one or multiple *operations* to it. Each operation modifies certain aspects of the SBOM. These modifications cannot be targeted at individual components in the SBOM which sets the *amend* command apart from *set*. Its use-case is ensuring an SBOM fulfils certain requirements in an automated fashion.
 
-See the command help with `cdx-ev amend --help` for a list of available operations. All operations marked `[default]` will run unless the command-line option `--operation` is provided.
+See the command help with `cdx-ev amend --help` for a list of available operations. All operations marked `[default]` will run unless the command-line option `--operation` is provided. In the latter case only the specified operation(s) will be executed.
 
 For more information on a particular operation, use the `cdx-ev amend --help-operation <operation>` command.
 
@@ -211,6 +211,37 @@ The *target component* can be identified through any of the identifiable propert
 
 If *coordinates* are used to identify the target, they must match the component fully. In other words, if __only__ *name* is given, it will __only match__ components with that name which do __not__ contain *version* or *group* fields.
 
+In *coordinates* it is also possible to provide a range of versions using the *version-range* parameter instead of *version* following the [PURL specification](https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst) as referenced by [CycloneDX](https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range).
+
+The version range has the format
+
+    vers:<versioning-scheme>/<version-constraint>|<version-constraint>|...
+
+beginning with the `vers` identifier. Following this the versioning-scheme is specified, in the case of semantic versioning this would be `semver` or `generic`. Following this a list of constraints divided by an `|` can be provided, to specify which versions are in scope.
+A few examples:
+
+To target all versions higher than and not including 2.0.0 the version range to provide would be:
+
+    vers:generic/>2.0.0
+
+To target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 the version range to provide would be:
+
+    vers:generic/>2.0.0|<=4.5.0
+
+To target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 except the single version 4.1.1 the version range to provide would be:
+
+    vers:generic/>2.0.0|!=4.1.1|<=4.5.0
+
+To target all versions to target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 as well as the additional version 5.0.0 the version range to provide would be:
+
+    vers:generic/>2.0.0|<=4.5.0|5.0.0
+
+Note that instead of specific version constraints it is possible to provide a wildcard *\** to allow all versions. So to target all versions the provided version range would be:
+
+    vers:generic/*
+
+Further information on the supported versions can be found here [univers documentation](https://pypi.org/project/univers/).
+
 If the target component isn't found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the `--ignore-missing` flag.
 
 #### Protected fields
@@ -233,6 +264,9 @@ The *value* must be given as a valid JSON value. That means command-line usage c
 
     # Set a simple string property, such as copyright in bash
     cdx-ev set bom.json --cpe <target-cpe> --key copyright --value '"2022 Acme Inc"'
+
+    # Set the copyright for all versions of the given component
+    cdx-ev set bom.json --group=org.acme --name=my_program --version-range vers:generic/* --key copyright --value '"Copyright 2024 Acme"' 
 
 ### Conflicts
 
@@ -262,7 +296,7 @@ When passing the targets, names and values in a file, the file must conform to t
             "id": {
                 # Could be any one of the identifying properties in CycloneDX.
                 # Multiple identifiers are not allowed (with the special exception of name,
-                # group and version which are only valid together)
+                # group and version/version-range which are only valid together)
                 "cpe": "CPE of target component goes here"
             },
             "set": {
@@ -283,6 +317,50 @@ When passing the targets, names and values in a file, the file must conform to t
         },
         ...
     ]
+
+Example for the use of version ranges:
+
+    [
+        {   
+            "id": {
+                "name": "web-framework",
+                "group": "org.acme",
+                # It is possible to provide a version range
+                # the format must comply with the PURL specification for version ranges  
+                "version-range": "vers:generic/>=1.0.2|<2.0.0",
+            },
+                "set": {"copyright": "1990 Acme Inc"},
+        },
+        {
+            "id": {
+                "name": "firmware-framework",
+                "group": "org.acme",
+                # It is also possible to provide a wildcard for the version
+                # if the version is set to "*" all versions of the specified schema are passed
+                "version-range": "vers:generic/*",
+            },
+                "set": {"copyright": "1990 Acme Inc"},
+        },
+        ...
+    ]
+
+The above provided example would set the `copyright` in the component
+
+    {
+        "name": "web-framework"
+        "group": "org.acme",
+        "version":"1.5.0"
+    }
+
+while it would leave the component
+
+    {
+        "name": "web-framework"
+        "group": "org.acme",
+        "version":"2.0.0"
+    }
+
+unchanged.
 
 This file can then be applied as the following example shows:
 

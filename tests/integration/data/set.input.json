@@ -67,7 +67,7 @@
     "id": {
       "name": "x-ray",
       "group": "physics",
-      "version": "18.9.5"
+      "version-range": "vers:generic/18.9.5"
     },
     "set": {
       "licenses": [

@@ -60,7 +60,7 @@ def test_version_from_pyproject(
 
     assert e.value.code == Status.OK
     stdout, _ = capsys.readouterr()
-    assert stdout.strip() == expected_version
+    assert expected_version == stdout.strip()
 
 
 def test_dir_output(
@@ -85,7 +85,7 @@ def test_dir_output(
     # Verify that output matches what is expected
     actual = load_sbom(tmp_path / output_file)
     expected = load_sbom(data_dir / "amend.expected_default.cdx.json")
-    assert actual == expected
+    assert expected == actual
 
 
 def test_file_output(
@@ -111,7 +111,7 @@ def test_file_output(
     # Verify that output matches what is expected
     actual = load_sbom(output_file)
     expected = load_sbom(data_dir / "amend.expected_default.cdx.json")
-    assert actual == expected
+    assert expected == actual
 
 
 class TestAmend:
@@ -189,7 +189,7 @@ class TestAmend:
         assert exit_code == Status.OK
 
         expected = load_sbom(data_dir / "amend.expected_add-license-text.cdx.json")
-        assert actual == expected
+        assert expected == actual
 
     def test_missing_operation_arg(
         self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]
@@ -216,7 +216,7 @@ class TestAmend:
         expected = non_alnum.sub("", AddLicenseText.__doc__)  # type: ignore
         actual = non_alnum.sub("", stdout)
 
-        assert actual == expected
+        assert expected == actual
 
 
 class TestBuildPublic:
@@ -322,12 +322,12 @@ class TestMerge:
         input_3 = input_folder / "merge.input_3.cdx.json"
 
         argv("merge", str(input_1), str(input_2), str(input_3))
-        exit_code, output, _ = run_main(capsys=capsys, parse_output="json")
+        exit_code, actual, _ = run_main(capsys=capsys, parse_output="json")
 
         assert exit_code == Status.OK
 
         expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
-        assert output == expected
+        assert expected == actual
 
     def test_order(
         self,
@@ -361,12 +361,12 @@ class TestMerge:
         input_folder = data_dir / "merge-from-folder"
 
         argv("merge", "--from-folder", str(input_folder))
-        exit_code, output, _ = run_main(capsys=capsys, parse_output="json")
+        exit_code, actual, _ = run_main(capsys=capsys, parse_output="json")
 
         assert exit_code == Status.OK
 
         expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
-        assert output == expected
+        assert expected == actual
 
     def test_mixed(
         self,
@@ -380,12 +380,12 @@ class TestMerge:
         input_1 = input_folder / "merge.input_1.cdx.json"
 
         argv("merge", "--from-folder", str(input_folder), str(input_1))
-        exit_code, output, _ = run_main(capsys=capsys, parse_output="json")
+        exit_code, actual, _ = run_main(capsys=capsys, parse_output="json")
 
         assert exit_code == Status.OK
 
         expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
-        assert output == expected
+        assert expected == actual
 
     def test_not_enough_inputs(self, argv: Callable[..., None]):
         argv("merge")
@@ -487,6 +487,31 @@ class TestSet:
         target_component = search_entry(actual, "purl", "pkg:npm/test-app@1.0.0")
         assert target_component is not None
         assert target_component["copyright"] == "ACME Inc."
+
+    def test_direct_range(
+        self,
+        data_dir: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            str(data_dir / "set.input_version-ranges.cdx.json"),
+            "--name",
+            "web-framework",
+            "--version-range",
+            "vers:generic/>2.0.0|<=3.0.0",
+            "--key",
+            "copyright",
+            "--value",
+            '"ACME Inc."',
+        )
+        exit_code, actual, _ = run_main(capsys, "json")
+
+        assert exit_code == Status.OK
+
+        expected = load_sbom(data_dir / "set.expected_version-ranges.cdx.json")
+        assert expected == actual
 
     def test_from_file(
         self,
@@ -705,7 +730,7 @@ class TestValidate:
         expected_exit_code = {"valid": Status.OK, "invalid": Status.VALIDATION_ERROR}[
             expected_result
         ]
-        assert exit_code == expected_exit_code
+        assert expected_exit_code == exit_code
 
     def test_warnings_ng(
         self, argv: Callable[..., None], data_dir: Path, tmp_path: Path

@@ -1,31 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "./bom-1.6-custom.schema.json",
+  "$id": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "type": "object",
   "title": "CycloneDX Bill of Materials Standard",
   "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
-  "if": {
-    "required": ["components"]
-  },
-  "then": {
-    "required": [
-      "bomFormat",
-      "specVersion",
-      "version",
-      "metadata",
-      "compositions",
-      "dependencies"
-    ]
-  },
-  "else": {
-    "required": [
-      "bomFormat",
-      "specVersion",
-      "version",
-      "metadata",
-      "compositions"
-    ]
-  },
+  "required": [
+    "bomFormat",
+    "specVersion"
+  ],
   "additionalProperties": false,
   "properties": {
     "$schema": {
@@ -552,7 +534,6 @@
     "refType": {
       "description": "Identifier for referable and therefore interlinkable elements.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
       "type": "string",
-      "additionalProperties": false,
       "minLength": 1,
       "$comment": "TODO (breaking change): add a format constraint that prevents the value from staring with 'urn:cdx:'"
     },
@@ -721,26 +702,17 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
-          "title": "Component License(s)"
+          "title": "BOM License(s)",
+          "description": "The license information for the BOM document.\nThis may be different from the license(s) of the component(s) that the BOM describes.",
+          "$ref": "#/definitions/licenseChoice"
         },
         "properties": {
           "type": "array",
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-          "items": {
-            "$ref": "#/definitions/property"
-          }
+          "items": {"$ref": "#/definitions/property"}
         }
-      },
-      "required": [
-        "timestamp",
-        "authors",
-        "component"
-      ]
+      }
     },
     "tool": {
       "type": "object",
@@ -791,7 +763,6 @@
         "name": {
           "type": "string",
           "title": "Organization Name",
-          "minLength": 1,
           "description": "The name of the organization",
           "examples": [
             "Example Inc."
@@ -818,24 +789,7 @@
           "description": "A contact at the organization. Multiple contacts are allowed.",
           "items": {"$ref": "#/definitions/organizationalContact"}
         }
-      },
-      "anyOf": [
-          {
-              "required": [
-                  "name"
-              ]
-          },
-          {
-              "required": [
-                  "url"
-              ]
-          },
-          {
-            "required": [
-                "contact"
-            ]
-        }
-      ]
+      }
     },
     "organizationalContact": {
       "type": "object",
@@ -867,19 +821,14 @@
           "description": "The phone number of the contact.",
           "examples": ["800-555-1212"]
         }
-      },
-      "required": [
-        "name"
-      ]
+      }
     },
     "component": {
       "type": "object",
       "title": "Component",
       "required": [
         "type",
-        "name",
-        "version",
-        "bom-ref"
+        "name"
       ],
       "additionalProperties": false,
       "properties": {
@@ -929,7 +878,6 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "minLength": 1,
           "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "supplier": {
@@ -970,14 +918,12 @@
         "name": {
           "type": "string",
           "title": "Component Name",
-          "minLength": 1,
           "description": "The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery",
           "examples": ["tomcat-catalina"]
         },
         "version": {
           "$ref": "#/definitions/version",
           "title": "Component Version",
-          "minLength": 1,
           "description": "The component version. The version should ideally comply with semantic versioning but is not enforced."
         },
         "description": {
@@ -1008,11 +954,7 @@
           "items": {"$ref": "#/definitions/hash"}
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
+          "$ref": "#/definitions/licenseChoice",
           "title": "Component License(s)"
         },
         "copyright": {
@@ -1155,109 +1097,7 @@
           "title": "Signature",
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
-      },
-      "allOf": [
-        {
-          "anyOf": [
-            {
-              "required": [
-                "licenses"
-              ],
-              "properties": {
-                "licenses": {
-                  "minItems": 1
-                }
-              }
-            },
-            {
-              "required": [
-                "copyright"
-              ],
-              "properties": {
-                "copyright": {
-                  "minLength": 1
-                }
-              }
-            }
-          ]
-        },
-        {
-          "anyOf": [
-            {
-              "required": [
-                "supplier"
-              ]
-            },
-            {
-              "required": [
-                "author"
-              ]
-            }
-          ]
-        },
-        {
-          "if": {
-            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["copyright"]
-          },
-          "then": {
-            "if":{
-              "not":{
-              "allOf":[ {
-                "required": ["licenses"]
-              },
-              {
-                "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } }
-              }
-            ]
-          }
-            },
-            "then":{
-              "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-              "required": ["supplier"],
-              "dependencies": {
-                "supplier": {"properties": {"supplier": {"required": ["name"]}}}
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-            "required": ["supplier"],
-            "dependencies": {
-              "supplier": {"properties": {"supplier": {"required": ["name"]}}}
-            }
-          },
-          "then": {
-            "if":{
-              "not":{
-              "allOf":[ {
-                "required": ["licenses"]
-              },
-              {
-                "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } }
-              }
-            ]
-          }
-            },
-            "then":{
-                "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-                "required": ["copyright"]
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["author"]
-          },
-          "then": {
-            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["copyright"]
-          }
-        }
-      ]
+      }
     },
     "swid": {
       "type": "object",
@@ -1339,7 +1179,6 @@
         "content": {
           "type": "string",
           "title": "Attachment Text",
-          "minLength": 1,
           "description": "The attachment data. Proactive controls such as input validation and sanitization should be employed to prevent misuse of attachment text."
         }
       }
@@ -1378,16 +1217,14 @@
         "BLAKE2b-384",
         "BLAKE2b-512",
         "BLAKE3"
-      ],
-      "additionalProperties": false
+      ]
     },
     "hash-content": {
       "type": "string",
       "title": "Hash Value",
       "description": "The value of the hash.",
       "examples": ["3942447fac867ae5cdb3229b658f4d48"],
-      "pattern": "^([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{96}|[a-fA-F0-9]{128})$",
-      "additionalProperties": false
+      "pattern": "^([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{96}|[a-fA-F0-9]{128})$"
     },
     "license": {
       "type": "object",
@@ -1416,7 +1253,6 @@
         "name": {
           "type": "string",
           "title": "License Name",
-          "minLength": 1,
           "description": "If SPDX does not define the license used, this field may be used to provide the license name",
           "examples": ["Acme Software License"]
         },
@@ -1588,8 +1424,7 @@
               "title": "Expiration",
               "description": "The timestamp indicating when the current license expires (if applicable)."
             }
-          },
-          "required": ["licenseTypes","licensor","licensee"]
+          }
         },
         "properties": {
           "type": "array",
@@ -1597,9 +1432,6 @@
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
           "items": {"$ref": "#/definitions/property"}
         }
-      },
-      "dependencies": {
-        "name": ["text", "licensing"]
       }
     },
     "licenseAcknowledgementEnumeration": {
@@ -1616,33 +1448,55 @@
       }
     },
     "licenseChoice": {
-      "type": "object",
-      "title": "License(s)",
-      "additionalProperties": false,
-      "properties": {
-        "license": {
-          "$ref": "#/definitions/license"
-        },
-        "expression": {
-          "type": "string",
-          "minLength": 1,
-          "title": "SPDX License Expression",
-          "examples": [
-            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-            "GPL-3.0-only WITH Classpath-exception-2.0"
-          ]
-        }
-      },
+      "title": "License Choice",
+      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "type": "array",
       "oneOf": [
         {
-          "required": [
-            "license"
-          ]
+          "title": "Multiple licenses",
+          "description": "A list of SPDX licenses and/or named licenses.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "title": "License",
+            "required": ["license"],
+            "additionalProperties": false,
+            "properties": {
+              "license": {"$ref": "#/definitions/license"}
+            }
+          }
         },
         {
-          "required": [
-            "expression"
-          ]
+          "title": "SPDX License Expression",
+          "description": "A tuple of exactly one SPDX License Expression.",
+          "type": "array",
+          "additionalItems": false,
+          "minItems": 1,
+          "maxItems": 1,
+          "items": [{
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["expression"],
+            "properties": {
+              "expression": {
+                "type": "string",
+                "title": "SPDX License Expression",
+                "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements",
+                "examples": [
+                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                  "GPL-3.0-only WITH Classpath-exception-2.0"
+                ]
+              },
+              "acknowledgement": {
+                "$ref": "#/definitions/licenseAcknowledgementEnumeration"
+              },
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+              }
+            }
+          }]
         }
       ]
     },
@@ -2077,8 +1931,6 @@
           "description": "Specifies information about the data including the directional flow of data and the data classification."
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
           "$ref": "#/definitions/licenseChoice",
           "title": "Component License(s)"
         },
@@ -2207,7 +2059,6 @@
         "unknown": "The directional flow of data is not known."
       },
       "title": "Data flow direction",
-      "additionalProperties": false,
       "description": "Specifies the flow direction of the data. Direction is relative to the service."
     },
     "copyright": {
@@ -2367,8 +2218,7 @@
       "type": "object",
       "title": "Compositions",
       "required": [
-        "aggregate",
-        "assemblies"
+        "aggregate"
       ],
       "additionalProperties": false,
       "properties": {
@@ -2440,7 +2290,6 @@
         "unknown",
         "not_specified"
       ],
-      "additionalProperties": false,
       "meta:enum": {
         "complete": "The relationship is complete. No further relationships including constituent components, services, or dependencies are known to exist.",
         "incomplete": "The relationship is incomplete. Additional relationships exist and may include constituent components, services, or dependencies.",
@@ -2479,8 +2328,7 @@
       "type": "string",
       "pattern": "^([a-z]{2})(-[A-Z]{2})?$",
       "title": "Locale",
-      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code MUST be lower case. If the country code is specified, the country code MUST be upper case. The language code and country code MUST be separated by a minus sign. Examples: en, en-US, fr, fr-CA",
-      "additionalProperties": false
+      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code MUST be lower case. If the country code is specified, the country code MUST be upper case. The language code and country code MUST be separated by a minus sign. Examples: en, en-US, fr, fr-CA"
     },
     "releaseType": {
       "type": "string",
@@ -2611,8 +2459,7 @@
       "type": "integer",
       "minimum": 1,
       "title": "CWE",
-      "description": "Integer representation of a Common Weaknesses Enumerations (CWE). For example 399 (of https://cwe.mitre.org/data/definitions/399.html)",
-      "additionalProperties": false
+      "description": "Integer representation of a Common Weaknesses Enumerations (CWE). For example 399 (of https://cwe.mitre.org/data/definitions/399.html)"
     },
     "severity": {
       "type": "string",
@@ -2627,7 +2474,6 @@
         "none",
         "unknown"
       ],
-      "additionalProperties": false,
       "meta:enum": {
         "critical": "Critical severity",
         "high": "High severity",
@@ -2651,7 +2497,6 @@
         "SSVC",
         "other"
       ],
-      "additionalProperties": false,
       "meta:enum": {
         "CVSSv2": "Common Vulnerability Scoring System v2.0",
         "CVSSv3": "Common Vulnerability Scoring System v3.0",
@@ -2698,7 +2543,6 @@
         "protected_at_perimeter",
         "protected_by_mitigating_control"
       ],
-      "additionalProperties": false,
       "meta:enum": {
         "code_not_present": "The code has been removed or tree-shaked.",
         "code_not_reachable": "The vulnerable code is not invoked at runtime.",
@@ -3112,7 +2956,6 @@
         "unaffected",
         "unknown"
       ],
-      "additionalProperties": false,
       "meta:enum": {
         "affected": "The version is affected by the vulnerability.",
         "unaffected": "The version is not affected by the vulnerability.",
@@ -3123,7 +2966,6 @@
       "description": "A single disjunctive version identifier, for a component or service.",
       "type": "string",
       "maxLength": 1024,
-      "minLength": 1,
       "examples": [
         "9.0.14",
         "v1.33.7",
@@ -3131,8 +2973,7 @@
         "2.0pre1",
         "1.0.0-beta1",
         "0.8.15"
-      ],
-      "additionalProperties": false
+      ]
     },
     "versionRange": {
       "description": "A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/VERSION-RANGE-SPEC.rst",
@@ -3150,8 +2991,7 @@
     "range": {
       "deprecated": true,
       "description": "Deprecated definition. use definition `versionRange` instead.",
-      "$ref": "#/definitions/versionRange",
-      "additionalProperties": false
+      "$ref": "#/definitions/versionRange"
     },
     "annotations": {
       "type": "object",
@@ -5173,7 +5013,6 @@
     "signature": {
       "$ref": "jsf-0.82.schema.json#/definitions/signature",
       "title": "Signature",
-      "additionalProperties": false,
       "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
     },
     "cryptoProperties": {

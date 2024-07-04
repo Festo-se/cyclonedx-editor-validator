@@ -3,9 +3,9 @@
 import json
 import re
 import typing as t
+from copy import copy
 from pathlib import Path
 from typing import Sequence
-from copy import copy
 
 from jsonschema import Draft7Validator, FormatChecker
 

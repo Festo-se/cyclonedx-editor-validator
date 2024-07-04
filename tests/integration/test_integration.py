@@ -546,13 +546,14 @@ class TestSet:
             ["purl", "swid", "key", "value"],
             ["name", "cpe", "key", "value"],
             ["version", "group", "key", "value"],
+            ["name", "version", "version-range", "key", "value"],
             ["key", "value"],
             ["name", "key"],
             ["name", "value"],
             ["from-file", "name"],
             ["from-file", "key", "value"],
         ],
-        ids=lambda keys: "only: " + ", ".join(keys),
+        ids=lambda keys: "options: " + ", ".join(keys),
     )
     def test_invalid_option_combinations(
         self, use_only: list[str], input_file: Path, argv: Callable[..., None]
@@ -560,6 +561,7 @@ class TestSet:
         options = {
             "name": "comp",
             "version": "1.0.0",
+            "version-range": "vers:generic/>1.0.0",
             "group": "acme",
             "purl": "pkg:test/comp@1.0.0",
             "swid": "foo",

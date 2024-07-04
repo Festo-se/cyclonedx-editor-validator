@@ -604,12 +604,14 @@ def create_set_parser(
         metavar="<group>",
         help="Group of target component. If specified, name must also be specified.",
     )
-    identifiers.add_argument(
+
+    group = identifiers.add_mutually_exclusive_group()
+    group.add_argument(
         "--version",
         metavar="<version>",
         help="Version of target component. If specified, name must also be specified.",
     )
-    identifiers.add_argument(
+    group.add_argument(
         "--version-range",
         metavar="<version>",
         help="Version range of target components. If specified, name must also be specified.",

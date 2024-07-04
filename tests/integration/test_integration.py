@@ -45,7 +45,8 @@ def test_version(argv: Callable[..., None], capsys: pytest.CaptureFixture[str]):
 
 
 @pytest.mark.skipif(
-    "CI" not in os.environ, reason="Run only in CI, after a clean install"
+    "CI" not in os.environ,
+    reason="Often fails in dev installs. Works after clean install.",
 )
 def test_version_from_pyproject(
     argv: Callable[..., None], capsys: pytest.CaptureFixture[str]

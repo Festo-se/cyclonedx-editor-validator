@@ -536,8 +536,7 @@ class TestValidateUseOwnSchema(unittest.TestCase):
             ap.exception.details.description,
         )
 
-
-class TestValidateLicensing(unittest.TestCase):
+class TestValidateUseSchema15(unittest.TestCase):
     def test_correct_license(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
@@ -1137,19 +1136,19 @@ class TestValidateFilename(unittest.TestCase):
     def setUp(self) -> None:
         self.sbom = get_test_sbom()
 
-    def test_valid_with_default_schema(self):
+    def test_valid_with_default_schema(self) -> None:
         for filename in ["bom.json", "random.cdx.json", "-.cdx.json"]:
             with self.subTest(filename=filename):
                 result = validate_filename(filename, "", self.sbom, "default")
                 self.assertFalse(result)
 
-    def test_invalid_with_default_schema(self):
+    def test_invalid_with_default_schema(self) -> None:
         for filename in ["bomjson", "bom.jso", "random.bom.json", ".cdx.json"]:
             with self.subTest(filename=filename):
                 result = validate_filename(filename, "", self.sbom, "default")
                 self.assertIsInstance(result, str)
 
-    def test_valid_with_custom_schema(self):
+    def test_valid_with_custom_schema(self) -> None:
         for filename in [
             "bom.json",
             "Acme_Application_9.1.1_20220217T101458.cdx.json",
@@ -1160,7 +1159,7 @@ class TestValidateFilename(unittest.TestCase):
                 result = validate_filename(filename, "", self.sbom, "custom")
                 self.assertFalse(result)
 
-    def test_invalid_with_custom_schema(self):
+    def test_invalid_with_custom_schema(self) -> None:
         for filename in [
             "bomjson",
             "bom.jso",

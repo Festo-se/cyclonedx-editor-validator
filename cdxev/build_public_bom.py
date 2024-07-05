@@ -78,8 +78,8 @@ def remove_component_tagged_internal(
             if validator_for_being_internal.is_valid(component):
                 list_of_removed_component_bom_refs.append(component.get("bom-ref", ""))
                 sub_components = extract_components(component.get("components", []))
-            for comp in sub_components:
-                list_of_removed_component_bom_refs.append(comp.get("bom-ref", ""))
+                for comp in sub_components:
+                    list_of_removed_component_bom_refs.append(comp.get("bom-ref", ""))
             else:
                 remove_internal_information_from_properties(component)
                 cleared_components.append(component)

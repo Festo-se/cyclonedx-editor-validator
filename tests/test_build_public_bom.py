@@ -37,6 +37,7 @@ relative_path_to_example_schema_2 = (
 )
 path_to_example_schema_2 = Path(os.path.abspath(relative_path_to_example_schema_2))
 
+
 relative_path_to_documentation_schema_1 = (
     "tests/auxiliary/test_build_public_bom_sboms/schema/documentation_schema_1.json"
 )
@@ -154,8 +155,6 @@ class TestCreateExternalBom(unittest.TestCase):
         sbom = get_test_sbom()
         public_sbom = get_public_sbom()
         external_bom = b_p_b.build_public_bom(sbom, path_to_example_schema_1)
-        dumpsbom(public_sbom, "public.json")
-        dumpsbom(external_bom, "external.json")
         self.assertDictEqual(public_sbom, external_bom)
 
     def test_build_public_group_is_internal_name_contained_is_public(self) -> None:
@@ -260,4 +259,25 @@ class TestCreateExternalBom(unittest.TestCase):
                 ],
             }
         ]
+        self.assertDictEqual(external_bom, public_sbom)
+
+    def test_build_public_delete_nested_components(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["group"] = "com.acme.internal"
+        public_sbom = get_test_sbom()
+        public_sbom["components"].pop(0)
+        public_sbom["compositions"][0]["assemblies"].pop(0)
+        public_sbom["compositions"][0]["assemblies"].pop(0)
+        public_sbom["dependencies"][0]["dependsOn"].pop(0)
+        public_sbom["dependencies"][0]["dependsOn"].append("comp4")
+        public_sbom["dependencies"].pop(1)
+        public_sbom["dependencies"].pop(1)
+        public_sbom["metadata"]["component"]["properties"].pop(1)
+        public_sbom["components"][0]["properties"].pop(1)
+        public_sbom["components"][0]["properties"].pop(2)
+        public_sbom["components"][5]["properties"].pop(0)
+        public_sbom["components"][2]["properties"].pop(0)
+        public_sbom["components"][1]["properties"].pop(0)
+        public_sbom["components"][4]["properties"].pop(0)
+        external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
         self.assertDictEqual(external_bom, public_sbom)

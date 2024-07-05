@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Sequence
 
 from jsonschema import Draft7Validator, FormatChecker
+
 from cdxev.auxiliary.sbomFunctions import extract_components
 
 

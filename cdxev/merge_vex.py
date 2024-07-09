@@ -42,9 +42,7 @@ def get_refs_from_sbom(sbom: dict) -> list:
         List with the bom-refs used in the sbom
     """
     references = [sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")]
-    component_refs = get_ref_from_components(
-        sbom.get("components", []), only_top_level=False
-    )
+    component_refs = get_ref_from_components(sbom.get("components", []))
     references += component_refs
     return references
 

@@ -67,6 +67,7 @@ This command creates a redacted version of an SBOM fit for publication. It
 * deletes any *property* (i.e., item in the `properties` array of a component) whose name starts with `internal:` from all components.
 
 The actions are performed in this order, meaning that *internal* properties will be taken into account when matching the JSON schema.
+If a component containing nested components is deleted, those nested components are deleted as well.
 
 The JSON schema must be formulated according to the Draft 7 specification.
 
@@ -161,28 +162,24 @@ The following schema is a little more involved. It will delete any component who
 
 ## merge
 
-This command requires at least two input files, but can accept an arbitrary number.
+This command requires at least two input files, but can accept an arbitrary number. Inputs can either be specified directly as positional arguments on the command-line or using the `--from-folder <path>` option. Files specified as arguments are merged in the order they are given, files in the folder are merged in alphabetical order (see note below).  
+If both positional arguments and the `--from-folder` option are used, then the position arguments are merged first, followed by the files in the folder. The command will not merge the same file twice, if it is specified on the command-line and also part of the folder.
 
-Alternatively only one file can be submitted and the command `--from-folder` must be used to provide the path to a folder.
-This command reads the contents of the provided folder and loads *all files* with "*.cdx.json" or the name "bom.json", according to the naming convention described in the [CycloneDX Specification](https://cyclonedx.org/specification/overview/#recognized-file-patterns).
-If a file in the folder has the same name as the provided sbom to be merged in, it will be skipped.
-The files are then merged in alphabetical order into the regularly provided sbom in this order.
+When using the `--from-folder` option, the program looks for files matching either of the [recommended CycloneDX naming schemes](https://cyclonedx.org/specification/overview/#recognized-file-patterns): `bom.json` or `*.cdx.json`.
 
-The process runs iterative, merging two SBOMs in each step.
-In the first step, the second submitted SBOM is merged into the first.
-In the second step the third would be merged into the resulting SBOM from step one etc.
+__Note on merge order:__  
+Input files in the folder provided to the `--from-folder` option are sorted in a platform-specific way. In other words, they are merged in the same order they appear in your operating system's file browser (e.g., Windows Explorer).
 
-The Resulting SBOM will contain the Metadata from the first SBOM submitted, with only the timestamp being updated.
+The process runs iteratively, merging two SBOMs in each iteration. In the first round, the second submitted SBOM is merged into the first. In the second round the third would be merged into the result of the first round and so on.  
+In mathematical terms: `output = (((input_1 x input_2) x input_3) x input_4 ...)`
 
-The components from the first SBOM submitted will be kept unchanged, if the SBOMs that are merged contain new components,
-those will be added to the list of components. Should a component be contained in several SBOMs, the one from the SBOM that was merged earlier will be taken without any consideration. If this happens and a component is dropped during the merge, a warning will be shown.
-Uniqueness of the bom-refs will be ensured.
+A few noted on the merge algorithm:
 
-The dependencies for new components are taken over.
-If components are contained in both SBOMs, then the dependsON lists
-for them will be merged so that no information will be lost.
-
-If a VEX section is contained, it will be merged as well, for details see merge-vex section
+* The `metadata` field is always retained from the first input and never changed through a merge with the exception of the `timestamp`.
+* Components are merged into the result in the order they __first__ appear in the inputs. If any subsequent input specifies the same component (sameness in this case being defined as having identical identifying attributes such as `name`, `version`, `purl`, etc.), the later instance of the component will be dropped with a warning. __This command cannot be used to merge information inside components.__
+* The resulting dependency graph will reflect all dependencies from all inputs. Dependencies from later inputs are always added to the result, even if the component is dropped as a duplicate as described above.
+* Uniqueness of *bom-refs* will be ensured.
+* If the inputs contain VEX information in the form of a `vulnerabilities` field, this will be merged as well. For details see section on the `merge-vex` command.
 
 ## merge-vex
 
@@ -266,7 +263,7 @@ The *value* must be given as a valid JSON value. That means command-line usage c
     cdx-ev set bom.json --cpe <target-cpe> --key copyright --value '"2022 Acme Inc"'
 
     # Set the copyright for all versions of the given component
-    cdx-ev set bom.json --group=org.acme --name=my_program --version-range vers:generic/* --key copyright --value '"Copyright 2024 Acme"' 
+    cdx-ev set bom.json --group=org.acme --name=my_program --version-range vers:generic/* --key copyright --value '"Copyright 2024 Acme"'
 
 ### Conflicts
 
@@ -321,7 +318,7 @@ When passing the targets, names and values in a file, the file must conform to t
 Example for the use of version ranges:
 
     [
-        {   
+        {
             "id": {
                 "name": "web-framework",
                 "group": "org.acme",

@@ -256,8 +256,9 @@ class TestBuildPublic:
     ):
         argv(
             "build-public",
-            str(data["input"]),
+            "--schema-path",
             str(data["schema"]),
+            str(data["input"]),
         )
         exit_code, actual, _ = run_main(capsys, "json")
 

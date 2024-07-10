@@ -202,9 +202,7 @@ class TestCreateExternalBom(unittest.TestCase):
 
     def test_build_public_no_schema(self) -> None:
         sbom = get_test_sbom()
-        sbom = get_test_sbom()
         public_sbom = get_test_sbom()
-
         public_sbom["metadata"]["component"]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(2)
@@ -213,18 +211,73 @@ class TestCreateExternalBom(unittest.TestCase):
         public_sbom["components"][2]["properties"].pop(0)
         public_sbom["components"][5]["properties"].pop(0)
         external_bom = b_p_b.build_public_bom(sbom, None)
+
         public_sbom["compositions"] = [
             {
                 "aggregate": "incomplete",
                 "assemblies": [
                     "comp1",
+                    "sub_comp1",
                     "comp2",
-                    "internalcomp2",
                     "comp3",
                     "comp4",
-                    "internalcomp3",
                     "internalcomp1",
+                    "internalcomp2",
+                    "internalcomp3",
                 ],
             }
         ]
+        self.assertDictEqual(external_bom, public_sbom)
+
+    def test_deletion_of_orphaned_bom_refs(self) -> None:
+        sbom = get_test_sbom()
+        public_sbom = get_test_sbom()
+        public_sbom["metadata"]["component"]["properties"].pop(1)
+        public_sbom["components"][1]["properties"].pop(1)
+        public_sbom["components"][1]["properties"].pop(2)
+        public_sbom["components"][6]["properties"].pop(0)
+        public_sbom["components"][3]["properties"].pop(0)
+        public_sbom["components"][2]["properties"].pop(0)
+        public_sbom["components"][5]["properties"].pop(0)
+        sbom["compositions"][0]["assemblies"].append("orphaned bom-ref 1")
+        sbom["compositions"][0]["assemblies"].append("orphaned bom-ref 2")
+        external_bom = b_p_b.build_public_bom(sbom, None)
+        public_sbom["compositions"] = [
+            {
+                "aggregate": "incomplete",
+                "assemblies": [
+                    "comp1",
+                    "sub_comp1",
+                    "comp2",
+                    "comp3",
+                    "comp4",
+                    "internalcomp1",
+                    "internalcomp2",
+                    "internalcomp3",
+                    "orphaned bom-ref 1",
+                    "orphaned bom-ref 2",
+                ],
+            }
+        ]
+        self.assertDictEqual(external_bom, public_sbom)
+
+    def test_build_public_delete_nested_components(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["group"] = "com.acme.internal"
+        public_sbom = get_test_sbom()
+        public_sbom["components"].pop(0)
+        public_sbom["compositions"][0]["assemblies"].pop(0)
+        public_sbom["compositions"][0]["assemblies"].pop(0)
+        public_sbom["dependencies"][0]["dependsOn"].pop(0)
+        public_sbom["dependencies"][0]["dependsOn"].append("comp4")
+        public_sbom["dependencies"].pop(1)
+        public_sbom["dependencies"].pop(1)
+        public_sbom["metadata"]["component"]["properties"].pop(1)
+        public_sbom["components"][0]["properties"].pop(1)
+        public_sbom["components"][0]["properties"].pop(2)
+        public_sbom["components"][5]["properties"].pop(0)
+        public_sbom["components"][2]["properties"].pop(0)
+        public_sbom["components"][1]["properties"].pop(0)
+        public_sbom["components"][4]["properties"].pop(0)
+        external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
         self.assertDictEqual(external_bom, public_sbom)

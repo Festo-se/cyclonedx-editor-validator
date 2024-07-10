@@ -11,7 +11,7 @@ import toml
 
 from cdxev.__main__ import Status
 from cdxev.amend.operations import AddLicenseText
-from tests.auxiliary.sbomFunctionsTests import search_entry
+from tests.auxiliary.helper import search_entry
 from tests.integration.helper import load_sbom, run_main
 
 

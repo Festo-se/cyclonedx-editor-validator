@@ -67,6 +67,7 @@ This command creates a redacted version of an SBOM fit for publication. It
 * deletes any *property* (i.e., item in the `properties` array of a component) whose name starts with `internal:` from all components.
 
 The actions are performed in this order, meaning that *internal* properties will be taken into account when matching the JSON schema.
+If a component containing nested components is deleted, those nested components are deleted as well.
 
 The JSON schema must be formulated according to the Draft 7 specification.
 

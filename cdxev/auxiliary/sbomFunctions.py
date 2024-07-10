@@ -154,22 +154,6 @@ def get_component_by_ref(ref: str, list_of_components: Sequence[dict]) -> dict:
     return {}
 
 
-def get_bom_refs_from_components(list_of_components: Sequence[dict]) -> list:
-    """
-    Function that gets a list of components and returns a list with their sboms
-
-    Input:
-    list_of_components: list with dicts of components
-
-    Output:
-    list_of_bom_refs: List of Strings, containing the bom-refs of the components
-    """
-    list_of_bom_refs = []
-    for component in list_of_components:
-        list_of_bom_refs.append(component.get("bom-ref", ""))
-    return list_of_bom_refs
-
-
 def get_bom_refs_from_dependencies(dependencies: Sequence[dict]) -> list[str]:
     """
     Function that gets a list of dependencies and returns a list with their sboms

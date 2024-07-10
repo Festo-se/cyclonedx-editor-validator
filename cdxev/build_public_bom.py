@@ -8,7 +8,7 @@ from typing import Sequence
 
 from jsonschema import Draft7Validator, FormatChecker
 
-from cdxev.auxiliary.sbomFunctions import get_ref_from_components
+from cdxev.auxiliary.sbomFunctions import extract_components
 
 
 def remove_internal_information_from_properties(component: dict) -> None:
@@ -78,6 +78,9 @@ def remove_component_tagged_internal(
             # if not, the property within namespace internal will be removed
             if validator_for_being_internal.is_valid(component):
                 list_of_removed_component_bom_refs.append(component.get("bom-ref", ""))
+                sub_components = extract_components(component.get("components", []))
+                for comp in sub_components:
+                    list_of_removed_component_bom_refs.append(comp.get("bom-ref", ""))
             else:
                 remove_internal_information_from_properties(component)
                 cleared_components.append(component)
@@ -154,14 +157,17 @@ def build_public_bom(sbom: dict, path_to_schema: t.Union[Path, None]) -> dict:
     ) = remove_component_tagged_internal(components, path_to_schema)
     for bom_ref in list_of_removed_components:
         dependencies = merge_dependency_for_removed_component(bom_ref, dependencies)
-    new_compositions = get_ref_from_components(cleared_components)
     remove_internal_information_from_properties(
         sbom.get("metadata", {}).get("component", {})
     )
     sbom["components"] = cleared_components
     sbom["dependencies"] = dependencies
-    compositions = [{"aggregate": "incomplete", "assemblies": new_compositions}]
-    sbom["compositions"] = compositions
+    for composition in sbom.get("compositions", []):
+        new_assemblies = composition.get("assemblies").copy()
+        for bom_ref in composition.get("assemblies"):
+            if bom_ref in list_of_removed_components:
+                new_assemblies.remove(bom_ref)
+        composition["assemblies"] = new_assemblies
     return sbom
 
 

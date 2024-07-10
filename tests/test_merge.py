@@ -681,7 +681,7 @@ class TestReplaceBomRefs(unittest.TestCase):
             if component["bom-ref"] != "sp_fifteenth_component"
         ]
         sbom["vulnerabilities"] = dictionary_with_stuff["vulnerabilities_tls_equal"]
-        list_of_bom_refs = sbF.get_bom_refs_from_components(sbom.get("components", []))
+        list_of_bom_refs = sbF.get_ref_from_components(sbom.get("components", []))
         sbom_bom_refs_replaced = load_additional_sbom_dict()[
             "sbom_with_bom_refs_replaced"
         ]

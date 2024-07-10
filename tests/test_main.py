@@ -302,6 +302,29 @@ class TestSetCommand(unittest.TestCase):
             result = main()
             self.assertEqual(result, Status.OK)
 
+        with unittest.mock.patch(
+            "sys.argv",
+            [
+                "",
+                "set",
+                "fake_bom_1.cdx.json",
+                "--name",
+                "<target-name>",
+                "--group",
+                "<target-group",
+                "--version-range",
+                "vers:generic/*",
+                "--key",
+                "copyright",
+                "--value",
+                '"2022 Acme Inc"',
+            ],
+        ):
+            mock_set.return_value = {}
+            mock_read.return_value = ({}, "json")
+            result = main()
+            self.assertEqual(result, Status.OK)
+
     @unittest.mock.patch("cdxev.__main__.read_sbom")
     @unittest.mock.patch("cdxev.set.run")
     @unittest.mock.patch(

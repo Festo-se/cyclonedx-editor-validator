@@ -187,8 +187,7 @@
         {
             "aggregate": "incomplete",
             "assemblies": [
-                "com.company.unit/depA@4.0.2",
-                "some-vendor/depB@1.2.3"
+                "com.company.unit/depA@4.0.2"
             ]
         }
     ],

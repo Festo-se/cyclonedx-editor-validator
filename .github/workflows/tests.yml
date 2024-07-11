@@ -50,7 +50,7 @@ jobs:
     - name: Run pytest
       run: |
         poetry run coverage run -m pytest --junitxml=reports/unittest.xml
-        poetry run coverage report
+        poetry run coverage report --fail-under=95
         poetry run coverage xml -o reports/py-coverage.cobertura.xml
     - name: Archive test results
       uses: actions/upload-artifact@v3

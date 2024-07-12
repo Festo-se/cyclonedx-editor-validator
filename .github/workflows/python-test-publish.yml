@@ -40,7 +40,7 @@ jobs:
           poetry version --dry-run
           poetry publish --build -r testpypi
       - name: Create PR
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           title: Change version in pyproject.toml
           base: main

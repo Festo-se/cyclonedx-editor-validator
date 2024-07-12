@@ -23,7 +23,7 @@ cdx-ev = "cdxev.__main__:main"
 [tool.poetry.dependencies]
 python = "^3.9.0"
 python-dateutil = "2.9.0.post0"
-jsonschema = {version = "4.22.0", extras = ["format"]}
+jsonschema = {version = "4.23.0", extras = ["format"]}
 docstring-parser = "^0.16"
 charset-normalizer = "^3.3.2"
 pyicu = [

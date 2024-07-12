@@ -1,18 +1,18 @@
-documentation:
+"documentation":
   - changed-files:
     - any-glob-to-any-file:
-      - docs/**/*
+      - "docs/**/*"
 
-unittests:
+"unittests":
   - changed-files:
     - any-glob-to-any-file:
-      - tests/**/*
+      - "tests/**/*"
 
-settings_changes:
+"settings_changes":
   - changed-files:
-    - any-glob-to-any-file: ['*', '!LICENSE', '!README.md'] 
+    - any-glob-to-any-file: ["*", "!LICENSE", "!README.md"] 
 
-enhancement:
+"enhancement":
   - changed-files:
     - any-glob-to-any-file:
-      - cdxev/**/*
+      - "cdxev/**/*"

@@ -1,12 +1,10 @@
 "documentation":
   - changed-files:
-    - any-glob-to-any-file:
-      - "docs/**/*"
+    - any-glob-to-any-file: "docs/**/*"
 
 "unittests":
   - changed-files:
-    - any-glob-to-any-file:
-      - "tests/**/*"
+    - any-glob-to-any-file: "tests/**/*"
 
 "settings_changes":
   - changed-files:
@@ -14,5 +12,4 @@
 
 "enhancement":
   - changed-files:
-    - any-glob-to-any-file:
-      - "cdxev/**/*"
+    - any-glob-to-any-file: "cdxev/**/*"

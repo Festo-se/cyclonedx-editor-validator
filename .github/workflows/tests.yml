@@ -53,12 +53,12 @@ jobs:
         poetry run coverage report
         poetry run coverage xml -o reports/py-coverage.cobertura.xml
     - name: Archive test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-report
         path: reports/unittest.xml
     - name: Archive code coverage results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: code-coverage-report
         path: reports/py-coverage.cobertura.xml

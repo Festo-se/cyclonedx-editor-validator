@@ -21,9 +21,7 @@ jobs:
     steps:
     - name: Install and configure poetry
       uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-    - run: |
-        python -m pip install --upgrade pip
-        pipx install poetry
+    - run: pipx install poetry
     - name: Configure poetry
       run: |
         poetry config virtualenvs.in-project false

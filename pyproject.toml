@@ -46,7 +46,7 @@ toml = "0.10.2"
 typing-extensions = "4.12.2"
 bandit = "1.7.9"
 isort = "5.13.2"
-pre-commit = "3.7.0"
+pre-commit = "3.8.0"
 
 [build-system]
 requires = ["poetry-core"]

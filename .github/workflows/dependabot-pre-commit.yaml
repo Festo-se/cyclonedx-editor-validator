@@ -18,7 +18,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.COMMIT_KEY }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           # Check out HEAD of source branch. Without this option, the merge commit would be checked out.
           ref: ${{ github.event.pull_request.head.ref }}

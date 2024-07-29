@@ -12,7 +12,7 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: install poetry
         run: pipx install poetry
       - uses: actions/setup-python@v5
@@ -34,11 +34,11 @@ jobs:
 
   pytest:
     runs-on: ubuntu-latest
-    
+
     needs: static_analysis
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - name: install poetry
       run: pipx install poetry
     - uses: actions/setup-python@v5
@@ -69,4 +69,3 @@ jobs:
         junitxml-path: reports/unittest.xml
         pytest-xml-coverage-path: reports/py-coverage.cobertura.xml
         report-only-changed-files: true
-

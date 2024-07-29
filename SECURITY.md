@@ -14,7 +14,7 @@ We kindly request that you adhere to responsible disclosure practices when repor
 
 1. **Providing Sufficient Information**: Please provide detailed information about the vulnerability or concern you have identified. This will help our PSIRT team understand and address the issue more effectively.
 
-2. **Giving Us Time to Respond**: We appreciate your patience while our PSIRT team investigates and resolves the reported issue. We will make every effort to keep you informed of our progress. We aim to process your report within one week, and respond within two weeks.
+2. **Giving Us Time to Respond**: We appreciate your patience while our PSIRT team investigates and resolves the reported issue. We will make every effort to keep you informed of our progress. We aim to process your report within one week, and give you a first respond within two weeks. For critical vulnerabilities we aim to resolve them within 90 days.
 
 3. **Not Publicly Disclosing the Issue**: To protect the security of our users, we request that you do not publicly disclose the reported issue until we have had an opportunity to address it.
 

@@ -7,6 +7,25 @@ on:
   workflow_call:
 
 jobs:
+  test_pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+        with:
+          python-version: '3.9'
+          cache: 'poetry'
+      - run: |
+          poetry config virtualenvs.in-project false
+          poetry config cache-dir ~/cache/.poetry
+      - name: Install dependencies
+        run: poetry install --only docs
+      - name: Test pages
+        run: poetry run mkdocs build
+
   static_analysis:
 
       runs-on: ubuntu-latest

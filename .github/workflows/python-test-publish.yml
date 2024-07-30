@@ -22,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Install poetry
-        run: pipx install poetry
-      - uses: actions/setup-python@v5
+        run: pipx install poetry==1.8.3
+      - uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
         with:
           python-version: '3.9'
           cache: 'poetry'
@@ -39,8 +39,3 @@ jobs:
         run: |
           poetry version --dry-run
           poetry publish --build -r testpypi
-      - name: Create PR
-        uses: peter-evans/create-pull-request@v6
-        with:
-          title: Change version in pyproject.toml
-          base: main

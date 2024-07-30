@@ -22,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Install poetry
-        run: pipx install poetry
-      - uses: actions/setup-python@v5
+        run: pipx install poetry==1.8.3
+      - uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
         with:
           python-version: '3.9'
           cache: 'poetry'
@@ -34,9 +34,9 @@ jobs:
           poetry config cache-dir ~/cache/.poetry
           poetry config pypi-token.pypi "${{ secrets.API_TOKEN_PYPI }}"
           poetry version ${{ github.ref_name }}
+      - name: Install dependencies
+        run: poetry install --only docs
       - name: Deploy pages
-        run: |
-          python -m pip install mkdocs mdx_truly_sane_lists
-          mkdocs gh-deploy --strict --force
+        run: poetry run mkdocs gh-deploy --strict --force
       - name: Publish package
         run: poetry publish --build

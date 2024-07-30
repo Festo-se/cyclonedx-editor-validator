@@ -7,15 +7,34 @@ on:
   workflow_call:
 
 jobs:
+  test_pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - name: Install poetry
+        run: pipx install poetry==1.8.3
+      - uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+        with:
+          python-version: '3.9'
+          cache: 'poetry'
+      - run: |
+          poetry config virtualenvs.in-project false
+          poetry config cache-dir ~/cache/.poetry
+      - name: Install dependencies
+        run: poetry install --only docs
+      - name: Test pages
+        run: poetry run mkdocs build
+
   static_analysis:
 
       runs-on: ubuntu-latest
 
       steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: install poetry
-        run: pipx install poetry
-      - uses: actions/setup-python@v5
+        run: pipx install poetry==1.8.3
+      - uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
         with:
           python-version: '3.9'
           cache: 'poetry'
@@ -34,14 +53,14 @@ jobs:
 
   pytest:
     runs-on: ubuntu-latest
-    
+
     needs: static_analysis
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - name: install poetry
-      run: pipx install poetry
-    - uses: actions/setup-python@v5
+      run: pipx install poetry==1.8.3
+    - uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
       with:
         python-version: '3.9'
         cache: 'poetry'
@@ -53,20 +72,19 @@ jobs:
         poetry run coverage report
         poetry run coverage xml -o reports/py-coverage.cobertura.xml
     - name: Archive test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
       with:
         name: test-report
         path: reports/unittest.xml
     - name: Archive code coverage results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
       with:
         name: code-coverage-report
         path: reports/py-coverage.cobertura.xml
     - name: Coverage commit
       if: ${{ success() && GITHUB.EVENT_NAME == 'pull_request' && !github.event.pull_request.head.repo.fork }}
-      uses: MishaKav/pytest-coverage-comment@main
+      uses: MishaKav/pytest-coverage-comment@fa1c641d7e3fa1d98ed95d5f658ccd638b774628 # v1.1.52
       with:
         junitxml-path: reports/unittest.xml
         pytest-xml-coverage-path: reports/py-coverage.cobertura.xml
         report-only-changed-files: true
-

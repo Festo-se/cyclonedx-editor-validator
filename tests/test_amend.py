@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import copy
-import datetime
 import json
 import typing as t
 import unittest
@@ -14,7 +13,6 @@ from cdxev.amend.operations import (
     Compositions,
     DefaultAuthor,
     DeleteAmbiguousLicenses,
-    InferCopyright,
     InferSupplier,
     LicenseNameToId,
     Operation,
@@ -390,59 +388,6 @@ class AddLicenseTextTestCase(AmendTestCase):
         operation = AddLicenseText(Path("somethingthatsurelydoesntexist"))
         with self.assertRaises(AppError):
             operation.prepare(self.sbom_fixture)
-
-
-class InferCopyrightTestCase(AmendTestCase):
-    def setUp(self) -> None:
-        super().setUp()
-        self.operation = InferCopyright()
-
-    def test_no_supplier_is_given(self) -> None:
-        component = {"name": "something"}
-        expected = {"name": "something"}
-        self.operation.handle_component(component)
-        self.assertDictEqual(expected, component)
-
-    def test_supplier_and_license_is_present(self) -> None:
-        component = {"licenses": [], "supplier": {"name": "some_supplier"}}
-        expected = {"licenses": [], "supplier": {"name": "some_supplier"}}
-        self.operation.handle_component(component)
-        self.assertDictEqual(expected, component)
-
-    def test_supplier_and_copyright_is_present(self) -> None:
-        component = {"copyright": "some copyright", "supplier": {"name": "Acme Inc."}}
-        expected = {"copyright": "some copyright", "supplier": {"name": "Acme Inc."}}
-        self.operation.handle_component(component)
-        self.assertDictEqual(expected, component)
-
-    def test_create_copyright(self) -> None:
-        component = {"supplier": {"name": "Acme Inc."}}
-        year = datetime.date.today().year
-        copyright = f"Copyright (c) {year} Acme Inc."
-        expected = {"copyright": copyright, "supplier": {"name": "Acme Inc."}}
-        self.operation.handle_component(component)
-        self.assertDictEqual(expected, component)
-
-    def test_set_copyright_from_supplier_in_metadata(self) -> None:
-        year = datetime.date.today().year
-        self.sbom_fixture["metadata"]["component"]["supplier"] = {"name": "Acme Inc."}
-        run_amend(self.sbom_fixture, selected=[InferCopyright])
-        self.assertEqual(
-            self.sbom_fixture["metadata"]["component"]["copyright"],
-            f"Copyright (c) {year} Acme Inc.",
-        )
-
-    def test_set_copyright_from_supplier_in_components(self) -> None:
-        self.sbom_fixture["components"][0].pop("licenses")
-        self.sbom_fixture["components"][0].pop("externalReferences")
-        self.sbom_fixture["components"][0]["supplier"] = {"name": "Acme Inc."}
-        year = datetime.date.today().year
-        run_amend(self.sbom_fixture, selected=[InferCopyright])
-        company = self.sbom_fixture["components"][0]["supplier"]["name"]
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["copyright"],
-            f"Copyright (c) {year} {company}",
-        )
 
 
 class DeleteAmbiguousLicensesTestCase(AmendTestCase):

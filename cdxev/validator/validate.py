@@ -33,12 +33,7 @@ def validate_sbom(
         )
 
     if input_format == "json":
-        try:
-            spec_version = sbom["specVersion"]
-        except KeyError:
-            logger.info("SBOM doesn't specify CycloneDX version. Assuming version 1.3.")
-            spec_version = "1.3"
-
+        spec_version: t.Optional[str] = sbom.get("specVersion", None)
         sbom_schema = open_schema(spec_version, schema_type, schema_path)
 
         if filename_regex is not None:

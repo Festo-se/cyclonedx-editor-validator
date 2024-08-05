@@ -14,12 +14,17 @@ logger = logging.getLogger(__name__)
 
 
 def open_schema(
-    spec_version: str,
+    spec_version: t.Optional[str],
     schema_type: t.Optional[str],
     schema_path: t.Optional[Path],
 ) -> dict:
     try:
         if schema_type:
+            if spec_version is None:
+                logger.info(
+                    "SBOM doesn't specify CycloneDX version. Assuming version 1.3."
+                )
+                spec_version = "1.3"
             return _get_builtin_schema(schema_type, spec_version)
         else:
             # Convince mypy that schema_path isn't None, because the caller made sure of this

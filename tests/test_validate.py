@@ -89,6 +89,13 @@ class TestValidateInit(unittest.TestCase):
             search_for_word_issues("'version' is a required property", issues)
         )
 
+    def test_missing_specversion(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+        }
+        with self.assertRaisesRegex(AppError, ".*'specVersion'.*"):
+            validate_test(sbom)
+
 
 class TestValidateMetadata(unittest.TestCase):
     def test_metadata_missing(self) -> None:

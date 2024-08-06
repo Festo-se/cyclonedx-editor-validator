@@ -37,7 +37,14 @@ def validate_sbom(
         )
 
     if input_format == "json":
-        spec_version: t.Optional[str] = sbom.get("specVersion", None)
+        try:
+            spec_version: str = sbom["specVersion"]
+        except KeyError:
+            raise AppError(
+                "Invalid SBOM",
+                "Failed to validate against built-in schema because 'specVersion' is missing. "
+                "Add the field, then retry.",
+            )
         sbom_schema = open_schema(spec_version, schema_type, schema_path)
 
         if filename_regex is not None:

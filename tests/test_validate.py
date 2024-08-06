@@ -414,7 +414,7 @@ class TestValidateComponents(unittest.TestCase):
             sbom["components"][0]["version"] = ""
             issues = validate_test(sbom)
             self.assertEqual(
-                search_for_word_issues("'version' should be non-empty", issues), True
+                search_for_word_issues("'version' should not be empty", issues), True
             )
 
     def test_supplier_empty(self) -> None:
@@ -424,7 +424,7 @@ class TestValidateComponents(unittest.TestCase):
             sbom["components"][0]["supplier"] = {"name": ""}
             issues = validate_test(sbom)
             self.assertEqual(
-                search_for_word_issues("'name' should be non-empty", issues), True
+                search_for_word_issues("'name' should not be empty", issues), True
             )
 
 
@@ -742,7 +742,7 @@ class TestValidateUseSchema15(unittest.TestCase):
             ]
             issues = validate_test(sbom)
             self.assertEqual(
-                search_for_word_issues("'content' should be non-empty", issues), True
+                search_for_word_issues("'content' should not be empty", issues), True
             )
 
     def test_no_components_no_dependencies(

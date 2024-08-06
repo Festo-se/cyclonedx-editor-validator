@@ -5,10 +5,14 @@ import re
 import typing as t
 from pathlib import Path
 
-from jsonschema import Draft7Validator, FormatChecker
+import jsonschema
+import jsonschema.exceptions
+import jsonschema.validators
+from jsonschema import FormatChecker
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012, Schema
 
+from cdxev.error import AppError
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
 from cdxev.validator.helper import load_spdx_schema, open_schema, validate_filename
@@ -26,7 +30,7 @@ def validate_sbom(
     filename_regex: t.Optional[str],
     schema_path: t.Optional[Path],
 ) -> int:
-    errors = []
+    errors: list[str] = []
     if (schema_path is not None) == bool(schema_type):
         raise AssertionError(
             "Exactly one of schema_path or schema_type must be non-None"
@@ -52,8 +56,25 @@ def validate_sbom(
         registry: Registry[Schema] = Registry().with_resource(
             uri="spdx.schema.json", resource=schema_spdx
         )
-        v = Draft7Validator(
-            schema=sbom_schema, registry=registry, format_checker=FormatChecker()
+
+        validator_cls: type[jsonschema.Validator] = jsonschema.validators.validator_for(
+            sbom_schema
+        )
+        if schema_path is not None:
+            # Built-in schemas are assumed to be tested during development. A runtime check on
+            # every run of the validate command would be excessive.
+            try:
+                validator_cls.check_schema(sbom_schema)
+            except jsonschema.exceptions.SchemaError:
+                raise AppError(
+                    "Schema not loaded",
+                    "Invalid JSON Schema in schema file " + str(schema_path),
+                )
+        v = validator_cls(
+            schema=sbom_schema,
+            # remove mypy exclusion, if https://github.com/python/typeshed/pull/12484 is merged
+            registry=registry,  # type: ignore[call-arg]
+            format_checker=FormatChecker(),
         )
         for error in sorted(v.iter_errors(sbom), key=str):
             try:
@@ -82,16 +103,16 @@ def validate_sbom(
                         + " has the mistake: "
                     )
                 elif len(error.absolute_path) == 1:
-                    if "$schema" in error.absolute_path[0]:
+                    if "$schema" == error.absolute_path[0]:
                         # skip error that schema is wrong as probably another scheme is in use
                         continue
                     else:
-                        error_path = error.absolute_path[0] + " has the mistake: "
+                        error_path = f"{error.absolute_path[0]} has the mistake: "
                 else:
                     error_path = "SBOM has the mistake: "
             except AttributeError:
                 error_path = error.json_path + " has the mistake: "
-            if len(error.context) > 0:
+            if error.context is not None and len(error.context) > 0:
                 error_message = ""
                 for i in range(len(error.context)):
                     error_field = re.search(
@@ -140,10 +161,7 @@ def validate_sbom(
                         )
                 elif "non-empty" in error.message:
                     errors.append(
-                        error_path
-                        + "'"
-                        + error.absolute_path[-1]
-                        + "' should be non-empty"
+                        f"{error_path}'{error.absolute_path[-1]}' should not be empty"
                     )
                 elif error.validator == "pattern":
                     errors.append(error_path + error.message.replace("\\", ""))
@@ -163,14 +181,14 @@ def validate_sbom(
         logger.info("SBOM is compliant to the provided specification schema")
         return 0
     else:
-        for error in sorted_errors:
+        for error_msg in sorted_errors:
             logger.error(
                 LogMessage(
                     message="Invalid SBOM",
-                    description=error.replace(
-                        error[0 : error.find("has the mistake")], ""
+                    description=error_msg.replace(
+                        error_msg[0 : error_msg.find("has the mistake")], ""
                     ).replace("has the mistake: ", ""),
-                    module_name=error[0 : error.find("has the mistake") - 1],
+                    module_name=error_msg[0 : error_msg.find("has the mistake") - 1],
                 )
             )
         return 1

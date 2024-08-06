@@ -1,4 +1,0 @@
-[
-    "filename doesn't match regular expression bom\\.json|Acme_Application_9\\.1\\.1_[0-9]{8}T[0-9]{6}\\.cdx\\.json",
-    "'timestamp' is a required property"
-]

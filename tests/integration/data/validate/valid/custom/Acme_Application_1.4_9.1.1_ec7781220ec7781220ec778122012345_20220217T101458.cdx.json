@@ -4,6 +4,20 @@
     "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
     "version": 1,
     "metadata": {
+        "timestamp": "2022-02-17T10:14:58Z",
+        "tools": [
+            {
+                "name": "My tool",
+                "vendor": "The vendor",
+                "version": "1.0.0",
+                "externalReferences": [
+                    {
+                        "type": "other",
+                        "url": "http://example.com/"
+                    }
+                ]
+            }
+        ],
         "authors": [
             {
                 "name": "automated"
@@ -12,13 +26,19 @@
         "component": {
             "type": "application",
             "bom-ref": "acme-app",
-            "group": "com.company.internal",
+            "group": "com.festo.internal",
             "supplier": {
-                "name": "Company Legal"
+                "name": "Festo SE & Co. KG"
             },
-            "name": "Acme_Application",
+            "name": "Acme_Application_1.4",
             "version": "9.1.1",
-            "copyright": "Company Legal 2022, all rights reserved",
+            "copyright": "Festo SE & Co. KG 2022, all rights reserved",
+            "hashes": [
+                {
+                    "alg": "MD5",
+                    "content": "ec7781220ec7781220ec778122012345"
+                }
+            ],
             "properties": [
                 {
                     "name": "internal:component:status",
@@ -101,7 +121,7 @@
         },
         {
             "type": "library",
-            "bom-ref": "card-verifier bom-ref",
+            "bom-ref": "card-verifier bomref",
             "supplier": {
                 "name": "Acme, Inc."
             },
@@ -132,12 +152,12 @@
         },
         {
             "type": "application",
-            "bom-ref": "some program application",
+            "bom-ref": "someprogramm application",
             "supplier": {
-                "name": "Company Legal"
+                "name": "Festo SE & Co.KG"
             },
-            "group": "com.company.internal",
-            "name": "some program",
+            "group": "com.festo.internal",
+            "name": "someprogramm",
             "version": "T4.0.1.30",
             "hashes": [
                 {
@@ -152,7 +172,7 @@
                     }
                 }
             ],
-            "copyright": "Company Legal 2022, all rights reserved",
+            "copyright": "Festo SE & Co. KG 2022, all rights reserved",
             "properties": [
                 {
                     "name": "internal:component:status",
@@ -167,7 +187,7 @@
             "dependsOn": [
                 "pkg:maven/org.acme/web-framework@1.0.0",
                 "pkg:maven/org.acme/persistence@3.1.0",
-                "some program application"
+                "someprogramm application"
             ]
         },
         {
@@ -195,9 +215,9 @@
                 "pkg:maven/org.acme/persistence@3.1.0",
                 "pkg:maven/org.acme/common-util@3.0.0",
                 "tomcat-catalina ref",
-                "card-verifier bom-ref",
+                "card-verifier bomref",
                 "ref on util",
-                "some program application"
+                "someprogramm application"
             ]
         }
     ]

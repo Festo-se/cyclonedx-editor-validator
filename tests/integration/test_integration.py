@@ -744,7 +744,7 @@ class TestValidate:
             "warnings-ng",
             "--report-path",
             str(report_path),
-            str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
+            str(data_dir / "validate" / "invalid" / "default" / "laravel_1.4.cdx.json"),
         )
         exit_code, *_ = run_main()
 
@@ -766,7 +766,7 @@ class TestValidate:
             "gitlab-code-quality",
             "--report-path",
             str(report_path),
-            str(data_dir / "validate" / "invalid" / "default" / "laravel.cdx.json"),
+            str(data_dir / "validate" / "invalid" / "default" / "laravel_1.4.cdx.json"),
         )
         exit_code, *_ = run_main()
 
@@ -789,7 +789,7 @@ class TestValidate:
             "validate",
             "--filename-pattern",
             "fail",
-            str(data_dir / "validate" / "valid" / "default" / "laravel.cdx.json"),
+            str(data_dir / "validate" / "valid" / "default" / "laravel_1.4.cdx.json"),
         )
         exit_code, *_ = run_main()
 
@@ -810,7 +810,7 @@ class TestValidate:
             "validate",
             "--schema-path",
             str(data_dir / "validate.custom_schema.json"),
-            str(data_dir / "validate" / "valid" / "default" / "laravel.cdx.json"),
+            str(data_dir / "validate" / "valid" / "default" / "laravel_1.4.cdx.json"),
         )
         exit_code, *_ = run_main()
 

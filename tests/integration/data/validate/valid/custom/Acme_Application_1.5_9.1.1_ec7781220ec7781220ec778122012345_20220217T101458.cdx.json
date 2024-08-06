@@ -1,10 +1,28 @@
 {
     "bomFormat": "CycloneDX",
-    "specVersion": "1.3",
+    "specVersion": "1.5",
     "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
     "version": 1,
     "metadata": {
         "timestamp": "2022-02-17T10:14:58Z",
+        "tools": {
+            "components": [
+                {
+                    "type": "application",
+                    "bom-ref": "foo",
+                    "name": "My tool",
+                    "version": "1.0.0",
+                    "author": "Author",
+                    "copyright": "2024 Author",
+                    "externalReferences": [
+                        {
+                            "type": "other",
+                            "url": "http://example.com/"
+                        }
+                    ]
+                }
+            ]
+        },
         "authors": [
             {
                 "name": "automated"
@@ -17,7 +35,7 @@
             "supplier": {
                 "name": "Festo SE & Co. KG"
             },
-            "name": "Acme_Application",
+            "name": "Acme_Application_1.5",
             "version": "9.1.1",
             "copyright": "Festo SE & Co. KG 2022, all rights reserved",
             "hashes": [

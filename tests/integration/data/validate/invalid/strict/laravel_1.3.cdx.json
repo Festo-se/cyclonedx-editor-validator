@@ -1,7 +1,6 @@
 {
-    "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
     "bomFormat": "CycloneDX",
-    "specVersion": "1.4",
+    "specVersion": "1.3",
     "version": 1,
     "metadata": {
         "tools": [
@@ -1751,6 +1750,7 @@
         },
         {
             "bom-ref": "symfony/console-5.4.16.0",
+            "type": "library",
             "name": "console",
             "version": "v5.4.16",
             "group": "symfony",

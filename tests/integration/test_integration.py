@@ -583,7 +583,7 @@ class TestSet:
     )
     def test_invalid_json_value(
         self,
-        value,
+        value: str,
         input_file: Path,
         argv: Callable[..., None],
     ):
@@ -704,7 +704,12 @@ class TestSet:
 
         assert exit_code == Status.OK
 
-    def test_component_remapping(self, data_dir, argv, capsys):
+    def test_component_remapping(
+        self,
+        data_dir: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
         input_sbom = data_dir / "set.input_remap.cdx.json"
         input_set_file = data_dir / "set.input_remap.json"
 
@@ -721,6 +726,49 @@ class TestSet:
         assert (
             'The component "COORDINATES[nested]" was not found and could not be updated.'
             in stderr
+        )
+
+    def test_empty_set_file(
+        self,
+        input_file: Path,
+        data_dir: Path,
+        argv: Callable[..., None],
+        caplog: pytest.LogCaptureFixture,
+    ):
+        input_set_file = data_dir / "set.input_empty.json"
+        argv(
+            "--verbose",
+            "set",
+            str(input_file),
+            "--from-file",
+            str(input_set_file),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.OK
+        assert caplog.records[0].msg.startswith("No updates to perform.")
+
+    def test_invalid_set_file(
+        self,
+        input_file: Path,
+        data_dir: Path,
+        argv: Callable[..., None],
+        caplog: pytest.LogCaptureFixture,
+    ):
+        input_set_file = data_dir / "set.input_invalid.json"
+        argv(
+            "set",
+            str(input_file),
+            "--from-file",
+            str(input_set_file),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.APP_ERROR
+        assert (
+            caplog.records[0].msg.description  # type: ignore
+            == "Invalid update record: The update object with id "
+            "COORDINATES[delete nested components] is missing the 'set' property."
         )
 
 

@@ -23,6 +23,9 @@ class LogMessage:
     line_start: t.Optional[int] = None
     """The line where the error occurred in :py:attr:`file_name`."""
 
+    def __str__(self) -> str:
+        return f"{self.message}: {self.description}"
+
 
 class LogMessageFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:  # noqa: N802

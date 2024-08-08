@@ -192,20 +192,22 @@ def _should_overwrite(
                 "Use the --force option to overwrite."
             ),
         )
+    else:  # pragma: no cover
+        if _prompt_for_overwrite(property, component_id):
+            logger.debug(
+                f'Overwriting "{property}" on component "{component_id}" due to user choice.'
+            )
+            return True
 
-    if _prompt_for_overwrite(property, component_id):
         logger.debug(
-            f'Overwriting "{property}" on component "{component_id}" due to user choice.'
+            f'Not overwriting "{property}" on component "{component_id}" due to user choice.'
         )
-        return True
-
-    logger.debug(
-        f'Not overwriting "{property}" on component "{component_id}" due to user choice.'
-    )
-    return False
+        return False
 
 
-def _prompt_for_overwrite(property: str, component_id: ComponentIdentity) -> bool:
+def _prompt_for_overwrite(
+    property: str, component_id: ComponentIdentity
+) -> bool:  # pragma: no cover
     print(
         f'The property "{property}" is already present on the component with id "{component_id}".'
     )

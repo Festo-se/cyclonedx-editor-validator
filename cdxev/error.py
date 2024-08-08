@@ -53,7 +53,7 @@ class AppError(Exception):
             )
 
     def __str__(self) -> str:
-        return f"{self.details.message}: {self.details.description}"
+        return str(self.details)
 
 
 class InputFileError(AppError):

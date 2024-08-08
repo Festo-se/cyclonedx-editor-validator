@@ -74,7 +74,7 @@ def read_sbom(sbom_file: Path, file_type: Optional[str] = None) -> Tuple[dict, s
     :raise FileTypeError: If *file_type* isn't specified and can't be guessed.
     """
     if not sbom_file.is_file():
-        raise InputFileError("File not found.")
+        raise InputFileError(f"File not found: {sbom_file}")
 
     if file_type is None:
         file_type = sbom_file.suffix[1:]
@@ -664,7 +664,7 @@ def invoke_amend(args: argparse.Namespace) -> int:
         print(long_desc)
         print()
 
-        sys.exit()
+        return Status.OK
 
     if not args.input:
         usage_error("<input> argument missing.", args.parser)
@@ -815,7 +815,7 @@ def invoke_set(args: argparse.Namespace) -> int:
                 isinstance(target.key, cdxev.set.CoordinatesWithVersionRange)
                 and target.key.version_range is not None
             ):
-                updates[0]["id"]["version_range"] = target.key.version_range
+                updates[0]["id"]["version-range"] = target.key.version_range
 
     else:
         if has_target() or args.key is not None or args.value is not None:
@@ -825,15 +825,17 @@ def invoke_set(args: argparse.Namespace) -> int:
             )
 
         updates = []
-        with open(args.from_file) as from_file:
-            try:
+        try:
+            with open(args.from_file) as from_file:
                 updates = json.load(from_file)
-            except json.JSONDecodeError as ex:
-                raise InputFileError(
-                    "Invalid JSON passed to --from-file",
-                    None,
-                    ex.lineno,
-                ) from ex
+        except json.JSONDecodeError as ex:
+            raise InputFileError(
+                "Invalid JSON passed to --from-file",
+                None,
+                ex.lineno,
+            ) from ex
+        except FileNotFoundError as ex:
+            raise InputFileError(f"File not found: {args.from_file}", None) from ex
 
     sbom, _ = read_sbom(args.input)
     cfg = cdxev.set.SetConfig(

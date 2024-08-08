@@ -1,0 +1,82 @@
+[
+  {
+    "id": {
+      "purl": "pkg:npm/test-app@1.0.0"
+    },
+    "set": {
+      "author": "Another author"
+    }
+  },
+  {
+    "id": {
+      "purl": "pkg:npm/test-app@1.0.0"
+    },
+    "set": {
+      "copyright": "2022 Acme Inc"
+    }
+  },
+  {
+    "id": {
+      "name": "depA",
+      "group": "com.company.unit",
+      "version": "4.0.2"
+    },
+    "set": {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": {
+      "name": "depC",
+      "version": "3.2.1"
+    },
+    "set": {
+      "licenses": {
+        "license": {
+          "id": "Apache-2.0"
+        }
+      }
+    }
+  },
+  {
+    "id": {
+      "purl": "pkg:npm/test-app@1.0.0"
+    },
+    "set": {
+      "description": null
+    }
+  },
+  {
+    "id": {
+      "name": "x-ray",
+      "group": "physics",
+      "version": "18.9.5"
+    },
+    "set": {
+      "author": "New author",
+      "licenses": null
+    }
+  },
+  {
+    "id": {
+      "name": "x-ray",
+      "group": "physics",
+      "version-range": "vers:generic/18.9.5"
+    },
+    "set": {
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    }
+  }
+]

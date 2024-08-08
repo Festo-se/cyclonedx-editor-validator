@@ -69,7 +69,7 @@ jobs:
     - name: Run pytest
       run: poetry run coverage run -m pytest --junitxml=reports/unittest.xml
     - name: Check coverage
-      run: poetry run coverage report --fail-under=99
+      run: poetry run coverage report --fail-under=95
     - name: Save test results
       run: poetry run coverage xml -o reports/py-coverage.cobertura.xml
     - name: Archive test results

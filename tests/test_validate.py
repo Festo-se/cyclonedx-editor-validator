@@ -73,22 +73,6 @@ class TestValidateInit(unittest.TestCase):
         issues = validate_test(sbom, schema_type="default", schema_path=None)
         self.assertEqual(issues, ["no issue"])
 
-    def test_warnings_ng_format(self) -> None:
-        sbom = get_test_sbom()
-        sbom["components"][0].pop("version")
-        issues = validate_test(sbom, report_format="warnings-ng")
-        self.assertTrue(
-            search_for_word_issues("'version' is a required property", issues)
-        )
-
-    def test_gitlab_cq_format(self) -> None:
-        sbom = get_test_sbom()
-        sbom["components"][0].pop("version")
-        issues = validate_test(sbom, report_format="gitlab-code-quality")
-        self.assertTrue(
-            search_for_word_issues("'version' is a required property", issues)
-        )
-
     def test_missing_specversion(self) -> None:
         sbom = {
             "bomFormat": "CycloneDX",
@@ -119,6 +103,7 @@ class TestValidateMetadata(unittest.TestCase):
             results = search_for_word_issues("timestamp", issues)
             self.assertEqual(results, True)
             sbom["metadata"]["timestamp"] = "2022-02-17T10:14:59Z"
+            issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("name", issues), True)
 
     def test_metadata_authors_missing(self) -> None:

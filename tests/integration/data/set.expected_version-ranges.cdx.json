@@ -1,0 +1,58 @@
+{
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.3",
+    "serialNumber": "urn:uuid:9b94319e-ec1c-441f-943d-75421a1d2040",
+    "version": 2,
+    "metadata": {
+        "timestamp": "2024-07-04T09:43:38+00:00",
+        "component": {
+            "type": "application",
+            "bom-ref": "acme-app",
+            "name": "Acme_Application",
+            "version": "9.1.1"
+        },
+        "tools": [
+            {
+                "name": "cyclonedx-editor-validator",
+                "vendor": "Festo SE & Co. KG",
+                "version": "0.0.0"
+            }
+        ]
+    },
+    "components": [
+        {
+            "bom-ref": "web-framework@1.0.0",
+            "type": "library",
+            "name": "web-framework",
+            "version": "1.0.0"
+        },
+        {
+            "bom-ref": "web-framework@2.0.0",
+            "type": "library",
+            "name": "web-framework",
+            "version": "2.0.0"
+        },
+        {
+            "bom-ref": "web-framework@2.0.1",
+            "type": "library",
+            "name": "web-framework",
+            "version": "3.0.0",
+            "copyright": "ACME Inc."
+        },
+        {
+            "bom-ref": "container@2.0.1",
+            "type": "library",
+            "name": "container",
+            "version": "2.0.1",
+            "components": [
+                {
+                    "bom-ref": "container@2.0.1|web-framework@2.0.1",
+                    "type": "library",
+                    "name": "web-framework",
+                    "version": "2.0.1",
+                    "copyright": "ACME Inc."
+                }
+            ]
+        }
+    ]
+}

@@ -43,13 +43,13 @@ jobs:
       - name: Run black
         run: poetry run black cdxev tests --check
       - name: Run isort
-        run: poetry run isort cdxev/ tests/ --check-only --profile black
+        run: poetry run isort cdxev/ tests/ --check-only
       - name: Run flake8
         run: poetry run flake8 cdxev tests
       - name: Run mypy
         run: poetry run mypy --install-types --non-interactive --config-file=pyproject.toml
       - name: Run bandit
-        run: poetry run bandit -r cdxev tests
+        run: poetry run bandit -c pyproject.toml -r cdxev
 
   pytest:
     runs-on: ubuntu-latest

@@ -1,0 +1,18 @@
+[
+  {
+    "id": {
+      "name": "delete nested components"
+    },
+    "set": {
+      "components": null
+    }
+  },
+  {
+    "id": {
+      "name": "nested"
+    },
+    "set": {
+      "copyright": "foo"
+    }
+  }
+]

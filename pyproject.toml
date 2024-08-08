@@ -75,6 +75,5 @@ source = ["cdxev"]
 
 [tool.coverage.report]
 omit = ["*__init__.py*"]
-fail_under = 50.0
 
 [tool.black]

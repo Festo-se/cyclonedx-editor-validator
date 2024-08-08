@@ -194,9 +194,6 @@ def _should_overwrite(
         )
     else:  # pragma: no cover
         if _prompt_for_overwrite(property, component_id):
-            logger.debug(
-                f'Overwriting "{property}" on component "{component_id}" due to user choice.'
-            )
             return True
 
         logger.debug(

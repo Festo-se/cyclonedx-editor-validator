@@ -232,8 +232,7 @@ def _update_id(
     for key in old:
         instance_list = map.pop(key)
 
-    if instance_list is None:
-        return
+    instance_list = t.cast(list[dict], instance_list)
 
     for key in new:
         map[key] = instance_list

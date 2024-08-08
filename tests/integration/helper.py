@@ -20,7 +20,7 @@ def load_sbom(path: Path) -> dict:
 def delete_non_reproducible(sbom: dict):
     """
     Deletes any fields from the SBOM that are typically not reproducible between builds.
-    These would mess lead to wrong test results when comparing actual to expected SBOMs.
+    These would lead to wrong test results when comparing actual to expected SBOMs.
     """
     _delete_tool_version(sbom)
 

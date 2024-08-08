@@ -867,6 +867,25 @@ class TestValidate:
             == "filename doesn't match regular expression fail"
         )
 
+    def test_implicit_filename_validation(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        caplog: pytest.LogCaptureFixture,
+    ):
+        argv(
+            "validate",
+            str(data_dir / "validate.invalid_filename.json"),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.OK
+        assert len(caplog.records) == 2
+        assert (
+            caplog.records[0].msg
+            == "filename doesn't match regular expression ^(bom\\.json|.+\\.cdx\\.json)$"
+        )
+
     def test_custom_schema(
         self,
         argv: Callable[..., None],
@@ -885,6 +904,25 @@ class TestValidate:
 
         assert len(caplog.records) == 1
         assert caplog.records[0].msg.description.endswith("is not of type 'array'")  # type: ignore
+
+    def test_invalid_schema(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        caplog: pytest.LogCaptureFixture,
+    ):
+        argv(
+            "validate",
+            "--schema-path",
+            str(data_dir / "validate.invalid_schema.json"),
+            str(data_dir / "validate" / "valid" / "default" / "laravel_1.4.cdx.json"),
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.APP_ERROR
+        assert caplog.records[0].msg.description.startswith(  # type: ignore
+            "Invalid JSON Schema in schema file"
+        )
 
     def test_invalid_option_combinations(self, argv: Callable[..., None]):
         argv(

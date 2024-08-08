@@ -32,14 +32,14 @@ def validate_sbom(
 ) -> int:
     errors: list[str] = []
     if (schema_path is not None) == bool(schema_type):
-        raise AssertionError(
+        raise AssertionError(  # pragma: no cover
             "Exactly one of schema_path or schema_type must be non-None"
         )
 
     if input_format == "json":
         try:
             spec_version: str = sbom["specVersion"]
-        except KeyError:
+        except (KeyError, TypeError):
             raise AppError(
                 "Invalid SBOM",
                 "Failed to validate against built-in schema because 'specVersion' is missing. "
@@ -48,13 +48,16 @@ def validate_sbom(
         sbom_schema = open_schema(spec_version, schema_type, schema_path)
 
         if filename_regex is not None:
+            # Filename should be validated
             filename_error = validate_filename(
                 file.name, filename_regex, sbom, schema_type
             )
             if filename_error:
-                if filename_regex == "" and schema_type == "default":
+                if filename_regex == "" and schema_type != "custom":
+                    # Implicit validation against CycloneDX recommendations is only a warning
                     logger.warning(filename_error)
                 else:
+                    # Explicit filename pattern or custom schema produces validation errors
                     errors.append("SBOM has the mistake: " + filename_error)
 
         schema_spdx = Resource.from_contents(

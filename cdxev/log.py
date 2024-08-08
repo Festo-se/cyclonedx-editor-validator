@@ -24,7 +24,7 @@ class LogMessage:
     """The line where the error occurred in :py:attr:`file_name`."""
 
     def __str__(self) -> str:
-        return f"{self.message}: {self.description}"
+        return f"{self.message} at [{self.module_name}]: {self.description}"
 
 
 class LogMessageFormatter(logging.Formatter):

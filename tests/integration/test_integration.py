@@ -700,9 +700,28 @@ class TestSet:
             "--force",
             "--allow-protected",
         )
-        exit_code, *_ = run_main(capsys)
+        exit_code, *_ = run_main()
 
         assert exit_code == Status.OK
+
+    def test_component_remapping(self, data_dir, argv, capsys):
+        input_sbom = data_dir / "set.input_remap.cdx.json"
+        input_set_file = data_dir / "set.input_remap.json"
+
+        argv(
+            "set",
+            "--allow-protected",
+            str(input_sbom),
+            "--from-file",
+            str(input_set_file),
+        )
+        exit_code, _, stderr = run_main(capsys)
+
+        assert exit_code == Status.APP_ERROR
+        assert (
+            'The component "COORDINATES[nested]" was not found and could not be updated.'
+            in stderr
+        )
 
 
 class TestValidate:

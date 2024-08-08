@@ -246,6 +246,12 @@ def _do_update(component: dict, update: dict, ctx: Context) -> None:
     remap = False
 
     for prop in update_set:
+        if _should_update_id(prop):
+            original_id = original_id or ComponentIdentity.create(component, True)
+
+        if _should_remap(prop):
+            remap = True
+
         if _should_delete(prop, component, update_set):
             logger.debug(f'Deleting "{prop}" on component "{component_id}".')
             del component[prop]
@@ -255,12 +261,6 @@ def _do_update(component: dict, update: dict, ctx: Context) -> None:
             logger.debug(f'Merging "{prop}" on component "{component_id}".')
             component[prop].append(update_set[prop])
             continue
-
-        if _should_update_id(prop):
-            original_id = original_id or ComponentIdentity.create(component, True)
-
-        if _should_remap(prop):
-            remap = True
 
         if prop not in component or _should_overwrite(
             prop, component_id, ctx.config.force

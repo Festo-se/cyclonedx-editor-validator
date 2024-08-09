@@ -15,7 +15,7 @@ class AppError(Exception):
         module_name: Optional[str] = None,
         line_start: Optional[int] = None,
         *,
-        log_msg: Optional[LogMessage] = None
+        log_msg: Optional[LogMessage] = None,
     ):
         """
         :param str message: A short message, often not even a full sentence. Avoid putting a
@@ -51,6 +51,9 @@ class AppError(Exception):
                 module_name,
                 line_start,
             )
+
+    def __str__(self) -> str:
+        return str(self.details)
 
 
 class InputFileError(AppError):

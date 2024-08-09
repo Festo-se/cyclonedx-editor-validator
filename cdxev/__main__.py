@@ -74,7 +74,7 @@ def read_sbom(sbom_file: Path, file_type: Optional[str] = None) -> Tuple[dict, s
     :raise FileTypeError: If *file_type* isn't specified and can't be guessed.
     """
     if not sbom_file.is_file():
-        raise InputFileError("File not found.")
+        raise InputFileError(f"File not found: {sbom_file}")
 
     if file_type is None:
         file_type = sbom_file.suffix[1:]
@@ -447,23 +447,14 @@ def create_validation_parser(
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         "--schema-type",
-        help=(
-            "Decide whether to use the default specification of CycloneDX or a custom schema. "
-            "The version will be derived from the specVersion in the provided SBOM. "
-            "If no version is provided defaults to 1.3."
-        ),
+        help="Use a built-in schema for validation.",
         choices=["default", "strict", "custom"],
-        default="default",
     )
     group.add_argument(
         "--schema-path",
         metavar="<schema-path>",
-        help=(
-            "Path to a JSON schema to use for validator. "
-            "If it's not specified, the program will try"
-            " to use one of the embedded schemata."
-        ),
-        type=str,
+        help="Path to the JSON schema file to validate against.",
+        type=Path,
     )
 
     group = parser.add_mutually_exclusive_group()
@@ -471,7 +462,7 @@ def create_validation_parser(
         "--filename-pattern",
         help=(
             "Regex for validation of filename. If not specified, a default regex depending on "
-            "the schema-type is applied. To disable filename validation altogether, use "
+            "the schema is applied. To disable filename validation altogether, use "
             "--no-filename-validation."
         ),
         default="",
@@ -673,7 +664,7 @@ def invoke_amend(args: argparse.Namespace) -> int:
         print(long_desc)
         print()
 
-        sys.exit()
+        return Status.OK
 
     if not args.input:
         usage_error("<input> argument missing.", args.parser)
@@ -824,7 +815,7 @@ def invoke_set(args: argparse.Namespace) -> int:
                 isinstance(target.key, cdxev.set.CoordinatesWithVersionRange)
                 and target.key.version_range is not None
             ):
-                updates[0]["id"]["version_range"] = target.key.version_range
+                updates[0]["id"]["version-range"] = target.key.version_range
 
     else:
         if has_target() or args.key is not None or args.value is not None:
@@ -834,15 +825,17 @@ def invoke_set(args: argparse.Namespace) -> int:
             )
 
         updates = []
-        with open(args.from_file) as from_file:
-            try:
+        try:
+            with open(args.from_file) as from_file:
                 updates = json.load(from_file)
-            except json.JSONDecodeError as ex:
-                raise InputFileError(
-                    "Invalid JSON passed to --from-file",
-                    None,
-                    ex.lineno,
-                ) from ex
+        except json.JSONDecodeError as ex:
+            raise InputFileError(
+                "Invalid JSON passed to --from-file",
+                None,
+                ex.lineno,
+            ) from ex
+        except FileNotFoundError as ex:
+            raise InputFileError(f"File not found: {args.from_file}", None) from ex
 
     sbom, _ = read_sbom(args.input)
     cfg = cdxev.set.SetConfig(
@@ -864,6 +857,12 @@ def invoke_validate(args: argparse.Namespace) -> int:
             "Cannot use --report-format without --report-path or vice-versa.",
             args.parser,
         )
+
+    if args.schema_type is None and args.schema_path is None:
+        # Default to built-in stock schema. This case can't be handled by argparse
+        # due to an undocumented behavior which keeps options with default values
+        # from working correctly in mutually exclusive groups.
+        args.schema_type = "default"
 
     sbom, file_type = read_sbom(args.input)
     return (

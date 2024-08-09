@@ -1,0 +1,688 @@
+﻿{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.3",
+  "version": 1,
+  "metadata": {
+    "tools": [
+      {
+        "vendor": "cyclonedx",
+        "name": "cyclonedx-php-composer",
+        "version": "in-dev",
+        "externalReferences": [
+          {
+            "type": "distribution",
+            "url": "../.."
+          },
+          {
+            "type": "website",
+            "url": "https://github.com/CycloneDX/cyclonedx-php-composer/#readme",
+            "comment": "as detected from Composer manifest 'homepage'"
+          },
+          {
+            "type": "issue-tracker",
+            "url": "https://github.com/CycloneDX/cyclonedx-php-composer/issues",
+            "comment": "as detected from Composer manifest 'support.issues'"
+          },
+          {
+            "type": "vcs",
+            "url": "https://github.com/CycloneDX/cyclonedx-php-composer/",
+            "comment": "as detected from Composer manifest 'support.source'"
+          }
+        ]
+      }
+    ],
+    "component": {
+      "bom-ref": "cyclonedx/cyclonedx-php-composer-demo-dev-master",
+      "type": "application",
+      "name": "cyclonedx-php-composer-demo",
+      "version": "dev-master",
+      "group": "cyclonedx",
+      "description": "demo of cyclonedx/cyclonedx-php-composer with a pinned version of laravel/framework",
+      "author": "Jan Kowalleck",
+      "properties": [
+        {
+          "name": "cdx:composer:package:type",
+          "value": "project"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "asm89/stack-cors-1.3.0.0",
+      "type": "library",
+      "name": "stack-cors",
+      "version": "1.3.0",
+      "group": "asm89",
+      "description": "Cross-origin resource sharing library and stack middleware",
+      "author": "Alexander",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://api.github.com/repos/asm89/stack-cors/zipball/b9c31def6a83f84b4d4a40d35996d375755f0e08"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/asm89/stack-cors.git"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/asm89/stack-cors",
+          "comment": "as detected from Composer manifest 'homepage'"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/asm89/stack-cors/issues",
+          "comment": "as detected from Composer manifest 'support.issues'"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/asm89/stack-cors/tree/1.3.0",
+          "comment": "as detected from Composer manifest 'support.source'"
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:composer:package:distReference",
+          "value": "b9c31def6a83f84b4d4a40d35996d375755f0e08"
+        },
+        {
+          "name": "cdx:composer:package:sourceReference",
+          "value": "b9c31def6a83f84b4d4a40d35996d375755f0e08"
+        },
+        {
+          "name": "cdx:composer:package:type",
+          "value": "library"
+        }
+      ]
+    },
+    {
+      "bom-ref": "brick/math-0.9.3.0",
+      "type": "library",
+      "name": "math",
+      "version": "0.9.3",
+      "group": "brick",
+      "description": "Arbitrary-precision arithmetic library",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://api.github.com/repos/brick/math/zipball/ca57d18f028f84f777b2168cd1911b0dee2343ae"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/brick/math.git"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/brick/math/issues",
+          "comment": "as detected from Composer manifest 'support.issues'"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/brick/math/tree/0.9.3",
+          "comment": "as detected from Composer manifest 'support.source'"
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:composer:package:distReference",
+          "value": "ca57d18f028f84f777b2168cd1911b0dee2343ae"
+        },
+        {
+          "name": "cdx:composer:package:sourceReference",
+          "value": "ca57d18f028f84f777b2168cd1911b0dee2343ae"
+        },
+        {
+          "name": "cdx:composer:package:type",
+          "value": "library"
+        }
+      ]
+    },
+    {
+      "bom-ref": "doctrine/inflector-2.0.6.0",
+      "type": "library",
+      "name": "inflector",
+      "version": "2.0.6",
+      "group": "doctrine",
+      "description": "PHP Doctrine Inflector is a small library that can perform string manipulations with regard to upper/lowercase and singular/plural forms of words.",
+      "author": "Guilherme Blanco, Roman Borschel, Benjamin Eberlei, Jonathan Wage, Johannes Schmitt",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://api.github.com/repos/doctrine/inflector/zipball/d9d313a36c872fd6ee06d9a6cbcf713eaa40f024"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/doctrine/inflector.git"
+        },
+        {
+          "type": "website",
+          "url": "https://www.doctrine-project.org/projects/inflector.html",
+          "comment": "as detected from Composer manifest 'homepage'"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/doctrine/inflector/issues",
+          "comment": "as detected from Composer manifest 'support.issues'"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/doctrine/inflector/tree/2.0.6",
+          "comment": "as detected from Composer manifest 'support.source'"
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:composer:package:distReference",
+          "value": "d9d313a36c872fd6ee06d9a6cbcf713eaa40f024"
+        },
+        {
+          "name": "cdx:composer:package:sourceReference",
+          "value": "d9d313a36c872fd6ee06d9a6cbcf713eaa40f024"
+        },
+        {
+          "name": "cdx:composer:package:type",
+          "value": "library"
+        }
+      ]
+    },
+    {
+      "bom-ref": "doctrine/lexer-1.2.3.0",
+      "type": "library",
+      "name": "lexer",
+      "version": "1.2.3",
+      "group": "doctrine",
+      "description": "PHP Doctrine Lexer parser library that can be used in Top-Down, Recursive Descent Parsers.",
+      "author": "Guilherme Blanco, Roman Borschel, Johannes Schmitt",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://api.github.com/repos/doctrine/lexer/zipball/c268e882d4dbdd85e36e4ad69e02dc284f89d229"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/doctrine/lexer.git"
+        },
+        {
+          "type": "website",
+          "url": "https://www.doctrine-project.org/projects/lexer.html",
+          "comment": "as detected from Composer manifest 'homepage'"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/doctrine/lexer/issues",
+          "comment": "as detected from Composer manifest 'support.issues'"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/doctrine/lexer/tree/1.2.3",
+          "comment": "as detected from Composer manifest 'support.source'"
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:composer:package:distReference",
+          "value": "c268e882d4dbdd85e36e4ad69e02dc284f89d229"
+        },
+        {
+          "name": "cdx:composer:package:sourceReference",
+          "value": "c268e882d4dbdd85e36e4ad69e02dc284f89d229"
+        },
+        {
+          "name": "cdx:composer:package:type",
+          "value": "library"
+        }
+      ]
+    },
+    {
+      "bom-ref": "dragonmantank/cron-expression-2.3.1.0",
+      "type": "library",
+      "name": "cron-expression",
+      "version": "v2.3.1",
+      "group": "dragonmantank",
+      "description": "CRON for PHP: Calculate the next or previous run date and determine if a CRON expression is due",
+      "author": "Michael Dowling, Chris Tankersley",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/65b2d8ee1f10915efb3b55597da3404f096acba2"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/dragonmantank/cron-expression.git"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/dragonmantank/cron-expression/issues",
+          "comment": "as detected from Composer manifest 'support.issues'"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/dragonmantank/cron-expression/tree/v2.3.1",
+          "comment": "as detected from Composer manifest 'support.source'"
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:composer:package:distReference",
+          "value": "65b2d8ee1f10915efb3b55597da3404f096acba2"
+        },
+        {
+          "name": "cdx:composer:package:sourceReference",
+          "value": "65b2d8ee1f10915efb3b55597da3404f096acba2"
+        },
+        {
+          "name": "cdx:composer:package:type",
+          "value": "library"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "asm89/stack-cors-1.3.0.0",
+      "dependsOn": [
+        "symfony/http-foundation-5.4.16.0",
+        "symfony/http-kernel-5.4.16.0"
+      ]
+    },
+    {
+      "ref": "brick/math-0.9.3.0"
+    },
+    {
+      "ref": "doctrine/inflector-2.0.6.0"
+    },
+    {
+      "ref": "doctrine/lexer-1.2.3.0"
+    },
+    {
+      "ref": "dragonmantank/cron-expression-2.3.1.0"
+    },
+    {
+      "ref": "egulias/email-validator-2.1.25.0",
+      "dependsOn": [
+        "doctrine/lexer-1.2.3.0",
+        "symfony/polyfill-intl-idn-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "fideloper/proxy-4.4.2.0"
+    },
+    {
+      "ref": "fruitcake/laravel-cors-1.0.6.0",
+      "dependsOn": [
+        "asm89/stack-cors-1.3.0.0",
+        "symfony/http-foundation-5.4.16.0",
+        "symfony/http-kernel-5.4.16.0"
+      ]
+    },
+    {
+      "ref": "guzzlehttp/guzzle-6.5.8.0",
+      "dependsOn": [
+        "guzzlehttp/promises-1.5.2.0",
+        "guzzlehttp/psr7-1.9.0.0",
+        "symfony/polyfill-intl-idn-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "guzzlehttp/promises-1.5.2.0"
+    },
+    {
+      "ref": "guzzlehttp/psr7-1.9.0.0",
+      "dependsOn": [
+        "psr/http-message-1.0.1.0",
+        "ralouphie/getallheaders-3.0.3.0"
+      ]
+    },
+    {
+      "ref": "laravel/framework-7.30.6.0",
+      "dependsOn": [
+        "doctrine/inflector-2.0.6.0",
+        "dragonmantank/cron-expression-2.3.1.0",
+        "egulias/email-validator-2.1.25.0",
+        "league/commonmark-1.6.7.0",
+        "league/flysystem-1.1.10.0",
+        "monolog/monolog-2.8.0.0",
+        "nesbot/carbon-2.63.0.0",
+        "opis/closure-3.6.3.0",
+        "psr/container-1.1.1.0",
+        "psr/simple-cache-1.0.1.0",
+        "ramsey/uuid-4.2.3.0",
+        "swiftmailer/swiftmailer-6.3.0.0",
+        "symfony/console-5.4.16.0",
+        "symfony/error-handler-5.4.15.0",
+        "symfony/finder-5.4.11.0",
+        "symfony/http-foundation-5.4.16.0",
+        "symfony/http-kernel-5.4.16.0",
+        "symfony/mime-5.4.16.0",
+        "symfony/polyfill-php73-1.27.0.0",
+        "symfony/process-5.4.11.0",
+        "symfony/routing-5.4.15.0",
+        "symfony/var-dumper-5.4.14.0",
+        "tijsverkoyen/css-to-inline-styles-2.2.5.0",
+        "vlucas/phpdotenv-4.3.0.0",
+        "voku/portable-ascii-1.6.1.0"
+      ]
+    },
+    {
+      "ref": "laravel/laravel-7.12.0.0",
+      "dependsOn": [
+        "fideloper/proxy-4.4.2.0",
+        "fruitcake/laravel-cors-1.0.6.0",
+        "guzzlehttp/guzzle-6.5.8.0",
+        "laravel/framework-7.30.6.0",
+        "laravel/tinker-2.7.3.0"
+      ]
+    },
+    {
+      "ref": "laravel/tinker-2.7.3.0",
+      "dependsOn": [
+        "psy/psysh-0.11.9.0",
+        "symfony/var-dumper-5.4.14.0"
+      ]
+    },
+    {
+      "ref": "league/commonmark-1.6.7.0"
+    },
+    {
+      "ref": "league/flysystem-1.1.10.0",
+      "dependsOn": [
+        "league/mime-type-detection-1.11.0.0"
+      ]
+    },
+    {
+      "ref": "league/mime-type-detection-1.11.0.0"
+    },
+    {
+      "ref": "monolog/monolog-2.8.0.0",
+      "dependsOn": [
+        "psr/log-1.1.4.0"
+      ]
+    },
+    {
+      "ref": "nesbot/carbon-2.63.0.0",
+      "dependsOn": [
+        "symfony/polyfill-mbstring-1.27.0.0",
+        "symfony/polyfill-php80-1.27.0.0",
+        "symfony/translation-5.4.14.0"
+      ]
+    },
+    {
+      "ref": "nikic/php-parser-4.15.2.0"
+    },
+    {
+      "ref": "opis/closure-3.6.3.0"
+    },
+    {
+      "ref": "phpoption/phpoption-1.9.0.0"
+    },
+    {
+      "ref": "psr/container-1.1.1.0"
+    },
+    {
+      "ref": "psr/event-dispatcher-1.0.0.0"
+    },
+    {
+      "ref": "psr/http-message-1.0.1.0"
+    },
+    {
+      "ref": "psr/log-1.1.4.0"
+    },
+    {
+      "ref": "psr/simple-cache-1.0.1.0"
+    },
+    {
+      "ref": "psy/psysh-0.11.9.0",
+      "dependsOn": [
+        "nikic/php-parser-4.15.2.0",
+        "symfony/console-5.4.16.0",
+        "symfony/var-dumper-5.4.14.0"
+      ]
+    },
+    {
+      "ref": "ralouphie/getallheaders-3.0.3.0"
+    },
+    {
+      "ref": "ramsey/collection-1.2.2.0",
+      "dependsOn": [
+        "symfony/polyfill-php81-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "ramsey/uuid-4.2.3.0",
+      "dependsOn": [
+        "brick/math-0.9.3.0",
+        "ramsey/collection-1.2.2.0",
+        "symfony/polyfill-ctype-1.27.0.0",
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "swiftmailer/swiftmailer-6.3.0.0",
+      "dependsOn": [
+        "egulias/email-validator-2.1.25.0",
+        "symfony/polyfill-iconv-1.27.0.0",
+        "symfony/polyfill-intl-idn-1.27.0.0",
+        "symfony/polyfill-mbstring-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/console-5.4.16.0",
+      "dependsOn": [
+        "symfony/deprecation-contracts-2.5.2.0",
+        "symfony/polyfill-mbstring-1.27.0.0",
+        "symfony/polyfill-php73-1.27.0.0",
+        "symfony/polyfill-php80-1.27.0.0",
+        "symfony/service-contracts-2.5.2.0",
+        "symfony/string-5.4.15.0"
+      ]
+    },
+    {
+      "ref": "symfony/css-selector-5.4.11.0",
+      "dependsOn": [
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/deprecation-contracts-2.5.2.0"
+    },
+    {
+      "ref": "symfony/error-handler-5.4.15.0",
+      "dependsOn": [
+        "psr/log-1.1.4.0",
+        "symfony/var-dumper-5.4.14.0"
+      ]
+    },
+    {
+      "ref": "symfony/event-dispatcher-5.4.9.0",
+      "dependsOn": [
+        "symfony/deprecation-contracts-2.5.2.0",
+        "symfony/event-dispatcher-contracts-2.5.2.0",
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/event-dispatcher-contracts-2.5.2.0",
+      "dependsOn": [
+        "psr/event-dispatcher-1.0.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/finder-5.4.11.0",
+      "dependsOn": [
+        "symfony/deprecation-contracts-2.5.2.0",
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/http-foundation-5.4.16.0",
+      "dependsOn": [
+        "symfony/deprecation-contracts-2.5.2.0",
+        "symfony/polyfill-mbstring-1.27.0.0",
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/http-kernel-5.4.16.0",
+      "dependsOn": [
+        "psr/log-1.1.4.0",
+        "symfony/deprecation-contracts-2.5.2.0",
+        "symfony/error-handler-5.4.15.0",
+        "symfony/event-dispatcher-5.4.9.0",
+        "symfony/http-foundation-5.4.16.0",
+        "symfony/polyfill-ctype-1.27.0.0",
+        "symfony/polyfill-php73-1.27.0.0",
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/mime-5.4.16.0",
+      "dependsOn": [
+        "symfony/deprecation-contracts-2.5.2.0",
+        "symfony/polyfill-intl-idn-1.27.0.0",
+        "symfony/polyfill-mbstring-1.27.0.0",
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/polyfill-ctype-1.27.0.0"
+    },
+    {
+      "ref": "symfony/polyfill-iconv-1.27.0.0"
+    },
+    {
+      "ref": "symfony/polyfill-intl-grapheme-1.27.0.0"
+    },
+    {
+      "ref": "symfony/polyfill-intl-idn-1.27.0.0",
+      "dependsOn": [
+        "symfony/polyfill-intl-normalizer-1.27.0.0",
+        "symfony/polyfill-php72-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/polyfill-intl-normalizer-1.27.0.0"
+    },
+    {
+      "ref": "symfony/polyfill-mbstring-1.27.0.0"
+    },
+    {
+      "ref": "symfony/polyfill-php72-1.27.0.0"
+    },
+    {
+      "ref": "symfony/polyfill-php73-1.27.0.0"
+    },
+    {
+      "ref": "symfony/polyfill-php80-1.27.0.0"
+    },
+    {
+      "ref": "symfony/polyfill-php81-1.27.0.0"
+    },
+    {
+      "ref": "symfony/process-5.4.11.0",
+      "dependsOn": [
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/routing-5.4.15.0",
+      "dependsOn": [
+        "symfony/deprecation-contracts-2.5.2.0",
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/service-contracts-2.5.2.0",
+      "dependsOn": [
+        "psr/container-1.1.1.0",
+        "symfony/deprecation-contracts-2.5.2.0"
+      ]
+    },
+    {
+      "ref": "symfony/string-5.4.15.0",
+      "dependsOn": [
+        "symfony/polyfill-ctype-1.27.0.0",
+        "symfony/polyfill-intl-grapheme-1.27.0.0",
+        "symfony/polyfill-intl-normalizer-1.27.0.0",
+        "symfony/polyfill-mbstring-1.27.0.0",
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "symfony/translation-5.4.14.0",
+      "dependsOn": [
+        "symfony/deprecation-contracts-2.5.2.0",
+        "symfony/polyfill-mbstring-1.27.0.0",
+        "symfony/polyfill-php80-1.27.0.0",
+        "symfony/translation-contracts-2.5.2.0"
+      ]
+    },
+    {
+      "ref": "symfony/translation-contracts-2.5.2.0"
+    },
+    {
+      "ref": "symfony/var-dumper-5.4.14.0",
+      "dependsOn": [
+        "symfony/polyfill-mbstring-1.27.0.0",
+        "symfony/polyfill-php80-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "tijsverkoyen/css-to-inline-styles-2.2.5.0",
+      "dependsOn": [
+        "symfony/css-selector-5.4.11.0"
+      ]
+    },
+    {
+      "ref": "vlucas/phpdotenv-4.3.0.0",
+      "dependsOn": [
+        "phpoption/phpoption-1.9.0.0",
+        "symfony/polyfill-ctype-1.27.0.0"
+      ]
+    },
+    {
+      "ref": "voku/portable-ascii-1.6.1.0"
+    },
+    {
+      "ref": "cyclonedx/cyclonedx-php-composer-demo-dev-master",
+      "dependsOn": [
+        "laravel/laravel-7.12.0.0"
+      ]
+    }
+  ]
+}

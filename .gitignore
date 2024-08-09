@@ -25,4 +25,4 @@ ENV/
 
 # CycloneDX json files except for those in the tests directory
 *.cdx.json
-!tests/auxiliary/test_*/*.cdx.json
+!tests/**/*.cdx.json

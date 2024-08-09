@@ -192,20 +192,19 @@ def _should_overwrite(
                 "Use the --force option to overwrite."
             ),
         )
+    else:  # pragma: no cover
+        if _prompt_for_overwrite(property, component_id):
+            return True
 
-    if _prompt_for_overwrite(property, component_id):
         logger.debug(
-            f'Overwriting "{property}" on component "{component_id}" due to user choice.'
+            f'Not overwriting "{property}" on component "{component_id}" due to user choice.'
         )
-        return True
-
-    logger.debug(
-        f'Not overwriting "{property}" on component "{component_id}" due to user choice.'
-    )
-    return False
+        return False
 
 
-def _prompt_for_overwrite(property: str, component_id: ComponentIdentity) -> bool:
+def _prompt_for_overwrite(
+    property: str, component_id: ComponentIdentity
+) -> bool:  # pragma: no cover
     print(
         f'The property "{property}" is already present on the component with id "{component_id}".'
     )
@@ -232,8 +231,7 @@ def _update_id(
     for key in old:
         instance_list = map.pop(key)
 
-    if instance_list is None:
-        return
+    instance_list = t.cast(list[dict], instance_list)
 
     for key in new:
         map[key] = instance_list
@@ -247,6 +245,12 @@ def _do_update(component: dict, update: dict, ctx: Context) -> None:
     remap = False
 
     for prop in update_set:
+        if _should_update_id(prop):
+            original_id = original_id or ComponentIdentity.create(component, True)
+
+        if _should_remap(prop):
+            remap = True
+
         if _should_delete(prop, component, update_set):
             logger.debug(f'Deleting "{prop}" on component "{component_id}".')
             del component[prop]
@@ -256,12 +260,6 @@ def _do_update(component: dict, update: dict, ctx: Context) -> None:
             logger.debug(f'Merging "{prop}" on component "{component_id}".')
             component[prop].append(update_set[prop])
             continue
-
-        if _should_update_id(prop):
-            original_id = original_id or ComponentIdentity.create(component, True)
-
-        if _should_remap(prop):
-            remap = True
 
         if prop not in component or _should_overwrite(
             prop, component_id, ctx.config.force
@@ -349,12 +347,12 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
 
     try:
         _validate_update_list(updates, ctx)
-    except AppError:
-        msg = LogMessage(
+    except AppError as e:
+        raise AppError(
             "Set not performed",
-            f'Exception was raised while setting from file "{cfg.from_file}',
+            f"Invalid update record: {e.details.description}",
+            log_msg=e.details,
         )
-        raise AppError(log_msg=msg)
 
     ctx.component_map = _map_out_components(sbom)
 

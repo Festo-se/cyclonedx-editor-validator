@@ -43,13 +43,13 @@ jobs:
       - name: Run black
         run: poetry run black cdxev tests --check
       - name: Run isort
-        run: poetry run isort cdxev/ tests/ --check-only --profile black
+        run: poetry run isort cdxev/ tests/ --check-only
       - name: Run flake8
         run: poetry run flake8 cdxev tests
       - name: Run mypy
         run: poetry run mypy --install-types --non-interactive --config-file=pyproject.toml
       - name: Run bandit
-        run: poetry run bandit -r cdxev tests
+        run: poetry run bandit -c pyproject.toml -r cdxev
 
   pytest:
     runs-on: ubuntu-latest
@@ -67,10 +67,11 @@ jobs:
     - name: Install package
       run: poetry install
     - name: Run pytest
-      run: |
-        poetry run coverage run -m pytest --junitxml=reports/unittest.xml
-        poetry run coverage report
-        poetry run coverage xml -o reports/py-coverage.cobertura.xml
+      run: poetry run coverage run -m pytest --junitxml=reports/unittest.xml
+    - name: Check coverage
+      run: poetry run coverage report --fail-under=95
+    - name: Save test results
+      run: poetry run coverage xml -o reports/py-coverage.cobertura.xml
     - name: Archive test results
       uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
       with:

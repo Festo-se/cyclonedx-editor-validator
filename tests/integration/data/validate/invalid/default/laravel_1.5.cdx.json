@@ -61,7 +61,6 @@
           }
         }
       ],
-      "purl": "pkg:composer/asm89/stack-cors@1.3.0",
       "externalReferences": [
         {
           "type": "distribution",
@@ -116,7 +115,6 @@
           }
         }
       ],
-      "purl": "pkg:composer/brick/math@0.9.3",
       "externalReferences": [
         {
           "type": "distribution",
@@ -167,7 +165,6 @@
           }
         }
       ],
-      "purl": "pkg:composer/doctrine/inflector@2.0.6",
       "externalReferences": [
         {
           "type": "distribution",
@@ -223,7 +220,6 @@
           }
         }
       ],
-      "purl": "pkg:composer/doctrine/lexer@1.2.3",
       "externalReferences": [
         {
           "type": "distribution",
@@ -279,7 +275,6 @@
           }
         }
       ],
-      "purl": "pkg:composer/dragonmantank/cron-expression@v2.3.1",
       "externalReferences": [
         {
           "type": "distribution",

@@ -50,8 +50,7 @@
             ],
             "group": "org.acme",
             "name": "web-framework",
-            "version": "1.0.0",
-            "purl": "pkg:maven/org.acme/web-framework@1.0.0"
+            "version": "1.0.0"
         },
         {
             "type": "library",
@@ -62,7 +61,6 @@
             "group": "org.acme",
             "name": "persistence",
             "version": "3.1.0",
-            "purl": "pkg:maven/org.acme/persistence@3.1.0",
             "licenses": [
                 {
                     "license": {
@@ -86,8 +84,7 @@
             ],
             "group": "org.acme",
             "name": "common-util",
-            "version": "3.0.0",
-            "purl": "pkg:maven/org.acme/common-util@3.0.0"
+            "version": "3.0.0"
         },
         {
             "type": "library",

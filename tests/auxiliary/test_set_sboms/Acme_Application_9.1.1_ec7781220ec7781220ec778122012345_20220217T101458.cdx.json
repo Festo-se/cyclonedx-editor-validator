@@ -39,7 +39,6 @@
             "group": "org.acme",
             "name": "web-framework",
             "version": "1.0.0",
-            "purl": "pkg:maven/org.acme/web-framework@1.0.0",
             "type": "library",
             "bom-ref": "pkg:maven/org.acme/web-framework@1.0.0",
             "supplier": {
@@ -57,7 +56,6 @@
             "group": "org.acme",
             "name": "web-framework",
             "version": "2.0.0",
-            "purl": "pkg:maven/org.acme/web-framework@2.0.0",
             "type": "library",
             "bom-ref": "pkg:maven/org.acme/web-framework@2.0.0",
             "supplier": {
@@ -75,7 +73,6 @@
             "group": "org.acme",
             "name": "web-framework",
             "version": "3.0.0",
-            "purl": "pkg:maven/org.acme/web-framework@3.0.0",
             "type": "library",
             "bom-ref": "pkg:maven/org.acme/web-framework@3.0.0",
             "supplier": {
@@ -93,7 +90,6 @@
             "group": "org.acme",
             "name": "web-framework",
             "version": "4.0.0",
-            "purl": "pkg:maven/org.acme/web-framework@4.0.0",
             "type": "library",
             "bom-ref": "pkg:maven/org.acme/web-framework@4.0.0",
             "supplier": {
@@ -111,7 +107,6 @@
             "group": "org.acme",
             "name": "web-framework",
             "version": "4.1.0",
-            "purl": "pkg:maven/org.acme/web-framework@4.1.0",
             "type": "library",
             "bom-ref": "pkg:maven/org.acme/web-framework@4.1.0",
             "supplier": {
@@ -129,7 +124,6 @@
             "group": "org.acme",
             "name": "web-framework",
             "version": "4.1.9",
-            "purl": "pkg:maven/org.acme/web-framework@4.1.9",
             "type": "library",
             "bom-ref": "pkg:maven/org.acme/web-framework@4.1.9",
             "supplier": {

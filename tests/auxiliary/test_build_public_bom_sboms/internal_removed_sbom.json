@@ -4,48 +4,47 @@
   "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
   "version": 1,
   "metadata": {
-     "timestamp": "2022-02-17T10:14:58Z",
-     "authors": [
+    "timestamp": "2022-02-17T10:14:58Z",
+    "authors": [
+      {
+        "name": "anonymous"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "acme-app",
+      "group": "com.company.internal",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "name": "Acme_Application",
+      "version": "9.1.1",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "properties": [
         {
-           "name": "anonymous"
+          "name": "notinternal:stuff",
+          "value": "something"
         }
-     ],
-     "component": {
-        "type": "application",
-        "bom-ref": "acme-app",
-		"group":  "com.company.internal",
-		"supplier": {
-			"name": "Company Legal"
-		},
-        "name": "Acme_Application",
-        "version": "9.1.1",
-        "copyright": "Company Legal 2022, all rights reserved",
-        "properties": [
-          {
-            "name": "notinternal:stuff",
-            "value": "something"
-          }
-        ]
-     }
+      ]
+    }
   },
   "components": [
     {
       "type": "library",
       "bom-ref": "comp1",
       "supplier": {
-         "name": "Acme, Inc."
+        "name": "Acme, Inc."
       },
       "licenses": [
         {
-			"license": {
-				"id": "Apache-1.0"
-			}
+          "license": {
+            "id": "Apache-1.0"
+          }
         }
-      ],	  
+      ],
       "group": "org.acme",
       "name": "web-framework",
-	  "version": "1.0.0",
-      "purl": "pkg:maven/org.acme/web-framework@1.0.0",
+      "version": "1.0.0",
       "components": [
         {
           "type": "library",
@@ -55,15 +54,14 @@
           },
           "licenses": [
             {
-          "license": {
-            "id": "Apache-1.0"
-          }
+              "license": {
+                "id": "Apache-1.0"
+              }
             }
-          ],	  
+          ],
           "group": "org.acme",
           "name": "sub_web-framework",
-          "version": "1.0.0",
-          "purl": "pkg:maven/org.acme/sub_web-framework@1.0.0"
+          "version": "1.0.0"
         }
       ]
     },
@@ -71,7 +69,7 @@
       "type": "library",
       "bom-ref": "comp2",
       "supplier": {
-         "name": "Acme, Inc."
+        "name": "Acme, Inc."
       },
       "group": "com.something",
       "name": "persistence",
@@ -86,12 +84,11 @@
           "value": "should be in"
         }
       ],
-      "purl": "pkg:maven/org.acme/persistence@3.1.0",
-	  "licenses": [
+      "licenses": [
         {
-			"license": {
-				"id": "Apache-2.0"
-			}
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -99,7 +96,7 @@
       "type": "library",
       "bom-ref": "comp3",
       "supplier": {
-         "name": "Acme, Inc."
+        "name": "Acme, Inc."
       },
       "group": "com.acme",
       "name": "tomcat-catalina",
@@ -107,9 +104,9 @@
       "properties": [],
       "licenses": [
         {
-			"license": {
-				"id": "Apache-2.0"
-			}
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -117,7 +114,7 @@
       "type": "library",
       "bom-ref": "comp4",
       "supplier": {
-         "name": "Acme, Inc."
+        "name": "Acme, Inc."
       },
       "group": "",
       "name": "card-verifier",
@@ -128,7 +125,7 @@
         }
       ]
     }
-    ],
+  ],
   "dependencies": [
     {
       "ref": "acme-app",
@@ -172,15 +169,15 @@
     }
   ],
   "compositions": [
-     {
-        "aggregate": "incomplete",
-        "assemblies": [
-           "comp1",
-           "sub_comp1",
-           "comp2",
-           "comp3",
-           "comp4"
-        ]
-     }
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "comp1",
+        "sub_comp1",
+        "comp2",
+        "comp3",
+        "comp4"
+      ]
+    }
   ]
 }

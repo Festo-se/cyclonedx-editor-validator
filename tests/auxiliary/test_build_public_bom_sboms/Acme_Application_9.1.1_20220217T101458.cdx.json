@@ -4,52 +4,51 @@
   "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
   "version": 1,
   "metadata": {
-     "timestamp": "2022-02-17T10:14:58Z",
-     "authors": [
+    "timestamp": "2022-02-17T10:14:58Z",
+    "authors": [
+      {
+        "name": "anonymous"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "acme-app",
+      "group": "com.company.internal",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "name": "Acme_Application",
+      "version": "9.1.1",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "properties": [
         {
-           "name": "anonymous"
+          "name": "notinternal:stuff",
+          "value": "something"
+        },
+        {
+          "name": "internal:component:status",
+          "value": "internal"
         }
-     ],
-     "component": {
-        "type": "application",
-        "bom-ref": "acme-app",
-		"group":  "com.company.internal",
-		"supplier": {
-			"name": "Company Legal"
-		},
-        "name": "Acme_Application",
-        "version": "9.1.1",
-        "copyright": "Company Legal 2022, all rights reserved",
-        "properties": [
-          {
-            "name": "notinternal:stuff",
-            "value": "something"
-          },
-          {
-            "name": "internal:component:status",
-            "value": "internal"
-          }
-        ]
-     }
+      ]
+    }
   },
   "components": [
     {
       "type": "library",
       "bom-ref": "comp1",
       "supplier": {
-         "name": "Acme, Inc."
+        "name": "Acme, Inc."
       },
       "licenses": [
         {
-			"license": {
-				"id": "Apache-1.0"
-			}
+          "license": {
+            "id": "Apache-1.0"
+          }
         }
-      ],	  
+      ],
       "group": "org.acme",
       "name": "web-framework",
-	  "version": "1.0.0",
-      "purl": "pkg:maven/org.acme/web-framework@1.0.0",
+      "version": "1.0.0",
       "components": [
         {
           "type": "library",
@@ -59,15 +58,14 @@
           },
           "licenses": [
             {
-          "license": {
-            "id": "Apache-1.0"
-          }
+              "license": {
+                "id": "Apache-1.0"
+              }
             }
-          ],	  
+          ],
           "group": "org.acme",
           "name": "sub_web-framework",
-          "version": "1.0.0",
-          "purl": "pkg:maven/org.acme/sub_web-framework@1.0.0"
+          "version": "1.0.0"
         }
       ]
     },
@@ -75,7 +73,7 @@
       "type": "library",
       "bom-ref": "comp2",
       "supplier": {
-         "name": "Acme, Inc."
+        "name": "Acme, Inc."
       },
       "group": "com.something",
       "name": "persistence",
@@ -98,12 +96,11 @@
           "value": "should also be gone"
         }
       ],
-      "purl": "pkg:maven/org.acme/persistence@3.1.0",
-	  "licenses": [
+      "licenses": [
         {
-			"license": {
-				"id": "Apache-2.0"
-			}
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -111,46 +108,45 @@
       "type": "library",
       "bom-ref": "internalcomp2",
       "supplier": {
-         "name": "Acme, Inc."
+        "name": "Acme, Inc."
       },
       "properties": [
         {
-              "name": "internal:component:status",
-              "value": "internal"
+          "name": "internal:component:status",
+          "value": "internal"
         }
       ],
       "licenses": [
         {
-			"license": {
-				"id": "BSD-3-Clause"
-			}
+          "license": {
+            "id": "BSD-3-Clause"
+          }
         }
       ],
       "group": "com.company.internal",
       "name": "common-util",
-      "version": "3.0.0",
-      "purl": "pkg:maven/org.acme/common-util@3.0.0"
+      "version": "3.0.0"
     },
     {
       "type": "library",
       "bom-ref": "comp3",
       "supplier": {
-         "name": "Acme, Inc."
+        "name": "Acme, Inc."
       },
       "group": "com.acme",
       "name": "tomcat-catalina",
       "version": "9.0.14",
       "properties": [
         {
-              "name": "internal:buildstuff",
-              "value": "stuff"
+          "name": "internal:buildstuff",
+          "value": "stuff"
         }
       ],
       "licenses": [
         {
-			"license": {
-				"id": "Apache-2.0"
-			}
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -158,7 +154,7 @@
       "type": "library",
       "bom-ref": "comp4",
       "supplier": {
-         "name": "Acme, Inc."
+        "name": "Acme, Inc."
       },
       "group": "",
       "name": "card-verifier",
@@ -174,12 +170,12 @@
       "bom-ref": "internalcomp3",
       "properties": [
         {
-              "name": "internal:component:status",
-              "value": "internal"
+          "name": "internal:component:status",
+          "value": "internal"
         }
       ],
       "supplier": {
-         "name": "Example, Inc."
+        "name": "Example, Inc."
       },
       "group": "com.company.internal",
       "name": "util",
@@ -195,17 +191,17 @@
       "type": "application",
       "bom-ref": "internalcomp1",
       "supplier": {
-         "name": "somecompany SE & Co.KG"
+        "name": "somecompany SE & Co.KG"
       },
-      "group":  "com.company.internal",
+      "group": "com.company.internal",
       "name": "some_name",
       "version": "T4.0.1.30",
-	  "hashes": [
+      "hashes": [
         {
           "alg": "SHA-256",
           "content": "3942447fac867ae5cdb3229b658f4d48"
         }
-       ],
+      ],
       "licenses": [
         {
           "license": {
@@ -214,12 +210,12 @@
         }
       ],
       "copyright": "Company Legal 2022, all rights reserved",
-	  "properties": [
-		{
+      "properties": [
+        {
           "name": "internal:component:status",
           "value": "internal"
         }
-	   ]
+      ]
     }
   ],
   "dependencies": [
@@ -241,8 +237,7 @@
     },
     {
       "ref": "sub_comp1",
-      "dependsOn": [
-      ]
+      "dependsOn": []
     },
     {
       "ref": "comp2",
@@ -283,18 +278,18 @@
     }
   ],
   "compositions": [
-     {
-        "aggregate": "incomplete",
-        "assemblies": [
-           "comp1",
-           "sub_comp1",
-           "comp2",
-           "comp3",
-           "comp4",
-           "internalcomp1",
-           "internalcomp2",
-           "internalcomp3"
-        ]
-     }
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "comp1",
+        "sub_comp1",
+        "comp2",
+        "comp3",
+        "comp4",
+        "internalcomp1",
+        "internalcomp2",
+        "internalcomp3"
+      ]
+    }
   ]
 }

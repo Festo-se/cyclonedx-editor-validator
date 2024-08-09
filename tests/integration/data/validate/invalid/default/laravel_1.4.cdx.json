@@ -38,7 +38,6 @@
       "group": "cyclonedx",
       "description": "demo of cyclonedx/cyclonedx-php-composer with a pinned version of laravel/framework",
       "author": "Jan Kowalleck",
-      "purl": "pkg:composer/cyclonedx/cyclonedx-php-composer-demo@dev-master",
       "properties": [
         {
           "name": "cdx:composer:package:type",

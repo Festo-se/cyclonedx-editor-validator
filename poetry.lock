@@ -1401,13 +1401,13 @@ files = [
 
 [[package]]
 name = "univers"
-version = "30.12.0"
+version = "30.12.1"
 description = "A mostly universal library to parse and compare software package versions and version ranges. A companion to Package URLs."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "univers-30.12.0-py3-none-any.whl", hash = "sha256:d01c21a86216bdd092c32b527742263cbe2ee72b4c71797e2ddfa4b688dde930"},
-    {file = "univers-30.12.0.tar.gz", hash = "sha256:35bb2861f4e4e525b251066739d9be6425caef00fe0d5feea5d447a87a14e3d7"},
+    {file = "univers-30.12.1-py3-none-any.whl", hash = "sha256:2fb9b8d281fd524c6437e1b5aa58d2660b213fcad92e489bdce06ae2608e35a2"},
+    {file = "univers-30.12.1.tar.gz", hash = "sha256:c21b943372079ee2b96e45c9f123eb3283b77119e6d32c4a04fc4149f7902056"},
 ]
 
 [package.dependencies]
@@ -1531,4 +1531,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9.0"
-content-hash = "a6cd0a70c195ee53e29249bf4e9c5fdaaebc8cbee1bc073781b56c15d0a41985"
+content-hash = "1771658a74c6850af483204375f5550a655f796becd33fe096ee4cc7baff8630"

@@ -671,7 +671,7 @@
               "properties": {
                 "components": {
                   "type": "array",
-                  "items": {"$ref": "#/definitions/default_component"},
+                  "items": {"$ref": "#/definitions/tools_component"},
                   "uniqueItems": true,
                   "title": "Components",
                   "description": "A list of software and hardware components used as tools."
@@ -2955,7 +2955,7 @@
               "properties": {
                 "components": {
                   "type": "array",
-                  "items": {"$ref": "#/definitions/default_component"},
+                  "items": {"$ref": "#/definitions/tools_component"},
                   "uniqueItems": true,
                   "title": "Components",
                   "description": "A list of software and hardware components used as tools."
@@ -3226,7 +3226,7 @@
             },
             "component": {
               "description": "The tool or component that created the annotation",
-              "$ref": "#/definitions/default_component"
+              "$ref": "#/definitions/tools_component"
             },
             "service": {
               "description": "The service that created the annotation",
@@ -5830,7 +5830,7 @@
         "object-detection"
       ]
     },
-    "default_component": {
+    "tools_component": {
       "type": "object",
       "title": "Component",
       "required": [

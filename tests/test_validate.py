@@ -23,7 +23,8 @@ path_to_modified_sbom = (
     "Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
-list_of_spec_versions = ["1.3", "1.4", "1.5"]
+list_of_spec_versions = ["1.3", "1.4", "1.5", "1.6"]
+list_of_spec_versions_containing_licensing = ["1.5", "1.6"]
 
 
 def search_for_word_issues(word: str, issue_list: list) -> bool:
@@ -419,6 +420,17 @@ class TestValidateComponents(unittest.TestCase):
                 search_for_word_issues("'name' should not be empty", issues), True
             )
 
+    def test_no_components_no_dependencies(
+        self,
+    ) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom.pop("components")
+            sbom.pop("dependencies")
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
 
 class TestValidateDependencies(unittest.TestCase):
     def test_dependencies_missing(self) -> None:
@@ -525,10 +537,7 @@ class TestValidateUseOwnSchema(unittest.TestCase):
         )
 
 
-list_of_spec_versions_containing_licensing = ["1.5"]
-
-
-class TestValidateUseSchema15(unittest.TestCase):
+class TestValidateLicensing(unittest.TestCase):
     def test_correct_license(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
@@ -736,17 +745,6 @@ class TestValidateUseSchema15(unittest.TestCase):
             self.assertEqual(
                 search_for_word_issues("'content' should not be empty", issues), True
             )
-
-    def test_no_components_no_dependencies(
-        self,
-    ) -> None:
-        for spec_version in list_of_spec_versions:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom.pop("components")
-            sbom.pop("dependencies")
-            issues = validate_test(sbom)
-            self.assertEqual(issues, ["no issue"])
 
 
 class TestValidateUseSchemaType(unittest.TestCase):

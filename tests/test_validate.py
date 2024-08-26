@@ -536,7 +536,8 @@ class TestValidateUseOwnSchema(unittest.TestCase):
             ap.exception.details.description,
         )
 
-class TestValidateUseSchema15(unittest.TestCase):
+
+class TestValidateLicensing(unittest.TestCase):
     def test_correct_license(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()

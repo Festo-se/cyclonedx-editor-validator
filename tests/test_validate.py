@@ -1173,7 +1173,7 @@ class TestInternalMetaData(unittest.TestCase):
 
 
 class TestValidateFilename(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.sbom = get_test_sbom()
 
     def test_valid_with_default_schema(self):

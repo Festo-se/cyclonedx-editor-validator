@@ -133,8 +133,8 @@ class TestAmend:
             },
             {
                 "input": "amend.input.cdx.json",
-                "expected": "amend.expected_infer-copyright.cdx.json",
-                "operations": ["infer-copyright"],
+                "expected": "amend.expected_delete-ambiguous-licenses.cdx.json",
+                "operations": ["delete-ambiguous-licenses"],
             },
         ],
         ids=["default operations", "single operation"],

@@ -59,7 +59,7 @@ jobs:
 
     needs: static_analysis
     permissions:
-      content: write
+      contents: write
       pull-requests: write
 
     steps:

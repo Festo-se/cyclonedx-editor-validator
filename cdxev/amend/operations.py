@@ -27,9 +27,6 @@ Examples:
   clutter but consumers of the SBOM could take the absence of license claims in the SBOM as
   a sign that the component is not licensed. *So it should be used with caution and does not run
   by default.*
-* *:py:class:`InferCopyright` is dangerous*. It should only be used in controlled circumstances
-  - e.g., when it is known that no unintended components will be affected - because it could
-  add entirely false claims with legal relevance to the SBOM.
 
 Implementation notes
 --------------------
@@ -58,7 +55,6 @@ If you want to add additional operations to the amend command, do it like this:
 
 """
 
-import datetime
 import importlib.resources
 import json
 import logging
@@ -432,43 +428,6 @@ class AddLicenseText(Operation):
 
     def handle_component(self, component: dict) -> None:
         foreach_license(self._do_it, component)
-
-
-class InferCopyright(Operation):
-    """
-    Attempts to infer copyright claims from supplier.
-
-    If neither copyright nor license is present on a component but there is a supplier,
-    this operation generates the copyright field from the supplier in the format
-    `Copyright (c) <supplier.name> <current year>, all rights reserved`.
-
-    Because of the risk of generating false copyright claims, this operation is disabled by
-    default.
-    """
-
-    def infer_copyright(self, component: dict) -> None:
-        if "copyright" in component.keys() or "licenses" in component.keys():
-            return
-
-        if "supplier" not in component.keys():
-            return
-
-        if "name" not in component.get("supplier", {}).keys():
-            return
-
-        year = datetime.date.today().year
-        supplier_name = component.get("supplier", {}).get("name", "")
-        copyright = f"Copyright (c) {year} {supplier_name}"
-        component["copyright"] = copyright
-        component_id = ComponentIdentity.create(component, True)
-        logger.info(f"Copyright claim '{copyright}' added to {component_id}.")
-
-    def handle_component(self, component: dict) -> None:
-        self.infer_copyright(component)
-
-    def handle_metadata(self, metadata: dict) -> None:
-        component = metadata.get("component", {})
-        self.infer_copyright(component)
 
 
 class DeleteAmbiguousLicenses(Operation):

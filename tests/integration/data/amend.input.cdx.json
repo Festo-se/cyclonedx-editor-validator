@@ -91,7 +91,7 @@
           "licenses": [
             {
               "license": {
-                "id": "MIT"
+                "name": "some license"
               }
             }
           ],
@@ -128,7 +128,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT"
+            "name": "other license"
           }
         }
       ],

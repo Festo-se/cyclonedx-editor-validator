@@ -1,6 +1,6 @@
 ﻿{
   "bomFormat": "CycloneDX",
-  "specVersion": "1.5",
+  "specVersion": "1.6",
   "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
   "version": 1,
   "metadata": {
@@ -32,7 +32,7 @@
       "supplier": {
         "name": "Festo SE & Co. KG"
       },
-      "name": "Acme_Application_1.5",
+      "name": "Acme_Application_1.6",
       "version": "9.1.1",
       "copyright": "Festo SE & Co. KG 2022, all rights reserved",
       "hashes": [

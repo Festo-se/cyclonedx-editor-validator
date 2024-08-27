@@ -27,9 +27,6 @@ Examples:
   clutter but consumers of the SBOM could take the absence of license claims in the SBOM as
   a sign that the component is not licensed. *So it should be used with caution and does not run
   by default.*
-* *:py:class:`InferCopyright` is dangerous*. It should only be used in controlled circumstances
-  - e.g., when it is known that no unintended components will be affected - because it could
-  add entirely false claims with legal relevance to the SBOM.
 
 Implementation notes
 --------------------

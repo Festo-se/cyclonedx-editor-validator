@@ -177,7 +177,7 @@ def validate_sbom(
                     errors.append(error_path + error.message.replace("\\", ""))
                 else:
                     errors.append(error_path + error.message)
-    sorted_errors = set(sorted(errors))
+    sorted_errors = sorted(set(errors))
 
     report_handler: t.Optional[logging.Handler] = None
     if report_format == "warnings-ng":

@@ -29,6 +29,7 @@ from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
+from cdxev.initialize_sbom import initialize_sbom
 
 logger: logging.Logger
 
@@ -182,6 +183,7 @@ def create_parser() -> argparse.ArgumentParser:
     create_validation_parser(subparsers)
     create_set_parser(subparsers)
     create_build_public_bom_parser(subparsers)
+    create_init_sbom_parser(subparsers)
 
     return parser
 
@@ -709,6 +711,48 @@ def create_build_public_bom_parser(
     return parser
 
 
+# noinspection PyUnresolvedReferences,PyProtectedMember
+def create_init_sbom_parser(
+    subparsers: argparse._SubParsersAction,
+) -> argparse.ArgumentParser:
+    parser = subparsers.add_parser(
+        "init-sbom",
+        help=(
+            "Provides the first draft of a SBOM for manual completion"
+        ),
+    )
+    parser.add_argument(
+        "--name",
+        metavar="<schema path>",
+        help=(
+            "Name of the software the SBOM belongs to"
+        ),
+        default=None,
+        type=str,
+    )
+    parser.add_argument(
+        "--version",
+        metavar="<schema path>",
+        help=(
+            "Version of the software the SBOM belongs to"
+        ),
+        default=None,
+        type=str,
+    )
+    parser.add_argument(
+        "--supplier",
+        metavar="<schema path>",
+        help=(
+            "Name of the supplier of the software the SBOM belongs to"
+        ),
+        default=None,
+        type=str,
+    )
+    add_output_argument(parser)
+    parser.set_defaults(cmd_handler=invoke_init_sbom, parser=parser)
+    return parser
+
+
 def invoke_amend(args: argparse.Namespace) -> int:
     if args.help_operation:
         short_desc = args.operations_by_name[args.help_operation].short_description
@@ -948,6 +992,15 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
     sbom, _ = read_sbom(args.input)
     output = build_public_bom(sbom, args.schema_path)
     write_sbom(output, args.output)
+    return Status.OK
+
+
+def invoke_init_sbom(args: argparse.Namespace) -> int:
+    name = args.name
+    version = args.version
+    supplier = args.supplier
+    sbom = initialize_sbom(software_name=name, supplier_name=supplier, version=version)
+    write_sbom(sbom, args.output)
     return Status.OK
 
 

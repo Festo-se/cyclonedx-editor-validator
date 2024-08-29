@@ -68,6 +68,7 @@ def initialize_sbom(
             Tool(
                 name=pkg.NAME,
                 version=pkg.VERSION,
+                vendor=pkg.VENDOR,
                 external_references=[refrence_to_cdxev_tool],
             )
         ],

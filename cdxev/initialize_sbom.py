@@ -82,6 +82,5 @@ def initialize_sbom(
 
         my_json_outputter = JsonV1Dot6(sbom)
         serialized_json = json.loads(my_json_outputter.output_as_string(indent=4))
-        with open("generated_init__function_output_sbom.json", "w", encoding="utf8") as json_file:
-            json.dump(serialized_json, json_file, indent=4)
+
     return serialized_json

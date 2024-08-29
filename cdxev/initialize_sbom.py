@@ -3,15 +3,15 @@
 import json
 import warnings
 from datetime import datetime
-from typing import Union
+from typing import Union, Any
 
-from cyclonedx.model import ExternalReference, ExternalReferenceType, Tool, XsUri
-from cyclonedx.model.bom import Bom, BomMetaData
-from cyclonedx.model.bom_ref import BomRef
-from cyclonedx.model.component import Component, ComponentType
-from cyclonedx.model.contact import OrganizationalContact, OrganizationalEntity
-from cyclonedx.model.dependency import Dependency
-from cyclonedx.output.json import JsonV1Dot6
+from cyclonedx.model import ExternalReference, ExternalReferenceType, Tool, XsUri  # type: ignore
+from cyclonedx.model.bom import Bom, BomMetaData  # type: ignore
+from cyclonedx.model.bom_ref import BomRef  # type: ignore
+from cyclonedx.model.component import Component, ComponentType  # type: ignore
+from cyclonedx.model.contact import OrganizationalContact, OrganizationalEntity  # type: ignore
+from cyclonedx.model.dependency import Dependency  # type: ignore
+from cyclonedx.output.json import JsonV1Dot6   # type: ignore
 
 from cdxev import pkg
 
@@ -20,7 +20,7 @@ def initialize_sbom(
     software_name: Union[str, None],
     version: Union[str, None],
     supplier_name: Union[str, None],
-) -> dict:
+) -> dict[str, Any]:
     if software_name is None:
         software_name = "Name of the software described in the SBOM"
     if version is None:
@@ -81,6 +81,6 @@ def initialize_sbom(
         )
 
         my_json_outputter = JsonV1Dot6(sbom)
-        serialized_json = json.loads(my_json_outputter.output_as_string(indent=4))
+        serialized_json: dict[str, Any] = json.loads(my_json_outputter.output_as_string(indent=4))
 
     return serialized_json

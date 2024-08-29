@@ -288,7 +288,6 @@ class TestInitSbom:
         expected_path = data_dir / request.param["expected"]
 
         expected_json = load_sbom(expected_path)
-        expected_json["metadata"]["tools"][1]["version"] = pkg.VERSION
 
         return self.DataFixture(
             expected=expected_json,

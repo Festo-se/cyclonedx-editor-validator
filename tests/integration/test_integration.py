@@ -11,7 +11,6 @@ from typing import TypedDict
 import pytest
 import toml
 
-from cdxev import pkg
 from cdxev.__main__ import Status
 from cdxev.amend.operations import AddLicenseText
 from tests.auxiliary.helper import search_entry

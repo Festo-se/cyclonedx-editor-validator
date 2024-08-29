@@ -18,15 +18,50 @@ class TestInitializeSbom(unittest.TestCase):
         self.assertEqual(
             sbom["metadata"]["component"]["version"], "Version of the software"
         )
+        self.assertEqual(
+            sbom["metadata"]["supplier"]["name"],
+            "The name of the organization supplying the software",
+        )
 
     def test_name_argument_given(self) -> None:
         sbom = initialize_sbom(software_name="xyz", supplier_name=None, version=None)
         self.assertEqual(sbom["metadata"]["component"]["name"], "xyz")
+        self.assertEqual(
+            sbom["metadata"]["component"]["supplier"]["name"],
+            "The name of the organization supplying the software",
+        )
+        self.assertEqual(
+            sbom["metadata"]["component"]["version"], "Version of the software"
+        )
+        self.assertEqual(
+            sbom["metadata"]["supplier"]["name"],
+            "The name of the organization supplying the software",
+        )
 
     def test_supplier_arguments_given(self) -> None:
         sbom = initialize_sbom(supplier_name="yxz", software_name=None, version=None)
         self.assertEqual(sbom["metadata"]["component"]["supplier"]["name"], "yxz")
+        self.assertEqual(
+            sbom["metadata"]["component"]["name"],
+            "Name of the software described in the SBOM",
+        )
+        self.assertEqual(
+            sbom["metadata"]["component"]["version"], "Version of the software"
+        )
+        self.assertEqual(sbom["metadata"]["supplier"]["name"], "yxz")
 
     def test_version_given(self) -> None:
         sbom = initialize_sbom(version="9.9.9", supplier_name=None, software_name=None)
         self.assertEqual(sbom["metadata"]["component"]["version"], "9.9.9")
+        self.assertEqual(
+            sbom["metadata"]["component"]["name"],
+            "Name of the software described in the SBOM",
+        )
+        self.assertEqual(
+            sbom["metadata"]["component"]["supplier"]["name"],
+            "The name of the organization supplying the software",
+        )
+        self.assertEqual(
+            sbom["metadata"]["supplier"]["name"],
+            "The name of the organization supplying the software",
+        )

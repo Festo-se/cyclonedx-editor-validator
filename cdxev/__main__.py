@@ -717,34 +717,26 @@ def create_init_sbom_parser(
 ) -> argparse.ArgumentParser:
     parser = subparsers.add_parser(
         "init-sbom",
-        help=(
-            "Provides the first draft of a SBOM for manual completion"
-        ),
+        help=("Provides the first draft of a SBOM for manual completion"),
     )
     parser.add_argument(
         "--name",
         metavar="<schema path>",
-        help=(
-            "Name of the software the SBOM belongs to"
-        ),
+        help=("Name of the software the SBOM belongs to"),
         default=None,
         type=str,
     )
     parser.add_argument(
         "--version",
         metavar="<schema path>",
-        help=(
-            "Version of the software the SBOM belongs to"
-        ),
+        help=("Version of the software the SBOM belongs to"),
         default=None,
         type=str,
     )
     parser.add_argument(
         "--supplier",
         metavar="<schema path>",
-        help=(
-            "Name of the supplier of the software the SBOM belongs to"
-        ),
+        help=("Name of the supplier of the software the SBOM belongs to"),
         default=None,
         type=str,
     )

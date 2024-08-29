@@ -11,7 +11,7 @@ from cyclonedx.model.bom_ref import BomRef  # type: ignore
 from cyclonedx.model.component import Component, ComponentType  # type: ignore
 from cyclonedx.model.contact import OrganizationalContact, OrganizationalEntity  # type: ignore
 from cyclonedx.model.dependency import Dependency  # type: ignore
-from cyclonedx.output.json import JsonV1Dot6   # type: ignore
+from cyclonedx.output.json import JsonV1Dot6  # type: ignore
 
 from cdxev import pkg
 
@@ -81,6 +81,8 @@ def initialize_sbom(
         )
 
         my_json_outputter = JsonV1Dot6(sbom)
-        serialized_json: dict[str, Any] = json.loads(my_json_outputter.output_as_string(indent=4))
+        serialized_json: dict[str, Any] = json.loads(
+            my_json_outputter.output_as_string(indent=4)
+        )
 
     return serialized_json

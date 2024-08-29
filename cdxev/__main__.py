@@ -992,7 +992,7 @@ def invoke_init_sbom(args: argparse.Namespace) -> int:
     version = args.version
     supplier = args.supplier
     sbom = initialize_sbom(software_name=name, supplier_name=supplier, version=version)
-    write_sbom(sbom, args.output)
+    write_sbom(sbom, args.output, update_metadata=False)
     return Status.OK
 
 

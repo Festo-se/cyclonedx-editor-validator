@@ -1,0 +1,52 @@
+{
+    "dependencies": [
+        {
+            "ref": "bom-ref of the metadata component"
+        }
+    ],
+    "metadata": {
+        "authors": [
+            {
+                "email": "Email author of the SBOM",
+                "name": "Name of the author of the SBOM",
+                "phone": "The phone number of the author of the SBOM"
+            }
+        ],
+        "component": {
+            "bom-ref": "bom-ref of the metadata component",
+            "copyright": "Copyright of the software",
+            "name": "software name",
+            "supplier": {
+                "name": "supplier name"
+            },
+            "type": "application",
+            "version": "1.1.1"
+        },
+        "supplier": {
+            "name": "supplier name"
+        },
+        "timestamp": "2024-08-29T12:44:05+00:00",
+        "tools": [
+            {
+                "externalReferences": [
+                    {
+                        "type": "website",
+                        "url": "https://github.com/Festo-se/cyclonedx-editor-validator"
+                    }
+                ],
+                "name": "cyclonedx-editor-validator",
+                "version": "0.0.0"
+            },
+            {
+                "name": "cyclonedx-editor-validator",
+                "vendor": "Festo SE & Co. KG",
+                "version": "0.0.0"
+            }
+        ]
+    },
+    "serialNumber": "urn:uuid:1af4c61b-2ebd-4849-aba4-5e7967f1140c",
+    "version": 1,
+    "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.6"
+}

@@ -17,9 +17,9 @@ from cdxev import pkg
 
 
 def initialize_sbom(
-    software_name: Union[str | None],
-    version: Union[str | None],
-    supplier_name: Union[str | None],
+    software_name: Union[str, None],
+    version: Union[str, None],
+    supplier_name: Union[str, None],
 ) -> dict:
     if software_name is None:
         software_name = "Name of the software described in the SBOM"

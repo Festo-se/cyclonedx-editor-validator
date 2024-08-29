@@ -81,7 +81,7 @@ def initialize_sbom(
             "ignore"
         )  # ignore warning caused by absence of components
         sbom = Bom(
-            version=3,
+            version=1,
             metadata=metadata,
             dependencies=[
                 Dependency(BomRef("bom-ref of the metadata component"), dependencies=[])

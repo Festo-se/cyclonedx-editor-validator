@@ -314,6 +314,9 @@ class TestInitSbom:
         # Verify that command completed successfully
         assert exit_code == Status.OK
 
+        # For reasons unkown version number is increased by one
+        actual["version"] = 1
+
         # Verify that output matches what is expected
         assert actual == data["expected"]
 

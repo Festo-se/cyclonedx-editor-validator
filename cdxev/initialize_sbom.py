@@ -3,13 +3,21 @@
 import json
 import warnings
 from datetime import datetime
-from typing import Union, Any
+from typing import Any, Union
 
-from cyclonedx.model import ExternalReference, ExternalReferenceType, Tool, XsUri  # type: ignore
+from cyclonedx.model import (  # type: ignore
+    ExternalReference,
+    ExternalReferenceType,
+    Tool,
+    XsUri,
+)
 from cyclonedx.model.bom import Bom, BomMetaData  # type: ignore
 from cyclonedx.model.bom_ref import BomRef  # type: ignore
 from cyclonedx.model.component import Component, ComponentType  # type: ignore
-from cyclonedx.model.contact import OrganizationalContact, OrganizationalEntity  # type: ignore
+from cyclonedx.model.contact import (  # type: ignore
+    OrganizationalContact,
+    OrganizationalEntity,
+)
 from cyclonedx.model.dependency import Dependency  # type: ignore
 from cyclonedx.output.json import JsonV1Dot6  # type: ignore
 

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
 from cdxev.initialize_sbom import initialize_sbom
 
 

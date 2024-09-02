@@ -25,6 +25,7 @@ class SetConfig:
     sbom_paths: t.Sequence[pathlib.Path]
     from_file: t.Optional[pathlib.Path]
     ignore_missing: bool = False
+    ignore_existing: bool = False
 
 
 @dataclass
@@ -178,18 +179,23 @@ def _should_delete(property: str, component: dict, update_set: dict) -> bool:
 
 
 def _should_overwrite(
-    property: str, component_id: ComponentIdentity, force: bool
+    property: str, component_id: ComponentIdentity, force: bool, ignore_existing: bool
 ) -> bool:
     if force:
         logger.debug(f'Overwriting "{property}" on component "{component_id}"')
         return True
+
+    if ignore_existing:
+        logger.debug(f'Not overwriting "{property}" on component "{component_id}"')
+        return False
 
     if not sys.stdin.isatty():
         raise AppError(
             "Attempted overwrite",
             (
                 f'The property "{property}" is already present on the component "{component_id}". '
-                "Use the --force option to overwrite."
+                "Use the --force option to overwrite. "
+                "Or --ignore-existing option to not overwrite."
             ),
         )
     else:  # pragma: no cover
@@ -262,7 +268,7 @@ def _do_update(component: dict, update: dict, ctx: Context) -> None:
             continue
 
         if prop not in component or _should_overwrite(
-            prop, component_id, ctx.config.force
+            prop, component_id, ctx.config.force, ctx.config.ignore_existing
         ):
             logger.debug(f'Setting "{prop}" on component "{component_id}".')
             component[prop] = update_set[prop]

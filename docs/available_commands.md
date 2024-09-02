@@ -271,9 +271,10 @@ Conflicts arise when a target component already has a value for the specified pr
 
 1. If the new value is `null`, delete the existing property. The tool assumes that a user who sets `null` is aware that the property exists and wants to delete it.
 2. If the property is an array, the new value is appended to the old value.
-3. If the `--force` command-line option is set, the old value is overwritten with the new.
-4. If the tool is running in an interactive terminal, the user is prompted to decide whether to overwrite the old value.
-5. If none of the above applies, an error is thrown.
+3. If the `--ignore-existing` command-line option is set, the old value will not be overwritten.
+4. If the `--force` command-line option is set, the old value is overwritten with the new.
+5. If the tool is running in an interactive terminal, the user is prompted to decide whether to overwrite the old value.
+6. If none of the above applies, an error is thrown.
 
 Hawk-eyed readers will have spotted a little stumbling block in these rules. What if an array should be overwritten? A little trickery is needed here. The property must first be explicitly deleted by setting it to `null`, then re-added with the new value.
 On the command-line this can be done in two subsequent invocations:

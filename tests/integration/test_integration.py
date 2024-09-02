@@ -775,6 +775,29 @@ class TestSet:
             "COORDINATES[delete nested components] is missing the 'set' property."
         )
 
+    def test_ignore_existing(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        caplog: pytest.LogCaptureFixture,
+    ):
+        argv(
+            "--verbose",
+            "set",
+            str(input_file),
+            "--purl",
+            "pkg:npm/test-app@1.0.0",
+            "--key",
+            "bom-ref",
+            "--value",
+            '"should not overwrite"',
+            "--ignore-existing",
+        )
+        exit_code, *_ = run_main()
+
+        assert exit_code == Status.OK
+        assert caplog.records[0].msg.startswith("Not overwriting")
+
 
 class TestValidate:
     # This test function is parametrized by pytest_generate_tests in conftest.py.

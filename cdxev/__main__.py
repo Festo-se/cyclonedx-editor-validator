@@ -550,10 +550,16 @@ def create_set_parser(
             "May not be combined with --from-file."
         ),
     )
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         "--force",
         "-f",
         help="Quietly overwrite existing information without asking.",
+        action="store_true",
+    )
+    group.add_argument(
+        "--ignore-existing",
+        help="Quietly skip existing information without asking.",
         action="store_true",
     )
     parser.add_argument(
@@ -846,6 +852,7 @@ def invoke_set(args: argparse.Namespace) -> int:
         [args.input],
         args.from_file,
         args.ignore_missing,
+        args.ignore_existing,
     )
     cdxev.set.run(sbom, updates, cfg)
     write_sbom(sbom, args.output)

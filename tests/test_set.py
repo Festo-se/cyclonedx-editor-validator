@@ -132,6 +132,40 @@ class SetTestCase(unittest.TestCase):
         }
         self.assertDictEqual(self.sbom_fixture["components"][0], expected)
 
+    def test_do_not_overwrite_existing(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "name": "depA",
+                    "group": "com.company.unit",
+                    "version": "4.0.2",
+                },
+                "set": {"author": "Should not overwrite existing field"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            False,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+            False,
+            True,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        expected = {
+            "type": "library",
+            "name": "depA",
+            "group": "com.company.unit",
+            "version": "4.0.2",
+            "bom-ref": "com.company.unit/depA@4.0.2",
+            "author": "Company Unit",
+            "licenses": [{"license": {"id": "Apache-2.0"}}],
+            "externalReferences": [{"type": "website", "url": "https://www.festo.com"}],
+        }
+        self.assertDictEqual(self.sbom_fixture["components"][0], expected)
+
     def test_delete_property(self) -> None:
         updates = [
             {
@@ -189,7 +223,7 @@ class SetTestCase(unittest.TestCase):
         }
         self.assertDictEqual(self.sbom_fixture["components"][0], expected)
 
-    def test_overwrite_without_force_raises(self) -> None:
+    def test_overwrite_without_force_and_ignore_existing_raises(self) -> None:
         updates = [
             {
                 "id": {"purl": "pkg:npm/test-app@1.0.0"},

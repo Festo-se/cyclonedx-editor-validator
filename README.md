@@ -131,7 +131,7 @@ The JSON schema must be formulated according to the Draft 7 specification.
 
 Any components deleted by this command are equally removed from the dependency graph. Their dependencies are assigned as new dependencies to their dependents.
 
-![Dependencies of deleted components are assigned to their dependents.](img/dependency-resolution.svg)
+![Dependencies of deleted components are assigned to their dependents.](docs/img/dependency-resolution.svg)
 
 #### Examples
 

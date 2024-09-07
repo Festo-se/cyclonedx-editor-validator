@@ -6,9 +6,11 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from cdxev import pkg
+
 project = "CycloneDX Editor Validator Tool"
 copyright = "2024, Festo SE & Co. KG"
-release = "0.18.0"
+release = pkg.VERSION
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -37,7 +37,18 @@ jobs:
           poetry version ${{ github.ref_name }}
       - name: Install dependencies
         run: poetry install --only docs
+      - name: Build HTML
+        run: poetry run sphinx-build -a -E docs/source/ docs/build/
+      - name: Upload artifacts
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        with:
+          name: html-docs
+          path: docs/build/html
       - name: Deploy pages
-        run: poetry run mkdocs gh-deploy --strict --force
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/html
       - name: Publish package
         run: poetry publish --build

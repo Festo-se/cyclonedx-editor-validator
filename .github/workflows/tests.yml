@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: poetry install --only docs
       - name: Test pages
-        run: poetry run mkdocs build
+        run: poetry run sphinx-build -a -E docs/source/ docs/build/
 
   static_analysis:
 

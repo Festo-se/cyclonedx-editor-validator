@@ -22,7 +22,7 @@ jobs:
           poetry config virtualenvs.in-project false
           poetry config cache-dir ~/cache/.poetry
       - name: Install dependencies
-        run: poetry install --only docs
+        run: poetry install --with docs
       - name: Test pages
         run: poetry run sphinx-build -a -E docs/source/ docs/build/
 

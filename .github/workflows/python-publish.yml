@@ -36,7 +36,7 @@ jobs:
           poetry config pypi-token.pypi "${{ secrets.API_TOKEN_PYPI }}"
           poetry version ${{ github.ref_name }}
       - name: Install dependencies
-        run: poetry install --only docs
+        run: poetry install --with docs
       - name: Build HTML
         run: poetry run sphinx-build -a -E docs/source/ docs/build/
       - name: Upload artifacts

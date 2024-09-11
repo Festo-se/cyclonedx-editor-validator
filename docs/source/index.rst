@@ -9,15 +9,16 @@ This tool also offers command to amend and set, respectively editing information
 
 .. toctree::
    :caption: Documentation
-   :maxdepth: 2
+   :maxdepth: 1
 
+   self
    first_steps
-   available_commands
+   usage/index
    known_limitations
 
 .. toctree::
    :caption: Further information
-   :maxdepth: 2
+   :maxdepth: 1
 
    maintainers
    CONTRIBUTING

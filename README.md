@@ -10,7 +10,7 @@
 
 This command-line tool performs various actions on [CycloneDX](https://cyclonedx.org/) SBOMs. It allows you to modify, merge and validate your Software Bill of Materials (SBOM).
 
-The tool is built with automation in mind, i.e. usage within CI/CD. We try to be a scriptable as possible with various command-line flags to avoid interactive prompts, multiple output options and fine-grained exit codes.
+The tool is built with automation in mind, i.e. usage within CI/CD. We try to be as scriptable as possible with various command-line flags to avoid interactive prompts, multiple output options and fine-grained exit codes.
 
 ## Command overview
 

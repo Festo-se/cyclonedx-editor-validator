@@ -9,9 +9,10 @@ import re
 import shutil
 import sys
 import textwrap
+from collections.abc import MutableSequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, NoReturn, Optional, Tuple
+from typing import TYPE_CHECKING, Iterator, NoReturn, Optional, Tuple
 
 import docstring_parser
 from natsort import os_sorted
@@ -135,14 +136,15 @@ def create_parser() -> argparse.ArgumentParser:
         prog="cdx-ev",
         description=(
             "This tool performs various actions on CycloneDX SBOMs. The action is determined by "
-            "the <command> flag.\n"
-            "Global options described in this output must be specified BEFORE the <command>. Each "
-            "<command> might have additional options which must be specified AFTER the <command>."
-            "\n"
-            "For help on a commands options, run the <command> with the --help option."
+            "the <command> argument."
         ),
+        add_help=False,
     )
-    parser.add_argument(
+    group = parser.add_argument_group(
+        title="Global options",
+        description="These options must be specified BEFORE <command>.",
+    )
+    group.add_argument(
         "--quiet",
         "-q",
         help=(
@@ -151,19 +153,28 @@ def create_parser() -> argparse.ArgumentParser:
         ),
         action="store_true",
     )
-    parser.add_argument(
+    group.add_argument(
         "--verbose",
         "-v",
         help=(
             "Enable verbose logging output. This has no effect on output to stdout or "
-            "the --output or --report-format options"
+            "the --output or --report-format options."
         ),
         action="store_true",
     )
-    parser.add_argument("--version", action="version", version=pkg.VERSION)
+    group.add_argument(
+        "--version", action="version", version=pkg.VERSION, help="Print version."
+    )
+    group.add_argument("--help", "-h", action="help", help="Print this help message.")
 
     subparsers = parser.add_subparsers(
-        title="Commands", metavar="<command>", required=True
+        title="Commands",
+        metavar="<command>",
+        required=True,
+        description=(
+            "Determines the action to perform on the SBOM. Each command might have more options. "
+            "To get help on command options, use cdx-ev <command> --help."
+        ),
     )
     create_amend_parser(subparsers)
     create_merge_parser(subparsers)
@@ -211,6 +222,13 @@ def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
     :param cls: The operation class. Must be a subclass of :py:class:`Operation`.
     :return: Details about the operation documentation and its options.
     """
+
+    def rest_to_text(rest: Optional[str]) -> Optional[str]:
+        if rest is None:
+            return None
+
+        return re.sub("`+", "'", rest)
+
     if TYPE_CHECKING:
         # Shut up mypy. If these assertions don't hold,
         # integration tests will break, so no problem at runtime.
@@ -218,8 +236,8 @@ def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
         assert cls.__init__.__doc__ is not None  # nosec B101
     op_name = re.sub(_upper_case_letters_after_first, "-", cls.__name__).lower()
     op_doc = docstring_parser.parse(cls.__doc__)
-    op_short_help = op_doc.short_description
-    op_long_help = op_doc.long_description
+    op_short_help = rest_to_text(op_doc.short_description)
+    op_long_help = rest_to_text(op_doc.long_description)
     op_is_default = getattr(cls, "_amendDefault", False)
     init_sig = inspect.signature(cls.__init__)
     init_params = {
@@ -239,7 +257,9 @@ def get_operation_details(cls: type[Operation]) -> _AmendOperationDetails:
             "dest": name,
             "name": "--" + name.replace("_", "-"),
             "type": param.annotation,
-            "help": param_doc.description,
+            "help": rest_to_text(
+                param_doc.description,
+            ),
         }
         if param.default != inspect.Parameter.empty:
             arg["default"] = param.default
@@ -263,6 +283,10 @@ def reflow_paragraphs(text: str, indent: int = 8) -> str:
     This function considers double newlines ('\\n\\n') paragraph breaks and will preserve them.
     Any other whitespace, including single newlines will be collapsed.
 
+    The algorithm is barely aware of RestructuredText, so most special formatting will simply be
+    treated like any other text. The only exception are simple single-level lists, which are
+    specially handled.
+
     The width of the final string is equal to the terminal width but capped at 160 characters.
 
     :param text: The string to reformat.
@@ -271,14 +295,41 @@ def reflow_paragraphs(text: str, indent: int = 8) -> str:
     """
     max_width = min(shutil.get_terminal_size()[0], 160)
     textwrapper = textwrap.TextWrapper(
-        width=max_width,
-        initial_indent=" " * indent,
-        subsequent_indent=" " * indent,
+        width=max_width, initial_indent=" " * indent, subsequent_indent=" " * indent
     )
     text = textwrap.dedent(text)
-    paragraphs = [textwrapper.fill(para) for para in text.split("\n\n")]
+    paragraphs = text.split("\n\n")
+    result = []
+    for para in paragraphs:
+        lines = para.splitlines()
+        if all(re.match(r"([*\-+] )|(\s+)", line) for line in lines):
+            # This branch is run if the paragraph constitutes a ReST-formatted list.
+            # I.e., all lines start with a list symbol or with spaces.
+            def listitems(lines: MutableSequence[str]) -> Iterator[str]:
+                """
+                Merges lines of text which constitutes a single item in a ReST list.
 
-    return "\n\n".join(paragraphs)
+                >>> rest_list = ["- 1st item", "- 2nd item, 1st line", "  2nd item, 2nd line"]
+                >>> list(listitems(rest_list))
+                ["- 1st item", "- 2nd item, 1st line  2nd item, 2nd line"]
+
+                :param lines: A (Python) list of lines from a single paragraph.
+                :returns: A new (Python) list with one entry per (ReST) list item.
+                """
+                while len(lines) > 0:
+                    item = lines.pop(0)
+                    while len(lines) > 0 and not lines[0][0] in "*-+":
+                        item += lines.pop(0)
+                    yield item
+
+            para = "\n".join(textwrapper.fill(item) for item in listitems(lines))
+
+        else:
+            # This branch covers all other cases.
+            para = textwrapper.fill(para)
+        result.append(para)
+
+    return "\n\n".join(result)
 
 
 # noinspection PyUnresolvedReferences,PyProtectedMember

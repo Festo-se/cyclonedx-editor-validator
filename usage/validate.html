@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>validate &mdash; CycloneDX Editor Validator Tool 0.18.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
+      <link rel="stylesheet" type="text/css" href="https://www.festo.com/fonts/fonts.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29ae757a"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Known Limitations" href="../known_limitations.html" />
+    <link rel="prev" title="set" href="set.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            CycloneDX Editor Validator Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
+<li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="merge-vex.html">merge-vex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">validate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schema-selection">Schema selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validation-of-filename">Validation of filename</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#exit-codes">Exit codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Further information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../maintainers.html">Maintainers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CycloneDX Editor Validator Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Usage</a></li>
+      <li class="breadcrumb-item active">validate</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/validate.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="validate">
+<h1>validate<a class="headerlink" href="#validate" title="Link to this heading"></a></h1>
+<p>Validates an SBOM against a JSON schema.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">validate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+                       <span class="p">[</span><span class="o">--</span><span class="n">schema</span><span class="o">-</span><span class="nb">type</span> <span class="p">{</span><span class="n">default</span><span class="p">,</span><span class="n">strict</span><span class="p">,</span><span class="n">custom</span><span class="p">}</span> <span class="o">|</span> <span class="o">--</span><span class="n">schema</span><span class="o">-</span><span class="n">path</span> <span class="o">&lt;</span><span class="n">schema</span><span class="o">-</span><span class="n">path</span><span class="o">&gt;</span><span class="p">]</span>
+                       <span class="p">[</span><span class="o">--</span><span class="n">filename</span><span class="o">-</span><span class="n">pattern</span> <span class="n">FILENAME_PATTERN</span> <span class="o">|</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">filename</span><span class="o">-</span><span class="n">validation</span><span class="p">]</span>
+                       <span class="p">[</span><span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="nb">format</span> <span class="p">{</span><span class="n">warnings</span><span class="o">-</span><span class="n">ng</span><span class="p">,</span><span class="n">gitlab</span><span class="o">-</span><span class="n">code</span><span class="o">-</span><span class="n">quality</span><span class="p">}]</span>
+                       <span class="p">[</span><span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="n">path</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
+                       <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<section id="create_parser-positional-arguments">
+<h2>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>&lt;input&gt;</kbd></dt>
+<dd><p>Path to the SBOM file to validate.</p>
+</dd>
+</dl>
+</section>
+<section id="create_parser-named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>--schema-type</kbd></dt>
+<dd><p>Possible choices: default, strict, custom</p>
+<p>Use a built-in schema for validation.</p>
+</dd>
+<dt><kbd>--schema-path</kbd></dt>
+<dd><p>Path to the JSON schema file to validate against.</p>
+</dd>
+<dt><kbd>--filename-pattern</kbd></dt>
+<dd><p>Regex for validation of filename. If not specified, a default regex depending on the schema is applied. To disable filename validation altogether, use --no-filename-validation.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">''</span></code></p>
+</dd>
+<dt><kbd>--no-filename-validation</kbd></dt>
+<dd><p>Disable filename validation</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt><kbd>--report-format</kbd></dt>
+<dd><p>Possible choices: warnings-ng, gitlab-code-quality</p>
+<p>Write results to a file in the specified format. Must be combined with the --report-path option.</p>
+</dd>
+<dt><kbd>--report-path</kbd></dt>
+<dd><p>The path to where the report file should be written. Must be combined with the --report-format option.</p>
+</dd>
+</dl>
+</section>
+<section id="schema-selection">
+<h2>Schema selection<a class="headerlink" href="#schema-selection" title="Link to this heading"></a></h2>
+<p>This tool can validate SBOMs against any user-provided JSON schema but for convenience, two schema types are built in:</p>
+<ul class="simple">
+<li><p>The <em>default</em> schema type validates against the <a class="reference external" href="https://github.com/CycloneDX/specification">stock CycloneDX schema</a>.</p></li>
+<li><p>The <em>strict</em> schema type refers to the strict variants of the stock CycloneDX schema which were discontinued after version 1.3.</p></li>
+<li><p>The <em>custom</em> schema type uses a more restrictive schema which accepts a subset of CycloneDX. Additional requirements incorporated into the schema mostly originate from the <a class="reference external" href="https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf">NTIA</a>.</p></li>
+</ul>
+<p>You can select the schema with the <code class="docutils literal notranslate"><span class="pre">--schema-type</span></code> or <code class="docutils literal notranslate"><span class="pre">--schema-path</span></code> options:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">validate</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="p">[</span><span class="o">--</span><span class="n">schema</span><span class="o">-</span><span class="nb">type</span> <span class="n">default</span><span class="p">]</span>           <span class="c1"># stock CycloneDX schema</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">validate</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">schema</span><span class="o">-</span><span class="nb">type</span> <span class="n">custom</span>              <span class="c1"># built-in custom schema</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">validate</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">schema</span><span class="o">-</span><span class="n">path</span> <span class="o">&lt;</span><span class="n">json_schema</span><span class="o">.</span><span class="n">json</span><span class="o">&gt;</span>  <span class="c1"># your own schema</span>
+</pre></div>
+</div>
+<p>For all built-in schemas, the tool determines the CycloneDX version from the input SBOM. The following versions are currently supported:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p>Supported CycloneDX versions</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">default</span></code></p></td>
+<td><p>1.2 to 1.6</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">strict</span></code></p></td>
+<td><p>1.2 to 1.3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">custom</span></code></p></td>
+<td><p>1.3 to 1.6</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="validation-of-filename">
+<h2>Validation of filename<a class="headerlink" href="#validation-of-filename" title="Link to this heading"></a></h2>
+<p>The tool, by default, also validates the filename of the SBOM. Which filenames are accepted depends on several command-line options:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">--no-filename-validation</span></code> completely disables validation.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">--filename-pattern</span></code> to provide a custom regex.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The filename must be a full match, regex anchors (^ and $) are not required.</p></li>
+<li><p>Regex patterns often include special characters. Pay attention to escaping rules for your shell to ensure proper results.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>In all other cases, the acceptable filenames depend on the selected schema:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>When using the stock CycloneDX schema (<code class="docutils literal notranslate"><span class="pre">--schema-type</span> <span class="pre">default</span></code> or no option at all) or when using your own schema (<code class="docutils literal notranslate"><span class="pre">--schema-path</span></code> option), the validator accepts the two patterns recommended by the <a class="reference external" href="https://cyclonedx.org/specification/overview/#recognized-file-patterns">CycloneDX specification</a>: <code class="docutils literal notranslate"><span class="pre">bom.json</span></code> or <code class="docutils literal notranslate"><span class="pre">*.cdx.json</span></code>.</p></li>
+<li><p>When validating against the built-in custom schema (<code class="docutils literal notranslate"><span class="pre">--schema-type</span> <span class="pre">custom</span></code>), filenames must match one of these patterns: <code class="docutils literal notranslate"><span class="pre">bom.json</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;_&lt;version&gt;_&lt;hash&gt;|&lt;timestamp&gt;|&lt;hash&gt;_&lt;timestamp&gt;.cdx.json</span></code>. See below for explanations of the placeholders.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;version&gt;</span></code> correspond to the respective fields in <code class="docutils literal notranslate"><span class="pre">metadata.component</span></code> in the SBOM.</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;timestamp&gt;</span></code> corresponds to <code class="docutils literal notranslate"><span class="pre">metadata.timestamp</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;hash&gt;</span></code> means any value in <code class="docutils literal notranslate"><span class="pre">metadata.component.hashes[].content</span></code>.</p>
+<p>Either <code class="docutils literal notranslate"><span class="pre">&lt;timestamp&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;hash&gt;</span></code> must be present. If both are specified, <code class="docutils literal notranslate"><span class="pre">&lt;hash&gt;</span></code> must come first.</p>
+</section>
+<section id="output">
+<h2>Output<a class="headerlink" href="#output" title="Link to this heading"></a></h2>
+<p>By default, the command writes human-readable validation results to <em>stderr</em> only. For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the <code class="docutils literal notranslate"><span class="pre">--report-format</span></code> option and an output path using the <code class="docutils literal notranslate"><span class="pre">--report-path</span></code> option.</p>
+<p>These formats are currently supported:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/jenkinsci/warnings-ng-plugin">Jenkins warnings-ng-plugin</a></p></li>
+<li><p><a class="reference external" href="https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool">GitLab Code Quality</a></p></li>
+</ul>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Write human-readable messages to stderr and a report in warnings-ng format to report.json</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">validate</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="nb">format</span> <span class="n">warnings</span><span class="o">-</span><span class="n">ng</span> <span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="n">path</span> <span class="n">report</span><span class="o">.</span><span class="n">json</span>
+
+<span class="c1"># Write only a report in GitLab Code Quality format to cq.json</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="o">--</span><span class="n">quiet</span> <span class="n">validate</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="nb">format</span> <span class="n">gitlab</span><span class="o">-</span><span class="n">code</span><span class="o">-</span><span class="n">quality</span> <span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="n">path</span> <span class="n">cq</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="set.html" class="btn btn-neutral float-left" title="set" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../known_limitations.html" class="btn btn-neutral float-right" title="Known Limitations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Festo SE &amp; Co. KG.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

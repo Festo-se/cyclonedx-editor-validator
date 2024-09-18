@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>set &mdash; CycloneDX Editor Validator Tool 0.18.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
+      <link rel="stylesheet" type="text/css" href="https://www.festo.com/fonts/fonts.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29ae757a"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="validate" href="validate.html" />
+    <link rel="prev" title="merge-vex" href="merge-vex.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            CycloneDX Editor Validator Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
+<li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="merge-vex.html">merge-vex</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">set</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-target">target</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#target-components">Target components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#protected-fields">Protected fields</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#values">Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#conflicts">Conflicts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-list-file-format">Set list file format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="validate.html">validate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#exit-codes">Exit codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Further information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../maintainers.html">Maintainers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CycloneDX Editor Validator Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Usage</a></li>
+      <li class="breadcrumb-item active">set</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/set.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="set">
+<h1>set<a class="headerlink" href="#set" title="Link to this heading"></a></h1>
+<p>This command sets properties on specified components to specified values. If a component in an SBOM is missing a particular property or the property is present but has a wrong value, this command can be used to modify just the affected properties without changing the rest of the SBOM.</p>
+<p>For this command to work, three bits of information must be provided by the user: The <em>target</em> component(s) to modify as well as the <em>name</em> and <em>new value</em> of each property to set on the target component.</p>
+<p>This data can either be passed directly on the command-line — in this case only a single update can be performed per invocation — or in a JSON file — this allows performing an unlimited number of updates in a single invocation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">set</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">force</span><span class="p">]</span> <span class="p">(</span><span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">file</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span> <span class="o">|</span> <span class="o">&lt;</span><span class="n">target</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">key</span> <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">value</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<section id="create_parser-positional-arguments">
+<h2>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>&lt;input&gt;</kbd></dt>
+<dd><p>Path to the input SBOM file.</p>
+</dd>
+</dl>
+</section>
+<section id="create_parser-named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>--output, -o</kbd></dt>
+<dd><p>The path to where the output should be written. If this is a file, output is written there. If it’s a directory, output is written to a file with an auto-generated name inside that directory. If it’s not specified, output is written to stdout.</p>
+</dd>
+<dt><kbd>--from-file</kbd></dt>
+<dd><p>Read the target components and updated fields from a file or URL. Cannot be used in conjunction with a target option or the --key and --value options.</p>
+</dd>
+<dt><kbd>--key</kbd></dt>
+<dd><p>Name of the component field to set or update. May not be combined with --from-file.</p>
+</dd>
+<dt><kbd>--value</kbd></dt>
+<dd><p>The new value for the field. If the target field is an array or object, you’ll have to format your value as a valid JSON object or array, too. May not be combined with --from-file.</p>
+</dd>
+<dt><kbd>--force, -f</kbd></dt>
+<dd><p>Quietly overwrite existing information without asking.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt><kbd>--ignore-existing</kbd></dt>
+<dd><p>Quietly skip existing information without asking.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt><kbd>--allow-protected</kbd></dt>
+<dd><p>Allow writing protected fields, e.g., identifiers.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt><kbd>--ignore-missing</kbd></dt>
+<dd><p>Suppress warnings that a component is not present when using ‘--from-file’</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="create_parser-target">
+<h2>target<a class="headerlink" href="#create_parser-target" title="Link to this heading"></a></h2>
+<p>Identifies the target component. If the --from-file option is not used, exactly one of these options must be specified. --name, --version and --group act together to identify a component. If the --from-file option is used, none of these options may be present.</p>
+<dl class="option-list">
+<dt><kbd>--cpe</kbd></dt>
+<dd><p>CPE of target component.</p>
+</dd>
+<dt><kbd>--purl</kbd></dt>
+<dd><p>PURL of target component.</p>
+</dd>
+<dt><kbd>--swid</kbd></dt>
+<dd><p>SWID of target component.</p>
+</dd>
+<dt><kbd>--name</kbd></dt>
+<dd><p>Name of target component. Can be combined with group and version.</p>
+</dd>
+<dt><kbd>--group</kbd></dt>
+<dd><p>Group of target component. If specified, name must also be specified.</p>
+</dd>
+<dt><kbd>--version</kbd></dt>
+<dd><p>Version of target component. If specified, name must also be specified.</p>
+</dd>
+<dt><kbd>--version-range</kbd></dt>
+<dd><p>Version range of target components. If specified, name must also be specified.</p>
+</dd>
+</dl>
+</section>
+<section id="target-components">
+<h2>Target components<a class="headerlink" href="#target-components" title="Link to this heading"></a></h2>
+<p>The <em>target component</em> can be identified through any of the identifiable properties defined by CycloneDX, specifically: <em>cpe</em>, <em>purl</em>, <em>swid</em> or the combination of <em>name</em>, <em>group</em> and/or <em>version</em> (collectively called <em>coordinates</em>).</p>
+<p>If <em>coordinates</em> are used to identify the target, they must match the component fully. In other words, if <strong>only</strong> <em>name</em> is given, it will <strong>only match</strong> components with that name which do <strong>not</strong> contain <em>version</em> or <em>group</em> fields.</p>
+<p>In <em>coordinates</em> it is also possible to provide a range of versions using the <em>version-range</em> parameter instead of <em>version</em> following the <a class="reference external" href="https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst">PURL specification</a> as referenced by <a class="reference external" href="https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range">CycloneDX</a>.</p>
+<p>The version range has the format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="o">&lt;</span><span class="n">versioning</span><span class="o">-</span><span class="n">scheme</span><span class="o">&gt;/&lt;</span><span class="n">version</span><span class="o">-</span><span class="n">constraint</span><span class="o">&gt;|&lt;</span><span class="n">version</span><span class="o">-</span><span class="n">constraint</span><span class="o">&gt;|...</span>
+</pre></div>
+</div>
+<p>beginning with the <code class="docutils literal notranslate"><span class="pre">vers</span></code> identifier. Following this the versioning scheme is specified, in the case of semantic versioning this would be <code class="docutils literal notranslate"><span class="pre">semver</span></code> or <code class="docutils literal notranslate"><span class="pre">generic</span></code>. Following this a list of constraints divided by an <code class="docutils literal notranslate"><span class="pre">|</span></code> can be provided, to specify which versions are in scope.
+A few examples:</p>
+<p>To target all versions higher than and not including 2.0.0 the version range to provide would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/&gt;</span><span class="mf">2.0.0</span>
+</pre></div>
+</div>
+<p>To target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 the version range to provide would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/&gt;</span><span class="mf">2.0.0</span><span class="o">|&lt;=</span><span class="mf">4.5.0</span>
+</pre></div>
+</div>
+<p>To target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 except the single version 4.1.1 the version range to provide would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/&gt;</span><span class="mf">2.0.0</span><span class="o">|!=</span><span class="mf">4.1.1</span><span class="o">|&lt;=</span><span class="mf">4.5.0</span>
+</pre></div>
+</div>
+<p>To target all versions to target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 as well as the additional version 5.0.0 the version range to provide would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/&gt;</span><span class="mf">2.0.0</span><span class="o">|&lt;=</span><span class="mf">4.5.0</span><span class="o">|</span><span class="mf">5.0.0</span>
+</pre></div>
+</div>
+<p>Note that instead of specific version constraints it is possible to provide a wildcard <em>*</em> to allow all versions. So to target all versions the provided version range would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/*</span>
+</pre></div>
+</div>
+<p>Further information on the supported versions can be found here <a class="reference external" href="https://pypi.org/project/univers/">univers documentation</a>.</p>
+<p>If the target component isn’t found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the <code class="docutils literal notranslate"><span class="pre">--ignore-missing</span></code> flag.</p>
+</section>
+<section id="protected-fields">
+<h2>Protected fields<a class="headerlink" href="#protected-fields" title="Link to this heading"></a></h2>
+<p>Some fields are protected and cannot be set by default. The full list of protected properties is:</p>
+<ul class="simple">
+<li><p><em>cpe</em></p></li>
+<li><p><em>purl</em></p></li>
+<li><p><em>swid</em></p></li>
+<li><p><em>name</em></p></li>
+<li><p><em>group</em></p></li>
+<li><p><em>version</em></p></li>
+<li><p><em>components</em></p></li>
+</ul>
+<p>To set any of these fields, use the <code class="docutils literal notranslate"><span class="pre">--allow-protected</span></code> command-line switch.</p>
+</section>
+<section id="values">
+<h2>Values<a class="headerlink" href="#values" title="Link to this heading"></a></h2>
+<p>The <em>value</em> must be given as a valid JSON value. That means command-line usage can be a little strange, when setting a simple string value. To be valid JSON, the string must be surrounded by double quotes. Since double quotes hold a special meaning in most shells, they will likely have to be escaped. An example in the bash shell:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set a simple string property, such as copyright in bash</span>
+cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--cpe<span class="w"> </span>&lt;target-cpe&gt;<span class="w"> </span>--key<span class="w"> </span>copyright<span class="w"> </span>--value<span class="w"> </span><span class="s1">&#39;&quot;2022 Acme Inc&quot;&#39;</span>
+
+<span class="c1"># Set the copyright for all versions of the given component</span>
+cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--group<span class="o">=</span>org.acme<span class="w"> </span>--name<span class="o">=</span>my_program<span class="w"> </span>--version-range<span class="w"> </span>vers:generic/*<span class="w"> </span>--key<span class="w"> </span>copyright<span class="w"> </span>--value<span class="w"> </span><span class="s1">&#39;&quot;Copyright 2024 Acme&quot;&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="conflicts">
+<h2>Conflicts<a class="headerlink" href="#conflicts" title="Link to this heading"></a></h2>
+<p>Conflicts arise when a target component already has a value for the specified property. When this happens, the command follows the following rules to determine how to proceed:</p>
+<ol class="arabic simple">
+<li><p>If the new value is <code class="docutils literal notranslate"><span class="pre">null</span></code>, delete the existing property. The tool assumes that a user who sets <code class="docutils literal notranslate"><span class="pre">null</span></code> is aware that the property exists and wants to delete it.</p></li>
+<li><p>If the property is an array, the new value is appended to the old value.</p></li>
+<li><p>If the <code class="docutils literal notranslate"><span class="pre">--ignore-existing</span></code> command-line option is set, the old value will not be overwritten.</p></li>
+<li><p>If the <code class="docutils literal notranslate"><span class="pre">--force</span></code> command-line option is set, the old value is overwritten with the new.</p></li>
+<li><p>If the tool is running in an interactive terminal, the user is prompted to decide whether to overwrite the old value.</p></li>
+<li><p>If none of the above applies, an error is thrown.</p></li>
+</ol>
+<p>Hawk-eyed readers will have spotted a little stumbling block in these rules. What if an array should be overwritten? A little trickery is needed here. The property must first be explicitly deleted by setting it to <code class="docutils literal notranslate"><span class="pre">null</span></code>, then re-added with the new value.
+On the command-line this can be done in two subsequent invocations:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Overwrite an array-valued property</span>
+cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--cpe<span class="w"> </span>&lt;target_cpe&gt;<span class="w"> </span>--key<span class="w"> </span>licenses<span class="w"> </span>--value<span class="w"> </span>null
+cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--cpe<span class="w"> </span>&lt;target_cpe&gt;<span class="w"> </span>--key<span class="w"> </span>licenses<span class="w"> </span>--value<span class="w"> </span><span class="s1">&#39;[{&quot;license&quot;: {&quot;id&quot;: &quot;MIT&quot;}}]&#39;</span>
+</pre></div>
+</div>
+<p>When passing the set list in a file, two separate updates must be specified for the same target component.</p>
+</section>
+<section id="set-list-file-format">
+<h2>Set list file format<a class="headerlink" href="#set-list-file-format" title="Link to this heading"></a></h2>
+<p>When passing the targets, names and values in a file, the file must conform to this format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1"># Could be any one of the identifying properties in CycloneDX.</span>
+            <span class="c1"># Multiple identifiers are not allowed (with the special exception of name,</span>
+            <span class="c1"># group and version/version-range which are only valid together)</span>
+            <span class="s2">&quot;cpe&quot;</span><span class="p">:</span> <span class="s2">&quot;CPE of target component goes here&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1"># Sets a simple property</span>
+            <span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;2022 Acme Inc&quot;</span><span class="p">,</span>
+            <span class="c1"># Deletes a property</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+            <span class="c1"># Sets an array array-valued property. If the property already exists on the target,</span>
+            <span class="c1"># the new value will be appended to the existing one.</span>
+            <span class="s2">&quot;licenses&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;license&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;MIT&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Example for the use of version ranges:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;web-framework&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span>
+            <span class="c1"># It is possible to provide a version range</span>
+            <span class="c1"># the format must comply with the PURL specification for version ranges</span>
+            <span class="s2">&quot;version-range&quot;</span><span class="p">:</span> <span class="s2">&quot;vers:generic/&gt;=1.0.2|&lt;2.0.0&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+            <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;1990 Acme Inc&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;firmware-framework&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span>
+            <span class="c1"># It is also possible to provide a wildcard for the version</span>
+            <span class="c1"># if the version is set to &quot;*&quot; all versions of the specified schema are passed</span>
+            <span class="s2">&quot;version-range&quot;</span><span class="p">:</span> <span class="s2">&quot;vers:generic/*&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+            <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;1990 Acme Inc&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>The above provided example would set the <cite>copyright</cite> in the component</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;web-framework&quot;</span>
+    <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;1.5.0&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>while it would leave the component</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;web-framework&quot;</span>
+    <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;2.0.0&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>unchanged.</p>
+<p>This file can then be applied as the following example shows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Perform several operations on properties using set-command</span>
+cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--from-file<span class="w"> </span>mysetfile.json
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="merge-vex.html" class="btn btn-neutral float-left" title="merge-vex" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="validate.html" class="btn btn-neutral float-right" title="validate" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Festo SE &amp; Co. KG.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

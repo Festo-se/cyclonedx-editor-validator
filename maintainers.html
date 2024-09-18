@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CycloneDX Editor Validator Tool &mdash; CycloneDX Editor Validator Tool 0.18.2 documentation</title>
+  <title>Maintainers &mdash; CycloneDX Editor Validator Tool 0.18.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/festo-web-essentials.css" />
@@ -20,11 +20,11 @@
         <script src="_static/documentation_options.js?v=29ae757a"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="First Steps" href="first_steps.html" /> 
+    <link rel="next" title="Contributing" href="CONTRIBUTING.html" />
+    <link rel="prev" title="Known Limitations" href="known_limitations.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -35,7 +35,7 @@
 
           
           
-          <a href="#" class="icon icon-home">
+          <a href="index.html" class="icon icon-home">
             CycloneDX Editor Validator Tool
           </a>
 <div role="search">
@@ -47,15 +47,15 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CycloneDX Editor Validator Tool</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">CycloneDX Editor Validator Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="first_steps.html">First Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage/index.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="known_limitations.html">Known Limitations</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Further information</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="maintainers.html">Maintainers</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Maintainers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
 </ul>
 
@@ -65,17 +65,17 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">CycloneDX Editor Validator Tool</a>
+          <a href="index.html">CycloneDX Editor Validator Tool</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">CycloneDX Editor Validator Tool</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Maintainers</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/maintainers.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -83,35 +83,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cyclonedx-editor-validator-tool">
-<h1>CycloneDX Editor Validator Tool<a class="headerlink" href="#cyclonedx-editor-validator-tool" title="Link to this heading"></a></h1>
-<p>This command-line tool performs various actions on <a class="reference external" href="https://cyclonedx.org/">CycloneDX</a> SBOMs. It allows you to modify, merge and validate your Software Bill of Materials (SBOM).
-Originally, it was created to validate CycloneDX SBOMs against not only official schema, which is already supported by <a class="reference external" href="https://github.com/CycloneDX/cyclonedx-cli">cyclonedx-cli</a>, but also custom schemas.
-Please note that even though we are speaking of “SBOMs”, the tool does not have any limitation regarding the variant of CycloneDX BOMs, e.g., it also works with BOMs having only “hardware” included.</p>
-<p>This tool also offers command to amend and set, respectively editing information within a BOM. In addition the tool supports merging two or more BOMs.</p>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CycloneDX Editor Validator Tool</a></li>
-<li class="toctree-l1"><a class="reference internal" href="first_steps.html">First Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage/index.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="known_limitations.html">Known Limitations</a></li>
+  <section id="maintainers">
+<h1>Maintainers<a class="headerlink" href="#maintainers" title="Link to this heading"></a></h1>
+<p>The following people are currently principally responsible for development of this tool:</p>
+<ul class="simple">
+<li><p>Aleg Vilinski (<a class="reference external" href="mailto:aleg&#46;vilinski&#37;&#52;&#48;festo&#46;com">aleg<span>&#46;</span>vilinski<span>&#64;</span>festo<span>&#46;</span>com</a>)</p></li>
 </ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Further information</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="maintainers.html">Maintainers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+<p>Contributions were made by:</p>
+<ul class="simple">
+<li><p>Moritz Marseu (<a class="reference external" href="mailto:moritz&#46;marseu&#37;&#52;&#48;festo&#46;com">moritz<span>&#46;</span>marseu<span>&#64;</span>festo<span>&#46;</span>com</a>)</p></li>
+<li><p>Christian Beck (<a class="reference external" href="mailto:christian&#46;beck&#37;&#52;&#48;festo&#46;com">christian<span>&#46;</span>beck<span>&#64;</span>festo<span>&#46;</span>com</a>)</p></li>
 </ul>
-</div>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="first_steps.html" class="btn btn-neutral float-right" title="First Steps" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="known_limitations.html" class="btn btn-neutral float-left" title="Known Limitations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CONTRIBUTING.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CycloneDX Editor Validator Tool &mdash; CycloneDX Editor Validator Tool 0.18.2 documentation</title>
+  <title>First Steps &mdash; CycloneDX Editor Validator Tool 0.18.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/festo-web-essentials.css" />
@@ -20,11 +20,11 @@
         <script src="_static/documentation_options.js?v=29ae757a"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="First Steps" href="first_steps.html" /> 
+    <link rel="next" title="Usage" href="usage/index.html" />
+    <link rel="prev" title="CycloneDX Editor Validator Tool" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -35,7 +35,7 @@
 
           
           
-          <a href="#" class="icon icon-home">
+          <a href="index.html" class="icon icon-home">
             CycloneDX Editor Validator Tool
           </a>
 <div role="search">
@@ -48,8 +48,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CycloneDX Editor Validator Tool</a></li>
-<li class="toctree-l1"><a class="reference internal" href="first_steps.html">First Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">CycloneDX Editor Validator Tool</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">First Steps</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="usage/index.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="known_limitations.html">Known Limitations</a></li>
 </ul>
@@ -65,17 +69,17 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">CycloneDX Editor Validator Tool</a>
+          <a href="index.html">CycloneDX Editor Validator Tool</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">CycloneDX Editor Validator Tool</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">First Steps</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/first_steps.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -83,35 +87,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cyclonedx-editor-validator-tool">
-<h1>CycloneDX Editor Validator Tool<a class="headerlink" href="#cyclonedx-editor-validator-tool" title="Link to this heading"></a></h1>
-<p>This command-line tool performs various actions on <a class="reference external" href="https://cyclonedx.org/">CycloneDX</a> SBOMs. It allows you to modify, merge and validate your Software Bill of Materials (SBOM).
-Originally, it was created to validate CycloneDX SBOMs against not only official schema, which is already supported by <a class="reference external" href="https://github.com/CycloneDX/cyclonedx-cli">cyclonedx-cli</a>, but also custom schemas.
-Please note that even though we are speaking of “SBOMs”, the tool does not have any limitation regarding the variant of CycloneDX BOMs, e.g., it also works with BOMs having only “hardware” included.</p>
-<p>This tool also offers command to amend and set, respectively editing information within a BOM. In addition the tool supports merging two or more BOMs.</p>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CycloneDX Editor Validator Tool</a></li>
-<li class="toctree-l1"><a class="reference internal" href="first_steps.html">First Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage/index.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="known_limitations.html">Known Limitations</a></li>
-</ul>
+  <section id="first-steps">
+<h1>First Steps<a class="headerlink" href="#first-steps" title="Link to this heading"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>This tool is published on <a class="reference external" href="https://pypi.org/project/cyclonedx-editor-validator/">PyPi</a> and can be installed via pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>cyclonedx-editor-validator
+</pre></div>
 </div>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Further information</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="maintainers.html">Maintainers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
-</ul>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<p>The tool comes with built-in command-line help on its usage. To display these hints, run it with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cdx-ev<span class="w"> </span>--help<span class="w">              </span><span class="c1"># Lists commands and options</span>
+cdx-ev<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--help<span class="w">    </span><span class="c1"># Help for a specific command and its options</span>
+</pre></div>
 </div>
+<p>Or clone the repository and run it as module with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Festo-se/cyclonedx-editor-validator.git<span class="w"> </span><span class="c1"># Clone repository</span>
+python<span class="w"> </span>-m<span class="w"> </span>cdxev<span class="w"> </span>--help<span class="w"> </span><span class="c1"># Lists commands and options</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="first_steps.html" class="btn btn-neutral float-right" title="First Steps" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="CycloneDX Editor Validator Tool" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usage/index.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

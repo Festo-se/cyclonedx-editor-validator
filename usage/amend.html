@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>amend &mdash; CycloneDX Editor Validator Tool 0.18.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
+      <link rel="stylesheet" type="text/css" href="https://www.festo.com/fonts/fonts.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29ae757a"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="build-public" href="build-public.html" />
+    <link rel="prev" title="Usage" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            CycloneDX Editor Validator Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">amend</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-options-for-'add-license-text'">Options for ‘add-license-text’</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#operation-details">Operation details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#add-bom-ref">add-bom-ref</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#add-license-text">add-license-text</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compositions">compositions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#default-author">default-author</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#delete-ambiguous-licenses">delete-ambiguous-licenses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#infer-supplier">infer-supplier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#license-name-to-id">license-name-to-id</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
+<li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="merge-vex.html">merge-vex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="validate.html">validate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#exit-codes">Exit codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Further information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../maintainers.html">Maintainers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CycloneDX Editor Validator Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Usage</a></li>
+      <li class="breadcrumb-item active">amend</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/amend.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="amend">
+<h1>amend<a class="headerlink" href="#amend" title="Link to this heading"></a></h1>
+<p><p>The amend command splits its functionality into several operations.
+You can select which operations run using the --operation option. If you don’t, operations marked [default] will run.
+The following operations are available:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>add-bom-ref [default]:</dt><dd><p>Adds a ‘bom-ref’ to components which don’t have one yet.</p>
+</dd>
+<dt>add-license-text:</dt><dd><p>Adds user-provided license texts to licenses with a specific name (not
+id).</p>
+</dd>
+<dt>compositions [default]:</dt><dd><p>Declares all component compositions as ‘unknown’.</p>
+</dd>
+<dt>default-author [default]:</dt><dd><p>Sets author of the metadata component to ‘automated’, if missing.</p>
+</dd>
+<dt>delete-ambiguous-licenses:</dt><dd><p>Deletes license claims which are solely identified by the ‘name’
+property.</p>
+</dd>
+<dt>infer-supplier [default]:</dt><dd><p>Attempts to infer component supplier from other fields.</p>
+</dd>
+<dt>license-name-to-id [default]:</dt><dd><p>Attempts to infer SPDX ids from license names.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">amend</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">operation</span> <span class="o">&lt;</span><span class="n">operation</span><span class="o">&gt;</span><span class="p">]</span>
+                    <span class="p">[</span><span class="o">--</span><span class="n">help</span><span class="o">-</span><span class="n">operation</span> <span class="o">&lt;</span><span class="n">operation</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">license</span><span class="o">-</span><span class="nb">dir</span> <span class="n">LICENSE_DIR</span><span class="p">]</span>
+                    <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
+                    <span class="p">[</span><span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="create_parser-positional-arguments">
+<h2>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>&lt;input&gt;</kbd></dt>
+<dd><p>Path to the SBOM file.</p>
+</dd>
+</dl>
+</section>
+<section id="create_parser-named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>--operation</kbd></dt>
+<dd><p>Possible choices: add-bom-ref, add-license-text, compositions, default-author, delete-ambiguous-licenses, infer-supplier, license-name-to-id</p>
+<p>Select an operation to run. Can be provided more than once to run multiple operations in one run.</p>
+</dd>
+<dt><kbd>--help-operation</kbd></dt>
+<dd><p>Possible choices: add-bom-ref, add-license-text, compositions, default-author, delete-ambiguous-licenses, infer-supplier, license-name-to-id</p>
+<p>Displays details about an operation and exits afterwards.</p>
+</dd>
+<dt><kbd>--output, -o</kbd></dt>
+<dd><p>The path to where the output should be written. If this is a file, output is written there. If it’s a directory, output is written to a file with an auto-generated name inside that directory. If it’s not specified, output is written to stdout.</p>
+</dd>
+</dl>
+</section>
+<section id="create_parser-options-for-'add-license-text'">
+<h2>Options for ‘add-license-text’<a class="headerlink" href="#create_parser-options-for-'add-license-text'" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>--license-dir</kbd></dt>
+<dd><p>Path to a folder with files containing license texts.</p>
+</dd>
+</dl>
+</section>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The order of operations cannot be controlled. If you want to ensure two operations run in a certain order you must run the command twice, each time with a different set of operations.</p>
+</div>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run all default operations on an SBOM.</span>
+cdx-ev<span class="w"> </span>amend<span class="w"> </span>bom.json
+
+<span class="c1"># Run only the default-author and add-bom-ref operations.</span>
+cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>default-author<span class="w"> </span>--operation<span class="w"> </span>add-bom-ref<span class="w"> </span>bom.json
+
+<span class="c1"># Run the add-license-text operation. License texts are stored in a directory named &#39;license_texts&#39;.</span>
+<span class="c1"># Afterwards, run the delete-ambiguous-licenses operation.</span>
+cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>add-license-text<span class="w"> </span>--license-dir<span class="w"> </span>./license_texts<span class="w"> </span>bom.json<span class="w"> </span>--output<span class="w"> </span>bom.json
+cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>delete-ambiguous-licenses<span class="w"> </span>bom.json
+</pre></div>
+</div>
+</section>
+<section id="operation-details">
+<h2>Operation details<a class="headerlink" href="#operation-details" title="Link to this heading"></a></h2>
+<section id="add-bom-ref">
+<h3>add-bom-ref<a class="headerlink" href="#add-bom-ref" title="Link to this heading"></a></h3>
+<p>Adds a <code class="docutils literal notranslate"><span class="pre">bom-ref</span></code> to components which don’t have one yet.</p>
+<p>This operation generates bom-refs comprising a single UUIDv4 for any component which doesn’t
+have an SBOM.</p>
+</section>
+<section id="add-license-text">
+<h3>add-license-text<a class="headerlink" href="#add-license-text" title="Link to this heading"></a></h3>
+<p>The operation <em>add-license-text</em> can be used to insert known full license texts for licenses identified by name. You can use this, for instance, in workflows where SBOMs are created or edited by hand - so a clutter-free JSON is preferred - then, in a last step, full texts are inserted using this operation.</p>
+<p>License texts are inserted only if:</p>
+<ul class="simple">
+<li><p>The license has a <code class="docutils literal notranslate"><span class="pre">name</span></code> field.</p></li>
+<li><p>The license has no <code class="docutils literal notranslate"><span class="pre">id</span></code> field.</p></li>
+<li><p>The license has no or an empty <code class="docutils literal notranslate"><span class="pre">text.content</span></code> field.</p></li>
+<li><p>A matching file is found.</p></li>
+</ul>
+<p>You must provide one file per license text in a flat directory. The stem of the filename, that is everything up to the extension (i.e., up to but not including the last period), must match the license name specified in the SBOM.</p>
+<section id="example">
+<h4>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h4>
+<p>Given this license in the input SBOM:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;license&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My license&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>the operation would search the full license text in any file named <code class="docutils literal notranslate"><span class="pre">My</span> <span class="pre">license</span></code>, <code class="docutils literal notranslate"><span class="pre">My</span> <span class="pre">license.txt</span></code>, <code class="docutils literal notranslate"><span class="pre">My</span> <span class="pre">license.md</span></code>, or any other extension.
+However, the file <code class="docutils literal notranslate"><span class="pre">My</span> <span class="pre">license.2.txt</span></code> would be disregarded, because its stem (<code class="docutils literal notranslate"><span class="pre">My</span> <span class="pre">license.2</span></code>) doesn’t match the license name.</p>
+</section>
+</section>
+<section id="compositions">
+<h3>compositions<a class="headerlink" href="#compositions" title="Link to this heading"></a></h3>
+<p>Declares all component compositions as <code class="docutils literal notranslate"><span class="pre">unknown</span></code>.</p>
+<p>Any existing entries in <code class="docutils literal notranslate"><span class="pre">compositions</span></code> are replaced by a single entry that marks all
+components in the SBOM as <code class="docutils literal notranslate"><span class="pre">unknown</span></code>. This serves two goals:</p>
+<ul class="simple">
+<li><p>The NTIA recommends that known unknowns be made explicit. See
+<a class="reference external" href="https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf">https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf</a></p></li>
+<li><p>It is safer to err on the side of caution when making claims about completeness.</p></li>
+</ul>
+<p>This excludes the metadata component because any SBOM supplier should be able to state the
+level of completeness of its first-level components.</p>
+</section>
+<section id="default-author">
+<h3>default-author<a class="headerlink" href="#default-author" title="Link to this heading"></a></h3>
+<p>Sets author of the metadata component to <code class="docutils literal notranslate"><span class="pre">automated</span></code>, if missing.</p>
+</section>
+<section id="delete-ambiguous-licenses">
+<h3>delete-ambiguous-licenses<a class="headerlink" href="#delete-ambiguous-licenses" title="Link to this heading"></a></h3>
+<p>Deletes license claims which are solely identified by the <code class="docutils literal notranslate"><span class="pre">name</span></code> property.</p>
+<p>Licenses that contain only a name property but no URL or text for context provide little
+informational value beyond the fact that some form of license is present.
+In certain cases it can therefore be beneficial to remove such clutter from an SBOM.</p>
+<p>Because of the risk involved in accidentally removing important data, this operation is
+disabled by default.</p>
+</section>
+<section id="infer-supplier">
+<h3>infer-supplier<a class="headerlink" href="#infer-supplier" title="Link to this heading"></a></h3>
+<p>Attempts to infer component supplier from other fields.</p>
+<p>CycloneDX contains numerous attributes on components to attest some sort of responsibility for
+its creation or distribution with fine semantic differences between them. These include
+<code class="docutils literal notranslate"><span class="pre">author</span></code>, <code class="docutils literal notranslate"><span class="pre">authors</span></code>, <code class="docutils literal notranslate"><span class="pre">manufacturer</span></code>, <code class="docutils literal notranslate"><span class="pre">supplier</span></code>, or <code class="docutils literal notranslate"><span class="pre">publisher</span></code> and the list might
+grow in future versions.
+Unfortunately, the toolscape doesn’t work equally well with all of these. For instance,
+Dependency-Track ignores everything but <code class="docutils literal notranslate"><span class="pre">author</span></code> and <code class="docutils literal notranslate"><span class="pre">supplier</span></code>.
+However, SBOMs generated by many tools do not always expose this information for all
+components. Where it is missing, this operation attempts to infer a <code class="docutils literal notranslate"><span class="pre">supplier</span></code> from available
+data.</p>
+<p>The algorithm sets the <code class="docutils literal notranslate"><span class="pre">supplier.name</span></code> to the first element found from the following list:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">publisher</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">author</span></code></p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">supplier.url</span></code> will be inferred from the following sources, in order of precedence:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">externalReference</span></code> of type <code class="docutils literal notranslate"><span class="pre">website</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">externalReference</span></code> of type <code class="docutils literal notranslate"><span class="pre">issue-tracker</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">externalReference</span></code> of type <code class="docutils literal notranslate"><span class="pre">vcs</span></code></p></li>
+</ul>
+<p>For all of the URLs there is the additional condition that they must utilize either the
+<code class="docutils literal notranslate"><span class="pre">http</span></code> or <code class="docutils literal notranslate"><span class="pre">https</span></code> scheme.</p>
+</section>
+<section id="license-name-to-id">
+<h3>license-name-to-id<a class="headerlink" href="#license-name-to-id" title="Link to this heading"></a></h3>
+<p>Attempts to infer SPDX ids from license names.</p>
+<p>For any license on a component or the metadata component that is declared with a name but no
+id, this operation attempts to replace the name with a matching SPDX id. The operation
+contains a lookup table of common license names to SPDX ids largely sourced from
+<a class="reference external" href="https://github.com/CycloneDX/cyclonedx-core-java/">https://github.com/CycloneDX/cyclonedx-core-java/</a> and <a class="reference external" href="https://spdx.org/licenses/">https://spdx.org/licenses/</a>.</p>
+<p>Licenses that already have an id are skipped. If no corresponding id can be found, the license
+is also skipped.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="build-public.html" class="btn btn-neutral float-right" title="build-public" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Festo SE &amp; Co. KG.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

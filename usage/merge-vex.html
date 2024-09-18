@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>merge-vex &mdash; CycloneDX Editor Validator Tool 0.18.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
+      <link rel="stylesheet" type="text/css" href="https://www.festo.com/fonts/fonts.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29ae757a"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="set" href="set.html" />
+    <link rel="prev" title="merge" href="merge.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            CycloneDX Editor Validator Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
+<li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">merge-vex</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="validate.html">validate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#exit-codes">Exit codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Further information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../maintainers.html">Maintainers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CycloneDX Editor Validator Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Usage</a></li>
+      <li class="breadcrumb-item active">merge-vex</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/merge-vex.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="merge-vex">
+<h1>merge-vex<a class="headerlink" href="#merge-vex" title="Link to this heading"></a></h1>
+<div class="admonition-deprecated admonition">
+<p class="admonition-title">Deprecated</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">merge-vex</span></code> command will be superseded by a new <code class="docutils literal notranslate"><span class="pre">vex</span></code> command in a future version. For further information refer to the <a class="reference external" href="https://github.com/Festo-se/cyclonedx-editor-validator/issues/156#issuecomment-2058312043">discussion</a>.</p>
+</div>
+<p>This command requires two input files, a SBOM and a VEX file that shell be merged.
+The VEX file needs to be compatible with the SBOM.</p>
+<p>If the SBOM does not contain a VEX file, the VEX file simply be added to the SBOM.</p>
+<p>If the SBOM already contains a VEX section, the two VEX files are merged uniquely.
+In the case of duplicate entries, the ratings will be merged. Should two ratings
+of the same method contain a different rating, the newer one will be kept.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">merge</span><span class="o">-</span><span class="n">vex</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">sbom_file</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">vex_file</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<section id="create_parser-positional-arguments">
+<h2>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>&lt;sbom_file&gt;</kbd></dt>
+<dd><p>Path to SBOM file to merge.The first file is assumed to be the SBOM, the second the vex file</p>
+</dd>
+<dt><kbd>&lt;vex_file&gt;</kbd></dt>
+<dd><p>Path to VEX file to merge.The first file is assumed to be the SBOM, the second the vex file</p>
+</dd>
+</dl>
+</section>
+<section id="create_parser-named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>--output, -o</kbd></dt>
+<dd><p>The path to where the output should be written. If this is a file, output is written there. If it’s a directory, output is written to a file with an auto-generated name inside that directory. If it’s not specified, output is written to stdout.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="merge.html" class="btn btn-neutral float-left" title="merge" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="set.html" class="btn btn-neutral float-right" title="set" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Festo SE &amp; Co. KG.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

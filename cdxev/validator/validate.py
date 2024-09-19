@@ -2,6 +2,7 @@
 
 import logging
 import re
+import sys
 import typing as t
 from pathlib import Path
 
@@ -16,8 +17,6 @@ from cdxev.error import AppError
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
 from cdxev.validator.helper import load_spdx_schema, open_schema, validate_filename
-
-logger = logging.getLogger(__name__)
 
 
 def validate_sbom(
@@ -35,6 +34,10 @@ def validate_sbom(
         raise AssertionError(  # pragma: no cover
             "Exactly one of schema_path or schema_type must be non-None"
         )
+
+    logger = logging.getLogger(__name__)
+    logger.propagate = False
+    logger.addHandler(logging.StreamHandler(sys.stdout))
 
     if input_format == "json":
         try:

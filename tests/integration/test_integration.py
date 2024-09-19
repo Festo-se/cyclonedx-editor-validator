@@ -817,9 +817,9 @@ class TestValidate:
             str(input),
         )
         if expected_errors:
-            exit_code, _, stderr = run_main(capsys)
+            exit_code, stdout, _ = run_main(capsys)
             for e in expected_errors:
-                assert e in stderr
+                assert e in stdout
         else:
             exit_code, _ = run_main()
 
@@ -877,7 +877,7 @@ class TestValidate:
         self,
         argv: Callable[..., None],
         data_dir: Path,
-        caplog: pytest.LogCaptureFixture,
+        capsys: pytest.CaptureFixture[str],
     ):
         argv(
             "validate",
@@ -885,39 +885,34 @@ class TestValidate:
             "fail",
             str(data_dir / "validate" / "valid" / "default" / "laravel_1.4.cdx.json"),
         )
-        exit_code, *_ = run_main()
+        exit_code, stdout, _ = run_main(capsys=capsys)
 
         assert exit_code == Status.VALIDATION_ERROR
-        assert len(caplog.records) == 1
-        assert (
-            caplog.records[0].msg.description  # type: ignore
-            == "filename doesn't match regular expression fail"
-        )
+        assert "filename doesn't match regular expression fail" in stdout
 
     def test_implicit_filename_validation(
         self,
         argv: Callable[..., None],
         data_dir: Path,
-        caplog: pytest.LogCaptureFixture,
+        capsys: pytest.CaptureFixture[str],
     ):
         argv(
             "validate",
             str(data_dir / "validate.invalid_filename.json"),
         )
-        exit_code, *_ = run_main()
+        exit_code, stdout, _ = run_main(capsys=capsys)
 
         assert exit_code == Status.OK
-        assert len(caplog.records) == 2
         assert (
-            caplog.records[0].msg
-            == "filename doesn't match regular expression ^(bom\\.json|.+\\.cdx\\.json)$"
+            "filename doesn't match regular expression ^(bom\\.json|.+\\.cdx\\.json)$"
+            in stdout
         )
 
     def test_custom_schema(
         self,
         argv: Callable[..., None],
         data_dir: Path,
-        caplog: pytest.LogCaptureFixture,
+        capsys: pytest.CaptureFixture[str],
     ):
         argv(
             "validate",
@@ -925,12 +920,10 @@ class TestValidate:
             str(data_dir / "validate.custom_schema.json"),
             str(data_dir / "validate" / "valid" / "default" / "laravel_1.4.cdx.json"),
         )
-        exit_code, *_ = run_main()
+        exit_code, stdout, _ = run_main(capsys=capsys)
 
         assert exit_code == Status.VALIDATION_ERROR
-
-        assert len(caplog.records) == 1
-        assert caplog.records[0].msg.description.endswith("is not of type 'array'")  # type: ignore
+        assert stdout.endswith("is not of type 'array'\n")
 
     def test_invalid_schema(
         self,

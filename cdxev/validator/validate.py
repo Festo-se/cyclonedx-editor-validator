@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import contextlib
 import logging
 import re
 import sys
@@ -18,6 +19,8 @@ from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
 from cdxev.validator.helper import load_spdx_schema, open_schema, validate_filename
 
+logger = logging.getLogger(__name__)
+
 
 def validate_sbom(
     sbom: dict,
@@ -35,9 +38,15 @@ def validate_sbom(
             "Exactly one of schema_path or schema_type must be non-None"
         )
 
-    logger = logging.getLogger(__name__)
-    logger.propagate = False
-    logger.addHandler(logging.StreamHandler(sys.stdout))
+    # Redirect stderr logging handler to stdout. StopIteration is raised if no handler writing
+    # to stderr is found (i.e. during testing)
+    with contextlib.suppress(StopIteration):
+        stderr_handler = next(
+            hdlr
+            for hdlr in logging.root.handlers
+            if isinstance(hdlr, logging.StreamHandler) and hdlr.stream == sys.stderr
+        )
+        stderr_handler.setStream(sys.stdout)
 
     if input_format == "json":
         try:

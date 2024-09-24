@@ -486,7 +486,7 @@ def create_validation_parser(
     subparsers: argparse._SubParsersAction,
 ) -> argparse.ArgumentParser:
     parser = subparsers.add_parser(
-        "validate", help="Validates a SBOM against a given specification."
+        "validate", help="Validates an SBOM against a given specification."
     )
     parser.add_argument(
         "input",

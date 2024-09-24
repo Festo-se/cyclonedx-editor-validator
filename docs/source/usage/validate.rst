@@ -60,7 +60,7 @@ Either ``<timestamp>`` or ``<hash>`` must be present. If both are specified, ``<
 Output
 ------
 
-By default, the command writes human-readable validation results to *stderr* only. For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the ``--report-format`` option and an output path using the ``--report-path`` option.
+By default, the command writes human-readable validation results to *stdout* only. For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the ``--report-format`` option and an output path using the ``--report-path`` option.
 
 These formats are currently supported:
 
@@ -69,7 +69,7 @@ These formats are currently supported:
 
 Examples::
 
-    # Write human-readable messages to stderr and a report in warnings-ng format to report.json
+    # Write human-readable messages to stdout and a report in warnings-ng format to report.json
     cdx-ev validate bom.json --report-format warnings-ng --report-path report.json
 
     # Write only a report in GitLab Code Quality format to cq.json

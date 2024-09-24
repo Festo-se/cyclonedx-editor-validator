@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import contextlib
 import logging
 import re
+import sys
 import typing as t
 from pathlib import Path
 
@@ -35,6 +37,16 @@ def validate_sbom(
         raise AssertionError(  # pragma: no cover
             "Exactly one of schema_path or schema_type must be non-None"
         )
+
+    # Redirect stderr logging handler to stdout. StopIteration is raised if no handler writing
+    # to stderr is found (i.e. during testing)
+    with contextlib.suppress(StopIteration):
+        stderr_handler = next(
+            hdlr
+            for hdlr in logging.root.handlers
+            if isinstance(hdlr, logging.StreamHandler) and hdlr.stream == sys.stderr
+        )
+        stderr_handler.setStream(sys.stdout)
 
     if input_format == "json":
         try:

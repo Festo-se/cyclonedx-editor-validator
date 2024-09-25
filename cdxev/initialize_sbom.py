@@ -29,6 +29,15 @@ def initialize_sbom(
     version: Union[str, None],
     supplier_name: Union[str, None],
 ) -> dict[str, Any]:
+    """
+    Creates a initial SBOM draft to work with, containing the most basic fields.
+
+    param software_name: the name of the software the sbom is for
+    param version: the version of the sbom the software is for
+    param supplier_name: name of the supplier the software is from 
+
+    returns: initial sbom for the software
+    """
     if software_name is None:
         software_name = "Name of the software described in the SBOM"
     if version is None:

@@ -34,7 +34,7 @@ def initialize_sbom(
 
     param software_name: the name of the software the sbom is for
     param version: the version of the sbom the software is for
-    param supplier_name: name of the supplier the software is from 
+    param supplier_name: name of the supplier the software is from
 
     returns: initial sbom for the software
     """

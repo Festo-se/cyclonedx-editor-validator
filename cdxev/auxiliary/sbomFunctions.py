@@ -9,6 +9,8 @@ from typing import Any, Callable, Literal, Optional, Sequence, Union
 
 from dateutil.parser import parse
 
+from cyclonedx.model.bom import Bom
+
 logger = logging.getLogger(__name__)
 
 
@@ -406,3 +408,11 @@ def get_corresponding_reference_to_component(
             bomref_from_list = component_from_list.get("bom-ref", "")
             break
     return is_in_list, bomref_from_list
+
+# Function for the usage of the python cyclonedx model
+
+
+def deserialize(sbom: dict) -> Bom:
+    sbom.pop("compositions")  # compositions need to be removed till the model supports those
+    deserialized_bom = Bom.from_json(data=sbom)  # type: ignore
+    return deserialized_bom

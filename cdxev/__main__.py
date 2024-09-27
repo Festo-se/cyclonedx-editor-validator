@@ -717,28 +717,22 @@ def create_init_sbom_parser(
 ) -> argparse.ArgumentParser:
     parser = subparsers.add_parser(
         "init-sbom",
-        help=("Provides the first draft of a SBOM for manual completion"),
+        help=("Provides the first draft of an SBOM for manual completion."),
     )
     parser.add_argument(
         "--name",
-        metavar="<schema path>",
-        help=("Name of the software the SBOM belongs to"),
-        default=None,
-        type=str,
+        metavar="<name>",
+        help=("Name of the software the SBOM belongs to."),
     )
     parser.add_argument(
         "--version",
-        metavar="<schema path>",
-        help=("Version of the software the SBOM belongs to"),
-        default=None,
-        type=str,
+        metavar="<version>",
+        help=("Version of the software the SBOM belongs to."),
     )
     parser.add_argument(
         "--supplier",
-        metavar="<schema path>",
-        help=("Name of the supplier of the software the SBOM belongs to"),
-        default=None,
-        type=str,
+        metavar="<supplier>",
+        help=("Name of the supplier of the software the SBOM belongs to."),
     )
     add_output_argument(parser)
     parser.set_defaults(cmd_handler=invoke_init_sbom, parser=parser)
@@ -988,10 +982,9 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
 
 
 def invoke_init_sbom(args: argparse.Namespace) -> int:
-    name = args.name
-    version = args.version
-    supplier = args.supplier
-    sbom = initialize_sbom(software_name=name, supplier_name=supplier, version=version)
+    sbom = initialize_sbom(
+        software_name=args.name, supplier_name=args.supplier, version=args.version
+    )
     write_sbom(sbom, args.output, update_metadata=False)
     return Status.OK
 

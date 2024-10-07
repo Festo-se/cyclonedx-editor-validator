@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>validate &mdash; CycloneDX Editor Validator Tool 0.18.2 documentation</title>
+  <title>validate &mdash; CycloneDX Editor Validator Tool 0.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -17,7 +17,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=29ae757a"></script>
+        <script src="../_static/documentation_options.js?v=cbfb3150"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -211,14 +211,14 @@
 </section>
 <section id="output">
 <h2>Output<a class="headerlink" href="#output" title="Link to this heading"></a></h2>
-<p>By default, the command writes human-readable validation results to <em>stderr</em> only. For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the <code class="docutils literal notranslate"><span class="pre">--report-format</span></code> option and an output path using the <code class="docutils literal notranslate"><span class="pre">--report-path</span></code> option.</p>
+<p>By default, the command writes human-readable validation results to <em>stdout</em> only. For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the <code class="docutils literal notranslate"><span class="pre">--report-format</span></code> option and an output path using the <code class="docutils literal notranslate"><span class="pre">--report-path</span></code> option.</p>
 <p>These formats are currently supported:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/jenkinsci/warnings-ng-plugin">Jenkins warnings-ng-plugin</a></p></li>
 <li><p><a class="reference external" href="https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool">GitLab Code Quality</a></p></li>
 </ul>
 <p>Examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Write human-readable messages to stderr and a report in warnings-ng format to report.json</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Write human-readable messages to stdout and a report in warnings-ng format to report.json</span>
 <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">validate</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="nb">format</span> <span class="n">warnings</span><span class="o">-</span><span class="n">ng</span> <span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="n">path</span> <span class="n">report</span><span class="o">.</span><span class="n">json</span>
 
 <span class="c1"># Write only a report in GitLab Code Quality format to cq.json</span>

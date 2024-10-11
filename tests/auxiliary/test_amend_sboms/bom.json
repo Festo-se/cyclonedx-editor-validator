@@ -1,166 +1,166 @@
 {
-    "bomFormat": "CycloneDX",
-    "specVersion": "1.3",
-    "version": 1,
-    "metadata": {
-        "timestamp": "2022-09-03T01:06:14",
-        "authors": [
-            {
-                "name": "automated"
-            }
-        ],
-        "component": {
-            "type": "library",
-            "bom-ref": "some program",
-            "supplier": {
-                "name": "Company Legal"
-            },
-            "group": "com.company.internal",
-            "name": "some program",
-            "version": "T5.0.1.25",
-            "licenses": [
-                {
-                    "license": {
-                        "name": "company internal"
-                    }
-                }
-            ],
-            "copyright": "Company Legal 2022, all rights reserved"
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.3",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2022-09-03T01:06:14",
+    "authors": [
+      {
+        "name": "automated"
+      }
+    ],
+    "component": {
+      "type": "library",
+      "bom-ref": "some program",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.internal",
+      "name": "some program",
+      "version": "T5.0.1.25",
+      "licenses": [
+        {
+          "license": {
+            "name": "company internal"
+          }
         }
+      ],
+      "copyright": "Company Legal 2022, all rights reserved"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "11231231",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.internal",
+      "name": "some name",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "1.0"
     },
-    "components": [
+    {
+      "type": "library",
+      "bom-ref": "first_component",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.internal",
+      "name": "first_component",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "e84ec5567d56d2dcf963ed2e454c106d9a9f323b"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/some name@1.3.3",
+      "publisher": "some publisher",
+      "name": "some name",
+      "version": "1.3.2",
+      "cpe": "",
+      "description": "some description",
+      "scope": "required",
+      "hashes": [
         {
-            "type": "library",
-            "bom-ref": "11231231",
-            "supplier": {
-                "name": "Company Legal"
-            },
-            "group": "com.company.internal",
-            "name": "some name",
-            "copyright": "Company Legal 2022, all rights reserved",
-            "version": "1.0"
-        },
-        {
-            "type": "library",
-            "bom-ref": "first_component",
-            "supplier": {
-                "name": "Company Legal"
-            },
-            "group": "com.company.internal",
-            "name": "first_component",
-            "copyright": "Company Legal 2022, all rights reserved",
-            "version": "e84ec5567d56d2dcf963ed2e454c106d9a9f323b"
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:nuget/some name@1.3.3",
-            "publisher": "some publisher",
-            "name": "some name",
-            "version": "1.3.2",
-            "cpe": "",
-            "description": "some description",
-            "scope": "required",
-            "hashes": [
-                {
-                    "alg": "SHA-512",
-                    "content": "5F6996E38A31861449A493B9387E91097ABE06F3CA936E618E6B914091699B7319BDA7E392A532A96C06287E9B3C28786183C5FBC212AC2BBDD10809151E6DBB"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "MIT"
-                    }
-                }
-            ],
-            "copyright": "Copyright 2000-2021 some name Contributors",
-            "purl": "pkg:nuget/some name@1.3.2"
+          "alg": "SHA-512",
+          "content": "5F6996E38A31861449A493B9387E91097ABE06F3CA936E618E6B914091699B7319BDA7E392A532A96C06287E9B3C28786183C5FBC212AC2BBDD10809151E6DBB"
         }
-    ],
-    "dependencies": [
+      ],
+      "licenses": [
         {
-            "ref": "some program",
-            "dependsOn": [
-                "first_component",
-                "second_component",
-                "third_component",
-                "fourth_component",
-                "fifth_component",
-                "sixth_component",
-                "seventh_component",
-                "eight_component",
-                "ninth_component",
-                "tenth_component",
-                "eleventh_component",
-                "json"
-            ]
-        },
-        {
-            "ref": "first_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "second_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "third_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "fourth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "fifth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sixth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "seventh_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "eight_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "ninth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "tenth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "eleventh_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "json",
-            "dependsOn": []
+          "license": {
+            "id": "MIT"
+          }
         }
-    ],
-    "compositions": [
-        {
-            "aggregate": "incomplete",
-            "assemblies": [
-                "first_component",
-                "second_component",
-                "third_component",
-                "fourth_component",
-                "fifth_component",
-                "sixth_component",
-                "seventh_component",
-                "eight_component",
-                "ninth_component",
-                "tenth_component",
-                "eleventh_component",
-                "json"
-            ]
-        }
-    ]
+      ],
+      "copyright": "Copyright 2000-2021 some name Contributors",
+      "purl": "pkg:nuget/some name@1.3.2"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "some program",
+      "dependsOn": [
+        "first_component",
+        "second_component",
+        "third_component",
+        "fourth_component",
+        "fifth_component",
+        "sixth_component",
+        "seventh_component",
+        "eight_component",
+        "ninth_component",
+        "tenth_component",
+        "eleventh_component",
+        "json"
+      ]
+    },
+    {
+      "ref": "first_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "second_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "third_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "fourth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "fifth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sixth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "seventh_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "eight_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "ninth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "tenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "eleventh_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "json",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "first_component",
+        "second_component",
+        "third_component",
+        "fourth_component",
+        "fifth_component",
+        "sixth_component",
+        "seventh_component",
+        "eight_component",
+        "ninth_component",
+        "tenth_component",
+        "eleventh_component",
+        "json"
+      ]
+    }
+  ]
 }

@@ -1,1365 +1,1365 @@
 {
-    "governing_program_with_vulnerabilities_new_ratings" :  [
+  "governing_program_with_vulnerabilities_new_ratings": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
         {
-            "description": "The application is vulnerable to remote SQL injection and shell upload",
-            "id": "Vul 1",
-            "ratings": [
-                {
-                    "score": 9.8,
-                    "severity": "critical",
-                    "method": "CVSSv31",
-                    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-                },
-                {
-                    "score": 7.5,
-                    "severity": "high",
-                    "method": "CVSSv2",
-                    "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-                },
-                {
-                  "score": 6,
-                  "severity": "high",
-                  "method": "New 1",
-                  "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-              }
-            ],
-            "affects": [
-                {
-                    "ref": "sub_program"
-                }
-            ]    
-        }
-      ],
-    "governing_program_with_vulnerabilities_published": [
-        {
-            "description": "The application is vulnerable to remote SQL injection and shell upload",
-            "id": "Vul 1",
-            "published": "2022-10-12T00:14Z",
-            "ratings": [
-                {
-                    "score": 9.8,
-                    "severity": "critical",
-                    "method": "CVSSv31",
-                    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-                },
-                {
-                    "score": 7.5,
-                    "severity": "high",
-                    "method": "CVSSv2",
-                    "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-                },
-                {
-                  "score": 6,
-                  "severity": "high",
-                  "method": "New 1",
-                  "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-              }
-            ],
-            "affects": [
-                {
-                    "ref": "sub_program"
-                }
-            ]    
-        }
-      ],
-    "governing_program_with_vulnerabilities_updated": [
-        {
-            "description": "The application is vulnerable to remote SQL injection and shell upload",
-            "id": "Vul 1",
-            "published": "2022-10-12T00:14Z",
-            "updated": "2022-11-12T00:15Z",
-            "Test Name": "This should be in the merged",
-            "ratings": [
-                {
-                    "score": 9.8,
-                    "severity": "critical",
-                    "method": "CVSSv31",
-                    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-                },
-                {
-                    "score": 7.5,
-                    "severity": "high",
-                    "method": "CVSSv2",
-                    "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-                },
-                {
-                  "score": 6,
-                  "severity": "high",
-                  "method": "New 1",
-                  "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-              }
-            ],
-            "affects": [
-                {
-                    "ref": "sub_program"
-                }
-            ]    
-        }
-      ],
-      "governing_program_with_vulnerabilities":  [
-        {
-            "description": "The application is vulnerable to remote SQL injection and shell upload",
-            "id": "Vul 1",
-            "ratings": [
-                {
-                    "score": 9.8,
-                    "severity": "critical",
-                    "method": "CVSSv31",
-                    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-                },
-                {
-                    "score": 7.5,
-                    "severity": "high",
-                    "method": "CVSSv2",
-                    "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-                }
-            ],
-            "affects": [
-                {
-                    "ref": "sub_program"
-                }
-            ]    
-        }
-      ],
-    "merged_governing_program_with_vul_without": [
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 1",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sub_program"
-            }
-          ]
-        }
-      ],
-      "merged_governing_program_with_vul_tls_equal": [
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 1",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sub_program"
-            }
-          ]
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
         },
         {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 2",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "gp_first_component-copy"
-            }
-          ]
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
         },
         {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 3",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sp_first_component"
-            }
-          ]
+          "score": 6,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
         }
       ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    }
+  ],
+  "governing_program_with_vulnerabilities_published": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "published": "2022-10-12T00:14Z",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 6,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    }
+  ],
+  "governing_program_with_vulnerabilities_updated": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "published": "2022-10-12T00:14Z",
+      "updated": "2022-11-12T00:15Z",
+      "Test Name": "This should be in the merged",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 6,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    }
+  ],
+  "governing_program_with_vulnerabilities": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    }
+  ],
+  "merged_governing_program_with_vul_without": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    }
+  ],
+  "merged_governing_program_with_vul_tls_equal": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "gp_first_component-copy"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ],
   "sub_program_with_vulnerabilities_new_ratings": [
     {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 1",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "New 1",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-          },
-          {
-            "score": 7.5,
-            "severity": "high",
-            "method": "this should be in",
-            "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "this should be in",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
         }
-        ],
-        "affects": [
-            {
-                "ref": "sub_program"
-            }
-        ]    
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
     },
-  {
-    "description": "The application is vulnerable to remote SQL injection and shell upload",
-    "id": "Vul 2",
-    "ratings": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
         {
-            "score": 9.8,
-            "severity": "critical",
-            "method": "CVSSv31",
-            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
         },
         {
-            "score": 7.5,
-            "severity": "high",
-            "method": "CVSSv2",
-            "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
         }
-    ],
-    "affects": [
+      ],
+      "affects": [
         {
-            "ref": "sp_fifteenth_component"
+          "ref": "sp_fifteenth_component"
         }
-    ]    
-},
-{
-    "description": "The application is vulnerable to remote SQL injection and shell upload",
-    "id": "Vul 3",
-    "ratings": [
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
         {
-            "score": 9.8,
-            "severity": "critical",
-            "method": "CVSSv31",
-            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
         },
         {
-            "score": 7.5,
-            "severity": "high",
-            "method": "CVSSv2",
-            "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
         }
-    ],
-    "affects": [
+      ],
+      "affects": [
         {
-            "ref": "sp_first_component"
+          "ref": "sp_first_component"
         }
-    ]    
-}
-],
-"sub_program_with_vulnerabilities_published": [
-  {
+      ]
+    }
+  ],
+  "sub_program_with_vulnerabilities_published": [
+    {
       "description": "The application is vulnerable to remote SQL injection and shell upload",
       "id": "Vul 1",
       "published": "2022-10-12T00:15Z",
       "Test Name": "This should be in the merged",
       "ratings": [
-          {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-          },
-          {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-          },
-          {
-            "score": 2,
-            "severity": "high",
-            "method": "New 1",
-            "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 2,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
         },
         {
           "score": 7.5,
           "severity": "high",
           "method": "this should be in",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
+        }
       ],
       "affects": [
-          {
-              "ref": "sub_program"
-          }
-      ]    
-  },
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 2",
-  "ratings": [
-      {
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
           "score": 9.8,
           "severity": "critical",
           "method": "CVSSv31",
           "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
+        },
+        {
           "score": 7.5,
           "severity": "high",
           "method": "CVSSv2",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
+        }
+      ],
+      "affects": [
+        {
           "ref": "sp_fifteenth_component"
-      }
-  ]    
-},
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 3",
-  "ratings": [
-      {
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
           "score": 9.8,
           "severity": "critical",
           "method": "CVSSv31",
           "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
+        },
+        {
           "score": 7.5,
           "severity": "high",
           "method": "CVSSv2",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
+        }
+      ],
+      "affects": [
+        {
           "ref": "sp_first_component"
-      }
-  ]    
-}
-],
-"sub_program_with_vulnerabilities_several_affect_references": [
-  {
+        }
+      ]
+    }
+  ],
+  "sub_program_with_vulnerabilities_several_affect_references": [
+    {
       "description": "The application is vulnerable to remote SQL injection and shell upload",
       "id": "Vul 1",
       "ratings": [
-          {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-          },
-          {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-          }
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
       ],
       "affects": [
-          {
-              "ref": "sp_eight_component"
-          },
-          {
-              "ref": "sub_program"
-          }
-      ]    
-  },
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 2",
-  "ratings": [
-      {
+        {
+          "ref": "sp_eight_component"
+        },
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
           "score": 9.8,
           "severity": "critical",
           "method": "CVSSv31",
           "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
+        },
+        {
           "score": 7.5,
           "severity": "high",
           "method": "CVSSv2",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
+        }
+      ],
+      "affects": [
+        {
           "ref": "sp_fifteenth_component"
-      }
-  ]    
-},
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 3",
-  "ratings": [
-      {
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
           "score": 9.8,
           "severity": "critical",
           "method": "CVSSv31",
           "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
+        },
+        {
           "score": 7.5,
           "severity": "high",
           "method": "CVSSv2",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
+        }
+      ],
+      "affects": [
+        {
           "ref": "sp_first_component"
-      }
-  ]    
-}
-],
-"sub_program_with_vulnerabilities_updated_toOlder": [
-  {
+        }
+      ]
+    }
+  ],
+  "sub_program_with_vulnerabilities_updated_toOlder": [
+    {
       "description": "The application is vulnerable to remote SQL injection and shell upload",
       "id": "Vul 1",
       "published": "2022-10-12T00:15Z",
       "Test Name": "This should NOT be in the merged",
-      "updated":"2022-10-12T00:10Z",
+      "updated": "2022-10-12T00:10Z",
       "ratings": [
-          {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-          },
-          {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-          },
-          {
-            "score": 2,
-            "severity": "high",
-            "method": "New 1",
-            "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 2,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
         },
         {
           "score": 7.5,
           "severity": "high",
           "method": "this should be in",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
+        }
       ],
       "affects": [
-          {
-              "ref": "sub_program"
-          }
-      ]    
-  },
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 2",
-  "ratings": [
-      {
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
           "score": 9.8,
           "severity": "critical",
           "method": "CVSSv31",
           "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
+        },
+        {
           "score": 7.5,
           "severity": "high",
           "method": "CVSSv2",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
+        }
+      ],
+      "affects": [
+        {
           "ref": "sp_fifteenth_component"
-      }
-  ]    
-},
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 3",
-  "ratings": [
-      {
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
           "score": 9.8,
           "severity": "critical",
           "method": "CVSSv31",
           "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
+        },
+        {
           "score": 7.5,
           "severity": "high",
           "method": "CVSSv2",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
+        }
+      ],
+      "affects": [
+        {
           "ref": "sp_first_component"
-      }
-  ]    
-}
-],
-"sub_program_with_vulnerabilities_updated": [
-  {
+        }
+      ]
+    }
+  ],
+  "sub_program_with_vulnerabilities_updated": [
+    {
       "description": "The application is vulnerable to remote SQL injection and shell upload",
       "id": "Vul 1",
       "published": "2022-10-12T00:15Z",
       "updated": "2022-11-12T00:14Z",
       "Test Name": "This should NoT be in the merged",
       "ratings": [
-          {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-          },
-          {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-          },
-          {
-            "score": 2,
-            "severity": "high",
-            "method": "New 1",
-            "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 2,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
         },
         {
           "score": 7.5,
           "severity": "high",
           "method": "this should be in",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
+        }
       ],
       "affects": [
-          {
-              "ref": "sub_program"
-          }
-      ]    
-  },
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 2",
-  "ratings": [
-      {
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
           "score": 9.8,
           "severity": "critical",
           "method": "CVSSv31",
           "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
+        },
+        {
           "score": 7.5,
           "severity": "high",
           "method": "CVSSv2",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
+        }
+      ],
+      "affects": [
+        {
           "ref": "sp_fifteenth_component"
-      }
-  ]    
-},
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 3",
-  "ratings": [
-      {
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
           "score": 9.8,
           "severity": "critical",
           "method": "CVSSv31",
           "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
+        },
+        {
           "score": 7.5,
           "severity": "high",
           "method": "CVSSv2",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
+        }
+      ],
+      "affects": [
+        {
           "ref": "sp_first_component"
-      }
-  ]    
-}
-],
-"sub_program_with_vulnerabilities": [
-  {
+        }
+      ]
+    }
+  ],
+  "sub_program_with_vulnerabilities": [
+    {
       "description": "The application is vulnerable to remote SQL injection and shell upload",
       "id": "Vul 1",
       "ratings": [
-          {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-          },
-          {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-          }
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
       ],
       "affects": [
-          {
-              "ref": "sub_program"
-          }
-      ]    
-  },
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 2",
-  "ratings": [
-      {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
-          "ref": "sp_fifteenth_component"
-      }
-  ]    
-},
-{
-  "description": "The application is vulnerable to remote SQL injection and shell upload",
-  "id": "Vul 3",
-  "ratings": [
-      {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-      },
-      {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-      }
-  ],
-  "affects": [
-      {
-          "ref": "sp_first_component"
-      }
-  ]    
-}
-],
-"merged_with_vulnerabilities_several_affect_references": [
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 1",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sub_program"
-            },  
-            {   
-                "ref": "sp_eight_component"
-            }                 
-        ]
-    },
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 2",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sp_fifteenth_component"
-            }
-        ]
-    },
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 3",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sp_first_component"
-            }
-        ]
-    }
-],
-"merged_new_ratings": [
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 1",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "New 1",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "this should be in",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sub_program"
-            }
-        ]
-    },
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 2",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sp_fifteenth_component"
-            }
-        ]
-    },
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 3",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sp_first_component"
-            }
-        ]
-    }
-],
-"merged_published": [
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 1",
-        "published": "2022-10-12T00:15Z",
-        "Test Name": "This should be in the merged",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            },
-            {
-                "score": 2,
-                "severity": "high",
-                "method": "New 1",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "this should be in",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sub_program"
-            }
-        ]
-    },
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 2",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sp_fifteenth_component"
-            }
-        ]
-    },
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 3",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sp_first_component"
-            }
-        ]
-    }
-],
-"merged_updated": [
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 1",
-        "published": "2022-10-12T00:14Z",
-        "updated": "2022-11-12T00:15Z",
-        "Test Name": "This should be in the merged",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            },
-            {
-                "score": 6,
-                "severity": "high",
-                "method": "New 1",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "this should be in",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sub_program"
-            }
-        ]
-    },
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 2",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sp_fifteenth_component"
-            }
-        ]
-    },
-    {
-        "description": "The application is vulnerable to remote SQL injection and shell upload",
-        "id": "Vul 3",
-        "ratings": [
-            {
-                "score": 9.8,
-                "severity": "critical",
-                "method": "CVSSv31",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-                "score": 7.5,
-                "severity": "high",
-                "method": "CVSSv2",
-                "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-        ],
-        "affects": [
-            {
-                "ref": "sp_first_component"
-            }
-        ]
-    }
-],
-  "merged_governing_program_with_vul_tls_unequal": [
         {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 1",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sub_program"
-            }
-          ]
-        },
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 2",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sp_fifteenth_component"
-            }
-          ]
-        },
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 3",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sp_first_component"
-            }
-          ]
-        }
-      ],
-      "sub_program_with_vulnerabilities_equal_mbed_tls": [
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 1",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sub_program"
-            }
-          ]
-        },
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 2",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sp_fifteenth_component"
-            }
-          ]
-        },
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 3",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sp_first_component"
-            }
-          ]
-        }
-      ],
-      "dependencies_tls_equal": [
-        {
-          "ref": "sub_program",
-          "dependsOn": [
-            "sp_first_component",
-            "sp_second_component",
-            "sp_fourth_component",
-            "sp_fifth_component",
-            "sp_sixth_component",
-            "sp_seventh_component",
-            "sp_eight_component",
-            "sp_ninth_component",
-            "sp_tenth_component",
-            "sp_eleventh_component",
-            "sp_twelfth_component",
-            "sp_thirteenth_component",
-            "sp_fourteenth_component",
-            "gp_first_component-copy"
-          ]
-        },
-        {
-          "ref": "sp_first_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_second_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_fourth_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_fifth_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_sixth_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_seventh_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_eight_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_ninth_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_tenth_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_eleventh_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_twelfth_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_thirteenth_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_fourteenth_component",
-          "dependsOn": [
-            "sp_sixteenth_component",
-            "sp_seventeenth_component"
-          ]
-        },
-        {
-          "ref": "sp_sixteenth_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "sp_seventeenth_component",
-          "dependsOn": []
-        },
-        {
-          "ref": "gp_first_component-copy",
-          "dependsOn": []
-        },
-        {
-          "ref": "governing_program",
-          "dependsOn": [
-            "sub_program",
-            "gp_first_component-copy"
-          ]
-        }
-      ],
-      "compositions_tls_equal": [
-        {
-          "aggregate": "incomplete",
-          "assemblies": [
-            "sub_program",
-            "gp_first_component-copy",
-            "sp_first_component",
-            "sp_second_component",
-            "sp_fourth_component",
-            "sp_fifth_component",
-            "sp_sixth_component",
-            "sp_seventh_component",
-            "sp_eight_component",
-            "sp_ninth_component",
-            "sp_tenth_component",
-            "sp_eleventh_component",
-            "sp_twelfth_component",
-            "sp_thirteenth_component",
-            "sp_fourteenth_component",
-            "sp_sixteenth_component",
-            "sp_seventeenth_component"
-          ]
-        }
-    ],
-    "vulnerabilities_tls_equal": [
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 1",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sub_program"
-            }
-          ]
-        },
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 2",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "gp_first_component-copy"
-            }
-          ]
-        },
-        {
-          "description": "The application is vulnerable to remote SQL injection and shell upload",
-          "id": "Vul 3",
-          "ratings": [
-            {
-              "score": 9.8,
-              "severity": "critical",
-              "method": "CVSSv31",
-              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-            },
-            {
-              "score": 7.5,
-              "severity": "high",
-              "method": "CVSSv2",
-              "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-            }
-          ],
-          "affects": [
-            {
-              "ref": "sp_first_component"
-            }
-          ]
+          "ref": "sub_program"
         }
       ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_fifteenth_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ],
+  "merged_with_vulnerabilities_several_affect_references": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        },
+        {
+          "ref": "sp_eight_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_fifteenth_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ],
+  "merged_new_ratings": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "this should be in",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_fifteenth_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ],
+  "merged_published": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "published": "2022-10-12T00:15Z",
+      "Test Name": "This should be in the merged",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 2,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "this should be in",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_fifteenth_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ],
+  "merged_updated": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "published": "2022-10-12T00:14Z",
+      "updated": "2022-11-12T00:15Z",
+      "Test Name": "This should be in the merged",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 6,
+          "severity": "high",
+          "method": "New 1",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "this should be in",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_fifteenth_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ],
+  "merged_governing_program_with_vul_tls_unequal": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_fifteenth_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ],
+  "sub_program_with_vulnerabilities_equal_mbed_tls": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_fifteenth_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ],
+  "dependencies_tls_equal": [
+    {
+      "ref": "sub_program",
+      "dependsOn": [
+        "sp_first_component",
+        "sp_second_component",
+        "sp_fourth_component",
+        "sp_fifth_component",
+        "sp_sixth_component",
+        "sp_seventh_component",
+        "sp_eight_component",
+        "sp_ninth_component",
+        "sp_tenth_component",
+        "sp_eleventh_component",
+        "sp_twelfth_component",
+        "sp_thirteenth_component",
+        "sp_fourteenth_component",
+        "gp_first_component-copy"
+      ]
+    },
+    {
+      "ref": "sp_first_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_second_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fourth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fifth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_sixth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_seventh_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_eight_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_ninth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_tenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_eleventh_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_twelfth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_thirteenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fourteenth_component",
+      "dependsOn": [
+        "sp_sixteenth_component",
+        "sp_seventeenth_component"
+      ]
+    },
+    {
+      "ref": "sp_sixteenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_seventeenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "gp_first_component-copy",
+      "dependsOn": []
+    },
+    {
+      "ref": "governing_program",
+      "dependsOn": [
+        "sub_program",
+        "gp_first_component-copy"
+      ]
+    }
+  ],
+  "compositions_tls_equal": [
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "sub_program",
+        "gp_first_component-copy",
+        "sp_first_component",
+        "sp_second_component",
+        "sp_fourth_component",
+        "sp_fifth_component",
+        "sp_sixth_component",
+        "sp_seventh_component",
+        "sp_eight_component",
+        "sp_ninth_component",
+        "sp_tenth_component",
+        "sp_eleventh_component",
+        "sp_twelfth_component",
+        "sp_thirteenth_component",
+        "sp_fourteenth_component",
+        "sp_sixteenth_component",
+        "sp_seventeenth_component"
+      ]
+    }
+  ],
+  "vulnerabilities_tls_equal": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "gp_first_component-copy"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ]
 }

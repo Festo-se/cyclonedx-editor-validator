@@ -8,7 +8,7 @@
 
 "settings_changes":
   - changed-files:
-    - any-glob-to-any-file: ["*", "!LICENSE", "!README.md"] 
+    - any-glob-to-any-file: ["*", "!LICENSE", "!README.md"]
 
 "enhancement":
   - changed-files:

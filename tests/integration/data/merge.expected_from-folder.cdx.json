@@ -1,823 +1,823 @@
 {
-    "bomFormat": "CycloneDX",
-    "specVersion": "1.5",
-    "version": 2,
-    "metadata": {
-        "timestamp": "2024-06-20T13:49:23+00:00",
-        "authors": [
-            {
-                "name": "automated"
-            }
-        ],
-        "component": {
-            "type": "application",
-            "bom-ref": "governing_program",
-            "supplier": {
-                "name": "Company Legal"
-            },
-            "group": "com.company.governing",
-            "name": "governing_program",
-            "version": "T5.0.3.96",
-            "licenses": [
-                {
-                    "license": {
-                        "name": "company internal"
-                    }
-                }
-            ],
-            "copyright": "Company Legal 2022, all rights reserved"
-        },
-        "tools": {
-            "components": [
-                {
-                    "type": "application",
-                    "name": "cyclonedx-editor-validator",
-                    "publisher": "Festo SE & Co. KG",
-                    "version": "0"
-                }
-            ]
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 2,
+  "metadata": {
+    "timestamp": "2024-06-20T13:49:23+00:00",
+    "authors": [
+      {
+        "name": "automated"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "governing_program",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "name": "governing_program",
+      "version": "T5.0.3.96",
+      "licenses": [
+        {
+          "license": {
+            "name": "company internal"
+          }
         }
+      ],
+      "copyright": "Company Legal 2022, all rights reserved"
     },
-    "components": [
+    "tools": {
+      "components": [
         {
-            "type": "library",
-            "bom-ref": "sub_program",
-            "supplier": {
-                "name": "Company Legal"
-            },
-            "group": "com.company.governing",
-            "name": "sub_program",
-            "copyright": "Company Legal 2022, all rights reserved",
-            "version": "T5.0.3.96"
-        },
-        {
-            "type": "library",
-            "bom-ref": "gp_first_component-copy",
-            "supplier": {
-                "name": "The first component Contributors"
-            },
-            "name": "gp_first_component",
-            "version": "2.24.0",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_first_component",
-            "supplier": {
-                "name": "Company Legal"
-            },
-            "group": "com.company.governing",
-            "name": "sp_first_component",
-            "copyright": "Company Legal 2022, all rights reserved",
-            "version": "e84ec5567d56d2dcf963ed2e454c106d9a9f323b"
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_second_component",
-            "supplier": {
-                "name": "some name Microcontroller GmbH"
-            },
-            "name": "sp_second_component",
-            "version": "5.16.1.0",
-            "licenses": [
-                {
-                    "license": {
-                        "name": "some name OS-01264"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_fifteenth_component",
-            "supplier": {
-                "name": "The first component Contributors"
-            },
-            "name": "gp_first_component",
-            "version": "3.1.0",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_fourth_component",
-            "supplier": {
-                "name": "some name Microcontroller GmbH"
-            },
-            "name": "sp_fourth_component",
-            "version": "5.16.1.0",
-            "licenses": [
-                {
-                    "license": {
-                        "name": "some name OS-01267"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_fifth_component",
-            "supplier": {
-                "name": "some name Microcontroller GmbH"
-            },
-            "name": "sp_fifth_component",
-            "version": "3.42.6",
-            "licenses": [
-                {
-                    "license": {
-                        "name": "some name IP-00443"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_sixth_component",
-            "supplier": {
-                "name": "some name Microcontroller GmbH"
-            },
-            "name": "sp_sixth_component",
-            "version": "5.14.0",
-            "licenses": [
-                {
-                    "license": {
-                        "name": "some name FS-00766"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_seventh_component",
-            "supplier": {
-                "name": "some name Microcontroller GmbH"
-            },
-            "name": "sp_seventh_component",
-            "version": "1.02h",
-            "licenses": [
-                {
-                    "license": {
-                        "name": "some name MODB-00197"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_eight_component",
-            "supplier": {
-                "name": "some electronics"
-            },
-            "name": "sp_eight_component",
-            "version": "1.14.0",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "BSD-3-Clause"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "MIT"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "IJG"
-                    }
-                },
-                {
-                    "license": {
-                        "name": "ST SLA0044"
-                    }
-                },
-                {
-                    "license": {
-                        "name": "ST Proprietary"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_ninth_component",
-            "supplier": {
-                "name": "some electronics"
-            },
-            "name": "sp_ninth_component",
-            "version": "1.8.0",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "BSD-3-Clause"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "MIT"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "IJG"
-                    }
-                },
-                {
-                    "license": {
-                        "name": "ST SLA0044"
-                    }
-                },
-                {
-                    "license": {
-                        "name": "ST Proprietary"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_tenth_component",
-            "supplier": {
-                "name": "some electronics"
-            },
-            "name": "sp_tenth_component",
-            "version": "1.4.0-1",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "BSD-3-Clause"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "MIT"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "IJG"
-                    }
-                },
-                {
-                    "license": {
-                        "name": "ST SLA0044"
-                    }
-                },
-                {
-                    "license": {
-                        "name": "ST Proprietary"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_eleventh_component",
-            "supplier": {
-                "name": "some stuff"
-            },
-            "name": "sp_eleventh_component",
-            "version": "6.15.2",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "MIT"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_twelfth_component",
-            "supplier": {
-                "name": " a supplier"
-            },
-            "name": "sp_twelfth_component",
-            "version": "1.12",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "MIT"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "BSD-3-Clause"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "GPL-2.0-or-later"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "GPL-2.0"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "BSD-4-Clause"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "ISC"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "BSD-1-Clause"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "Zlib"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "OFL-1.1"
-                    }
-                },
-                {
-                    "license": {
-                        "name": "MCD-ST Liberty SW License Agreement V2"
-                    }
-                },
-                {
-                    "license": {
-                        "name": "PJRC.COM"
-                    }
-                },
-                {
-                    "license": {
-                        "id": "LGPL-3.0-only"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_thirteenth_component",
-            "supplier": {
-                "name": " another supplier"
-            },
-            "name": "sp_thirteenth_component",
-            "version": "3.8.0",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "MIT"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_fourteenth_component",
-            "supplier": {
-                "name": "leg"
-            },
-            "name": "GNU Tools for Arm Embedded Processors",
-            "version": "9-2019-q4-major",
-            "copyright": "Arm Limited"
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_sixteenth_component",
-            "supplier": {
-                "name": "Free Software Foundation, Inc."
-            },
-            "name": "sp_sixteenth_component",
-            "version": "9.2.1",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "GPL-3.0-only"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "sp_seventeenth_component",
-            "supplier": {
-                "name": "some website"
-            },
-            "name": "sp_seventeenth_component",
-            "version": "3.1.0",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "GPL-3.0-only"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "name": "depA",
-            "group": "com.company.unit",
-            "version": "4.0.2",
-            "bom-ref": "com.company.unit/depA@4.0.2",
-            "author": "Company Unit SE",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "externalReferences": [
-                {
-                    "type": "website",
-                    "url": "https://www.company.com"
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "name": "depB",
-            "group": "some-vendor",
-            "version": "1.2.3",
-            "bom-ref": "some-vendor/depB@1.2.3",
-            "author": "dude@some-vendor.com",
-            "supplier": {
-                "name": "Some Vendor Inc.",
-                "url": [
-                    "https://www.some-vendor.com"
-                ]
-            },
-            "components": [
-                {
-                    "type": "library",
-                    "name": "gravity",
-                    "group": "physics",
-                    "version": "0.0.1",
-                    "bom-ref": "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
-                    "licenses": [
-                        {
-                            "license": {
-                                "id": "MIT"
-                            }
-                        }
-                    ],
-                    "externalReferences": [
-                        {
-                            "type": "vcs",
-                            "url": "https://github.com/physics/gravity.git"
-                        },
-                        {
-                            "type": "website",
-                            "url": "https://www.universe.com"
-                        }
-                    ]
-                },
-                {
-                    "type": "library",
-                    "name": "x-ray",
-                    "group": "physics",
-                    "version": "18.9.5",
-                    "bom-ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
-                    "author": "Acme Inc",
-                    "licenses": [
-                        {
-                            "license": {
-                                "id": "MIT"
-                            }
-                        }
-                    ],
-                    "externalReferences": [
-                        {
-                            "type": "vcs",
-                            "url": "git://not-a-browsable-url.com/x-ray.git"
-                        }
-                    ],
-                    "components": [
-                        {
-                            "type": "library",
-                            "name": "Rudolph",
-                            "version": "6.6.6",
-                            "bom-ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6",
-                            "copyright": "2000 Santa Claus",
-                            "externalReferences": [
-                                {
-                                    "type": "vcs",
-                                    "url": "https://northpole.com/rudolph.git"
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "name": "depC",
-            "version": "3.2.1",
-            "bom-ref": "depC@3.2.1",
-            "author": "Acme Inc",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "MIT"
-                    }
-                }
-            ],
-            "components": [
-                {
-                    "type": "library",
-                    "name": "Rudolph",
-                    "version": "6.6.6",
-                    "bom-ref": "depC@3.2.1:Rudolph@6.6.6",
-                    "copyright": "2000 Santa Claus",
-                    "externalReferences": [
-                        {
-                            "type": "vcs",
-                            "url": "https://northpole.com/rudolph.git"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "application",
-            "name": "test-app",
-            "version": "1.0.0",
-            "bom-ref": "pkg:npm/test-app@1.0.0",
-            "author": "Company SE",
-            "purl": "pkg:npm/test-app@1.0.0"
+          "type": "application",
+          "name": "cyclonedx-editor-validator",
+          "publisher": "Festo SE & Co. KG",
+          "version": "0"
         }
-    ],
-    "dependencies": [
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "sub_program",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "name": "sub_program",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "T5.0.3.96"
+    },
+    {
+      "type": "library",
+      "bom-ref": "gp_first_component-copy",
+      "supplier": {
+        "name": "The first component Contributors"
+      },
+      "name": "gp_first_component",
+      "version": "2.24.0",
+      "licenses": [
         {
-            "ref": "com.company.unit/depA@4.0.2",
-            "dependsOn": [
-                "some-vendor/depB@1.2.3",
-                "depC@3.2.1"
-            ]
-        },
-        {
-            "ref": "some-vendor/depB@1.2.3",
-            "dependsOn": [
-                "some-vendor/depB@1.2.3:physics/gravity@0.0.1"
-            ]
-        },
-        {
-            "ref": "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
-            "dependsOn": [
-                "depC@3.2.1"
-            ]
-        },
-        {
-            "ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
-            "dependsOn": [
-                "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6"
-            ]
-        },
-        {
-            "ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6",
-            "dependsOn": []
-        },
-        {
-            "ref": "depC@3.2.1",
-            "dependsOn": []
-        },
-        {
-            "ref": "sub_program",
-            "dependsOn": [
-                "sp_first_component",
-                "sp_second_component",
-                "sp_fourth_component",
-                "sp_fifth_component",
-                "sp_sixth_component",
-                "sp_seventh_component",
-                "sp_eight_component",
-                "sp_ninth_component",
-                "sp_tenth_component",
-                "sp_eleventh_component",
-                "sp_twelfth_component",
-                "sp_thirteenth_component",
-                "sp_fourteenth_component",
-                "sp_fifteenth_component"
-            ]
-        },
-        {
-            "ref": "sp_first_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_second_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_fourth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_fifth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_sixth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_seventh_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_eight_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_ninth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_tenth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_eleventh_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_twelfth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_thirteenth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_fourteenth_component",
-            "dependsOn": [
-                "sp_sixteenth_component",
-                "sp_seventeenth_component"
-            ]
-        },
-        {
-            "ref": "sp_sixteenth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_seventeenth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "sp_fifteenth_component",
-            "dependsOn": []
-        },
-        {
-            "ref": "governing_program",
-            "dependsOn": [
-                "sub_program",
-                "gp_first_component-copy"
-            ]
-        },
-        {
-            "ref": "gp_first_component-copy",
-            "dependsOn": []
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
-    ],
-    "compositions": [
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_first_component",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "name": "sp_first_component",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "e84ec5567d56d2dcf963ed2e454c106d9a9f323b"
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_second_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_second_component",
+      "version": "5.16.1.0",
+      "licenses": [
         {
-            "aggregate": "incomplete",
-            "assemblies": [
-                "sub_program",
-                "gp_first_component-copy",
-                "sp_fifth_component",
-                "sp_sixth_component",
-                "sp_seventh_component",
-                "sp_eight_component",
-                "sp_ninth_component",
-                "sp_tenth_component",
-                "sp_eleventh_component",
-                "sp_twelfth_component",
-                "sp_thirteenth_component",
-                "sp_fourteenth_component",
-                "sp_sixteenth_component",
-                "sp_seventeenth_component",
-                "sp_fifteenth_component",
-                "com.company.unit/depA@4.0.2"
-            ]
-        },
-        {
-            "aggregate": "complete",
-            "assemblies": [
-                "sp_first_component",
-                "sp_second_component",
-                "sp_fourth_component",
-                "some-vendor/depB@1.2.3",
-                "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
-                "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
-                "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6"
-            ]
+          "license": {
+            "name": "some name OS-01264"
+          }
         }
-    ],
-    "vulnerabilities": [
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_fifteenth_component",
+      "supplier": {
+        "name": "The first component Contributors"
+      },
+      "name": "gp_first_component",
+      "version": "3.1.0",
+      "licenses": [
         {
-            "description": "The application is vulnerable to remote SQL injection and shell upload",
-            "id": "Vul 1",
-            "ratings": [
-                {
-                    "score": 9.8,
-                    "severity": "critical",
-                    "method": "CVSSv31",
-                    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-                },
-                {
-                    "score": 7.5,
-                    "severity": "high",
-                    "method": "CVSSv2",
-                    "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-                }
-            ],
-            "affects": [
-                {
-                    "ref": "sub_program"
-                }
-            ]
-        },
-        {
-            "description": "The application is vulnerable to remote SQL injection and shell upload",
-            "id": "Vul 2",
-            "ratings": [
-                {
-                    "score": 9.8,
-                    "severity": "critical",
-                    "method": "CVSSv31",
-                    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-                },
-                {
-                    "score": 7.5,
-                    "severity": "high",
-                    "method": "CVSSv2",
-                    "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-                }
-            ],
-            "affects": [
-                {
-                    "ref": "sp_fifteenth_component"
-                }
-            ]
-        },
-        {
-            "description": "The application is vulnerable to remote SQL injection and shell upload",
-            "id": "Vul 3",
-            "ratings": [
-                {
-                    "score": 9.8,
-                    "severity": "critical",
-                    "method": "CVSSv31",
-                    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-                },
-                {
-                    "score": 7.5,
-                    "severity": "high",
-                    "method": "CVSSv2",
-                    "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-                }
-            ],
-            "affects": [
-                {
-                    "ref": "sp_first_component"
-                }
-            ]
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
-    ],
-    "serialNumber": "urn:uuid:e8eec8ad-18c2-48e3-bd32-1eae1bb8dd3f"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_fourth_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_fourth_component",
+      "version": "5.16.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "some name OS-01267"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_fifth_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_fifth_component",
+      "version": "3.42.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "some name IP-00443"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_sixth_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_sixth_component",
+      "version": "5.14.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "some name FS-00766"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_seventh_component",
+      "supplier": {
+        "name": "some name Microcontroller GmbH"
+      },
+      "name": "sp_seventh_component",
+      "version": "1.02h",
+      "licenses": [
+        {
+          "license": {
+            "name": "some name MODB-00197"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_eight_component",
+      "supplier": {
+        "name": "some electronics"
+      },
+      "name": "sp_eight_component",
+      "version": "1.14.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "IJG"
+          }
+        },
+        {
+          "license": {
+            "name": "ST SLA0044"
+          }
+        },
+        {
+          "license": {
+            "name": "ST Proprietary"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_ninth_component",
+      "supplier": {
+        "name": "some electronics"
+      },
+      "name": "sp_ninth_component",
+      "version": "1.8.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "IJG"
+          }
+        },
+        {
+          "license": {
+            "name": "ST SLA0044"
+          }
+        },
+        {
+          "license": {
+            "name": "ST Proprietary"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_tenth_component",
+      "supplier": {
+        "name": "some electronics"
+      },
+      "name": "sp_tenth_component",
+      "version": "1.4.0-1",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "IJG"
+          }
+        },
+        {
+          "license": {
+            "name": "ST SLA0044"
+          }
+        },
+        {
+          "license": {
+            "name": "ST Proprietary"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_eleventh_component",
+      "supplier": {
+        "name": "some stuff"
+      },
+      "name": "sp_eleventh_component",
+      "version": "6.15.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_twelfth_component",
+      "supplier": {
+        "name": " a supplier"
+      },
+      "name": "sp_twelfth_component",
+      "version": "1.12",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-4-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "ISC"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-1-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "Zlib"
+          }
+        },
+        {
+          "license": {
+            "id": "OFL-1.1"
+          }
+        },
+        {
+          "license": {
+            "name": "MCD-ST Liberty SW License Agreement V2"
+          }
+        },
+        {
+          "license": {
+            "name": "PJRC.COM"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-3.0-only"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_thirteenth_component",
+      "supplier": {
+        "name": " another supplier"
+      },
+      "name": "sp_thirteenth_component",
+      "version": "3.8.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_fourteenth_component",
+      "supplier": {
+        "name": "leg"
+      },
+      "name": "GNU Tools for Arm Embedded Processors",
+      "version": "9-2019-q4-major",
+      "copyright": "Arm Limited"
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_sixteenth_component",
+      "supplier": {
+        "name": "Free Software Foundation, Inc."
+      },
+      "name": "sp_sixteenth_component",
+      "version": "9.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-3.0-only"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sp_seventeenth_component",
+      "supplier": {
+        "name": "some website"
+      },
+      "name": "sp_seventeenth_component",
+      "version": "3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-3.0-only"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "depA",
+      "group": "com.company.unit",
+      "version": "4.0.2",
+      "bom-ref": "com.company.unit/depA@4.0.2",
+      "author": "Company Unit SE",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://www.company.com"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "depB",
+      "group": "some-vendor",
+      "version": "1.2.3",
+      "bom-ref": "some-vendor/depB@1.2.3",
+      "author": "dude@some-vendor.com",
+      "supplier": {
+        "name": "Some Vendor Inc.",
+        "url": [
+          "https://www.some-vendor.com"
+        ]
+      },
+      "components": [
+        {
+          "type": "library",
+          "name": "gravity",
+          "group": "physics",
+          "version": "0.0.1",
+          "bom-ref": "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT"
+              }
+            }
+          ],
+          "externalReferences": [
+            {
+              "type": "vcs",
+              "url": "https://github.com/physics/gravity.git"
+            },
+            {
+              "type": "website",
+              "url": "https://www.universe.com"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "x-ray",
+          "group": "physics",
+          "version": "18.9.5",
+          "bom-ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
+          "author": "Acme Inc",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT"
+              }
+            }
+          ],
+          "externalReferences": [
+            {
+              "type": "vcs",
+              "url": "git://not-a-browsable-url.com/x-ray.git"
+            }
+          ],
+          "components": [
+            {
+              "type": "library",
+              "name": "Rudolph",
+              "version": "6.6.6",
+              "bom-ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6",
+              "copyright": "2000 Santa Claus",
+              "externalReferences": [
+                {
+                  "type": "vcs",
+                  "url": "https://northpole.com/rudolph.git"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "depC",
+      "version": "3.2.1",
+      "bom-ref": "depC@3.2.1",
+      "author": "Acme Inc",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "Rudolph",
+          "version": "6.6.6",
+          "bom-ref": "depC@3.2.1:Rudolph@6.6.6",
+          "copyright": "2000 Santa Claus",
+          "externalReferences": [
+            {
+              "type": "vcs",
+              "url": "https://northpole.com/rudolph.git"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "application",
+      "name": "test-app",
+      "version": "1.0.0",
+      "bom-ref": "pkg:npm/test-app@1.0.0",
+      "author": "Company SE",
+      "purl": "pkg:npm/test-app@1.0.0"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "com.company.unit/depA@4.0.2",
+      "dependsOn": [
+        "some-vendor/depB@1.2.3",
+        "depC@3.2.1"
+      ]
+    },
+    {
+      "ref": "some-vendor/depB@1.2.3",
+      "dependsOn": [
+        "some-vendor/depB@1.2.3:physics/gravity@0.0.1"
+      ]
+    },
+    {
+      "ref": "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
+      "dependsOn": [
+        "depC@3.2.1"
+      ]
+    },
+    {
+      "ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
+      "dependsOn": [
+        "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6"
+      ]
+    },
+    {
+      "ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "depC@3.2.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "sub_program",
+      "dependsOn": [
+        "sp_first_component",
+        "sp_second_component",
+        "sp_fourth_component",
+        "sp_fifth_component",
+        "sp_sixth_component",
+        "sp_seventh_component",
+        "sp_eight_component",
+        "sp_ninth_component",
+        "sp_tenth_component",
+        "sp_eleventh_component",
+        "sp_twelfth_component",
+        "sp_thirteenth_component",
+        "sp_fourteenth_component",
+        "sp_fifteenth_component"
+      ]
+    },
+    {
+      "ref": "sp_first_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_second_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fourth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fifth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_sixth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_seventh_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_eight_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_ninth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_tenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_eleventh_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_twelfth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_thirteenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fourteenth_component",
+      "dependsOn": [
+        "sp_sixteenth_component",
+        "sp_seventeenth_component"
+      ]
+    },
+    {
+      "ref": "sp_sixteenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_seventeenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "sp_fifteenth_component",
+      "dependsOn": []
+    },
+    {
+      "ref": "governing_program",
+      "dependsOn": [
+        "sub_program",
+        "gp_first_component-copy"
+      ]
+    },
+    {
+      "ref": "gp_first_component-copy",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "sub_program",
+        "gp_first_component-copy",
+        "sp_fifth_component",
+        "sp_sixth_component",
+        "sp_seventh_component",
+        "sp_eight_component",
+        "sp_ninth_component",
+        "sp_tenth_component",
+        "sp_eleventh_component",
+        "sp_twelfth_component",
+        "sp_thirteenth_component",
+        "sp_fourteenth_component",
+        "sp_sixteenth_component",
+        "sp_seventeenth_component",
+        "sp_fifteenth_component",
+        "com.company.unit/depA@4.0.2"
+      ]
+    },
+    {
+      "aggregate": "complete",
+      "assemblies": [
+        "sp_first_component",
+        "sp_second_component",
+        "sp_fourth_component",
+        "some-vendor/depB@1.2.3",
+        "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
+        "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
+        "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 1",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sub_program"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 2",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_fifteenth_component"
+        }
+      ]
+    },
+    {
+      "description": "The application is vulnerable to remote SQL injection and shell upload",
+      "id": "Vul 3",
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv2",
+          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "sp_first_component"
+        }
+      ]
+    }
+  ],
+  "serialNumber": "urn:uuid:e8eec8ad-18c2-48e3-bd32-1eae1bb8dd3f"
 }

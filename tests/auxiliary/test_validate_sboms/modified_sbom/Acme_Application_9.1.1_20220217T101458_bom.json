@@ -1,204 +1,204 @@
 {
-    "bomFormat": "CycloneDX",
-    "specVersion": "1.4",
-    "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
-    "version": 1,
-    "metadata": {
-        "authors": [
-            {
-                "name": "automated"
-            }
-        ],
-        "component": {
-            "type": "application",
-            "bom-ref": "acme-app",
-            "group": "com.company.internal",
-            "supplier": {
-                "name": "Company Legal"
-            },
-            "name": "Acme_Application",
-            "version": "9.1.1",
-            "copyright": "Company Legal 2022, all rights reserved",
-            "properties": [
-                {
-                    "name": "internal:component:status",
-                    "value": "internal"
-                }
-            ]
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "metadata": {
+    "authors": [
+      {
+        "name": "automated"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "acme-app",
+      "group": "com.company.internal",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "name": "Acme_Application",
+      "version": "9.1.1",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "properties": [
+        {
+          "name": "internal:component:status",
+          "value": "internal"
         }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:maven/org.acme/web-framework@1.0.0",
+      "supplier": {
+        "name": "Acme, Inc."
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-1.0"
+          }
+        }
+      ],
+      "group": "org.acme",
+      "name": "web-framework",
+      "version": "1.0.0",
+      "purl": "pkg:maven/org.acme/web-framework@1.0.0"
     },
-    "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:maven/org.acme/persistence@3.1.0",
+      "supplier": {
+        "name": "Acme, Inc."
+      },
+      "group": "org.acme",
+      "name": "persistence",
+      "version": "3.1.0",
+      "purl": "pkg:maven/org.acme/persistence@3.1.0",
+      "licenses": [
         {
-            "type": "library",
-            "bom-ref": "pkg:maven/org.acme/web-framework@1.0.0",
-            "supplier": {
-                "name": "Acme, Inc."
-            },
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-1.0"
-                    }
-                }
-            ],
-            "group": "org.acme",
-            "name": "web-framework",
-            "version": "1.0.0",
-            "purl": "pkg:maven/org.acme/web-framework@1.0.0"
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/org.acme/persistence@3.1.0",
-            "supplier": {
-                "name": "Acme, Inc."
-            },
-            "group": "org.acme",
-            "name": "persistence",
-            "version": "3.1.0",
-            "purl": "pkg:maven/org.acme/persistence@3.1.0",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/org.acme/common-util@3.0.0",
-            "supplier": {
-                "name": "Acme, Inc."
-            },
-            "licenses": [
-                {
-                    "license": {
-                        "id": "BSD-3-Clause"
-                    }
-                }
-            ],
-            "group": "org.acme",
-            "name": "common-util",
-            "version": "3.0.0",
-            "purl": "pkg:maven/org.acme/common-util@3.0.0"
-        },
-        {
-            "type": "library",
-            "bom-ref": "tomcat-catalina ref",
-            "supplier": {
-                "name": "Acme, Inc."
-            },
-            "group": "com.acme",
-            "name": "tomcat-catalina",
-            "version": "9.0.14",
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "card-verifier bom-ref",
-            "supplier": {
-                "name": "Acme, Inc."
-            },
-            "group": "",
-            "name": "card-verifier",
-            "version": "1.0.2",
-            "licenses": [
-                {
-                    "expression": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0"
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "ref on util",
-            "supplier": {
-                "name": "Example, Inc."
-            },
-            "group": "com.example",
-            "name": "util",
-            "version": "2.0.0",
-            "licenses": [
-                {
-                    "expression": "Example, Inc. Commercial License"
-                }
-            ],
-            "cpe": "cpe:2.3:a:*:util:2.0.0:*:*:*:*:*:*:*"
-        },
-        {
-            "type": "application",
-            "bom-ref": "some program application",
-            "supplier": {
-                "name": "Company Legal"
-            },
-            "group": "com.company.internal",
-            "name": "some program",
-            "version": "T4.0.1.30",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "3942447fac867ae5cdb3229b658f4d48"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "copyright": "Company Legal 2022, all rights reserved",
-            "properties": [
-                {
-                    "name": "internal:component:status",
-                    "value": "internal"
-                }
-            ]
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
-    ],
-    "dependencies": [
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:maven/org.acme/common-util@3.0.0",
+      "supplier": {
+        "name": "Acme, Inc."
+      },
+      "licenses": [
         {
-            "ref": "acme-app",
-            "dependsOn": [
-                "pkg:maven/org.acme/web-framework@1.0.0",
-                "pkg:maven/org.acme/persistence@3.1.0",
-                "some program application"
-            ]
-        },
-        {
-            "ref": "pkg:maven/org.acme/web-framework@1.0.0",
-            "dependsOn": [
-                "pkg:maven/org.acme/common-util@3.0.0"
-            ]
-        },
-        {
-            "ref": "pkg:maven/org.acme/persistence@3.1.0",
-            "dependsOn": [
-                "pkg:maven/org.acme/common-util@3.0.0"
-            ]
-        },
-        {
-            "ref": "pkg:maven/org.acme/common-util@3.0.0",
-            "dependsOn": []
+          "license": {
+            "id": "BSD-3-Clause"
+          }
         }
-    ],
-    "compositions": [
+      ],
+      "group": "org.acme",
+      "name": "common-util",
+      "version": "3.0.0",
+      "purl": "pkg:maven/org.acme/common-util@3.0.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "tomcat-catalina ref",
+      "supplier": {
+        "name": "Acme, Inc."
+      },
+      "group": "com.acme",
+      "name": "tomcat-catalina",
+      "version": "9.0.14",
+      "licenses": [
         {
-            "aggregate": "incomplete",
-            "assemblies": [
-                "pkg:maven/org.acme/web-framework@1.0.0",
-                "pkg:maven/org.acme/persistence@3.1.0",
-                "pkg:maven/org.acme/common-util@3.0.0",
-                "tomcat-catalina ref",
-                "card-verifier bom-ref",
-                "ref on util",
-                "some program application"
-            ]
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
-    ]
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "card-verifier bom-ref",
+      "supplier": {
+        "name": "Acme, Inc."
+      },
+      "group": "",
+      "name": "card-verifier",
+      "version": "1.0.2",
+      "licenses": [
+        {
+          "expression": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "ref on util",
+      "supplier": {
+        "name": "Example, Inc."
+      },
+      "group": "com.example",
+      "name": "util",
+      "version": "2.0.0",
+      "licenses": [
+        {
+          "expression": "Example, Inc. Commercial License"
+        }
+      ],
+      "cpe": "cpe:2.3:a:*:util:2.0.0:*:*:*:*:*:*:*"
+    },
+    {
+      "type": "application",
+      "bom-ref": "some program application",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.internal",
+      "name": "some program",
+      "version": "T4.0.1.30",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3942447fac867ae5cdb3229b658f4d48"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "copyright": "Company Legal 2022, all rights reserved",
+      "properties": [
+        {
+          "name": "internal:component:status",
+          "value": "internal"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "acme-app",
+      "dependsOn": [
+        "pkg:maven/org.acme/web-framework@1.0.0",
+        "pkg:maven/org.acme/persistence@3.1.0",
+        "some program application"
+      ]
+    },
+    {
+      "ref": "pkg:maven/org.acme/web-framework@1.0.0",
+      "dependsOn": [
+        "pkg:maven/org.acme/common-util@3.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:maven/org.acme/persistence@3.1.0",
+      "dependsOn": [
+        "pkg:maven/org.acme/common-util@3.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:maven/org.acme/common-util@3.0.0",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "pkg:maven/org.acme/web-framework@1.0.0",
+        "pkg:maven/org.acme/persistence@3.1.0",
+        "pkg:maven/org.acme/common-util@3.0.0",
+        "tomcat-catalina ref",
+        "card-verifier bom-ref",
+        "ref on util",
+        "some program application"
+      ]
+    }
+  ]
 }

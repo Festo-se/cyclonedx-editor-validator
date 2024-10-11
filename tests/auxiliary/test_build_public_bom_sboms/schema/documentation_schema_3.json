@@ -1,8 +1,14 @@
 {
-    "properties": {
-        "name": {
-            "enum": ["AcmeSecret", "AcmeNotPublic", "AcmeSensitive"]
-        }
-    },
-    "required": ["name"]
+  "properties": {
+    "name": {
+      "enum": [
+        "AcmeSecret",
+        "AcmeNotPublic",
+        "AcmeSensitive"
+      ]
+    }
+  },
+  "required": [
+    "name"
+  ]
 }

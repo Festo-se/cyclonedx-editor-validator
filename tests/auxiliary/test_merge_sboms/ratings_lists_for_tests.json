@@ -1,154 +1,150 @@
 {
-"ratings1" : [
+  "ratings1": [
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "CVSSv31",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "CVSSv31",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     }
-],
-
-"ratings2" : [
+  ],
+  "ratings2": [
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "other method",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "other method",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     }
-],
-
-"merged_ratings_1_and_ratings_2" : [
+  ],
+  "merged_ratings_1_and_ratings_2": [
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "CVSSv31",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "CVSSv31",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     },
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "other method",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "other method",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     }
-],
-
-"ratings3" : [
+  ],
+  "ratings3": [
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "method",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "method",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     },
     {
-        "score": 7.5,
-        "severity": "high",
-        "method": "New 2",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 7.5,
+      "severity": "high",
+      "method": "New 2",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     },
     {
-        "score": 2,
-        "severity": "high",
-        "method": "New 1",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 2,
+      "severity": "high",
+      "method": "New 1",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     }
-],
-
-"ratings4" : [
+  ],
+  "ratings4": [
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "method 2",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "method 2",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     },
     {
-        "score": 7.5,
-        "severity": "high",
-        "method": "New 1",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 7.5,
+      "severity": "high",
+      "method": "New 1",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     },
     {
-        "score": 3,
-        "severity": "high",
-        "method": "New 2",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 3,
+      "severity": "high",
+      "method": "New 2",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     }
-],
-"merged_ratings_3_and_ratings_4_flag_0" : [
+  ],
+  "merged_ratings_3_and_ratings_4_flag_0": [
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "method",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "method",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     },
     {
-        "score": 7.5,
-        "severity": "high",
-        "method": "New 2",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 7.5,
+      "severity": "high",
+      "method": "New 2",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     },
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "method 2",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "method 2",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     },
     {
-        "score": 7.5,
-        "severity": "high",
-        "method": "New 1",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 7.5,
+      "severity": "high",
+      "method": "New 1",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     }
-],
-"merged_ratings_3_and_ratings_4_flag_1" : [
+  ],
+  "merged_ratings_3_and_ratings_4_flag_1": [
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "method",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "method",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     },
     {
-        "score": 7.5,
-        "severity": "high",
-        "method": "New 2",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 7.5,
+      "severity": "high",
+      "method": "New 2",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     },
     {
-        "score": 2,
-        "severity": "high",
-        "method": "New 1",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 2,
+      "severity": "high",
+      "method": "New 1",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     },
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "method 2",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "method 2",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     }
-],
-"merged_ratings_3_and_ratings4_flag_2" : [
+  ],
+  "merged_ratings_3_and_ratings4_flag_2": [
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "method",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "method",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     },
     {
-        "score": 9.8,
-        "severity": "critical",
-        "method": "method 2",
-        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "score": 9.8,
+      "severity": "critical",
+      "method": "method 2",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
     },
     {
-        "score": 7.5,
-        "severity": "high",
-        "method": "New 1",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 7.5,
+      "severity": "high",
+      "method": "New 1",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     },
     {
-        "score": 3,
-        "severity": "high",
-        "method": "New 2",
-        "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      "score": 3,
+      "severity": "high",
+      "method": "New 2",
+      "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
     }
-]
+  ]
 }

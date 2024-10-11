@@ -53,7 +53,9 @@
       "copyright": "Some Vendor Inc.",
       "supplier": {
         "name": "Some Vendor Inc.",
-        "url": ["https://www.some-vendor.com"]
+        "url": [
+          "https://www.some-vendor.com"
+        ]
       },
       "components": [
         {
@@ -149,19 +151,28 @@
   "dependencies": [
     {
       "ref": "com.company.unit/depA@4.0.2",
-      "dependsOn": ["some-vendor/depB@1.2.3", "depC@3.2.1"]
+      "dependsOn": [
+        "some-vendor/depB@1.2.3",
+        "depC@3.2.1"
+      ]
     },
     {
       "ref": "some-vendor/depB@1.2.3",
-      "dependsOn": ["some-vendor/depB@1.2.3:physics/gravity@0.0.1"]
+      "dependsOn": [
+        "some-vendor/depB@1.2.3:physics/gravity@0.0.1"
+      ]
     },
     {
       "ref": "some-vendor/depB@1.2.3:physics/gravity@0.0.1",
-      "dependsOn": ["depC@3.2.1"]
+      "dependsOn": [
+        "depC@3.2.1"
+      ]
     },
     {
       "ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5",
-      "dependsOn": ["some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6"]
+      "dependsOn": [
+        "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6"
+      ]
     },
     {
       "ref": "some-vendor/depB@1.2.3:physics/x-ray@18.9.5:Rudolph@6.6.6",
@@ -184,7 +195,9 @@
     },
     {
       "aggregate": "incomplete",
-      "assemblies": ["com.company.unit/depA@4.0.2"]
+      "assemblies": [
+        "com.company.unit/depA@4.0.2"
+      ]
     }
   ]
 }

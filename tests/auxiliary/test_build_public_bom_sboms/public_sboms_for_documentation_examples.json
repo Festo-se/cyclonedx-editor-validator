@@ -1,297 +1,297 @@
 {
-    "public_sbom_schema_1": {
-        "bomFormat": "CycloneDX",
-        "specVersion": "1.4",
-        "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
-        "version": 1,
-        "metadata": {
-            "timestamp": "2022-02-17T10:14:58Z",
-            "authors": [
-                {
-                    "name": "anonymous"
-                }
-            ],
-            "component": {
-                "type": "application",
-                "bom-ref": "acme-app",
-                "group": "com.company.internal",
-                "supplier": {
-                    "name": "Company Legal"
-                },
-                "name": "Acme_Application_documentation",
-                "version": "9.1.1",
-                "copyright": "Company Legal 2022, all rights reserved",
-                "properties": [
-                    {
-                        "name": "notinternal:stuff",
-                        "value": "something"
-                    }
-                ]
-            }
+  "public_sbom_schema_1": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.4",
+    "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-02-17T10:14:58Z",
+      "authors": [
+        {
+          "name": "anonymous"
+        }
+      ],
+      "component": {
+        "type": "application",
+        "bom-ref": "acme-app",
+        "group": "com.company.internal",
+        "supplier": {
+          "name": "Company Legal"
         },
-        "components": [],
-        "dependencies": [
-            {
-                "ref": "acme-app",
-                "dependsOn": []
-            }
-        ],
-        "compositions": [
-            {
-                "aggregate": "incomplete",
-                "assemblies": []
-            }
+        "name": "Acme_Application_documentation",
+        "version": "9.1.1",
+        "copyright": "Company Legal 2022, all rights reserved",
+        "properties": [
+          {
+            "name": "notinternal:stuff",
+            "value": "something"
+          }
         ]
+      }
     },
-    "public_sbom_schema_2": {
-        "bomFormat": "CycloneDX",
-        "specVersion": "1.4",
-        "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
-        "version": 1,
-        "metadata": {
-            "timestamp": "2022-02-17T10:14:58Z",
-            "authors": [
-                {
-                    "name": "anonymous"
-                }
-            ],
-            "component": {
-                "type": "application",
-                "bom-ref": "acme-app",
-                "group": "com.company.internal",
-                "supplier": {
-                    "name": "Company Legal"
-                },
-                "name": "Acme_Application_documentation",
-                "version": "9.1.1",
-                "copyright": "Company Legal 2022, all rights reserved",
-                "properties": [
-                    {
-                        "name": "notinternal:stuff",
-                        "value": "something"
-                    }
-                ]
-            }
+    "components": [],
+    "dependencies": [
+      {
+        "ref": "acme-app",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": []
+      }
+    ]
+  },
+  "public_sbom_schema_2": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.4",
+    "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-02-17T10:14:58Z",
+      "authors": [
+        {
+          "name": "anonymous"
+        }
+      ],
+      "component": {
+        "type": "application",
+        "bom-ref": "acme-app",
+        "group": "com.company.internal",
+        "supplier": {
+          "name": "Company Legal"
         },
-        "components": [
-            {
-                "type": "library",
-                "bom-ref": "comp2",
-                "supplier": {
-                    "name": "Acme, Inc."
-                },
-                "licenses": [
-                    {
-                        "license": {
-                            "id": "Apache-1.0"
-                        }
-                    }
-                ],
-                "group": "com.acme.internal",
-                "name": "Second Component",
-                "version": "1.0.0",
-                "properties": [
-                    {
-                        "name": "notinternal:stuff",
-                        "value": "something"
-                    }
-                ]
-            }
-        ],
-        "dependencies": [
-            {
-                "ref": "acme-app",
-                "dependsOn": [
-                    "comp2"
-                ]
-            },
-            {
-                "ref": "comp2",
-                "dependsOn": []
-            }
-        ],
-        "compositions": [
-            {
-                "aggregate": "incomplete",
-                "assemblies": [
-                    "comp2"
-                ]
-            }
+        "name": "Acme_Application_documentation",
+        "version": "9.1.1",
+        "copyright": "Company Legal 2022, all rights reserved",
+        "properties": [
+          {
+            "name": "notinternal:stuff",
+            "value": "something"
+          }
         ]
+      }
     },
-    "public_sbom_schema_3" : {
-        "bomFormat": "CycloneDX",
-        "specVersion": "1.4",
-        "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
-        "version": 1,
-        "metadata": {
-            "timestamp": "2022-02-17T10:14:58Z",
-            "authors": [
-                {
-                    "name": "anonymous"
-                }
-            ],
-            "component": {
-                "type": "application",
-                "bom-ref": "acme-app",
-                "group": "com.company.internal",
-                "supplier": {
-                    "name": "Company Legal"
-                },
-                "name": "Acme_Application_documentation",
-                "version": "9.1.1",
-                "copyright": "Company Legal 2022, all rights reserved",
-                "properties": [
-                    {
-                        "name": "notinternal:stuff",
-                        "value": "something"
-                    }
-                ]
-            }
+    "components": [
+      {
+        "type": "library",
+        "bom-ref": "comp2",
+        "supplier": {
+          "name": "Acme, Inc."
         },
-        "components": [
-            {
-                "type": "library",
-                "bom-ref": "comp4",
-                "supplier": {
-                    "name": "Acme, Inc."
-                },
-                "licenses": [
-                    {
-                        "license": {
-                            "id": "Apache-1.0"
-                        }
-                    }
-                ],
-                "group": "com.acme.internal",
-                "name": "This one remains",
-                "version": "1.0.0",
-                "properties": [
-                    {
-                        "name": "notinternal:stuff",
-                        "value": "something"
-                    },
-                    {
-                        "name": "This one remains",
-                        "value": "true"
-                    }
-                ]
+        "licenses": [
+          {
+            "license": {
+              "id": "Apache-1.0"
             }
+          }
         ],
-        "dependencies": [
-            {
-                "ref": "acme-app",
-                "dependsOn": [
-                    "comp4"
-                ]
-            },
-            {
-                "ref": "comp4",
-                "dependsOn": []
-            }
-        ],
-        "compositions": [
-            {
-                "aggregate": "incomplete",
-                "assemblies": [
-                    "comp4"
-                ]
-            }
+        "group": "com.acme.internal",
+        "name": "Second Component",
+        "version": "1.0.0",
+        "properties": [
+          {
+            "name": "notinternal:stuff",
+            "value": "something"
+          }
         ]
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "acme-app",
+        "dependsOn": [
+          "comp2"
+        ]
+      },
+      {
+        "ref": "comp2",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "comp2"
+        ]
+      }
+    ]
+  },
+  "public_sbom_schema_3": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.4",
+    "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-02-17T10:14:58Z",
+      "authors": [
+        {
+          "name": "anonymous"
+        }
+      ],
+      "component": {
+        "type": "application",
+        "bom-ref": "acme-app",
+        "group": "com.company.internal",
+        "supplier": {
+          "name": "Company Legal"
+        },
+        "name": "Acme_Application_documentation",
+        "version": "9.1.1",
+        "copyright": "Company Legal 2022, all rights reserved",
+        "properties": [
+          {
+            "name": "notinternal:stuff",
+            "value": "something"
+          }
+        ]
+      }
     },
-    "public_sbom_schema_4": {
-        "bomFormat": "CycloneDX",
-        "specVersion": "1.4",
-        "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
-        "version": 1,
-        "metadata": {
-            "timestamp": "2022-02-17T10:14:58Z",
-            "authors": [
-                {
-                    "name": "anonymous"
-                }
-            ],
-            "component": {
-                "type": "application",
-                "bom-ref": "acme-app",
-                "group": "com.company.internal",
-                "supplier": {
-                    "name": "Company Legal"
-                },
-                "name": "Acme_Application_documentation",
-                "version": "9.1.1",
-                "copyright": "Company Legal 2022, all rights reserved",
-                "properties": [
-                    {
-                        "name": "notinternal:stuff",
-                        "value": "something"
-                    }
-                ]
-            }
+    "components": [
+      {
+        "type": "library",
+        "bom-ref": "comp4",
+        "supplier": {
+          "name": "Acme, Inc."
         },
-        "components": [
-            {
-                "type": "library",
-                "bom-ref": "comp1",
-                "supplier": {
-                    "name": "Acme, Inc."
-                },
-                "licenses": [
-                    {
-                        "license": {
-                            "id": "Apache-1.0"
-                        }
-                    }
-                ],
-                "group": "com.acme.internal",
-                "name": "AcmeSecret",
-                "version": "1.0.0"
-            },
-            {
-                "type": "library",
-                "bom-ref": "comp3",
-                "supplier": {
-                    "name": "Acme, Inc."
-                },
-                "licenses": [
-                    {
-                        "license": {
-                            "id": "Apache-1.0"
-                        }
-                    }
-                ],
-                "group": "com.acme.internal",
-                "name": "AcmeNotPublic",
-                "version": "1.0.0",
-                "properties": [
-                    {
-                        "name": "notinternal:stuff",
-                        "value": "something"
-                    }
-                ]
+        "licenses": [
+          {
+            "license": {
+              "id": "Apache-1.0"
             }
+          }
         ],
-        "dependencies": [
-            {
-                "ref": "acme-app",
-                "dependsOn": [
-                    "comp1",
-                    "comp3"
-                ]
-            },
-            {
-                "ref": "comp1",
-                "dependsOn": []
-            }
-        ],
-        "compositions": [
-            {
-                "aggregate": "incomplete",
-                "assemblies": [
-                    "comp1",
-                    "comp3"
-                ]
-            }
+        "group": "com.acme.internal",
+        "name": "This one remains",
+        "version": "1.0.0",
+        "properties": [
+          {
+            "name": "notinternal:stuff",
+            "value": "something"
+          },
+          {
+            "name": "This one remains",
+            "value": "true"
+          }
         ]
-    }
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "acme-app",
+        "dependsOn": [
+          "comp4"
+        ]
+      },
+      {
+        "ref": "comp4",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "comp4"
+        ]
+      }
+    ]
+  },
+  "public_sbom_schema_4": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.4",
+    "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-02-17T10:14:58Z",
+      "authors": [
+        {
+          "name": "anonymous"
+        }
+      ],
+      "component": {
+        "type": "application",
+        "bom-ref": "acme-app",
+        "group": "com.company.internal",
+        "supplier": {
+          "name": "Company Legal"
+        },
+        "name": "Acme_Application_documentation",
+        "version": "9.1.1",
+        "copyright": "Company Legal 2022, all rights reserved",
+        "properties": [
+          {
+            "name": "notinternal:stuff",
+            "value": "something"
+          }
+        ]
+      }
+    },
+    "components": [
+      {
+        "type": "library",
+        "bom-ref": "comp1",
+        "supplier": {
+          "name": "Acme, Inc."
+        },
+        "licenses": [
+          {
+            "license": {
+              "id": "Apache-1.0"
+            }
+          }
+        ],
+        "group": "com.acme.internal",
+        "name": "AcmeSecret",
+        "version": "1.0.0"
+      },
+      {
+        "type": "library",
+        "bom-ref": "comp3",
+        "supplier": {
+          "name": "Acme, Inc."
+        },
+        "licenses": [
+          {
+            "license": {
+              "id": "Apache-1.0"
+            }
+          }
+        ],
+        "group": "com.acme.internal",
+        "name": "AcmeNotPublic",
+        "version": "1.0.0",
+        "properties": [
+          {
+            "name": "notinternal:stuff",
+            "value": "something"
+          }
+        ]
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "acme-app",
+        "dependsOn": [
+          "comp1",
+          "comp3"
+        ]
+      },
+      {
+        "ref": "comp1",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "comp1",
+          "comp3"
+        ]
+      }
+    ]
+  }
 }

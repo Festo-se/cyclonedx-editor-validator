@@ -3,7 +3,7 @@
   "$id": "http://cyclonedx.org/schema/jsf-0.82.schema.json",
   "type": "object",
   "title": "JSON Signature Format (JSF) standard",
-  "$comment" : "JSON Signature Format schema is published under the terms of the Apache License 2.0. JSF was developed by Anders Rundgren (anders.rundgren.net@gmail.com) as a part of the OpenKeyStore project. This schema supports the entirely of the JSF standard excluding 'extensions'.",
+  "$comment": "JSON Signature Format schema is published under the terms of the Apache License 2.0. JSF was developed by Anders Rundgren (anders.rundgren.net@gmail.com) as a part of the OpenKeyStore project. This schema supports the entirely of the JSF standard excluding 'extensions'.",
   "definitions": {
     "signature": {
       "type": "object",
@@ -17,7 +17,9 @@
               "title": "Signature",
               "description": "Unique top level property for Multiple Signatures. (multisignature)",
               "additionalItems": false,
-              "items": {"$ref": "#/definitions/signer"}
+              "items": {
+                "$ref": "#/definitions/signer"
+              }
             }
           }
         },
@@ -29,7 +31,9 @@
               "title": "Signature",
               "description": "Unique top level property for Signature Chains. (signaturechain)",
               "additionalItems": false,
-              "items": {"$ref": "#/definitions/signer"}
+              "items": {
+                "$ref": "#/definitions/signer"
+              }
             }
           }
         },
@@ -141,7 +145,11 @@
       "allOf": [
         {
           "if": {
-            "properties": { "kty": { "const": "EC" } }
+            "properties": {
+              "kty": {
+                "const": "EC"
+              }
+            }
           },
           "then": {
             "required": [
@@ -180,7 +188,11 @@
         },
         {
           "if": {
-            "properties": { "kty": { "const": "OKP" } }
+            "properties": {
+              "kty": {
+                "const": "OKP"
+              }
+            }
           },
           "then": {
             "required": [
@@ -212,7 +224,11 @@
         },
         {
           "if": {
-            "properties": { "kty": { "const": "RSA" } }
+            "properties": {
+              "kty": {
+                "const": "RSA"
+              }
+            }
           },
           "then": {
             "required": [

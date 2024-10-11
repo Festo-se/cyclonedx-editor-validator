@@ -382,7 +382,7 @@
       "type": "library",
       "bom-ref": "sp_thirteenth_component",
       "supplier": {
-      "name": " another supplier"
+        "name": " another supplier"
       },
       "name": "sp_thirteenth_component",
       "version": "3.8.0",
@@ -563,7 +563,7 @@
         "sp_sixteenth_component",
         "sp_seventeenth_component",
         "sp_fifteenth_component"
-         ]
+      ]
     }
   ]
 }

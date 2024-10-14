@@ -2,7 +2,6 @@
 
 import logging
 import pathlib
-import re
 import sys
 import typing as t
 from dataclasses import dataclass, field, fields
@@ -53,6 +52,12 @@ class CoordinatesWithVersionRange(Coordinates):
     version_range: univers.version_range.VersionRange
 
     def __eq__(self, other: object) -> bool:
+        if t.TYPE_CHECKING:
+            # univers guarantees that version_class is not None
+            assert (
+                self.version_range.version_class is not None
+            )  # nosec - only for type checker
+
         if isinstance(other, CoordinatesWithVersionRange):
             for field_ in fields(self):
                 if getattr(self, field_.name) != getattr(other, field_.name):
@@ -60,9 +65,6 @@ class CoordinatesWithVersionRange(Coordinates):
             return True
 
         if isinstance(other, Coordinates):
-            version_range_object = univers.version_range.VersionRange.from_string(
-                self.version_range
-            )
             for field_ in fields(other):
                 if field_.name != "version" and getattr(self, field_.name) != getattr(
                     other, field_.name
@@ -72,8 +74,8 @@ class CoordinatesWithVersionRange(Coordinates):
             if other.version is not None:
                 try:
                     if (
-                        version_range_object.version_class(other.version)
-                        in version_range_object
+                        self.version_range.version_class(other.version)
+                        in self.version_range
                     ):
                         return True
                 except univers.versions.InvalidVersion:
@@ -98,7 +100,7 @@ class CoordinatesWithVersionRange(Coordinates):
                             f"The component {other} matches the target {self}"
                             f" in the name and group keys but has a different versioning"
                             f" schema. The target has versioning schema"
-                            f' "{version_range_object.version_class.__name__}"'
+                            f' "{self.version_range.version_class.__name__}"'
                             f' this is incompatible with the version "{other.version}"'
                             + version_is_of,
                         )
@@ -153,12 +155,12 @@ class UpdateIdentity(ComponentIdentity):
         version: t.Optional[str] = None,
         version_range: t.Optional[str] = None,
     ) -> "Key":
-        coordinates = Coordinates(name, group, version)
-        if (
-            version_range is not None
-            and re.fullmatch("vers:.+/.+", version_range) is not None
-        ):
-            coordinates = CoordinatesWithVersionRange(name, group, None, version_range)
+        coordinates: Coordinates
+        if version_range is not None:
+            vers = univers.version_range.VersionRange.from_string(version_range)
+            coordinates = CoordinatesWithVersionRange(name, group, None, vers)
+        else:
+            coordinates = Coordinates(name, group, version)
         return Key(KeyType.COORDINATES, coordinates)
 
 
@@ -321,7 +323,14 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
                 "An update object for"
                 "contains a 'version' and 'version-range' but only one of them is permitted",
             )
-        component_id = UpdateIdentity.create(upd["id"], True)
+        try:
+            component_id = UpdateIdentity.create(upd["id"], True)
+        except (univers.versions.InvalidVersion, ValueError) as exc:
+            raise AppError(
+                "Invalid set file",
+                f"An update object has an invalid version-range: {exc}",
+            ) from exc
+
         upd["id"] = component_id
 
         if len(component_id) == 0:

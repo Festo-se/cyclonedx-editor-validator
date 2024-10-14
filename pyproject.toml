@@ -53,7 +53,7 @@ sphinx-argparse = [
     { version = "0.4.0", python = "<3.10" },
     { version = "0.5.2", python = ">=3.10" },
 ]
-sphinx-rtd-theme = "2.0.0"
+sphinx-rtd-theme = "3.0.1"
 sphinx = "7.4.7"
 
 [build-system]

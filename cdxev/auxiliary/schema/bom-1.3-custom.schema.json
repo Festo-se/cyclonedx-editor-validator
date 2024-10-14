@@ -5,7 +5,9 @@
   "title": "CycloneDX Software Bill-of-Material Specification",
   "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
   "if": {
-    "required": ["components"]
+    "required": [
+      "components"
+    ]
   },
   "then": {
     "required": [
@@ -254,21 +256,21 @@
       "additionalProperties": false,
       "anyOf": [
         {
-            "required": [
-                "name"
-            ]
-        },
-        {
-            "required": [
-                "url"
-            ]
+          "required": [
+            "name"
+          ]
         },
         {
           "required": [
-              "contact"
+            "url"
           ]
-      }
-    ]
+        },
+        {
+          "required": [
+            "contact"
+          ]
+        }
+      ]
     },
     "organizationalContact": {
       "type": "object",
@@ -580,64 +582,138 @@
         },
         {
           "if": {
-            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["copyright"]
+            "properties": {
+              "copyright": {
+                "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+              }
+            },
+            "required": [
+              "copyright"
+            ]
           },
           "then": {
-            "if":{
-              "not":{
-              "allOf":[ {
-                "required": ["licenses"]
-              },
-              {
-                "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } }
+            "if": {
+              "not": {
+                "allOf": [
+                  {
+                    "required": [
+                      "licenses"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "copyright": {
+                        "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                      }
+                    }
+                  }
+                ]
               }
-            ]
-          }
             },
-            "then":{
-              "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-              "required": ["supplier"],
+            "then": {
+              "properties": {
+                "supplier": {
+                  "properties": {
+                    "name": {
+                      "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                    }
+                  }
+                }
+              },
+              "required": [
+                "supplier"
+              ],
               "dependencies": {
-                "supplier": {"properties": {"supplier": {"required": ["name"]}}}
+                "supplier": {
+                  "properties": {
+                    "supplier": {
+                      "required": [
+                        "name"
+                      ]
+                    }
+                  }
+                }
               }
             }
           }
         },
         {
           "if": {
-            "properties": {"supplier": {"properties": {"name": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" }}} },
-            "required": ["supplier"],
-            "dependencies": {
-              "supplier": {"properties": {"supplier": {"required": ["name"]}}}
-            }
-          },
-          "then": {
-            "if":{
-              "not":{
-              "allOf":[ {
-                "required": ["licenses"]
-              },
-              {
-                "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } }
+            "properties": {
+              "supplier": {
+                "properties": {
+                  "name": {
+                    "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                  }
+                }
               }
-            ]
-          }
             },
-            "then":{
-                "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-                "required": ["copyright"]
+            "required": [
+              "supplier"
+            ],
+            "dependencies": {
+              "supplier": {
+                "properties": {
+                  "supplier": {
+                    "required": [
+                      "name"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "if": {
+              "not": {
+                "allOf": [
+                  {
+                    "required": [
+                      "licenses"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "copyright": {
+                        "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "then": {
+              "properties": {
+                "copyright": {
+                  "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                }
+              },
+              "required": [
+                "copyright"
+              ]
             }
           }
         },
         {
           "if": {
-            "properties": { "author": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["author"]
+            "properties": {
+              "author": {
+                "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+              }
+            },
+            "required": [
+              "author"
+            ]
           },
           "then": {
-            "properties": { "copyright": { "pattern": "([Ff][Ee][Ss][Tt][Oo])" } },
-            "required": ["copyright"]
+            "properties": {
+              "copyright": {
+                "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+              }
+            },
+            "required": [
+              "copyright"
+            ]
           }
         }
       ],
@@ -820,7 +896,9 @@
       },
       "additionalProperties": false,
       "dependencies": {
-        "name": ["text"]
+        "name": [
+          "text"
+        ]
       }
     },
     "licenseChoice": {

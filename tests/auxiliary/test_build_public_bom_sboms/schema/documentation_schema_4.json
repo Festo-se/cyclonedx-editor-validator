@@ -1,24 +1,30 @@
 {
-    "properties": {
-        "licenses": {
-            "contains": {
+  "properties": {
+    "licenses": {
+      "contains": {
+        "properties": {
+          "license": {
+            "properties": {
+              "text": {
                 "properties": {
-                    "license": {
-                        "properties": {
-                            "text": {
-                                "properties": {
-                                    "content": {
-                                        "pattern": "This must not be made public"
-                                    }
-                                }
-                            }
-                        },
-                        "required": ["text"]
-                    }
-                },
-                "required": ["license"]
-            }
-        }
-    },
-    "required": ["licenses"] 
+                  "content": {
+                    "pattern": "This must not be made public"
+                  }
+                }
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        },
+        "required": [
+          "license"
+        ]
+      }
+    }
+  },
+  "required": [
+    "licenses"
+  ]
 }

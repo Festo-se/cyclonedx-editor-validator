@@ -71,7 +71,7 @@
           }
         }
       ]
-    },    
+    },
     {
       "type": "library",
       "bom-ref": "sp_fourth_component",
@@ -355,7 +355,7 @@
       "type": "library",
       "bom-ref": "sp_thirteenth_component",
       "supplier": {
-      "name": " another supplier"
+        "name": " another supplier"
       },
       "name": "sp_thirteenth_component",
       "version": "3.8.0",
@@ -485,7 +485,10 @@
     },
     {
       "ref": "sp_fourteenth_component",
-      "dependsOn": ["sp_sixteenth_component","sp_seventeenth_component"]
+      "dependsOn": [
+        "sp_sixteenth_component",
+        "sp_seventeenth_component"
+      ]
     },
     {
       "ref": "sp_sixteenth_component",

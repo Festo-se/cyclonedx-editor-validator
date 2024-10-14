@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
+import logging
 import os
 import typing as t
 import unittest
@@ -430,6 +431,40 @@ class TestValidateComponents(unittest.TestCase):
             sbom.pop("dependencies")
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
+
+    @patch("cdxev.validator.validate.logger", spec=logging.Logger)
+    def test_external_bom(self, mock_logger: Mock) -> None:
+        for spec_version in list_of_spec_versions:
+            with self.subTest(spec_version=spec_version):
+                mock_logger.reset_mock()
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                sbom["components"][0] = {
+                    "type": "library",
+                    "name": "Externally described component",
+                    "bom-ref": "foo",
+                    "externalReferences": [
+                        {
+                            "type": "bom",
+                            "url": "urn:cdx:8428fc58-c402-4a4f-9f8d-0d96d2ad07e3/1",
+                        }
+                    ],
+                }
+                validate_sbom(
+                    sbom=sbom,
+                    input_format="json",
+                    file=Path(path_to_sbom),
+                    report_format=None,
+                    report_path=None,
+                    schema_type="custom",
+                    filename_regex=None,
+                    schema_path=None,
+                )
+                mock_logger.error.assert_not_called()
+                mock_logger.warning.assert_called_with(
+                    "Component [bom-ref: foo] is described by an external BOM. "
+                    "The validity of the referenced BOM cannot be checked."
+                )
 
 
 class TestValidateDependencies(unittest.TestCase):

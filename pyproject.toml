@@ -35,7 +35,7 @@ univers = "30.12.1"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "7.1.1"
-black = "24.8.0"
+black = "24.10.0"
 pep8-naming = "0.14.1"
 mypy = "1.11.2"
 types-python-dateutil = "2.9.0.20241003"

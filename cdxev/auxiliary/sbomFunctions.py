@@ -10,6 +10,8 @@ from typing import Any, Callable, Literal, Optional, Sequence, Union
 from dateutil.parser import parse
 
 from cyclonedx.model.bom import Bom
+from cyclonedx.model.component import Component
+
 
 logger = logging.getLogger(__name__)
 
@@ -413,3 +415,14 @@ def deserialize(sbom: dict) -> Bom:
     sbom.pop("compositions")  # compositions need to be removed till the model supports those
     deserialized_bom = Bom.from_json(data=sbom)  # type: ignore
     return deserialized_bom
+
+
+def extract_cyclonedx_components(list_of_components: Sequence[Component]) -> Sequence[Component]:
+    extracted_components = []
+    for component in list_of_components:
+        if component.components is None:
+            extracted_components.append(component)
+        else:
+            extracted_components.append(component)
+            extracted_components += extract_cyclonedx_components(component.components)
+    return extracted_components

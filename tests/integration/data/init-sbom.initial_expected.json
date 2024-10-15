@@ -17,13 +17,13 @@
             "copyright": "Copyright of the software",
             "name": "software name",
             "supplier": {
-                "name": "supplier name"
+                "name": "supplier software"
             },
             "type": "application",
             "version": "1.1.1"
         },
         "supplier": {
-            "name": "supplier name"
+            "name": "supplier sbom"
         },
         "timestamp": "2024-08-29T12:44:05+00:00",
         "tools": [

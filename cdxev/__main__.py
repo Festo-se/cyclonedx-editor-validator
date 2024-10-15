@@ -719,22 +719,32 @@ def create_init_sbom_parser(
         "init-sbom",
         help=("Provides the first draft of an SBOM for manual completion."),
     )
-    parser.add_argument(
+    submitted_values = parser.add_argument_group(
+        "target",
+        description=(
+            "Submitted values that will be written into the SBOM draft."
+            "Field values like the name and version of the software (--name and --version), "
+            "the supplier of the software (--supplier-software) "
+            "or the supplier off the SBOM (--supplier-sbom) "
+            "can be submitted to the program and will be written into the provided draft"
+        ),
+    )
+    submitted_values.add_argument(
         "--name",
         metavar="<name>",
         help=("Name of the software the SBOM belongs to."),
     )
-    parser.add_argument(
+    submitted_values.add_argument(
         "--version",
         metavar="<version>",
         help=("Version of the software the SBOM belongs to."),
     )
-    parser.add_argument(
+    submitted_values.add_argument(
         "--supplier-software",
         metavar="<supplier>",
         help=("Name of the supplier of the software the SBOM describes to."),
     )
-    parser.add_argument(
+    submitted_values.add_argument(
         "--supplier-sbom",
         metavar="<supplier>",
         help=("Name of the supplier of the SBOM."),

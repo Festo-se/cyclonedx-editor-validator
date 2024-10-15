@@ -302,8 +302,10 @@ class TestInitSbom:
             "init-sbom",
             "--name",
             "software name",
-            "--supplier",
-            "supplier name",
+            "--supplier-sbom",
+            "supplier sbom",
+            "--supplier-software",
+            "supplier software",
             "--version",
             "1.1.1",
         )

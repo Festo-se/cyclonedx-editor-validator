@@ -1,11 +1,19 @@
 import json
 import logging
-from cyclonedx.model.bom import Bom
 from cdxev.auxiliary.sbomFunctions import deserialize
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 
+from cyclonedx.model.license import (
+    License,
+    LicenseExpression,
+    DisjunctiveLicense,
+)
+from cyclonedx.model.bom import Bom
+
+
 logger = logging.getLogger(__name__)
+
 
 def print_license(license: dict) -> str:
     if license.get("expression", ""):
@@ -16,18 +24,36 @@ def print_license(license: dict) -> str:
         return license.get("license", {}).get("name", "")
 
 
+def extract_string_from_license(license: License) -> str:
+    if isinstance(license, DisjunctiveLicense):
+        if license.id is not None:
+            return license.id
+        elif license.name is not None:
+            return license.name
+        else:
+            return ""
+
+    elif isinstance(license, LicenseExpression):
+        if license.value is not None:
+            return license.value
+        else:
+            return ""
+    else:
+        return ""
+
+
 def list_license_information(sbom: dict) -> str:
     deserialized_bom = deserialize(sbom)
     metadata = deserialized_bom.metadata
 
-    product_licenses = []
+    product_licenses = [License]
     product_copyright = ""
 
-    header = []
-    text_body = []
+    header = [str]
+    text_body = [str]
     if metadata.component is not None:
         metadata_component = metadata.component
-        
+
         if metadata_component.name is not None:
             header.append(metadata_component.name)
             header.append("\n")
@@ -37,7 +63,7 @@ def list_license_information(sbom: dict) -> str:
                     "SBOM has no metadata.component",
                 )
             )
-        
+
         if metadata_component.licenses is not None:
             product_licenses = metadata_component.licenses
         if metadata_component.copyright is not None:
@@ -48,10 +74,12 @@ def list_license_information(sbom: dict) -> str:
 
 
     if product_copyright:
-        header += product_copyright + "\n"
+        header.append(product_copyright)
     elif product_licenses:
         for license in product_licenses:
-            header += print_license(license) + ","
-        header.rstrip(",")
+            license_string = extract_string_from_license(license)
+            if license_string:
+                header.append(license_string)
+
 
     return product_name

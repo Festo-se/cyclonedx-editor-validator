@@ -27,7 +27,8 @@ from cdxev import pkg
 def initialize_sbom(
     software_name: Union[str, None],
     version: Union[str, None],
-    supplier_name: Union[str, None],
+    supplier_software: Union[str, None],
+    supplier_sbom: Union[str, None],
 ) -> dict[str, Any]:
     """
     Creates an initial SBOM draft to work with, containing the most basic fields.
@@ -42,8 +43,10 @@ def initialize_sbom(
         software_name = "Name of the software described in the SBOM"
     if version is None:
         version = "Version of the software"
-    if supplier_name is None:
-        supplier_name = "The name of the organization supplying the software"
+    if supplier_sbom is None:
+        supplier_sbom = "The name of the organization supplying the SBOM"
+    if supplier_software is None:
+        supplier_software = "The name of the organization supplying the software"
 
     timestamp = datetime.now()
     copyright = "Copyright of the software"
@@ -55,7 +58,11 @@ def initialize_sbom(
     )
 
     metadata_supplier = OrganizationalEntity(
-        name=supplier_name,
+        name=supplier_sbom,
+    )
+
+    component_supplier = OrganizationalEntity(
+        name=supplier_software,
     )
 
     refrence_to_cdxev_tool = ExternalReference(
@@ -66,7 +73,7 @@ def initialize_sbom(
     metadata_component = Component(
         name=software_name,
         type=ComponentType.APPLICATION,
-        supplier=metadata_supplier,
+        supplier=component_supplier,
         version=version,
         copyright=copyright,
         bom_ref=BomRef("bom-ref of the metadata component"),

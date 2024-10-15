@@ -988,7 +988,10 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
 
 def invoke_init_sbom(args: argparse.Namespace) -> int:
     sbom = initialize_sbom(
-        software_name=args.name, supplier_name=args.supplier, version=args.version
+        software_name=args.name,
+        supplier_sbom=args.supplier_sbom,
+        supplier_software=args.supplier_software,
+        version=args.version,
     )
     write_sbom(sbom, args.output, update_metadata=False)
     return Status.OK

@@ -109,6 +109,13 @@ class CoordinatesWithVersionRange(Coordinates):
 
         return False
 
+    def __str__(self) -> str:
+        group_str = (f"{self.group}/") if self.group is not None else ""
+        version_str = (
+            (f"@{self.version_range}") if self.version_range is not None else ""
+        )
+        return group_str + self.name + version_str
+
 
 @dataclass(frozen=True)
 class UpdateIdentity(ComponentIdentity):
@@ -373,17 +380,15 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
 
     for update in updates:
         target_list: list[dict] = []
-        try:
-            update_key = update["id"][0]
-            if isinstance(update_key.key, CoordinatesWithVersionRange):
-                for key in ctx.component_map.keys():
-                    if update_key == key:
-                        target_list += ctx.component_map[key]
-            else:
-                target_list = ctx.component_map[update_key]
-            for target in target_list:
-                _do_update(target, update, ctx)
-        except KeyError:
+        update_key = update["id"][0]
+        if isinstance(update_key.key, CoordinatesWithVersionRange):
+            for key in ctx.component_map.keys():
+                if update_key == key:
+                    target_list += ctx.component_map[key]
+        elif update_key in ctx.component_map:
+            target_list = ctx.component_map[update_key]
+
+        if len(target_list) == 0:
             if not cfg.ignore_missing:
                 msg = LogMessage(
                     "Set not performed",
@@ -397,3 +402,6 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
                         f'The component "{update["id"]}" was not found and could not be updated.',
                     )
                 )
+
+        for target in target_list:
+            _do_update(target, update, ctx)

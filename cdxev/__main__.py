@@ -726,7 +726,7 @@ def create_init_sbom_parser(
             "Field values like the name and version of the software (--name and --version), "
             "the supplier of the software (--supplier-software) "
             "or the supplier off the SBOM (--supplier-sbom) "
-            "can be submitted to the program and will be written into the provided draft"
+            "can be submitted to the program and will be written into the provided draft."
         ),
     )
     submitted_values.add_argument(

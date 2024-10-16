@@ -741,12 +741,12 @@ def create_init_sbom_parser(
     )
     submitted_values.add_argument(
         "--supplier-software",
-        metavar="<supplier>",
+        metavar="<supplier-software>",
         help=("Name of the supplier of the software the SBOM describes to."),
     )
     submitted_values.add_argument(
         "--supplier-sbom",
-        metavar="<supplier>",
+        metavar="<supplier-sbom>",
         help=("Name of the supplier of the SBOM."),
     )
     add_output_argument(parser)

@@ -110,7 +110,7 @@ def validate_sbom(
                     elif "name" in comp:
                         comp_id = f"Component [name: {comp['name']}]"
                     else:
-                        comp_id = "Unidentified component"
+                        comp_id = f"Unidentified component at {error.json_path}"
 
                     logger.warning(
                         comp_id + " is described by an external BOM. "

@@ -69,6 +69,8 @@ build_command = "pip install poetry && poetry build"
 
 [tool.mypy]
 packages = "cdxev"
+# Excludes tests even when mypy is invoked with a path (as the VS Code extension does, for instance)
+exclude = ['tests/']
 disallow_untyped_defs = true
 no_error_summary = true
 

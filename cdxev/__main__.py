@@ -1064,7 +1064,7 @@ def invoke_list_command(args: argparse.Namespace) -> int:
         format=args.format,
         skip_metadata=args.skip_metadata,
     )
-    write_notice_file(output, args.output, sbom, format=args.format)
+    write_list(output, args.output, sbom, format=args.format)
 
     return Status.OK
 

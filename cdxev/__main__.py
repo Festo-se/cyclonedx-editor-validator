@@ -807,7 +807,7 @@ def create_list_command_parser(
     )
     parser.add_argument(
         "--format",
-        help="The output format of the data",
+        help="The output format of the data, the default is csv",
         choices=["txt", "csv"],
         default="csv",
         type=str,

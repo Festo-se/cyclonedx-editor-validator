@@ -31,6 +31,7 @@ from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
+from cdxev.list_command import list_command
 
 logger: logging.Logger
 
@@ -186,6 +187,7 @@ def create_parser() -> argparse.ArgumentParser:
     create_build_public_bom_parser(subparsers)
     create_init_sbom_parser(subparsers)
     create_notice_file_parser(subparsers)
+    create_list_command_parser(subparsers)
 
     return parser
 
@@ -780,6 +782,46 @@ def create_notice_file_parser(
     return parser
 
 
+def create_list_command_parser(
+    subparsers: argparse._SubParsersAction,
+) -> argparse.ArgumentParser:
+    parser = subparsers.add_parser(
+        "list",
+        help=(
+            "Lists contents of the SBOM."
+            "Currently supported are the listing of license information and components"
+        ),
+    )
+    parser.add_argument(
+        "operation",
+        metavar="<operation>",
+        help=("The list operation that shell be performed"),
+        choices=["licenses", "components"],
+        default=None,
+        type=str,
+    )
+    parser.add_argument(
+        "input",
+        help="Path to a SBOM file.",
+        type=Path,
+    )
+    parser.add_argument(
+        "--format",
+        help="The output format of the data",
+        choices=["txt", "csv"],
+        default="csv",
+        type=str,
+    )
+    parser.add_argument(
+        "--skip-metadata",
+        help="If chosen, the metadata information will not be listed",
+        action="store_true",
+    )
+    add_output_argument(parser)
+    parser.set_defaults(cmd_handler=invoke_list_command, parser=parser)
+    return parser
+
+
 def invoke_amend(args: argparse.Namespace) -> int:
     if args.help_operation:
         short_desc = args.operations_by_name[args.help_operation].short_description
@@ -1040,6 +1082,20 @@ def invoke_create_notice_file(args: argparse.Namespace) -> int:
     sbom, _ = read_sbom(args.input)
     output = create_notice_file(sbom)
     write_notice_file(output, args.output, sbom)
+
+    return Status.OK
+
+
+def invoke_list_command(args: argparse.Namespace) -> int:
+    sbom, _ = read_sbom(args.input)
+    output = create_notice_file(sbom)
+    output = list_command(
+        sbom=sbom,
+        operation=args.operation,
+        format=args.format,
+        skip_metadata=args.skip_metadata,
+    )
+    write_notice_file(output, args.output, sbom, format=args.format)
 
     return Status.OK
 

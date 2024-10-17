@@ -78,22 +78,26 @@ class TestComponentFunctions(unittest.TestCase):
             ),
         )
 
-
-def test_extract_cyclonedx_components(self) -> None:
+    def test_extract_cyclonedx_components(self) -> None:
         example_list: Sequence[dict] = [
             {
+                "name": "first_level_1",
                 "bom-ref": "first_level_1",
                 "components": [
                     {
+                        "name": "second_level_1",
                         "bom-ref": "second_level_1",
                     },
                     {
+                        "name": "second_level_2",
                         "bom-ref": "second_level_2",
                         "components": [
                             {
+                                "name": "third_level_1",
                                 "bom-ref": "third_level_1",
                             },
                             {
+                                "name": "third_level_2",
                                 "bom-ref": "third_level_2",
                             },
                         ],
@@ -101,15 +105,19 @@ def test_extract_cyclonedx_components(self) -> None:
                 ],
             },
             {
+                "name": "first_level_2",
                 "bom-ref": "first_level_2",
                 "components": [
                     {
+                        "name": "second_level_3",
                         "bom-ref": "second_level_3",
                         "components": [
                             {
+                                "name": "third_level_3",
                                 "bom-ref": "third_level_3",
                                 "components": [
                                     {
+                                        "name": "fourth_level_1",
                                         "bom-ref": "fourth_level_1",
                                     }
                                 ],
@@ -117,14 +125,17 @@ def test_extract_cyclonedx_components(self) -> None:
                         ],
                     },
                     {
+                        "name": "second_level_4",
                         "bom-ref": "second_level_4",
                     },
                 ],
             },
             {
+                "name": "first_level_3",
                 "bom-ref": "first_level_3",
                 "components": [
                     {
+                        "name": "second_level_5",
                         "bom-ref": "second_level_5",
                     }
                 ],
@@ -135,9 +146,9 @@ def test_extract_cyclonedx_components(self) -> None:
         components = sbF.extract_cyclonedx_components(sbom.components)
         bom_refs = []
         for component in components:
-            bom_refs.append(component.bom_ref)
+            bom_refs.append(component.bom_ref.value)
         self.assertEqual(
-            set(),
+            set(bom_refs),
             set(
                 [
                     "first_level_1",
@@ -155,6 +166,7 @@ def test_extract_cyclonedx_components(self) -> None:
                 ]
             ),
         )
+
 
 if __name__ == "__main__":
     unittest.main()

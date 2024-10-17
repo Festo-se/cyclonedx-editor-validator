@@ -1,4 +1,3 @@
-import json
 import logging
 from cdxev.auxiliary.sbomFunctions import deserialize, extract_cyclonedx_components
 from cdxev.error import AppError
@@ -163,10 +162,10 @@ def write_license_dict_to_csv(info_dict: dict) -> str:
 def write_license_information_to_txt(
     software_information: dict,
     component_information: list[dict],
-    list_metadata: bool = True,
+    skip_metadata: bool = False,
 ) -> str:
 
-    if list_metadata:
+    if not skip_metadata:
         string = write_license_dict_to_txt(software_information)
 
         if not component_information:
@@ -192,11 +191,11 @@ def write_license_information_to_txt(
 def write_license_information_to_csv(
     software_information: dict,
     component_information: list[dict],
-    list_metadata: bool = True,
+    skip_metadata: bool = False,
 ) -> str:
     string = "Name,Copyright,Licenses"
 
-    if list_metadata:
+    if not skip_metadata:
         string += "\n" + write_license_dict_to_csv(software_information)
 
     if not component_information:
@@ -211,7 +210,7 @@ def write_license_information_to_csv(
 
 
 def list_license_information(
-    sbom: Bom, format: str = "txt", list_metadata: bool = True
+    sbom: Bom, format: str = "txt", skip_metadata: bool = False
 ) -> str:
 
     metadata = sbom.metadata
@@ -220,12 +219,12 @@ def list_license_information(
     component_information = extract_components_metadata_information(sbom.components)
     if format == "txt":
         txt_string = write_license_information_to_txt(
-            software_information, component_information, list_metadata=list_metadata
+            software_information, component_information, skip_metadata=skip_metadata
         )
 
     if format == "csv":
         txt_string = write_license_information_to_csv(
-            software_information, component_information, list_metadata=list_metadata
+            software_information, component_information, skip_metadata=skip_metadata
         )
 
     return txt_string
@@ -252,49 +251,58 @@ def list_component_information(
     return string
 
 
-def list_components(sbom: Bom, list_metadata: bool = True, format: str = "txt") -> str:
+def list_components(sbom: Bom, skip_metadata: bool = False, format: str = "txt") -> str:
     if format == "txt":
         division_character = "\n"
         string = ""
         line_break = "\n\n"
     elif format == "csv":
         division_character = ","
-        string = "Name,Version,Supplier Name"
+        string = "Name,Version,Supplier\n"
         line_break = "\n"
 
-    if list_metadata:
+    if not skip_metadata:
         if sbom.metadata.component is not None:
-            string += "\n"
             string += list_component_information(
                 sbom.metadata.component, division_character
             )
+            string += line_break
 
     if sbom.components is not None:
         components = extract_cyclonedx_components(sbom.components)
         for component in components:
-            string += line_break
             string += list_component_information(component, division_character)
+            string += line_break
+
+    string = string[: -len(line_break)]
 
     return string
 
 
 def list_command(
-    sbom: dict, operation: str, format: str = "txt", list_metadata: bool = True
-) -> None:
+    sbom: dict, operation: str, format: str = "txt", skip_metadata: bool = True
+) -> str:
     deserialized_bom = deserialize(sbom)
 
-    if operation == "list-licenses":
-        license_list = list_license_information(
-            sbom=deserialized_bom, format=format, list_metadata=list_metadata
+    if operation == "licenses":
+        output = list_license_information(
+            sbom=deserialized_bom, format=format, skip_metadata=skip_metadata
         )
-        print(license_list)
-    elif operation == "list-components":
-        components_list = list_components(
-            sbom=deserialized_bom, list_metadata=list_metadata, format=format
+
+    elif operation == "components":
+        output = list_components(
+            sbom=deserialized_bom, skip_metadata=skip_metadata, format=format
         )
-        print(components_list)
+    else:
+        raise AppError(
+            "Operation not supported.",
+            f"The operation {operation} is not supported, choose one of 'txt' and 'csv'.",
+        )
+
+    return output
 
 
+"""
 # "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json",
 with open(
     "C:/Workspace/Github/cyclonedx-editor-validator/tests/auxiliary/test_create_notice_file_sboms/Acme_Application_9.1.1_20220217T101458.cdx.json",
@@ -308,21 +316,21 @@ with open(
 # data["components"].pop(4)
 # list_license_information(data)
 list_command(data, "list-components", format="csv")
-print("")
-list_command(data, "list-components", format="csv", list_metadata=False)
-print("")
-print("")
+
+list_command(data, "list-components", format="csv", skip_metadata=False)
+
 list_command(data, "list-licenses", format="csv")
-print("")
-list_command(data, "list-licenses", format="csv", list_metadata=False)
-print("")
-print("txt")
-print("")
+
+list_command(data, "list-licenses", format="csv", skip_metadata=False)
+
 list_command(data, "list-components", format="txt")
-print("")
-list_command(data, "list-components", format="txt", list_metadata=False)
-print("")
-print("")
+
+list_command(data, "list-components", format="txt", skip_metadata=False)
+
+
 list_command(data, "list-licenses", format="txt")
-print("txt")
-list_command(data, "list-licenses", format="txt", list_metadata=False)
+
+list_command(data, "list-licenses", format="txt", skip_metadata=False)
+
+
+"""

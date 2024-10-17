@@ -7,11 +7,9 @@ from functools import total_ordering
 from re import fullmatch
 from typing import Any, Callable, Literal, Optional, Sequence, Union
 
-from dateutil.parser import parse
-
 from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component
-
+from dateutil.parser import parse
 
 logger = logging.getLogger(__name__)
 

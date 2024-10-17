@@ -7,11 +7,11 @@ import typing as t
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
-from cdxev.error import AppError
 
 from cdxev import pkg
 from cdxev.auxiliary.filename_gen import generate_filename
 from cdxev.auxiliary.sbomFunctions import CycloneDXVersion, SpecVersion
+from cdxev.error import AppError
 
 logger = logging.getLogger(__name__)
 

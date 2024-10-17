@@ -333,8 +333,8 @@ def list_command(
 
     :param sbom: The SBOM.
     :param operation: The list operation to be performed, can be either 'licenses' or 'components'.
-    :param format: The output format, can be either 'csv' or 'txt', the default is 'csv'.
-    :param skip_metadata: Determines if the metadata information is included or not
+    :param format: The output format. Can be either 'csv' or 'txt', the default is 'csv'.
+    :param skip_metadata: Determines if the metadata information is included or not.
     """
     deserialized_bom = deserialize(sbom)
 

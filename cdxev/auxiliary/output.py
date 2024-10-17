@@ -124,7 +124,7 @@ def update_version(sbom: dict) -> None:
     sbom["version"] = version
 
 
-def write_notice_file(
+def write_list(
     notice_file: str, destination: t.Optional[Path], sbom: dict, format: str = "txt"
 ) -> None:
 

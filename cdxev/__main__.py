@@ -22,7 +22,7 @@ import cdxev.set
 from cdxev import pkg
 from cdxev.amend.operations import Operation
 from cdxev.auxiliary.identity import Key, KeyType
-from cdxev.auxiliary.output import write_notice_file, write_sbom
+from cdxev.auxiliary.output import write_list, write_sbom
 from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
 from cdxev.initialize_sbom import initialize_sbom
@@ -766,8 +766,8 @@ def create_list_command_parser(
     parser = subparsers.add_parser(
         "list",
         help=(
-            "Lists contents of the SBOM."
-            "Currently supported are the listing of license information and components"
+            "Lists specific contents of the SBOM."
+            "Currently supported are the listing of license information and component information"
         ),
     )
     parser.add_argument(
@@ -792,7 +792,7 @@ def create_list_command_parser(
     )
     parser.add_argument(
         "--skip-metadata",
-        help="If chosen, the metadata information will not be listed",
+        help="If selected the metadata information will not be listed",
         action="store_true",
     )
     add_output_argument(parser)

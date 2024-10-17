@@ -25,11 +25,11 @@ from cdxev.auxiliary.identity import Key, KeyType
 from cdxev.auxiliary.output import write_notice_file, write_sbom
 from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
+from cdxev.list_command import list_command
 from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
-from cdxev.list_command import list_command
 
 logger: logging.Logger
 

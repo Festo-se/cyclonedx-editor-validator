@@ -1,17 +1,13 @@
 import logging
+from typing import Any
+
+from cyclonedx.model.bom import Bom, BomMetaData
+from cyclonedx.model.component import Component
+from cyclonedx.model.license import DisjunctiveLicense, License, LicenseExpression
+
 from cdxev.auxiliary.sbomFunctions import deserialize, extract_cyclonedx_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
-
-from cyclonedx.model.license import (
-    License,
-    LicenseExpression,
-    DisjunctiveLicense,
-)
-from cyclonedx.model.bom import Bom, BomMetaData
-from cyclonedx.model.component import Component
-from typing import Any
-
 
 logger = logging.getLogger(__name__)
 

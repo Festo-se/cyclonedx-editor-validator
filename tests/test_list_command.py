@@ -26,7 +26,7 @@ def extract_license(license: dict) -> str:
 
 
 class TestListCommand(unittest.TestCase):
-    def test_list_command_file(self) -> None:
+    def test_list_license_information(self) -> None:
         sbom = get_test_sbom()
         deserialized_sbom = deserialize(sbom)
         license_file = lc.list_license_information(deserialized_sbom)
@@ -40,7 +40,6 @@ class TestListCommand(unittest.TestCase):
         ]
         notice_file_licenses_split = notice_file_licenses.split("\n\n")
 
-        print(notice_file_licenses_split)
         for component in components:
             found = False
             for license_entry in notice_file_licenses_split:
@@ -66,3 +65,161 @@ class TestListCommand(unittest.TestCase):
                 found = True
 
             self.assertTrue(found)
+
+    def test_list_license_information_no_metadata(self) -> None:
+        sbom = get_test_sbom()
+        deserialized_sbom = deserialize(sbom)
+        license_file = lc.list_license_information(
+            deserialized_sbom, skip_metadata=True
+        )
+        self.assertFalse(
+            "This product includes material developed by third parties:\n\n"
+            in license_file
+        )
+
+    def test_list_components(self) -> None:
+        sbom = get_test_sbom()
+        deserialized_sbom = deserialize(sbom)
+        license_file = lc.list_components(
+            sbom=deserialized_sbom, skip_metadata=False, format="txt"
+        )
+        components = sbom.get("components", [])
+        component_txt_list = license_file.split("\n\n")
+        for component in components:
+            found = False
+            for component_entry in component_txt_list:
+                attribute_text = component_entry.replace("\n", "")
+                if not component.get("name", "") in attribute_text:
+                    continue
+
+                if not (
+                    component.get("version", "") in attribute_text
+                    and component.get("supplier", {}).get("name", "") in attribute_text
+                ):
+                    continue
+                found = True
+
+            self.assertTrue(found)
+
+    def test_list_no_metadata_components(self) -> None:
+        sbom = get_test_sbom()
+        deserialized_sbom = deserialize(sbom)
+        license_file = lc.list_components(
+            sbom=deserialized_sbom, skip_metadata=True, format="txt"
+        )
+        component_txt_list = license_file.split("\n\n")
+        found = False
+        for component_entry in component_txt_list:
+            attribute_text = component_entry.replace("\n", "")
+            if not sbom["metadata"]["component"].get("name", "") in attribute_text:
+                continue
+
+            if not (
+                sbom["metadata"]["component"].get("version", "") in attribute_text
+                and sbom["metadata"]["component"]["supplier"].get("name", "")
+                in attribute_text
+            ):
+                continue
+            found = True
+
+            self.assertFalse(found)
+
+    def test_licenses_csv(self) -> None:
+        sbom = get_test_sbom()
+        deserialized_sbom = deserialize(sbom)
+        license_file = lc.list_license_information(deserialized_sbom, format="csv")
+        license_txt_list = license_file.split("\n")
+
+        components = sbom.get("components", [])
+
+        for component in components:
+            found = False
+            for license_entry in license_txt_list:
+
+                if component.get("name", "") not in license_entry:
+                    continue
+
+                if (
+                    component.get("copyright", "")
+                    and component.get("copyright", "") not in license_entry
+                ):
+                    continue
+                for license in component.get("licenses", []):
+                    license_content = extract_license(license)
+                    if license_content not in license_entry:
+                        continue
+
+                found = True
+
+            self.assertTrue(found)
+
+    def test_component_csv(self) -> None:
+        sbom = get_test_sbom()
+        deserialized_sbom = deserialize(sbom)
+        license_file = lc.list_components(deserialized_sbom, format="csv")
+        license_txt_list = license_file.split("\n")
+
+        components = sbom.get("components", [])
+
+        for component in components:
+            found = False
+            for license_entry in license_txt_list:
+
+                if component.get("name", "") not in license_entry:
+                    continue
+
+                if (
+                    component.get("version", "") not in license_entry
+                    and component.get("copyright", "") not in license_entry
+                ):
+                    continue
+
+                found = True
+
+            self.assertTrue(found)
+
+    def test_list_no_metadata_components_csv(self) -> None:
+        sbom = get_test_sbom()
+        deserialized_sbom = deserialize(sbom)
+        license_file = lc.list_components(
+            sbom=deserialized_sbom, skip_metadata=True, format="csv"
+        )
+        component_txt_list = license_file.split("\n")
+        found = False
+        for component_entry in component_txt_list:
+            attribute_text = component_entry.replace("\n", "")
+            if not sbom["metadata"]["component"].get("name", "") in attribute_text:
+                continue
+
+            if not (
+                sbom["metadata"]["component"].get("version", "") in attribute_text
+                and sbom["metadata"]["component"]["supplier"].get("name", "")
+                in attribute_text
+            ):
+                continue
+            found = True
+
+            self.assertFalse(found)
+
+    def test_list_license_information_no_metadata_csv(self) -> None:
+        sbom = get_test_sbom()
+        deserialized_sbom = deserialize(sbom)
+        license_file = lc.list_license_information(
+            deserialized_sbom, skip_metadata=True, format="csv"
+        )
+
+        license_txt_list = license_file.split("\n")
+        found = False
+        for license_entry in license_txt_list:
+            if not sbom["metadata"]["component"].get("name", "") in license_entry:
+                continue
+
+            if not (
+                sbom["metadata"]["component"].get("version", "") in license_entry
+                and sbom["metadata"]["component"]["supplier"].get("name", "")
+                in license_entry
+            ):
+                continue
+            found = True
+
+            self.assertFalse(found)

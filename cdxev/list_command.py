@@ -293,7 +293,7 @@ def list_command(
         Metadata component name:
         Metadata component copyright (if present)
         Metadata component license 1 (if present)
-        Metadata component license 2
+        Metadata component license 2 (if present)
         ...
 
         This product includes material developed by third parties: (if present)
@@ -307,7 +307,7 @@ def list_command(
         component 2 name:
         component 2 copyright
         component 2 license 1 (if present)
-        component 2 license 1 (if present)
+        component 2 license 2 (if present)
         ...
 
     The txt format for licenses has the structure:
@@ -325,8 +325,8 @@ def list_command(
     The csv format for licenses has the structure:
 
         Name,Copyright,Licenses
-        Metadata component name,Metadata component copyright,Metadata component license 1,Metadata component license 2....
-        component 1 name,component 1 copyright,component 1 license 1,component 1 license 1...
+        Metadata component name,Metadata component copyright,Metadata component license 1,...
+        component 1 name,component 1 copyright,component 1 license 1,component 1 license 2...
         ...
 
     The csv format for licenses has the structure:
@@ -358,37 +358,3 @@ def list_command(
         )
 
     return output
-
-
-"""
-# "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json",
-with open(
-    "C:/Workspace/Github/cyclonedx-editor-validator/tests/auxiliary/test_create_notice_file_sboms/Acme_Application_9.1.1_20220217T101458.cdx.json",
-    "r",
-) as file:
-    data = json.load(file)
-# data["components"] = data["components"][4]
-# data["components"].pop(4)
-# data["components"].pop(4)
-# data["components"].pop(4)
-# data["components"].pop(4)
-# list_license_information(data)
-list_command(data, "list-components", format="csv")
-
-list_command(data, "list-components", format="csv", skip_metadata=False)
-
-list_command(data, "list-licenses", format="csv")
-
-list_command(data, "list-licenses", format="csv", skip_metadata=False)
-
-list_command(data, "list-components", format="txt")
-
-list_command(data, "list-components", format="txt", skip_metadata=False)
-
-
-list_command(data, "list-licenses", format="txt")
-
-list_command(data, "list-licenses", format="txt", skip_metadata=False)
-
-
-"""

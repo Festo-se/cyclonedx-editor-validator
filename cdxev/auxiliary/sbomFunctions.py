@@ -408,16 +408,22 @@ def get_corresponding_reference_to_component(
             break
     return is_in_list, bomref_from_list
 
+
 # Function for the usage of the python cyclonedx model
 
 
 def deserialize(sbom: dict) -> Bom:
-    sbom.pop("compositions")  # compositions need to be removed till the model supports those
+    if sbom.get("compositions", {}):
+        sbom.pop(
+            "compositions"
+        )  # compositions need to be removed till the model supports those
     deserialized_bom = Bom.from_json(data=sbom)  # type: ignore
     return deserialized_bom
 
 
-def extract_cyclonedx_components(list_of_components: Sequence[Component]) -> Sequence[Component]:
+def extract_cyclonedx_components(
+    list_of_components: Sequence[Component],
+) -> Sequence[Component]:
     extracted_components = []
     for component in list_of_components:
         if component.components is None:

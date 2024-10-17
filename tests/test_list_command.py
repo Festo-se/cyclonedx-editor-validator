@@ -5,7 +5,7 @@ import cdxev.list_command as lc
 from cdxev.auxiliary.sbomFunctions import deserialize
 
 path_to_sbom = (
-    "tests/auxiliary/test_create_notice_file_sboms/"
+    "tests/auxiliary/test_list_command_sboms/"
     "Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
@@ -25,27 +25,8 @@ def extract_license(license: dict) -> str:
         return license.get("license", {}).get("name", "")
 
 
-class TestCreatenoticefile(unittest.TestCase):
-    """
-    def test_extract_license(self) -> None:
-        expression = "Example, Inc. Commercial License"
-        id = "Apache-1.0"
-        name = "Apache 1.0"
-        license_expression = {"expression": expression}
-        license_id = {"license": {"id": id}}
-        license_name = {"license": {"name": name}}
-        extracted_expression = noticefile.extract_license(license_expression)
-        extracted_id = noticefile.extract_license(license_id)
-        extracted_name = noticefile.extract_license(license_name)
-        extracted_empty_license = noticefile.extract_license({})
-
-        self.assertEqual(extracted_expression, expression)
-        self.assertEqual(extracted_id, id)
-        self.assertEqual(extracted_name, name)
-        self.assertEqual(extracted_empty_license, "")
-    """
-
-    def test_create_notice_file(self) -> None:
+class TestListCommand(unittest.TestCase):
+    def test_list_command_file(self) -> None:
         sbom = get_test_sbom()
         deserialized_sbom = deserialize(sbom)
         license_file = lc.list_license_information(deserialized_sbom)

@@ -2,7 +2,6 @@ import unittest
 from typing import Sequence
 
 from cdxev.auxiliary import sbomFunctions as sbF
-from cyclonedx.model.bom import Bom
 
 
 class TestComponentFunctions(unittest.TestCase):

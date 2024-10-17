@@ -7,6 +7,7 @@ import typing as t
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
+from cdxev.error import AppError
 
 from cdxev import pkg
 from cdxev.auxiliary.filename_gen import generate_filename
@@ -124,11 +125,19 @@ def update_version(sbom: dict) -> None:
 
 
 def write_notice_file(
-    notice_file: str, destination: t.Optional[Path], sbom: dict
+    notice_file: str, destination: t.Optional[Path], sbom: dict, format: str = "txt"
 ) -> None:
 
     def create_notice_file_filename(sbom: dict) -> str:
-        return "notice_file_" + generate_filename(sbom) + ".txt"
+        if format == "txt":
+            return "notice_file_" + generate_filename(sbom) + ".txt"
+        elif format == "csv":
+            return "notice_file_" + generate_filename(sbom) + ".csv"
+        else:
+            raise AppError(
+                "Format not supported.",
+                f"The format {format} is not supported, choose between 'txt' and 'csv'.",
+            )
 
     file: t.TextIO
     if destination is None:

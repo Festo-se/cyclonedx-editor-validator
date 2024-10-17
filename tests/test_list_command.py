@@ -44,11 +44,12 @@ class TestCreatenoticefile(unittest.TestCase):
         self.assertEqual(extracted_name, name)
         self.assertEqual(extracted_empty_license, "")
     """
+
     def test_create_notice_file(self) -> None:
         sbom = get_test_sbom()
         deserialized_sbom = deserialize(sbom)
         license_file = lc.list_license_information(deserialized_sbom)
-        components = (sbom.get("components", []))
+        components = sbom.get("components", [])
         notice_file_licenses = license_file[
             license_file.find(
                 "This product includes material developed by third parties:\n\n"

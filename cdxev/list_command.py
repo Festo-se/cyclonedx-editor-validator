@@ -282,6 +282,64 @@ def list_components(sbom: Bom, skip_metadata: bool = False, format: str = "txt")
 def list_command(
     sbom: dict, operation: str, format: str = "txt", skip_metadata: bool = True
 ) -> str:
+    """
+    Lists specific content of the sbom.
+
+    Currently supported are the listing of license information and component information.
+    The output can be in txt or csv format.
+
+    The txt format for licenses has the structure:
+
+        Metadata component name:
+        Metadata component copyright (if present)
+        Metadata component license 1 (if present)
+        Metadata component license 2
+        ...
+
+        This product includes material developed by third parties: (if present)
+
+        component 1 name:
+        component 1 copyright
+        component 1 license 1 (if present)
+        component 1 license 1 (if present)
+        ...
+
+        component 2 name:
+        component 2 copyright
+        component 2 license 1 (if present)
+        component 2 license 1 (if present)
+        ...
+
+    The txt format for licenses has the structure:
+
+        Metadata component name
+        Metadata component version
+        Metadata component supplier name
+
+        component 1 name
+        component 1 version
+        component 1 supplier name
+
+        ...
+
+    The csv format for licenses has the structure:
+
+        Name,Copyright,Licenses
+        Metadata component name,Metadata component copyright,Metadata component license 1,Metadata component license 2....
+        component 1 name,component 1 copyright,component 1 license 1,component 1 license 1...
+        ...
+
+    The csv format for licenses has the structure:
+        Name,Version,Supplier
+        Metadata component name,Metadata component version,Metadata component supplier name
+        component 1 name,component 1 version,component 1 supplier name
+
+
+    :param sbom: The SBOM.
+    :param operation: The list operation to be performed, can be either 'licenses' or 'components'.
+    :param format: The output format, can be either 'csv' or 'txt', the default is 'csv'.
+    :param skip_metadata: Determines if the metadata information is included or not
+    """
     deserialized_bom = deserialize(sbom)
 
     if operation == "licenses":

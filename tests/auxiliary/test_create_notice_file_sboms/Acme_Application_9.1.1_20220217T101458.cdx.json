@@ -158,7 +158,9 @@
         {
           "license":{
             "name": "A licenses name of card verifier",
-            "text": "Text describing the license"
+            "text": {
+              "content": "Text describing the license"
+            }
           }
         }
       ]

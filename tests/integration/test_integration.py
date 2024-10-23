@@ -821,6 +821,31 @@ class TestSet:
         assert exit_code == Status.OK
         assert caplog.records[0].msg.startswith("Not overwriting")
 
+    def test_invalid_vers_syntax(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            str(input_file),
+            "--name",
+            "foo",
+            "--version-range",
+            "invalid",
+            "--key",
+            "copyright",
+            "--value",
+            '"foo"',
+        )
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+        _, stderr = capsys.readouterr()
+        assert "'invalid' must start with the 'vers:' URI scheme." in stderr
+
 
 class TestValidate:
     # This test function is parametrized by pytest_generate_tests in conftest.py.

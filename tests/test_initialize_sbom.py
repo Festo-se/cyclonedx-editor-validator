@@ -2,8 +2,8 @@
 
 import unittest
 
-from cdxev.initialize_sbom import initialize_sbom
 from cdxev import pkg
+from cdxev.initialize_sbom import initialize_sbom
 
 
 class TestInitializeSbom(unittest.TestCase):

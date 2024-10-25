@@ -100,7 +100,10 @@ def initialize_sbom(
     with warnings.catch_warnings():
         warnings.simplefilter(
             "ignore"
-        )  # ignore warning caused by absence of components
+        )
+    # ignore warning caused by absence of components
+    # required due to an implementation in the cyclonedx-python-lib
+    #  https://github.com/CycloneDX/cyclonedx-python-lib/issues/617
         sbom = Bom(
             version=1,
             metadata=metadata,

@@ -769,6 +769,10 @@ def create_list_command_parser(
             "Lists specific contents of the SBOM."
             "Currently supported are the listing of license information and component information"
         ),
+        usage=(
+            "cdx-ev list [-h] [--format {txt,csv}] [--skip-metadata] "
+            "[--output <file>] <operation> input"
+        )
     )
     parser.add_argument(
         "operation",

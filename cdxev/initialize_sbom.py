@@ -41,13 +41,13 @@ def initialize_sbom(
     returns: initial SBOM for the software
     """
     if software_name is None:
-        software_name = "Name of the software described in the SBOM"
+        software_name = "The name of the component."
     if version is None:
-        version = "Version of the software"
+        version = "The component version."
     if supplier_sbom is None:
-        supplier_sbom = "The name of the organization supplying the SBOM"
+        supplier_sbom = "The organization that supplied the BOM."
     if supplier_software is None:
-        supplier_software = "The name of the organization supplying the software"
+        supplier_software = "The name of the organization that supplied the component."
 
     timestamp = datetime.now()
     copyright = "Copyright of the software"

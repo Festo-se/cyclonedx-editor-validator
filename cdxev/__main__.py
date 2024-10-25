@@ -772,7 +772,7 @@ def create_list_command_parser(
         usage=(
             "cdx-ev list [-h] [--format {txt,csv}] [--skip-metadata] "
             "[--output <file>] <operation> input"
-        )
+        ),
     )
     parser.add_argument(
         "operation",

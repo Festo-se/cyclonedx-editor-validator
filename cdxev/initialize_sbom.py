@@ -33,8 +33,8 @@ def initialize_sbom(
     """
     Creates an initial SBOM draft to work with, containing the most basic fields.
 
-    param software_name: the name of the software the sbom is for
-    param version: the version of the sbom the software is for
+    param software_name: the name of the software the SBOM is for
+    param version: the version of the SBOM the software is for
     param supplier_software: name of the supplier of the software
     param supplier_sbom: name of the supplier of the SBOM
 

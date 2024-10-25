@@ -27,16 +27,16 @@ from cdxev import pkg
 def initialize_sbom(
     software_name: Union[str, None],
     version: Union[str, None],
-    supplier_software: Union[str, None],
-    supplier_sbom: Union[str, None],
+    supplier: Union[str, None],
+    authors: Union[str, None],
 ) -> dict[str, Any]:
     """
     Creates an initial SBOM draft to work with, containing the most basic fields.
 
-    param software_name: the name of the software the SBOM is for
-    param version: the version of the SBOM the software is for
-    param supplier_software: name of the supplier of the software
-    param supplier_sbom: name of the supplier of the SBOM
+    param software_name: the name of the component
+    param version: the component version
+    param authors: the person(s) who created the BOM.
+    param supplier: the name of the organization that supplied the component
 
     returns: initial SBOM for the software
     """
@@ -44,31 +44,35 @@ def initialize_sbom(
         software_name = "The name of the component."
     if version is None:
         version = "The component version."
-    if supplier_sbom is None:
-        supplier_sbom = "The organization that supplied the BOM."
-    if supplier_software is None:
-        supplier_software = "The name of the organization that supplied the component."
+    if authors is None:
+        authors = "The person who created the BOM."
+    if supplier is None:
+        supplier = "The name of the organization that supplied the component."
 
     timestamp = datetime.now()
-    copyright = "Copyright of the software"
-
-    metadata_authors = OrganizationalContact(
-        name="Name of the author of the SBOM",
-        phone="The phone number of the author of the SBOM",
-        email="Email author of the SBOM",
+    copyright = (
+        "A copyright notice informing users of "
+        "the underlying claims to copyright ownership in a published work."
     )
 
-    metadata_supplier = OrganizationalEntity(
-        name=supplier_sbom,
+    metadata_authors = OrganizationalContact(
+        name=authors,
+        phone="The phone number of the contact.",
+        email="The email address of the contact.",
     )
 
     component_supplier = OrganizationalEntity(
-        name=supplier_software,
+        name=supplier
     )
 
     refrence_to_cdxev_tool = ExternalReference(
         url=XsUri("https://github.com/Festo-se/cyclonedx-editor-validator"),
         type=ExternalReferenceType.WEBSITE,
+    )
+
+    bom_ref = BomRef(
+        "An optional identifier which can be used "
+        "to reference the component elsewhere in the BOM."
     )
 
     metadata_component = Component(
@@ -77,7 +81,7 @@ def initialize_sbom(
         supplier=component_supplier,
         version=version,
         copyright=copyright,
-        bom_ref=BomRef("bom-ref of the metadata component"),
+        bom_ref=bom_ref,
     )
 
     metadata = BomMetaData(
@@ -91,7 +95,6 @@ def initialize_sbom(
         ],
         authors=[metadata_authors],
         component=metadata_component,
-        supplier=metadata_supplier,
         timestamp=timestamp,
     )
     with warnings.catch_warnings():
@@ -102,7 +105,7 @@ def initialize_sbom(
             version=1,
             metadata=metadata,
             dependencies=[
-                Dependency(BomRef("bom-ref of the metadata component"), dependencies=[])
+                Dependency(bom_ref, dependencies=[])
             ],
         )
 

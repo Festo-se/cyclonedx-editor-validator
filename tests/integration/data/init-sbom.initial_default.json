@@ -1,29 +1,26 @@
 {
     "dependencies": [
         {
-            "ref": "bom-ref of the metadata component"
+            "ref": "An optional identifier which can be used to reference the component elsewhere in the BOM."
         }
     ],
     "metadata": {
         "authors": [
             {
-                "email": "Email author of the SBOM",
-                "name": "Name of the author of the SBOM",
-                "phone": "The phone number of the author of the SBOM"
+                "name": "The person who created the BOM.",
+                "phone": "The phone number of the contact.",
+                "email": "The email address of the contact."
             }
         ],
         "component": {
-            "bom-ref": "bom-ref of the metadata component",
-            "copyright": "Copyright of the software",
-            "name": "Name of the software described in the SBOM",
+            "bom-ref": "An optional identifier which can be used to reference the component elsewhere in the BOM.",
+            "copyright": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
+            "name": "The name of the component.",
             "supplier": {
-                "name": "The name of the organization supplying the software"
+                "name": "The name of the organization that supplied the component."
             },
             "type": "application",
-            "version": "Version of the software"
-        },
-        "supplier": {
-            "name": "The name of the organization supplying the SBOM"
+            "version": "The component version."
         },
         "timestamp": "2024-10-15T22:15:37.204103+02:00",
         "tools": [

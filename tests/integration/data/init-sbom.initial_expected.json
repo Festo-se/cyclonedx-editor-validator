@@ -1,31 +1,28 @@
 {
     "dependencies": [
         {
-            "ref": "bom-ref of the metadata component"
+            "ref": "An optional identifier which can be used to reference the component elsewhere in the BOM."
         }
     ],
     "metadata": {
         "authors": [
             {
-                "email": "Email author of the SBOM",
-                "name": "Name of the author of the SBOM",
-                "phone": "The phone number of the author of the SBOM"
+                "name": "authors name",
+                "phone": "The phone number of the contact.",
+                "email": "The email address of the contact."
             }
         ],
         "component": {
-            "bom-ref": "bom-ref of the metadata component",
-            "copyright": "Copyright of the software",
+            "bom-ref": "An optional identifier which can be used to reference the component elsewhere in the BOM.",
+            "copyright": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
             "name": "software name",
             "supplier": {
-                "name": "supplier software"
+                "name": "supplier"
             },
             "type": "application",
             "version": "1.1.1"
         },
-        "supplier": {
-            "name": "supplier sbom"
-        },
-        "timestamp": "2024-08-29T12:44:05+00:00",
+        "timestamp": "2024-10-15T22:15:37.204103+02:00",
         "tools": [
             {
                 "externalReferences": [
@@ -35,12 +32,12 @@
                     }
                 ],
                 "name": "cyclonedx-editor-validator",
-                "version": "0.0.0",
-                "vendor": "Festo SE & Co. KG"
+                "vendor": "Festo SE & Co. KG",
+                "version": "0.0.0"
             }
         ]
     },
-    "serialNumber": "urn:uuid:1af4c61b-2ebd-4849-aba4-5e7967f1140c",
+    "serialNumber": "urn:uuid:1859cebc-67fb-448a-ad66-d00aa5fab3bf",
     "version": 1,
     "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
     "bomFormat": "CycloneDX",

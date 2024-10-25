@@ -3,12 +3,13 @@
 import unittest
 
 from cdxev.initialize_sbom import initialize_sbom
+from cdxev import pkg
 
 
 class TestInitializeSbom(unittest.TestCase):
     def test_no_arguments_given(self) -> None:
         sbom = initialize_sbom(
-            software_name=None, supplier_sbom=None, supplier_software=None, version=None
+            software_name=None, authors=None, supplier=None, version=None
         )
         self.assertEqual(
             sbom["metadata"]["component"]["name"],
@@ -22,15 +23,18 @@ class TestInitializeSbom(unittest.TestCase):
             sbom["metadata"]["component"]["version"], "The component version."
         )
         self.assertEqual(
-            sbom["metadata"]["supplier"]["name"],
-            "The organization that supplied the BOM."
+            sbom["metadata"]["authors"][0]["name"],
+            "The person who created the BOM."
+        )
+        self.assertEqual(
+            sbom["metadata"]["tools"][0]["version"], pkg.VERSION
         )
 
     def test_name_argument_given(self) -> None:
         sbom = initialize_sbom(
             software_name="xyz",
-            supplier_sbom=None,
-            supplier_software=None,
+            authors=None,
+            supplier=None,
             version=None,
         )
         self.assertEqual(sbom["metadata"]["component"]["name"], "xyz")
@@ -42,15 +46,15 @@ class TestInitializeSbom(unittest.TestCase):
             sbom["metadata"]["component"]["version"], "The component version."
         )
         self.assertEqual(
-            sbom["metadata"]["supplier"]["name"],
-            "The organization that supplied the BOM."
+            sbom["metadata"]["authors"][0]["name"],
+            "The person who created the BOM."
         )
 
-    def test_supplier_sbom_arguments_given(self) -> None:
+    def test_authors_arguments_given(self) -> None:
         sbom = initialize_sbom(
             software_name=None,
-            supplier_sbom="xyz",
-            supplier_software=None,
+            authors="xyz",
+            supplier=None,
             version=None,
         )
         self.assertEqual(
@@ -65,15 +69,15 @@ class TestInitializeSbom(unittest.TestCase):
             sbom["metadata"]["component"]["version"], "The component version."
         )
         self.assertEqual(
-            sbom["metadata"]["supplier"]["name"],
+            sbom["metadata"]["authors"][0]["name"],
             "xyz"
         )
 
-    def test_supplier_software_arguments_given(self) -> None:
+    def test_supplier_arguments_given(self) -> None:
         sbom = initialize_sbom(
             software_name=None,
-            supplier_sbom=None,
-            supplier_software="xyz",
+            authors=None,
+            supplier="xyz",
             version=None,
         )
         self.assertEqual(
@@ -88,15 +92,15 @@ class TestInitializeSbom(unittest.TestCase):
             sbom["metadata"]["component"]["version"], "The component version."
         )
         self.assertEqual(
-            sbom["metadata"]["supplier"]["name"],
-            "The organization that supplied the BOM."
+            sbom["metadata"]["authors"][0]["name"],
+            "The person who created the BOM."
         )
 
     def test_version_arguments_given(self) -> None:
         sbom = initialize_sbom(
             software_name=None,
-            supplier_sbom=None,
-            supplier_software=None,
+            authors=None,
+            supplier=None,
             version="xyz"
         )
         self.assertEqual(
@@ -109,6 +113,6 @@ class TestInitializeSbom(unittest.TestCase):
         )
         self.assertEqual(sbom["metadata"]["component"]["version"], "xyz")
         self.assertEqual(
-            sbom["metadata"]["supplier"]["name"],
-            "The organization that supplied the BOM."
+            sbom["metadata"]["authors"][0]["name"],
+            "The person who created the BOM."
         )

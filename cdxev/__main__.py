@@ -740,14 +740,14 @@ def create_init_sbom_parser(
         help=("The component version."),
     )
     submitted_values.add_argument(
-        "--supplier-software",
+        "--supplier",
         metavar="<supplier-software>",
         help=("The name of the organization that supplied the component."),
     )
     submitted_values.add_argument(
-        "--supplier-sbom",
+        "--authors",
         metavar="<supplier-sbom>",
-        help=("The organization that supplied the BOM."),
+        help=("The person who created the BOM."),
     )
     add_output_argument(parser)
     parser.set_defaults(cmd_handler=invoke_init_sbom, parser=parser)
@@ -999,8 +999,8 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
 def invoke_init_sbom(args: argparse.Namespace) -> int:
     sbom = initialize_sbom(
         software_name=args.name,
-        supplier_sbom=args.supplier_sbom,
-        supplier_software=args.supplier_software,
+        authors=args.authors,
+        supplier=args.supplier,
         version=args.version,
     )
     write_sbom(sbom, args.output, update_metadata=False)

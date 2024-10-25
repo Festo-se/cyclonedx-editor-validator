@@ -724,6 +724,7 @@ def create_init_sbom_parser(
             "Optionally for some fields values can be submitted to the command. "
             "Those fields are: "
             "The name for one author of the SBOM (metadata.authors[0].name) "
+            "The name of the supplier of the software (metadata.component.supplier.name) "
             "The name of the software (metadata.component.name) "
             "The version of the software (metadata.component.version)."
         ),

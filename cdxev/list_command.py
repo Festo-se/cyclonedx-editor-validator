@@ -264,6 +264,10 @@ def list_components(sbom: Bom, skip_metadata: bool = False, format: str = "txt")
             )
             string += line_break
 
+        if format == "txt":
+            string += "This product includes material developed by third parties:"
+            string += line_break
+
     if sbom.components is not None:
         components = extract_cyclonedx_components(sbom.components)
         for component in components:
@@ -311,6 +315,8 @@ def list_command(
         Metadata component name
         Metadata component version
         Metadata component supplier name
+
+        This product includes material developed by third parties: (if present)
 
         component 1 name
         component 1 version

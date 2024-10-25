@@ -61,9 +61,7 @@ def initialize_sbom(
         email="The email address of the contact.",
     )
 
-    component_supplier = OrganizationalEntity(
-        name=supplier
-    )
+    component_supplier = OrganizationalEntity(name=supplier)
 
     refrence_to_cdxev_tool = ExternalReference(
         url=XsUri("https://github.com/Festo-se/cyclonedx-editor-validator"),
@@ -98,18 +96,14 @@ def initialize_sbom(
         timestamp=timestamp,
     )
     with warnings.catch_warnings():
-        warnings.simplefilter(
-            "ignore"
-        )
-    # ignore warning caused by absence of components
-    # required due to an implementation in the cyclonedx-python-lib
-    #  https://github.com/CycloneDX/cyclonedx-python-lib/issues/617
+        warnings.simplefilter("ignore")
+        # ignore warning caused by absence of components
+        # required due to an implementation in the cyclonedx-python-lib
+        #  https://github.com/CycloneDX/cyclonedx-python-lib/issues/617
         sbom = Bom(
             version=1,
             metadata=metadata,
-            dependencies=[
-                Dependency(bom_ref, dependencies=[])
-            ],
+            dependencies=[Dependency(bom_ref, dependencies=[])],
         )
 
         my_json_outputter = JsonV1Dot6(sbom)

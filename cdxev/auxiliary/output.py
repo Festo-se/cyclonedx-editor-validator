@@ -125,14 +125,14 @@ def update_version(sbom: dict) -> None:
 
 
 def write_list(
-    notice_file: str, destination: t.Optional[Path], sbom: dict, format: str = "txt"
+    list_file: str, destination: t.Optional[Path], sbom: dict, format: str = "txt"
 ) -> None:
 
-    def create_notice_file_filename(sbom: dict) -> str:
+    def create_list_file_filename(sbom: dict) -> str:
         if format == "txt":
-            return "notice_file_" + generate_filename(sbom) + ".txt"
+            return "list_file_" + generate_filename(sbom) + ".txt"
         elif format == "csv":
-            return "notice_file_" + generate_filename(sbom) + ".csv"
+            return "list_file_" + generate_filename(sbom) + ".csv"
         else:
             raise AppError(
                 "Format not supported.",
@@ -145,7 +145,7 @@ def write_list(
         file = sys.stdout
     else:
         destination = create_destination_path(
-            destination, sbom, create_notice_file_filename
+            destination, sbom, create_list_file_filename
         )
         file = destination.open("w")
-    file.write(notice_file)
+    file.write(list_file)

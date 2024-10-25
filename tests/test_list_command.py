@@ -31,18 +31,18 @@ class TestListCommand(unittest.TestCase):
         deserialized_sbom = deserialize(sbom)
         license_file = lc.list_license_information(deserialized_sbom)
         components = sbom.get("components", [])
-        notice_file_licenses = license_file[
+        list_file_licenses = license_file[
             license_file.find(
                 "This product includes material developed by third parties:\n\n"
             )
             + len("This product includes material developed by third parties:\n")
             + 1 :
         ]
-        notice_file_licenses_split = notice_file_licenses.split("\n\n")
+        list_file_licenses_split = list_file_licenses.split("\n\n")
 
         for component in components:
             found = False
-            for license_entry in notice_file_licenses_split:
+            for license_entry in list_file_licenses_split:
                 license_component_name = license_entry[: license_entry.find(":\n")]
                 license_component_name = license_component_name.replace("\n", "")
                 licenses = license_entry[license_entry.find(":\n") + len(":\n") :]

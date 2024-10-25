@@ -699,6 +699,29 @@ class TestSet:
         assert exit_code == Status.APP_ERROR
         assert stderr.find('"COORDINATES[comp]" was not found') >= 0
 
+    def test_target_with_range_not_found(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            str(input_file),
+            "--name",
+            "comp",
+            "--version-range",
+            "vers:generic/1.0.0",
+            "--key",
+            "copyright",
+            "--value",
+            '"ACME Inc."',
+        )
+        exit_code, _, stderr = run_main(capsys)
+
+        assert exit_code == Status.APP_ERROR
+        assert stderr.find('"COORDINATES[comp@vers:generic/1.0.0]" was not found') >= 0
+
     def test_target_not_found_ignored(
         self,
         input_file: Path,
@@ -848,6 +871,31 @@ class TestSet:
 
         assert exit_code == Status.OK
         assert caplog.records[0].msg.startswith("Not overwriting")
+
+    def test_invalid_vers_syntax(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            str(input_file),
+            "--name",
+            "foo",
+            "--version-range",
+            "invalid",
+            "--key",
+            "copyright",
+            "--value",
+            '"foo"',
+        )
+        with pytest.raises(SystemExit) as e:
+            run_main()
+
+        assert e.value.code == Status.USAGE_ERROR
+        _, stderr = capsys.readouterr()
+        assert "'invalid' must start with the 'vers:' URI scheme." in stderr
 
 
 class TestValidate:

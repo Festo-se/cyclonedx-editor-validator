@@ -324,14 +324,14 @@ def list_command(
 
         ...
 
-    The csv format for licenses has the structure:
+    The csv format for components has the structure:
 
         Name,Copyright,Licenses
         Metadata component name,Metadata component copyright,Metadata component license 1,...
         component 1 name,component 1 copyright,component 1 license 1,component 1 license 2...
         ...
 
-    The csv format for licenses has the structure:
+    The csv format for component has the structure:
         Name,Version,Supplier
         Metadata component name,Metadata component version,Metadata component supplier name
         component 1 name,component 1 version,component 1 supplier name

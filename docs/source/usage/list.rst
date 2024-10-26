@@ -18,96 +18,101 @@ list
 
 
 Output Format
---------
+-------------
 
 The txt format for license information has the structure:
+::
+    Metadata component name:
+    Metadata component copyright 
+    Metadata component license 1 
+    Metadata component license 2 
+    ...
 
-        Metadata component name:
-        Metadata component copyright (if present)
-        Metadata component license 1 (if present)
-        Metadata component license 2 (if present)
-        ...
+    This product includes material developed by third parties: 
 
-        This product includes material developed by third parties: (if present)
+    component 1 name:
+    component 1 copyright
+    component 1 license 1 
+    component 1 license 1 
+    ...
 
-        component 1 name:
-        component 1 copyright
-        component 1 license 1 (if present)
-        component 1 license 1 (if present)
-        ...
+    component 2 name:
+    component 2 copyright
+    component 2 license 1 
+    component 2 license 2 
+    ...
 
-        component 2 name:
-        component 2 copyright
-        component 2 license 1 (if present)
-        component 2 license 2 (if present)
-        ...
 
-    Without the metadata information:
+The txt format for license information without the metadata component has the structure:
+::
+    component 1 name:
+    component 1 copyright
+    component 1 license 1 
+    component 1 license 1 
+    ...
 
-        component 1 name:
-        component 1 copyright
-        component 1 license 1 (if present)
-        component 1 license 1 (if present)
-        ...
-
-        component 2 name:
-        component 2 copyright
-        component 2 license 1 (if present)
-        component 2 license 2 (if present)
-        ...
+    component 2 name:
+    component 2 copyright
+    component 2 license 1 
+    component 2 license 2 
+    ...
 
     
-    The txt format for license information has the structure:
+The txt format for component information has the structure:
+::  
+    Metadata component name
+    Metadata component version
+    Metadata component supplier name
 
-        Metadata component name
-        Metadata component version
-        Metadata component supplier name
+    This product includes material developed by third parties: 
 
-        This product includes material developed by third parties: (if present)
+    component 1 name
+    component 1 version
+    component 1 supplier name
+    
+    ...
 
-        component 1 name
-        component 1 version
-        component 1 supplier name
+    
+The txt format for component information without the metadata component has the structure:
+::   
+    component 1 name
+    component 1 version
+    component 1 supplier name
+    
+    ...
         
-        ...
 
-    Without the metadata information:
-        component 1 name
-        component 1 version
-        component 1 supplier name
-        
-        ...
-      
+The csv format for license information has the structure:
+::
+    Name,Copyright,Licenses
+    Metadata component name,Metadata component copyright,Metadata component license 1,...
+    component 1 name,component 1 copyright,component 1 license 1,component 1 license 2...
+    ...
 
-    The csv format for license information has the structure:
+    
+The csv format for license information without the metadata component has the structure:
+::            
+    Name,Copyright,Licenses
+    component 1 name,component 1 copyright,component 1 license 1,component 1 license 2...
+    ...
 
-        Name,Copyright,Licenses
-        Metadata component name,Metadata component copyright,Metadata component license 1,...
-        component 1 name,component 1 copyright,component 1 license 1,component 1 license 2...
-        ...
+The csv format for component information has the structure:
+::     
+    Name,Version,Supplier
+    Metadata component name,Metadata component version,Metadata component supplier name
+    component 1 name,component 1 version,component 1 supplier name
+    ...
 
-    Without the metadata information:
-        
-        Name,Copyright,Licenses
-        component 1 name,component 1 copyright,component 1 license 1,component 1 license 2...
-        ...
 
-    The csv format for license information has the structure:
-        
-        Name,Version,Supplier
-        Metadata component name,Metadata component version,Metadata component supplier name
-        component 1 name,component 1 version,component 1 supplier name
-        ...
-
-    Without the metadata information:
-        
-        Name,Version,Supplier
-        component 1 name,component 1 version,component 1 supplier name
-        ...
+The csv format for component information without the metadata component has the structure:
+::   
+    Name,Version,Supplier
+    component 1 name,component 1 version,component 1 supplier name
+    ...
 
 
 Examples::
---------
+----------
 
 
     # List the license information from bom.json including the metadata component

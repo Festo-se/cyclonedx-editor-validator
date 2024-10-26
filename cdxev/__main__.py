@@ -757,7 +757,7 @@ def create_init_sbom_parser(
     submitted_values.add_argument(
         "--authors",
         metavar="<supplier-sbom>",
-        help=("The person who created the BOM."),
+        help=("The person who created the SBOM."),
     )
     add_output_argument(parser)
     parser.set_defaults(cmd_handler=invoke_init_sbom, parser=parser)

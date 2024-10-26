@@ -45,7 +45,7 @@ def initialize_sbom(
     if version is None:
         version = "The component version."
     if authors is None:
-        authors = "The person who created the BOM."
+        authors = "The person who created the SBOM."
     if supplier is None:
         supplier = "The name of the organization that supplied the component."
 

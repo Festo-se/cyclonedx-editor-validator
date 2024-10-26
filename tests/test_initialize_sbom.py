@@ -23,7 +23,7 @@ class TestInitializeSbom(unittest.TestCase):
             sbom["metadata"]["component"]["version"], "The component version."
         )
         self.assertEqual(
-            sbom["metadata"]["authors"][0]["name"], "The person who created the BOM."
+            sbom["metadata"]["authors"][0]["name"], "The person who created the SBOM."
         )
         self.assertEqual(sbom["metadata"]["tools"][0]["version"], pkg.VERSION)
 
@@ -43,7 +43,7 @@ class TestInitializeSbom(unittest.TestCase):
             sbom["metadata"]["component"]["version"], "The component version."
         )
         self.assertEqual(
-            sbom["metadata"]["authors"][0]["name"], "The person who created the BOM."
+            sbom["metadata"]["authors"][0]["name"], "The person who created the SBOM."
         )
 
     def test_authors_arguments_given(self) -> None:
@@ -82,7 +82,7 @@ class TestInitializeSbom(unittest.TestCase):
             sbom["metadata"]["component"]["version"], "The component version."
         )
         self.assertEqual(
-            sbom["metadata"]["authors"][0]["name"], "The person who created the BOM."
+            sbom["metadata"]["authors"][0]["name"], "The person who created the SBOM."
         )
 
     def test_version_arguments_given(self) -> None:
@@ -99,5 +99,5 @@ class TestInitializeSbom(unittest.TestCase):
         )
         self.assertEqual(sbom["metadata"]["component"]["version"], "xyz")
         self.assertEqual(
-            sbom["metadata"]["authors"][0]["name"], "The person who created the BOM."
+            sbom["metadata"]["authors"][0]["name"], "The person who created the SBOM."
         )

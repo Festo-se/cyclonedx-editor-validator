@@ -24,8 +24,8 @@ Optional inputs
 
 Examples::
 
-    # Write a SBOM draft with default content to bom.json
+    # Write an SBOM draft with default content to bom.json
     cdx-ev init-sbom -o bom.json 
 
-    # Write a SBOM draft with a submitted software name, version, supplier and author of the sbom to bom.json
+    # Write an SBOM draft with a submitted software name, version, supplier and author of the sbom to bom.json
     cdx-ev init-sbom --name "my software" --supplier "acme inc." --version "1.1.1" --author "acme inc"  -o bom.json

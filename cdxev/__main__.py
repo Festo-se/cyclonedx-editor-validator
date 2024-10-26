@@ -733,7 +733,7 @@ def create_init_sbom_parser(
         ),
         usage=(
             "cdx-ev init-sbom [-h] [--name <name of the component>] "
-            "[--authors <name of the author>] "
+            "<target> [--authors <name of the author>] "
             "[--supplier <supplier of the component>] "
             "[--version <version of the component>] "
             "[--output <file>]"

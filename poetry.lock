@@ -382,19 +382,19 @@ toml = ["tomli"]
 
 [[package]]
 name = "cyclonedx-python-lib"
-version = "7.6.0"
+version = "8.3.0"
 description = "Python library for CycloneDX"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "cyclonedx_python_lib-7.6.0-py3-none-any.whl", hash = "sha256:30655e89e5f987dc8d57835919748d71589fafeb33ff1dec45048eb72eda3cf9"},
-    {file = "cyclonedx_python_lib-7.6.0.tar.gz", hash = "sha256:fa481d5f0d82728cb6a32e55f8ba9c666ba75a2bd99eb643228e3011c56bb5c4"},
+    {file = "cyclonedx_python_lib-8.3.0-py3-none-any.whl", hash = "sha256:80519d8de7f7d18287495d34c48a79c7bd9dcea5bbb57e929d9fa98039bec721"},
+    {file = "cyclonedx_python_lib-8.3.0.tar.gz", hash = "sha256:d60f6060ad11a5a77ccbf7827acc16a40741f00c97f0ab21201617cd1fc44a7d"},
 ]
 
 [package.dependencies]
 license-expression = ">=30,<31"
 packageurl-python = ">=0.11,<2"
-py-serializable = ">=1.1.0,<2.0.0"
+py-serializable = ">=1.1.1,<2.0.0"
 sortedcontainers = ">=2.4.0,<3.0.0"
 
 [package.extras]
@@ -1063,12 +1063,12 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyicu"
-version = "2.13.1"
+version = "2.14"
 description = "Python extension wrapping the ICU C++ API"
 optional = false
 python-versions = "*"
 files = [
-    {file = "PyICU-2.13.1.tar.gz", hash = "sha256:d4919085eaa07da12bade8ee721e7bbf7ade0151ca0f82946a26c8f4b98cdceb"},
+    {file = "PyICU-2.14.tar.gz", hash = "sha256:acc7eb92bd5c554ed577249c6978450a4feda0aa6f01470152b3a7b382a02132"},
 ]
 
 [[package]]
@@ -1802,4 +1802,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9.0"
-content-hash = "4402d42f23449e1a5b4bb9095e6f739e38202edded0db149e0e6d424e6de5551"
+content-hash = "296a96cdb6c3f048dd109add9fc7537cf267433a0fc1654a43eedad03aaa5bd4"

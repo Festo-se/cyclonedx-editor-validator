@@ -742,7 +742,7 @@ def create_init_sbom_parser(
     submitted_values.add_argument(
         "--name",
         metavar="<name>",
-        help=("The name of the component."),
+        help=("The name of the component described by the SBOM"),
     )
     submitted_values.add_argument(
         "--version",

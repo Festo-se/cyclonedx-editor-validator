@@ -15,7 +15,7 @@
         "component": {
             "bom-ref": "An optional identifier which can be used to reference the component elsewhere in the BOM.",
             "copyright": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
-            "name": "The name of the component.",
+            "name": "The name of the component described by the SBOM",
             "supplier": {
                 "name": "The name of the organization that supplied the component."
             },

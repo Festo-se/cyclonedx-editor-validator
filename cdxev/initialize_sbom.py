@@ -41,7 +41,7 @@ def initialize_sbom(
     returns: initial SBOM for the software
     """
     if software_name is None:
-        software_name = "The name of the component."
+        software_name = "The name of the component described by the SBOM"
     if version is None:
         version = "The component version."
     if authors is None:

@@ -10,12 +10,13 @@ init-sbom
 
     This command provides a first draft of an SBOM for manual completion.
 
-    The created SBOM will be of the CycloneDX specification version 1.6.
+    The created SBOM is according to the CycloneDX specification version 1.6.
 
 Optional inputs
 ---------------
 
     Values for some fields can be provided to the command, those are:
+
     * The name for one author of the SBOM (metadata.authors[0].name) using the flag `--authors`,
     * The name of the supplier of the software (metadata.component.supplier.name) using the flag `--supplier`,
     * The name of the software (metadata.component.name) using the flag `--name`,

@@ -1,0 +1,123 @@
+============
+list
+============
+
+.. argparse::
+    :filename: ./cdxev/__main__.py
+    :func: create_parser
+    :prog: cdx-ev
+    :path: list
+
+    This command lists content of the SBOM. It can provide a list:
+
+    * of the license information in the sbom using the ``licenses`` operation,
+    * of the components in the sbom using the ``components`` operation.
+
+    The information can be displayed as a text file or in csv format.
+    The information of the metadata component can be excluded using the ``--skip-metadata`` flag.
+
+
+Output Format
+--------
+
+The txt format for license information has the structure:
+
+        Metadata component name:
+        Metadata component copyright (if present)
+        Metadata component license 1 (if present)
+        Metadata component license 2 (if present)
+        ...
+
+        This product includes material developed by third parties: (if present)
+
+        component 1 name:
+        component 1 copyright
+        component 1 license 1 (if present)
+        component 1 license 1 (if present)
+        ...
+
+        component 2 name:
+        component 2 copyright
+        component 2 license 1 (if present)
+        component 2 license 2 (if present)
+        ...
+
+    Without the metadata information:
+
+        component 1 name:
+        component 1 copyright
+        component 1 license 1 (if present)
+        component 1 license 1 (if present)
+        ...
+
+        component 2 name:
+        component 2 copyright
+        component 2 license 1 (if present)
+        component 2 license 2 (if present)
+        ...
+
+    
+    The txt format for license information has the structure:
+
+        Metadata component name
+        Metadata component version
+        Metadata component supplier name
+
+        This product includes material developed by third parties: (if present)
+
+        component 1 name
+        component 1 version
+        component 1 supplier name
+        
+        ...
+
+    Without the metadata information:
+        component 1 name
+        component 1 version
+        component 1 supplier name
+        
+        ...
+      
+
+    The csv format for license information has the structure:
+
+        Name,Copyright,Licenses
+        Metadata component name,Metadata component copyright,Metadata component license 1,...
+        component 1 name,component 1 copyright,component 1 license 1,component 1 license 2...
+        ...
+
+    Without the metadata information:
+        
+        Name,Copyright,Licenses
+        component 1 name,component 1 copyright,component 1 license 1,component 1 license 2...
+        ...
+
+    The csv format for license information has the structure:
+        
+        Name,Version,Supplier
+        Metadata component name,Metadata component version,Metadata component supplier name
+        component 1 name,component 1 version,component 1 supplier name
+        ...
+
+    Without the metadata information:
+        
+        Name,Version,Supplier
+        component 1 name,component 1 version,component 1 supplier name
+        ...
+
+
+Examples::
+--------
+
+
+    # List the license information from bom.json including the metadata component
+    cdx-ev list licenses bom.json 
+
+    # List the license information from without the metadata component
+    cdx-ev list licenses bom.json --skip-metadata
+
+    # List the components from bom.json including the metadata component
+    cdx-ev list components bom.json 
+
+    # List the components from bom.json without the metadata component
+    cdx-ev list components bom.json --skip-metadata

@@ -18,7 +18,8 @@ The tool is built with automation in mind, i.e. usage within CI/CD. We try to be
 | :-- | :-- |
 | [amend](https://festo-se.github.io/cyclonedx-editor-validator/usage/amend.html) | Accepts a single input file and will apply one or multiple *operations* to it. Each operation modifies certain aspects of the SBOM. These modifications cannot be targeted at individual components in the SBOM which sets the *amend* command apart from [*set*](https://festo-se.github.io/cyclonedx-editor-validator/usage/set.html). Its use-case is ensuring an SBOM fulfils certain requirements in an automated fashion. |
 | [build-public](https://festo-se.github.io/cyclonedx-editor-validator/usage/build-public.html) | Creates a redacted version of an SBOM fit for publication. |
-|[init-sbom](https://festo-se.github.io/cyclonedx-editor-validator/usage/init-sbom.html) | Provides a first draft of an SBOM for manual completion. |
+| [init-sbom](https://festo-se.github.io/cyclonedx-editor-validator/usage/init-sbom.html) | Provides a first draft of an SBOM for manual completion. |
+| [list](https://festo-se.github.io/cyclonedx-editor-validator/usage/list.html) | Lists content of the SBOM. |
 | [merge](https://festo-se.github.io/cyclonedx-editor-validator/usage/merge.html) | Merges two or more CycloneDX documents into one. |
 | [merge-vex](https://festo-se.github.io/cyclonedx-editor-validator/usage/merge-vex.html) | *[Deprecated]* Merges the *vex* information in two or more CycloneDX documents into one. |
 | [set](https://festo-se.github.io/cyclonedx-editor-validator/usage/set.html) | Sets properties on specified components to specified values. If a component in an SBOM is missing a particular property or the property is present but has a wrong value, this command can be used to modify just the affected properties without changing the rest of the SBOM. |

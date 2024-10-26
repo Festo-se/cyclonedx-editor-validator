@@ -10,7 +10,6 @@ from cyclonedx.model import (  # type: ignore
     ExternalReferenceType,
     XsUri,
 )
-from cyclonedx.model.tool import Tool
 from cyclonedx.model.bom import Bom, BomMetaData  # type: ignore
 from cyclonedx.model.bom_ref import BomRef  # type: ignore
 from cyclonedx.model.component import Component, ComponentType  # type: ignore
@@ -19,6 +18,7 @@ from cyclonedx.model.contact import (  # type: ignore
     OrganizationalEntity,
 )
 from cyclonedx.model.dependency import Dependency  # type: ignore
+from cyclonedx.model.tool import Tool
 from cyclonedx.output.json import JsonV1Dot6  # type: ignore
 
 from cdxev import pkg

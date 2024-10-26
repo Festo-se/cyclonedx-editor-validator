@@ -721,16 +721,6 @@ def create_init_sbom_parser(
     parser = subparsers.add_parser(
         "init-sbom",
         help=("Provides the first draft of an SBOM for manual completion."),
-        description=(
-            "Creates an initial SBOM draft, CycloneDX version1.6, "
-            "to work with, containing the most basic fields. "
-            "Optionally for some fields values can be submitted to the command. "
-            "Those fields are: "
-            "The name for one author of the SBOM (metadata.authors[0].name) "
-            "The name of the supplier of the software (metadata.component.supplier.name) "
-            "The name of the software (metadata.component.name) "
-            "The version of the software (metadata.component.version)."
-        ),
         usage=(
             "cdx-ev init-sbom [-h] [--name <name of the component>] "
             "<target> [--authors <name of the author>] "

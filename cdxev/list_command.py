@@ -335,6 +335,7 @@ def list_command(
         Name,Version,Supplier
         Metadata component name,Metadata component version,Metadata component supplier name
         component 1 name,component 1 version,component 1 supplier name
+        ...
 
 
     :param sbom: The SBOM.

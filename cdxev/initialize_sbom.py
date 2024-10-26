@@ -70,7 +70,7 @@ def initialize_sbom(
 
     bom_ref = BomRef(
         "An optional identifier which can be used "
-        "to reference the component elsewhere in the BOM."
+        "to reference the component elsewhere in the SBOM."
     )
 
     metadata_component = Component(

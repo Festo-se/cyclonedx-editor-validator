@@ -8,9 +8,9 @@ from typing import Any, Union
 from cyclonedx.model import (  # type: ignore
     ExternalReference,
     ExternalReferenceType,
-    Tool,
     XsUri,
 )
+from cyclonedx.model.tool import Tool
 from cyclonedx.model.bom import Bom, BomMetaData  # type: ignore
 from cyclonedx.model.bom_ref import BomRef  # type: ignore
 from cyclonedx.model.component import Component, ComponentType  # type: ignore

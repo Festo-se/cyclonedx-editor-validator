@@ -67,10 +67,10 @@ def extract_metadata_license_information(metadata: BomMetaData) -> dict:
     else:
         logger.info(
             LogMessage(
-                message="SBOM has no metadata.component",
+                message="SBOM has no metadata.component.",
                 description=(
                     "The SBOM has no metadata so no information "
-                    "about the software could be extracted"
+                    "about the software could be extracted."
                 ),
             )
         )
@@ -132,7 +132,7 @@ def write_license_dict_to_txt(info_dict: dict) -> str:
 
     if not info_dict.get("licenses", "") and not info_dict.get("copyright", ""):
         string += "\n"
-        string += "No license or copyright information available"
+        string += "No license or copyright information available."
 
     return string
 

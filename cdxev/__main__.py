@@ -784,7 +784,7 @@ def create_list_command_parser(
     )
     parser.add_argument(
         "input",
-        help="Path to a SBOM file.",
+        help="Path to an SBOM file.",
         type=Path,
     )
     parser.add_argument(

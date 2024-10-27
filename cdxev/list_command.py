@@ -153,8 +153,7 @@ def write_license_dict_to_csv(info_dict: dict) -> str:
 
 
 def write_license_information_to_txt(
-    software_information: dict,
-    component_information: list[dict]
+    software_information: dict, component_information: list[dict]
 ) -> str:
 
     string = write_license_dict_to_txt(software_information)
@@ -195,9 +194,7 @@ def write_license_information_to_csv(
     return string
 
 
-def list_license_information(
-    sbom: Bom, format: str = "txt"
-) -> str:
+def list_license_information(sbom: Bom, format: str = "txt") -> str:
 
     metadata = sbom.metadata
 
@@ -273,13 +270,9 @@ def list_components(sbom: Bom, format: str = "txt") -> str:
 
     if sbom.metadata.component is not None:
         if format == "csv":
-            string += list_component_information_csv(
-                sbom.metadata.component
-            )
+            string += list_component_information_csv(sbom.metadata.component)
         else:
-            string += list_component_information_txt(
-                sbom.metadata.component
-            )
+            string += list_component_information_txt(sbom.metadata.component)
         string += line_break
 
     if format == "txt":
@@ -300,9 +293,7 @@ def list_components(sbom: Bom, format: str = "txt") -> str:
     return string
 
 
-def list_command(
-    sbom: dict, operation: str, format: str = "txt"
-) -> str:
+def list_command(sbom: dict, operation: str, format: str = "txt") -> str:
     """
     Lists specific content of the sbom.
 
@@ -316,39 +307,35 @@ def list_command(
     deserialized_bom = deserialize(sbom)
 
     if operation == "licenses":
-        output = list_license_information(
-            sbom=deserialized_bom, format=format
-        )
+        output = list_license_information(sbom=deserialized_bom, format=format)
 
     elif operation == "components":
-        output = list_components(
-            sbom=deserialized_bom, format=format
-        )
+        output = list_components(sbom=deserialized_bom, format=format)
     else:
         raise AppError(
             "Operation not supported.",
             f"The operation {operation} is not supported, choose one of 'txt' and 'csv'.",
         )
 
-#    print(repr(list_license_information(sbom=deserialized_bom, format="txt")))
-#    print(" ")
-#    print(repr(list_license_information(sbom=deserialized_bom, format="csv")))
-#    print(" ")
-#    print(repr(list_components(sbom=deserialized_bom, format="txt")))
-#    print(" ")
-#    print(repr(list_components(sbom=deserialized_bom, format="csv")))
-#    print(" ")
+    #    print(repr(list_license_information(sbom=deserialized_bom, format="txt")))
+    #    print(" ")
+    #    print(repr(list_license_information(sbom=deserialized_bom, format="csv")))
+    #    print(" ")
+    #    print(repr(list_components(sbom=deserialized_bom, format="txt")))
+    #    print(" ")
+    #    print(repr(list_components(sbom=deserialized_bom, format="csv")))
+    #    print(" ")
 
-    with open('list_licenses.txt', 'w') as f:
+    with open("list_licenses.txt", "w") as f:
         f.write(list_license_information(sbom=deserialized_bom, format="txt"))
 
-    with open('list_licenses.csv', 'w') as f:
+    with open("list_licenses.csv", "w") as f:
         f.write(list_license_information(sbom=deserialized_bom, format="csv"))
 
-    with open('list_components.txt', 'w') as f:
+    with open("list_components.txt", "w") as f:
         f.write(list_components(sbom=deserialized_bom, format="txt"))
 
-    with open('list_components.csv', 'w') as f:
+    with open("list_components.csv", "w") as f:
         f.write(list_components(sbom=deserialized_bom, format="csv"))
 
     return output

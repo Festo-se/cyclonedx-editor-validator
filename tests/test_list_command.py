@@ -69,9 +69,7 @@ class TestListCommand(unittest.TestCase):
     def test_list_components(self) -> None:
         sbom = get_test_sbom()
         deserialized_sbom = deserialize(sbom)
-        license_file = lc.list_components(
-            sbom=deserialized_sbom, format="txt"
-        )
+        license_file = lc.list_components(sbom=deserialized_sbom, format="txt")
         components = sbom.get("components", [])
         component_txt_list = license_file.split("\n\n")
         for component in components:

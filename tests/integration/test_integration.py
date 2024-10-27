@@ -360,7 +360,7 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open("tests/integration/data/list_command/list_licenses.csv", 'r') as file:
+        with open("tests/integration/data/list_command/list_licenses.csv", "r") as file:
             file_contents = file.read()
         assert actual == file_contents
 
@@ -377,7 +377,9 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open("tests/integration/data/list_command/list_components.csv", 'r') as file:
+        with open(
+            "tests/integration/data/list_command/list_components.csv", "r"
+        ) as file:
             file_contents = file.read()
         assert actual == file_contents
 
@@ -394,7 +396,7 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open("tests/integration/data/list_command/list_licenses.txt", 'r') as file:
+        with open("tests/integration/data/list_command/list_licenses.txt", "r") as file:
             file_contents = file.read()
         assert actual == file_contents
 
@@ -411,7 +413,9 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open("tests/integration/data/list_command/list_components.txt", 'r') as file:
+        with open(
+            "tests/integration/data/list_command/list_components.txt", "r"
+        ) as file:
             file_contents = file.read()
         assert actual == file_contents
 

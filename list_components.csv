@@ -1,0 +1,12 @@
+Name,Version,Supplier
+"Acme_Application","9.1.1","Company Legal"
+"some_name","T4.0.1.30","somecompany SE & Co.KG"
+"card-verifier","1.0.2","Acme, Inc."
+"tomcat-catalina","9.0.14","Acme, Inc."
+"common-util","3.0.0","Acme, Inc."
+"util","2.0.0","Example, Inc."
+"persistence","3.1.0","Acme, Inc."
+"Component index 1","1.0.0","Acme, Inc."
+"web-framework","1.0.0","Acme, Inc."
+"sub_web-framework","1.0.0","Acme, Inc."
+"license and copyright less component","",""

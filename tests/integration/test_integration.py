@@ -360,7 +360,9 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        assert actual == data["expected"]["list_licenses_csv"]
+        with open("tests/integration/data/list_command/list_licenses.csv", 'r') as file:
+            file_contents = file.read()
+        assert actual == file_contents
 
     def test_list_components_csv(
         self,
@@ -375,9 +377,11 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        assert actual == data["expected"]["list_components_csv"]
+        with open("tests/integration/data/list_command/list_components.csv", 'r') as file:
+            file_contents = file.read()
+        assert actual == file_contents
 
-    def test_list_licenses_metadata_txt(
+    def test_list_licenses_txt(
         self,
         data: DataFixture,
         argv: Callable[..., None],
@@ -390,7 +394,9 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        assert actual == data["expected"]["list_licenses_txt"]
+        with open("tests/integration/data/list_command/list_licenses.txt", 'r') as file:
+            file_contents = file.read()
+        assert actual == file_contents
 
     def test_list_components_txt(
         self,
@@ -405,7 +411,9 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        assert actual == data["expected"]["list_components_txt"]
+        with open("tests/integration/data/list_command/list_components.txt", 'r') as file:
+            file_contents = file.read()
+        assert actual == file_contents
 
 
 class TestMerge:

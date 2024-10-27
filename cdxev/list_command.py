@@ -140,17 +140,14 @@ def write_license_dict_to_txt(info_dict: dict) -> str:
 def write_license_dict_to_csv(info_dict: dict) -> str:
     string = ""
 
-    if info_dict.get("name", ""):
-        string += info_dict.get("name", "")
+    string += '"' + info_dict.get("name", "") + '"'
 
-    if info_dict.get("copyright", ""):
-        string += ","
-        string += info_dict.get("copyright", "")
+    string += ","
+    string += '"' + info_dict.get("copyright", "") + '"'
 
-    if info_dict.get("licenses", ""):
-        license_str = write_list_to_str(info_dict.get("licenses", ""), ",")
-        string += ","
-        string += license_str
+    license_str = write_list_to_str(info_dict.get("licenses", ""), ";")
+    string += ","
+    string += '"' + license_str + '"'
 
     return string
 
@@ -219,7 +216,33 @@ def list_license_information(
     return txt_string
 
 
-def list_component_information(
+def list_component_information_csv(
+    component: Component, division_character: str = ","
+) -> str:
+    string = ""
+    if component.name is not None:
+        string += '"' + component.name + '"'
+    else:
+        string += '"' + '"'
+
+    if component.version is not None:
+        string += division_character
+        string += '"' + component.version + '"'
+    else:
+        string += division_character
+        string += '"' + '"'
+
+    if component.supplier is not None and component.supplier.name is not None:
+        string += division_character
+        string += '"' + component.supplier.name + '"'
+    else:
+        string += division_character
+        string += '"' + '"'
+
+    return string
+
+
+def list_component_information_txt(
     component: Component, division_character: str = "\n"
 ) -> str:
     string = ""
@@ -242,18 +265,21 @@ def list_component_information(
 
 def list_components(sbom: Bom, format: str = "txt") -> str:
     if format == "txt":
-        division_character = "\n"
         string = ""
         line_break = "\n\n"
     elif format == "csv":
-        division_character = ","
         string = "Name,Version,Supplier\n"
         line_break = "\n"
 
     if sbom.metadata.component is not None:
-        string += list_component_information(
-            sbom.metadata.component, division_character
-        )
+        if format == "csv":
+            string += list_component_information_csv(
+                sbom.metadata.component
+            )
+        else:
+            string += list_component_information_txt(
+                sbom.metadata.component
+            )
         string += line_break
 
     if format == "txt":
@@ -263,7 +289,10 @@ def list_components(sbom: Bom, format: str = "txt") -> str:
     if sbom.components is not None:
         components = extract_cyclonedx_components(sbom.components)
         for component in components:
-            string += list_component_information(component, division_character)
+            if format == "csv":
+                string += list_component_information_csv(component)
+            else:
+                string += list_component_information_txt(component)
             string += line_break
 
     string = string[: -len(line_break)]
@@ -300,5 +329,26 @@ def list_command(
             "Operation not supported.",
             f"The operation {operation} is not supported, choose one of 'txt' and 'csv'.",
         )
+
+#    print(repr(list_license_information(sbom=deserialized_bom, format="txt")))
+#    print(" ")
+#    print(repr(list_license_information(sbom=deserialized_bom, format="csv")))
+#    print(" ")
+#    print(repr(list_components(sbom=deserialized_bom, format="txt")))
+#    print(" ")
+#    print(repr(list_components(sbom=deserialized_bom, format="csv")))
+#    print(" ")
+
+    with open('list_licenses.txt', 'w') as f:
+        f.write(list_license_information(sbom=deserialized_bom, format="txt"))
+
+    with open('list_licenses.csv', 'w') as f:
+        f.write(list_license_information(sbom=deserialized_bom, format="csv"))
+
+    with open('list_components.txt', 'w') as f:
+        f.write(list_components(sbom=deserialized_bom, format="txt"))
+
+    with open('list_components.csv', 'w') as f:
+        f.write(list_components(sbom=deserialized_bom, format="csv"))
 
     return output

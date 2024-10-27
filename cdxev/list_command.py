@@ -295,7 +295,7 @@ def list_components(sbom: Bom, format: str = "txt") -> str:
 
 def list_command(sbom: dict, operation: str, format: str = "txt") -> str:
     """
-    Lists specific content of the sbom.
+    Lists specific content of the SBOM.
 
     Currently supported are the listing of license information and component information.
     The output can be in txt or csv format.

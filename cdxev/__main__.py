@@ -777,7 +777,7 @@ def create_list_command_parser(
     parser.add_argument(
         "operation",
         metavar="<operation>",
-        help=("The list operation that shell be performed"),
+        help=("The list operation that shall be performed."),
         choices=["licenses", "components"],
         default=None,
         type=str,

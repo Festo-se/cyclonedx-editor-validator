@@ -72,21 +72,13 @@ The csv format for component information has the structure:
     "Metadata component name","Metadata component version","Metadata component supplier name"
     "component 1 name","component 1 version","component 1 supplier name"
     "component 2 name","","component 2 supplier name"
-
     ...
 
 
 Examples::
-----------
 
-    # List the license information from bom.json including the metadata component
-
+    # List the license information from bom.json
     cdx-ev list licenses bom.json 
 
-    # List the license information from without the metadata component
-
-    cdx-ev list licenses bom.json --skip-metadata
-
-    # List the components from bom.json including the metadata component
-
+    # List the components from bom.json
     cdx-ev list components bom.json 

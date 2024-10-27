@@ -157,22 +157,17 @@ def write_license_dict_to_csv(info_dict: dict) -> str:
 
 def write_license_information_to_txt(
     software_information: dict,
-    component_information: list[dict],
-    skip_metadata: bool = False,
+    component_information: list[dict]
 ) -> str:
 
-    if not skip_metadata:
-        string = write_license_dict_to_txt(software_information)
+    string = write_license_dict_to_txt(software_information)
 
-        if not component_information:
-            return string
+    if not component_information:
+        return string
 
-        string += "\n\n"
-        string += "This product includes material developed by third parties:"
-        string += "\n\n"
-
-    else:
-        string = ""
+    string += "\n\n"
+    string += "This product includes material developed by third parties:"
+    string += "\n\n"
 
     for entry in component_information:
         if entry.get("name", ""):
@@ -187,12 +182,10 @@ def write_license_information_to_txt(
 def write_license_information_to_csv(
     software_information: dict,
     component_information: list[dict],
-    skip_metadata: bool = False,
 ) -> str:
     string = "Name,Copyright,Licenses"
 
-    if not skip_metadata:
-        string += "\n" + write_license_dict_to_csv(software_information)
+    string += "\n" + write_license_dict_to_csv(software_information)
 
     if not component_information:
         return string
@@ -206,7 +199,7 @@ def write_license_information_to_csv(
 
 
 def list_license_information(
-    sbom: Bom, format: str = "txt", skip_metadata: bool = False
+    sbom: Bom, format: str = "txt"
 ) -> str:
 
     metadata = sbom.metadata
@@ -215,12 +208,12 @@ def list_license_information(
     component_information = extract_components_metadata_information(sbom.components)
     if format == "txt":
         txt_string = write_license_information_to_txt(
-            software_information, component_information, skip_metadata=skip_metadata
+            software_information, component_information
         )
 
     if format == "csv":
         txt_string = write_license_information_to_csv(
-            software_information, component_information, skip_metadata=skip_metadata
+            software_information, component_information
         )
 
     return txt_string
@@ -247,7 +240,7 @@ def list_component_information(
     return string
 
 
-def list_components(sbom: Bom, skip_metadata: bool = False, format: str = "txt") -> str:
+def list_components(sbom: Bom, format: str = "txt") -> str:
     if format == "txt":
         division_character = "\n"
         string = ""
@@ -257,16 +250,15 @@ def list_components(sbom: Bom, skip_metadata: bool = False, format: str = "txt")
         string = "Name,Version,Supplier\n"
         line_break = "\n"
 
-    if not skip_metadata:
-        if sbom.metadata.component is not None:
-            string += list_component_information(
-                sbom.metadata.component, division_character
-            )
-            string += line_break
+    if sbom.metadata.component is not None:
+        string += list_component_information(
+            sbom.metadata.component, division_character
+        )
+        string += line_break
 
-        if format == "txt":
-            string += "This product includes material developed by third parties:"
-            string += line_break
+    if format == "txt":
+        string += "This product includes material developed by third parties:"
+        string += line_break
 
     if sbom.components is not None:
         components = extract_cyclonedx_components(sbom.components)
@@ -280,7 +272,7 @@ def list_components(sbom: Bom, skip_metadata: bool = False, format: str = "txt")
 
 
 def list_command(
-    sbom: dict, operation: str, format: str = "txt", skip_metadata: bool = True
+    sbom: dict, operation: str, format: str = "txt"
 ) -> str:
     """
     Lists specific content of the sbom.
@@ -291,18 +283,17 @@ def list_command(
     :param sbom: The SBOM.
     :param operation: The list operation to be performed, can be either 'licenses' or 'components'.
     :param format: The output format. Can be either 'csv' or 'txt', the default is 'csv'.
-    :param skip_metadata: Determines if the metadata information is included or not.
     """
     deserialized_bom = deserialize(sbom)
 
     if operation == "licenses":
         output = list_license_information(
-            sbom=deserialized_bom, format=format, skip_metadata=skip_metadata
+            sbom=deserialized_bom, format=format
         )
 
     elif operation == "components":
         output = list_components(
-            sbom=deserialized_bom, skip_metadata=skip_metadata, format=format
+            sbom=deserialized_bom, format=format
         )
     else:
         raise AppError(

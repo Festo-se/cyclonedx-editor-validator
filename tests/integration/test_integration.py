@@ -347,7 +347,7 @@ class TestListCommand:
             expected=expected_json,
         )
 
-    def test_list_licenses_metadata_csv(
+    def test_list_licenses_csv(
         self,
         data: DataFixture,
         argv: Callable[..., None],
@@ -360,37 +360,7 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        assert actual == data["expected"]["list_licenses_metadata_csv"]
-
-    def test_list_licenses_csv(
-        self,
-        data: DataFixture,
-        argv: Callable[..., None],
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        argv("list", "licenses", str(data["input"]), "--skip-metadata")
-        exit_code, actual, _ = run_main(capsys)
-
-        # Verify that command completed successfully
-        assert exit_code == Status.OK
-
-        # Verify that output matches what is expected
         assert actual == data["expected"]["list_licenses_csv"]
-
-    def test_list_components_metadata_csv(
-        self,
-        data: DataFixture,
-        argv: Callable[..., None],
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        argv("list", "components", str(data["input"]))
-        exit_code, actual, _ = run_main(capsys)
-
-        # Verify that command completed successfully
-        assert exit_code == Status.OK
-
-        # Verify that output matches what is expected
-        assert actual == data["expected"]["list_components_metadata_csv"]
 
     def test_list_components_csv(
         self,
@@ -398,7 +368,7 @@ class TestListCommand:
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        argv("list", "components", str(data["input"]), "--skip-metadata")
+        argv("list", "components", str(data["input"]))
         exit_code, actual, _ = run_main(capsys)
 
         # Verify that command completed successfully
@@ -420,39 +390,7 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        assert actual == data["expected"]["list_licenses_metadata_txt"]
-
-    def test_list_licenses_txt(
-        self,
-        data: DataFixture,
-        argv: Callable[..., None],
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        argv(
-            "list", "licenses", str(data["input"]), "--skip-metadata", "--format", "txt"
-        )
-        exit_code, actual, _ = run_main(capsys)
-
-        # Verify that command completed successfully
-        assert exit_code == Status.OK
-
-        # Verify that output matches what is expected
         assert actual == data["expected"]["list_licenses_txt"]
-
-    def test_list_components_metadata_txt(
-        self,
-        data: DataFixture,
-        argv: Callable[..., None],
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        argv("list", "components", str(data["input"]), "--format", "txt")
-        exit_code, actual, _ = run_main(capsys)
-
-        # Verify that command completed successfully
-        assert exit_code == Status.OK
-
-        # Verify that output matches what is expected
-        assert actual == data["expected"]["list_components_metadata_txt"]
 
     def test_list_components_txt(
         self,
@@ -460,14 +398,7 @@ class TestListCommand:
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        argv(
-            "list",
-            "components",
-            str(data["input"]),
-            "--skip-metadata",
-            "--format",
-            "txt",
-        )
+        argv("list", "components", str(data["input"]), "--format", "txt")
         exit_code, actual, _ = run_main(capsys)
 
         # Verify that command completed successfully

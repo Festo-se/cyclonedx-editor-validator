@@ -14,7 +14,6 @@ list
     * of the components in the sbom using the ``components`` operation.
 
     The information can be displayed as a text file or in csv format.
-    The information of the metadata component can be excluded using the ``--skip-metadata`` flag.
 
 
 Output Format

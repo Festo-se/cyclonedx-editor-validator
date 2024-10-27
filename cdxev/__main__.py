@@ -770,7 +770,7 @@ def create_list_command_parser(
             "Currently supported are the listing of license information and component information"
         ),
         usage=(
-            "cdx-ev list [-h] [--format {txt,csv}] [--skip-metadata] "
+            "cdx-ev list [-h] [--format {txt,csv}] "
             "[--output <file>] <operation> input"
         ),
     )
@@ -793,11 +793,6 @@ def create_list_command_parser(
         choices=["txt", "csv"],
         default="csv",
         type=str,
-    )
-    parser.add_argument(
-        "--skip-metadata",
-        help="If selected the metadata information will not be listed",
-        action="store_true",
     )
     add_output_argument(parser)
     parser.set_defaults(cmd_handler=invoke_list_command, parser=parser)
@@ -1066,7 +1061,6 @@ def invoke_list_command(args: argparse.Namespace) -> int:
         sbom=sbom,
         operation=args.operation,
         format=args.format,
-        skip_metadata=args.skip_metadata,
     )
     write_list(output, args.output, sbom, format=args.format)
 

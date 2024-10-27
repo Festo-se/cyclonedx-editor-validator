@@ -271,6 +271,57 @@ class TestBuildPublic:
         assert actual == data["expected"]
 
 
+class TestInitSbom:
+    class DataFixture(TypedDict):
+        expected: dict
+
+    def test(
+        self,
+        data_dir: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        argv(
+            "init-sbom",
+            "--name",
+            "software name",
+            "--authors",
+            "authors name",
+            "--supplier",
+            "supplier",
+            "--version",
+            "1.1.1",
+        )
+        exit_code, actual, _ = run_main(capsys, "json")
+
+        expected = load_sbom(data_dir / "init-sbom.initial_expected.json")
+
+        # Verify that command completed successfully
+        assert exit_code == Status.OK
+
+        # Verify that output matches what is expected
+        assert actual == expected
+
+    def test_no_arguments(
+        self,
+        data_dir: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        argv(
+            "init-sbom",
+        )
+        exit_code, actual, _ = run_main(capsys, "json")
+
+        expected = load_sbom(data_dir / "init-sbom.initial_default.json")
+
+        # Verify that command completed successfully
+        assert exit_code == Status.OK
+
+        # Verify that output matches what is expected
+        assert actual == expected
+
+
 class TestMerge:
     class DataFixture(TypedDict):
         inputs: list[Path]

@@ -145,7 +145,7 @@ def write_license_dict_to_csv(info_dict: dict) -> str:
     string += ","
     string += '"' + info_dict.get("copyright", "") + '"'
 
-    license_str = write_list_to_str(info_dict.get("licenses", ""), ";")
+    license_str = write_list_to_str(info_dict.get("licenses", ""), ",")
     string += ","
     string += '"' + license_str + '"'
 

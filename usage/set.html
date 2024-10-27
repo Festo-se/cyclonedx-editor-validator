@@ -1,25 +1,23 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>set &mdash; CycloneDX Editor Validator Tool 0.19.0 documentation</title>
+  <title>set &mdash; CycloneDX Editor Validator Tool 0.20.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
       <link rel="stylesheet" type="text/css" href="https://www.festo.com/fonts/fonts.css" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=cbfb3150"></script>
-        <script src="../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=b52c616d"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -55,6 +53,8 @@
 <li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
+<li class="toctree-l2"><a class="reference internal" href="init-sbom.html">init-sbom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="list.html">list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="merge-vex.html">merge-vex</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">set</a><ul>
@@ -178,7 +178,7 @@
 <dd><p>Version of target component. If specified, name must also be specified.</p>
 </dd>
 <dt><kbd>--version-range</kbd></dt>
-<dd><p>Version range of target components. If specified, name must also be specified.</p>
+<dd><p>Version range of target components in ‘vers’ notation. If specified, name must also be specified.</p>
 </dd>
 </dl>
 </section>
@@ -186,7 +186,7 @@
 <h2>Target components<a class="headerlink" href="#target-components" title="Link to this heading"></a></h2>
 <p>The <em>target component</em> can be identified through any of the identifiable properties defined by CycloneDX, specifically: <em>cpe</em>, <em>purl</em>, <em>swid</em> or the combination of <em>name</em>, <em>group</em> and/or <em>version</em> (collectively called <em>coordinates</em>).</p>
 <p>If <em>coordinates</em> are used to identify the target, they must match the component fully. In other words, if <strong>only</strong> <em>name</em> is given, it will <strong>only match</strong> components with that name which do <strong>not</strong> contain <em>version</em> or <em>group</em> fields.</p>
-<p>In <em>coordinates</em> it is also possible to provide a range of versions using the <em>version-range</em> parameter instead of <em>version</em> following the <a class="reference external" href="https://github.com/package-url/purl-spec/blob/version-range-spec/VERSION-RANGE-SPEC.rst">PURL specification</a> as referenced by <a class="reference external" href="https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range">CycloneDX</a>.</p>
+<p>In <em>coordinates</em> it is also possible to provide a range of versions using the <em>version-range</em> parameter instead of <em>version</em> following the <a class="reference external" href="https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst">PURL specification</a> as referenced by <a class="reference external" href="https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range">CycloneDX</a>.</p>
 <p>The version range has the format:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="o">&lt;</span><span class="n">versioning</span><span class="o">-</span><span class="n">scheme</span><span class="o">&gt;/&lt;</span><span class="n">version</span><span class="o">-</span><span class="n">constraint</span><span class="o">&gt;|&lt;</span><span class="n">version</span><span class="o">-</span><span class="n">constraint</span><span class="o">&gt;|...</span>
 </pre></div>

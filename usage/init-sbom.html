@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>init-sbom &mdash; CycloneDX Editor Validator Tool 0.20.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
+      <link rel="stylesheet" type="text/css" href="https://www.festo.com/fonts/fonts.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=b52c616d"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="list" href="list.html" />
+    <link rel="prev" title="build-public" href="build-public.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            CycloneDX Editor Validator Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">init-sbom</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create_parser-metadata">metadata</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optional-inputs">Optional inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="list.html">list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="merge-vex.html">merge-vex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="validate.html">validate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#exit-codes">Exit codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Further information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../maintainers.html">Maintainers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CycloneDX Editor Validator Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Usage</a></li>
+      <li class="breadcrumb-item active">init-sbom</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/init-sbom.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="init-sbom">
+<h1>init-sbom<a class="headerlink" href="#init-sbom" title="Link to this heading"></a></h1>
+<p>This command provides a first draft of an SBOM for manual completion.</p>
+<p>The created SBOM is according to the CycloneDX specification version 1.6.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">init</span><span class="o">-</span><span class="n">sbom</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">metadata</span><span class="o">&gt;</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="create_parser-named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>--output, -o</kbd></dt>
+<dd><p>The path to where the output should be written. If this is a file, output is written there. If it’s a directory, output is written to a file with an auto-generated name inside that directory. If it’s not specified, output is written to stdout.</p>
+</dd>
+</dl>
+</section>
+<section id="create_parser-metadata">
+<h2>metadata<a class="headerlink" href="#create_parser-metadata" title="Link to this heading"></a></h2>
+<p>Submitted values that will be written into the SBOM draft. Field values like the name and version of the software (--name and --version), the supplier of the software (--supplier-software) or the supplier of the SBOM (--supplier-sbom) can be submitted to the program and will be written into the provided draft.</p>
+<dl class="option-list">
+<dt><kbd>--name</kbd></dt>
+<dd><p>The name of the component described by the SBOM.</p>
+</dd>
+<dt><kbd>--version</kbd></dt>
+<dd><p>The component’s version.</p>
+</dd>
+<dt><kbd>--supplier</kbd></dt>
+<dd><p>The name of the organization that supplied the component.</p>
+</dd>
+<dt><kbd>--authors</kbd></dt>
+<dd><p>The person who created the SBOM.</p>
+</dd>
+</dl>
+</section>
+<section id="optional-inputs">
+<h2>Optional inputs<a class="headerlink" href="#optional-inputs" title="Link to this heading"></a></h2>
+<blockquote>
+<div><p>Values for some fields can be provided to the command, those are:</p>
+<ul class="simple">
+<li><p>The name for one author of the SBOM (metadata.authors[0].name) using the flag <cite>--authors</cite>,</p></li>
+<li><p>The name of the supplier of the software (metadata.component.supplier.name) using the flag <cite>--supplier</cite>,</p></li>
+<li><p>The name of the software (metadata.component.name) using the flag <cite>--name</cite>,</p></li>
+<li><p>The version of the software (metadata.component.version) using the flag <cite>--version</cite>.</p></li>
+</ul>
+</div></blockquote>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Write an SBOM draft with default content to bom.json</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">init</span><span class="o">-</span><span class="n">sbom</span> <span class="o">-</span><span class="n">o</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span>
+
+<span class="c1"># Write an SBOM draft with a submitted software name, version, supplier and author of the SBOM to bom.json</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">init</span><span class="o">-</span><span class="n">sbom</span> <span class="o">--</span><span class="n">name</span> <span class="s2">&quot;my software&quot;</span> <span class="o">--</span><span class="n">supplier</span> <span class="s2">&quot;acme inc.&quot;</span> <span class="o">--</span><span class="n">version</span> <span class="s2">&quot;1.1.1&quot;</span> <span class="o">--</span><span class="n">author</span> <span class="s2">&quot;acme inc&quot;</span>  <span class="o">-</span><span class="n">o</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+<p>The above provided example without passing arguments to <cite>init-sbom</cite> would result in:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;dependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="s2">&quot;An optional identifier which can be used to reference the component elsewhere in the SBOM.&quot;</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;The email address of the contact.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;The person who created the SBOM.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;phone&quot;</span><span class="p">:</span> <span class="s2">&quot;The phone number of the contact.&quot;</span>
+            <span class="p">}</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;bom-ref&quot;</span><span class="p">:</span> <span class="s2">&quot;An optional identifier which can be used to reference the component elsewhere in the SBOM.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;A copyright notice informing users of the underlying claims to copyright ownership in a published work.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;The name of the component described by the SBOM.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;supplier&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;The name of the organization that supplied the component.&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;application&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;The component version.&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;2024-10-27T10:56:40.095452+01:00&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tools&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;externalReferences&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;website&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/Festo-se/cyclonedx-editor-validator&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;cyclonedx-editor-validator&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;vendor&quot;</span><span class="p">:</span> <span class="s2">&quot;Festo SE &amp; Co. KG&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.0&quot;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;serialNumber&quot;</span><span class="p">:</span> <span class="s2">&quot;urn:uuid:1fa01e4f-04f0-4208-9ea3-b53de58fd6a0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;http://cyclonedx.org/schema/bom-1.6.schema.json&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bomFormat&quot;</span><span class="p">:</span> <span class="s2">&quot;CycloneDX&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;specVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;1.6&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="build-public.html" class="btn btn-neutral float-left" title="build-public" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="list.html" class="btn btn-neutral float-right" title="list" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Festo SE &amp; Co. KG.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

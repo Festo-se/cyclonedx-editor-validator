@@ -1,0 +1,12 @@
+Name,Copyright,Licenses
+"Acme_Application","Company Legal 2022, all rights reserved",""
+"some_name","Company Legal 2022, all rights reserved","Apache-2.0"
+"card-verifier","","EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0,A licenses name of card verifier"
+"tomcat-catalina","Copyright tomcat-catalina","Apache-1.0,Apache-2.0"
+"common-util","","BSD-3-Clause"
+"util","","Example, Inc. Commercial License,Apache-1.0"
+"persistence","","Apache-2.0"
+"Component index 1","","(CDDL-1.0 OR GPL-2.0-with-classpath-exception)"
+"web-framework","","Apache-1.0"
+"sub_web-framework","","Apache-1.0,Apache-2.0,Apache-3.0"
+"license and copyright less component","",""

@@ -721,16 +721,10 @@ def create_init_sbom_parser(
     parser = subparsers.add_parser(
         "init-sbom",
         help=("Provides the first draft of an SBOM for manual completion."),
-        usage=(
-            "cdx-ev init-sbom [-h] [--name <name of the component>] "
-            "<target> [--authors <name of the author>] "
-            "[--supplier <supplier of the component>] "
-            "[--version <version of the component>] "
-            "[--output <file>]"
-        ),
+        usage=("cdx-ev init-sbom [-h] <metadata> [--output <file>]"),
     )
     submitted_values = parser.add_argument_group(
-        "target",
+        "metadata",
         description=(
             "Submitted values that will be written into the SBOM draft. "
             "Field values like the name and version of the software (--name and --version), "
@@ -742,7 +736,7 @@ def create_init_sbom_parser(
     submitted_values.add_argument(
         "--name",
         metavar="<name>",
-        help=("The name of the component described by the SBOM"),
+        help=("The name of the component described by the SBOM."),
     )
     submitted_values.add_argument(
         "--version",

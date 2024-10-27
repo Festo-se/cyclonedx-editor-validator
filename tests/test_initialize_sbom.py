@@ -13,7 +13,7 @@ class TestInitializeSbom(unittest.TestCase):
         )
         self.assertEqual(
             sbom["metadata"]["component"]["name"],
-            "The name of the component described by the SBOM",
+            "The name of the component described by the SBOM.",
         )
         self.assertEqual(
             sbom["metadata"]["component"]["supplier"]["name"],
@@ -55,7 +55,7 @@ class TestInitializeSbom(unittest.TestCase):
         )
         self.assertEqual(
             sbom["metadata"]["component"]["name"],
-            "The name of the component described by the SBOM",
+            "The name of the component described by the SBOM.",
         )
         self.assertEqual(
             sbom["metadata"]["component"]["supplier"]["name"],
@@ -75,7 +75,7 @@ class TestInitializeSbom(unittest.TestCase):
         )
         self.assertEqual(
             sbom["metadata"]["component"]["name"],
-            "The name of the component described by the SBOM",
+            "The name of the component described by the SBOM.",
         )
         self.assertEqual(sbom["metadata"]["component"]["supplier"]["name"], "xyz")
         self.assertEqual(
@@ -91,7 +91,7 @@ class TestInitializeSbom(unittest.TestCase):
         )
         self.assertEqual(
             sbom["metadata"]["component"]["name"],
-            "The name of the component described by the SBOM",
+            "The name of the component described by the SBOM.",
         )
         self.assertEqual(
             sbom["metadata"]["component"]["supplier"]["name"],

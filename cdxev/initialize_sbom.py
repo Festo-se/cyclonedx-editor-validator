@@ -33,15 +33,15 @@ def initialize_sbom(
     """
     Creates an initial SBOM draft to work with, containing the most basic fields.
 
-    param software_name: the name of the component
-    param version: the component version
+    param software_name: the name of the component.
+    param version: the component version.
     param authors: the person(s) who created the BOM.
-    param supplier: the name of the organization that supplied the component
+    param supplier: the name of the organization that supplied the component.
 
-    returns: initial SBOM for the software
+    returns: initial SBOM for the software.
     """
     if software_name is None:
-        software_name = "The name of the component described by the SBOM"
+        software_name = "The name of the component described by the SBOM."
     if version is None:
         version = "The component version."
     if authors is None:

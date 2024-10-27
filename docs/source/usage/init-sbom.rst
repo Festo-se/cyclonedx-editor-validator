@@ -49,7 +49,7 @@ The above provided example without passing arguments to `init-sbom` would result
             "component": {
                 "bom-ref": "An optional identifier which can be used to reference the component elsewhere in the SBOM.",
                 "copyright": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
-                "name": "The name of the component described by the SBOM",
+                "name": "The name of the component described by the SBOM.",
                 "supplier": {
                     "name": "The name of the organization that supplied the component."
                 },

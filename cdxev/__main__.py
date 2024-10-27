@@ -25,6 +25,7 @@ from cdxev.auxiliary.identity import Key, KeyType
 from cdxev.auxiliary.output import write_sbom
 from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
+from cdxev.initialize_sbom import initialize_sbom
 from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
@@ -182,6 +183,7 @@ def create_parser() -> argparse.ArgumentParser:
     create_validation_parser(subparsers)
     create_set_parser(subparsers)
     create_build_public_bom_parser(subparsers)
+    create_init_sbom_parser(subparsers)
 
     return parser
 
@@ -712,6 +714,50 @@ def create_build_public_bom_parser(
     return parser
 
 
+# noinspection PyUnresolvedReferences,PyProtectedMember
+def create_init_sbom_parser(
+    subparsers: argparse._SubParsersAction,
+) -> argparse.ArgumentParser:
+    parser = subparsers.add_parser(
+        "init-sbom",
+        help=("Provides the first draft of an SBOM for manual completion."),
+        usage=("cdx-ev init-sbom [-h] <metadata> [--output <file>]"),
+    )
+    submitted_values = parser.add_argument_group(
+        "metadata",
+        description=(
+            "Submitted values that will be written into the SBOM draft. "
+            "Field values like the name and version of the software (--name and --version), "
+            "the supplier of the software (--supplier-software) "
+            "or the supplier of the SBOM (--supplier-sbom) "
+            "can be submitted to the program and will be written into the provided draft."
+        ),
+    )
+    submitted_values.add_argument(
+        "--name",
+        metavar="<name>",
+        help=("The name of the component described by the SBOM."),
+    )
+    submitted_values.add_argument(
+        "--version",
+        metavar="<version>",
+        help=("The component's version."),
+    )
+    submitted_values.add_argument(
+        "--supplier",
+        metavar="<supplier-software>",
+        help=("The name of the organization that supplied the component."),
+    )
+    submitted_values.add_argument(
+        "--authors",
+        metavar="<supplier-sbom>",
+        help=("The person who created the SBOM."),
+    )
+    add_output_argument(parser)
+    parser.set_defaults(cmd_handler=invoke_init_sbom, parser=parser)
+    return parser
+
+
 def invoke_amend(args: argparse.Namespace) -> int:
     if args.help_operation:
         short_desc = args.operations_by_name[args.help_operation].short_description
@@ -954,6 +1000,17 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
     sbom, _ = read_sbom(args.input)
     output = build_public_bom(sbom, args.schema_path)
     write_sbom(output, args.output)
+    return Status.OK
+
+
+def invoke_init_sbom(args: argparse.Namespace) -> int:
+    sbom = initialize_sbom(
+        software_name=args.name,
+        authors=args.authors,
+        supplier=args.supplier,
+        version=args.version,
+    )
+    write_sbom(sbom, args.output, update_metadata=False)
     return Status.OK
 
 

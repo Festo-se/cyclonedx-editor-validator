@@ -741,7 +741,7 @@ def create_init_sbom_parser(
     submitted_values.add_argument(
         "--version",
         metavar="<version>",
-        help=("The component version."),
+        help=("The component's version."),
     )
     submitted_values.add_argument(
         "--supplier",

@@ -317,16 +317,4 @@ def list_command(sbom: dict, operation: str, format: str = "txt") -> str:
             f"The operation {operation} is not supported, choose one of 'txt' and 'csv'.",
         )
 
-    with open("list_licenses.txt", "w") as f:
-        f.write(list_license_information(sbom=deserialized_bom, format="txt"))
-
-    with open("list_licenses.csv", "w") as f:
-        f.write(list_license_information(sbom=deserialized_bom, format="csv"))
-
-    with open("list_components.txt", "w") as f:
-        f.write(list_components(sbom=deserialized_bom, format="txt"))
-
-    with open("list_components.csv", "w") as f:
-        f.write(list_components(sbom=deserialized_bom, format="csv"))
-
     return output

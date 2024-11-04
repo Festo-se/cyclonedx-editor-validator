@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
-import warnings
 from datetime import datetime
 from typing import Any, Union
 
@@ -95,20 +94,16 @@ def initialize_sbom(
         component=metadata_component,
         timestamp=timestamp,
     )
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        # ignore warning caused by absence of components
-        # required due to an implementation in the cyclonedx-python-lib
-        #  https://github.com/CycloneDX/cyclonedx-python-lib/issues/617
-        sbom = Bom(
-            version=1,
-            metadata=metadata,
-            dependencies=[Dependency(bom_ref, dependencies=[])],
-        )
 
-        my_json_outputter = JsonV1Dot6(sbom)
-        serialized_json: dict[str, Any] = json.loads(
-            my_json_outputter.output_as_string(indent=4)
-        )
+    sbom = Bom(
+        version=1,
+        metadata=metadata,
+        dependencies=[Dependency(bom_ref, dependencies=[])],
+    )
+
+    my_json_outputter = JsonV1Dot6(sbom)
+    serialized_json: dict[str, Any] = json.loads(
+        my_json_outputter.output_as_string(indent=4)
+    )
 
     return serialized_json

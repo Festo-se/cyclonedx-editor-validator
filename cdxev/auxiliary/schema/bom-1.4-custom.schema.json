@@ -1223,7 +1223,8 @@
           "type": "string",
           "title": "URL",
           "description": "The URL to the external reference",
-          "format": "iri-reference"
+          "format": "iri-reference",
+          "minLength": 1
         },
         "comment": {
           "type": "string",

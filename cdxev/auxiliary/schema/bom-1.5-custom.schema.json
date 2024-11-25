@@ -1544,7 +1544,8 @@
             {
               "title": "URL",
               "type": "string",
-              "format": "iri-reference"
+              "format": "iri-reference",
+              "minLength": 1
             },
             {
               "title": "BOM-Link",

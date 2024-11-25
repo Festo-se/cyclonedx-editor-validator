@@ -1278,6 +1278,22 @@
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
       },
+      "anyOf": [
+        {
+          "properties": {
+            "licenses": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "copyright": {
+              "minLength": 1
+            }
+          }
+        }
+      ],
       "if": {
         "required": [
           "externalReferences"
@@ -1312,22 +1328,12 @@
               {
                 "required": [
                   "licenses"
-                ],
-                "properties": {
-                  "licenses": {
-                    "minItems": 1
-                  }
-                }
+                ]
               },
               {
                 "required": [
                   "copyright"
-                ],
-                "properties": {
-                  "copyright": {
-                    "minLength": 1
-                  }
-                }
+                ]
               }
             ]
           },

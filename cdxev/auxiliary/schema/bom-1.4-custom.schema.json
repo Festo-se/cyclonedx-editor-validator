@@ -620,6 +620,7 @@
         }
       ],
       "if": {
+        "$comment": "This condition is true for components which reference an external SBOM. Most non-standard requirements don't apply to these components.",
         "required": [
           "externalReferences"
         ],
@@ -636,12 +637,13 @@
         }
       },
       "then": {
-        "$comment": "This is only a marker requirement so that the validator can produce warnings about externally described components. It will not make validation fail.",
+        "$comment": "This 'then' schema produces a validation error which helps the validator logic recognize a component as referencing an external SBOM. It will not make validation fail.",
         "required": [
           "this_is_an_externally_described_component"
         ]
       },
       "else": {
+        "$comment": "These requirements only apply to components which DO NOT reference an external SBOM.",
         "allOf": [
           {
             "required": [

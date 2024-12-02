@@ -299,6 +299,11 @@ class TestInitSbom:
         # Verify that command completed successfully
         assert exit_code == Status.OK
 
+        expected["metadata"]["component"]["bom-ref"] = actual["metadata"]["component"][
+            "bom-ref"
+        ]
+        expected["dependencies"][0]["ref"] = actual["metadata"]["component"]["bom-ref"]
+
         # Verify that output matches what is expected
         assert actual == expected
 
@@ -317,6 +322,11 @@ class TestInitSbom:
 
         # Verify that command completed successfully
         assert exit_code == Status.OK
+
+        expected["metadata"]["component"]["bom-ref"] = actual["metadata"]["component"][
+            "bom-ref"
+        ]
+        expected["dependencies"][0]["ref"] = actual["metadata"]["component"]["bom-ref"]
 
         # Verify that output matches what is expected
         assert actual == expected

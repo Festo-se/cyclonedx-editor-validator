@@ -45,7 +45,7 @@ pytest = "8.3.4"
 coverage = "7.6.8"
 toml = "0.10.2"
 typing-extensions = "4.12.2"
-bandit = { version = "1.7.10", extras = ["toml"] }
+bandit = { version = "1.8.0", extras = ["toml"] }
 isort = "5.13.2"
 pre-commit = "4.0.1"
 

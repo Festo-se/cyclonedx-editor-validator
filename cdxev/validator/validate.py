@@ -100,7 +100,24 @@ def validate_sbom(
         )
         for error in sorted(v.iter_errors(sbom), key=str):
             try:
-                if len(error.absolute_path) > 3:
+                if error.validator == "required" and error.validator_value == [
+                    "this_is_an_externally_described_component"
+                ]:
+                    # This requirement in the schema allows us to produce warnings.
+                    comp = t.cast(dict, error.instance)
+                    if "bom-ref" in comp:
+                        comp_id = f"Component [bom-ref: {comp['bom-ref']}]"
+                    elif "name" in comp:
+                        comp_id = f"Component [name: {comp['name']}]"
+                    else:
+                        comp_id = f"Unidentified component at {error.json_path}"
+
+                    logger.warning(
+                        comp_id + " is described by an external BOM. "
+                        "The validity of the referenced BOM cannot be checked."
+                    )
+                    continue
+                elif len(error.absolute_path) > 3:
                     error_path = (
                         sbom[error.absolute_path[0]][error.absolute_path[1]].get(
                             "bom-ref",

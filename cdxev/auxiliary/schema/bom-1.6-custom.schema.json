@@ -955,7 +955,6 @@
       "required": [
         "type",
         "name",
-        "version",
         "bom-ref"
       ],
       "additionalProperties": false,
@@ -1279,76 +1278,140 @@
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
       },
-      "allOf": [
+      "anyOf": [
         {
-          "anyOf": [
-            {
-              "required": [
-                "licenses"
-              ],
+          "properties": {
+            "licenses": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "copyright": {
+              "minLength": 1
+            }
+          }
+        }
+      ],
+      "if": {
+        "$comment": "This condition is true for components which reference an external SBOM. Most non-standard requirements don't apply to these components.",
+        "required": [
+          "externalReferences"
+        ],
+        "properties": {
+          "externalReferences": {
+            "contains": {
               "properties": {
-                "licenses": {
-                  "minItems": 1
-                }
-              }
-            },
-            {
-              "required": [
-                "copyright"
-              ],
-              "properties": {
-                "copyright": {
-                  "minLength": 1
+                "type": {
+                  "const": "bom"
                 }
               }
             }
-          ]
-        },
-        {
-          "anyOf": [
-            {
-              "required": [
-                "supplier"
-              ]
-            },
-            {
-              "required": [
-                "author"
-              ]
-            }
-          ]
-        },
-        {
-          "if": {
-            "properties": {
-              "copyright": {
-                "pattern": "([Ff][Ee][Ss][Tt][Oo])"
-              }
-            },
+          }
+        }
+      },
+      "then": {
+        "$comment": "This 'then' schema produces a validation error which helps the validator logic recognize a component as referencing an external SBOM. It will not make validation fail.",
+        "required": [
+          "this_is_an_externally_described_component"
+        ]
+      },
+      "else": {
+        "$comment": "These requirements only apply to components which DO NOT reference an external SBOM.",
+        "allOf": [
+          {
             "required": [
-              "copyright"
+              "version"
             ]
           },
-          "then": {
+          {
+            "anyOf": [
+              {
+                "required": [
+                  "licenses"
+                ]
+              },
+              {
+                "required": [
+                  "copyright"
+                ]
+              }
+            ]
+          },
+          {
+            "anyOf": [
+              {
+                "required": [
+                  "supplier"
+                ]
+              },
+              {
+                "required": [
+                  "author"
+                ]
+              }
+            ]
+          },
+          {
             "if": {
-              "not": {
-                "allOf": [
-                  {
-                    "required": [
-                      "licenses"
-                    ]
-                  },
-                  {
+              "properties": {
+                "copyright": {
+                  "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                }
+              },
+              "required": [
+                "copyright"
+              ]
+            },
+            "then": {
+              "if": {
+                "not": {
+                  "allOf": [
+                    {
+                      "required": [
+                        "licenses"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "copyright": {
+                          "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "then": {
+                "properties": {
+                  "supplier": {
                     "properties": {
-                      "copyright": {
+                      "name": {
                         "pattern": "([Ff][Ee][Ss][Tt][Oo])"
                       }
                     }
                   }
-                ]
+                },
+                "required": [
+                  "supplier"
+                ],
+                "dependencies": {
+                  "supplier": {
+                    "properties": {
+                      "supplier": {
+                        "required": [
+                          "name"
+                        ]
+                      }
+                    }
+                  }
+                }
               }
-            },
-            "then": {
+            }
+          },
+          {
+            "if": {
               "properties": {
                 "supplier": {
                   "properties": {
@@ -1372,53 +1435,48 @@
                   }
                 }
               }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "supplier": {
+            },
+            "then": {
+              "if": {
+                "not": {
+                  "allOf": [
+                    {
+                      "required": [
+                        "licenses"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "copyright": {
+                          "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "then": {
                 "properties": {
-                  "name": {
+                  "copyright": {
                     "pattern": "([Ff][Ee][Ss][Tt][Oo])"
                   }
-                }
-              }
-            },
-            "required": [
-              "supplier"
-            ],
-            "dependencies": {
-              "supplier": {
-                "properties": {
-                  "supplier": {
-                    "required": [
-                      "name"
-                    ]
-                  }
-                }
+                },
+                "required": [
+                  "copyright"
+                ]
               }
             }
           },
-          "then": {
+          {
             "if": {
-              "not": {
-                "allOf": [
-                  {
-                    "required": [
-                      "licenses"
-                    ]
-                  },
-                  {
-                    "properties": {
-                      "copyright": {
-                        "pattern": "([Ff][Ee][Ss][Tt][Oo])"
-                      }
-                    }
-                  }
-                ]
-              }
+              "properties": {
+                "author": {
+                  "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                }
+              },
+              "required": [
+                "author"
+              ]
             },
             "then": {
               "properties": {
@@ -1431,30 +1489,8 @@
               ]
             }
           }
-        },
-        {
-          "if": {
-            "properties": {
-              "author": {
-                "pattern": "([Ff][Ee][Ss][Tt][Oo])"
-              }
-            },
-            "required": [
-              "author"
-            ]
-          },
-          "then": {
-            "properties": {
-              "copyright": {
-                "pattern": "([Ff][Ee][Ss][Tt][Oo])"
-              }
-            },
-            "required": [
-              "copyright"
-            ]
-          }
-        }
-      ]
+        ]
+      }
     },
     "swid": {
       "type": "object",
@@ -2087,7 +2123,8 @@
             {
               "title": "URL",
               "type": "string",
-              "format": "iri-reference"
+              "format": "iri-reference",
+              "minLength": 1
             },
             {
               "title": "BOM-Link",

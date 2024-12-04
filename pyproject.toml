@@ -77,7 +77,7 @@ strict = true
 
 # Allow generic types for certain files
 [[tool.mypy.overrides]]
-module = ["cdxev.merge", "cdxev.set", "cdxev.amend.operations", "cdxev.amend.license"]
+module = ["cdxev.merge", "cdxev.merge_vex", "cdxev.set", "cdxev.amend.operations", "cdxev.amend.license", "cdxev.amend.command"]
 disallow_any_generics = false
 
 

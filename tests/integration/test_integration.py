@@ -299,10 +299,10 @@ class TestInitSbom:
 
         # Verify that command completed successfully
         assert exit_code == Status.OK
-        
+
         # Verify bom ref is a valid UUID
         assert uuid.UUID(actual["metadata"]["component"]["bom-ref"])
-        
+
         # Remove randomly generated bom ref for the comparison
         actual["dependencies"][0].pop("ref")
         actual["metadata"]["component"].pop("bom-ref")
@@ -330,7 +330,7 @@ class TestInitSbom:
 
         # Verify bom ref is a valid UUID
         assert uuid.UUID(actual["metadata"]["component"]["bom-ref"])
-        
+
         # Remove randomly generated bom ref for the comparison
         actual["dependencies"][0].pop("ref")
         actual["metadata"]["component"].pop("bom-ref")

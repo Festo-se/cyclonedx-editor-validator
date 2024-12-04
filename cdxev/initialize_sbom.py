@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
-import uuid
+from uuid import uuid4
 from datetime import datetime
 from typing import Any, Union
 
@@ -68,7 +68,7 @@ def initialize_sbom(
         type=ExternalReferenceType.WEBSITE,
     )
 
-    bom_ref = BomRef(str(uuid.uuid4()))
+    bom_ref = BomRef(str(uuid4()))
 
     metadata_component = Component(
         name=software_name,

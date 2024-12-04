@@ -3,7 +3,7 @@
 import json
 import os
 import re
-import uuid
+from uuid import UUID
 from collections.abc import Callable
 from itertools import chain
 from pathlib import Path
@@ -301,7 +301,7 @@ class TestInitSbom:
         assert exit_code == Status.OK
 
         # Verify bom ref is a valid UUID
-        assert uuid.UUID(actual["metadata"]["component"]["bom-ref"])
+        assert UUID(actual["metadata"]["component"]["bom-ref"])
 
         # Remove randomly generated bom ref for the comparison
         actual["dependencies"][0].pop("ref")
@@ -329,7 +329,7 @@ class TestInitSbom:
         assert exit_code == Status.OK
 
         # Verify bom ref is a valid UUID
-        assert uuid.UUID(actual["metadata"]["component"]["bom-ref"])
+        assert UUID(actual["metadata"]["component"]["bom-ref"])
 
         # Remove randomly generated bom ref for the comparison
         actual["dependencies"][0].pop("ref")

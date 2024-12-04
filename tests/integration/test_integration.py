@@ -3,6 +3,7 @@
 import json
 import os
 import re
+import uuid
 from collections.abc import Callable
 from itertools import chain
 from pathlib import Path
@@ -298,11 +299,15 @@ class TestInitSbom:
 
         # Verify that command completed successfully
         assert exit_code == Status.OK
-
-        expected["metadata"]["component"]["bom-ref"] = actual["metadata"]["component"][
-            "bom-ref"
-        ]
-        expected["dependencies"][0]["ref"] = actual["metadata"]["component"]["bom-ref"]
+        
+        # Verify bom ref is a valid UUID
+        assert uuid.UUID(actual["metadata"]["component"]["bom-ref"])
+        
+        # Remove randomly generated bom ref for the comparison
+        actual["dependencies"][0].pop("ref")
+        actual["metadata"]["component"].pop("bom-ref")
+        expected["metadata"]["component"].pop("bom-ref")
+        expected["dependencies"][0].pop("ref")
 
         # Verify that output matches what is expected
         assert actual == expected
@@ -323,10 +328,14 @@ class TestInitSbom:
         # Verify that command completed successfully
         assert exit_code == Status.OK
 
-        expected["metadata"]["component"]["bom-ref"] = actual["metadata"]["component"][
-            "bom-ref"
-        ]
-        expected["dependencies"][0]["ref"] = actual["metadata"]["component"]["bom-ref"]
+        # Verify bom ref is a valid UUID
+        assert uuid.UUID(actual["metadata"]["component"]["bom-ref"])
+        
+        # Remove randomly generated bom ref for the comparison
+        actual["dependencies"][0].pop("ref")
+        actual["metadata"]["component"].pop("bom-ref")
+        expected["metadata"]["component"].pop("bom-ref")
+        expected["dependencies"][0].pop("ref")
 
         # Verify that output matches what is expected
         assert actual == expected

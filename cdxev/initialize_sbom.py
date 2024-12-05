@@ -3,6 +3,7 @@
 import json
 from datetime import datetime
 from typing import Any, Union
+from uuid import uuid4
 
 from cyclonedx.model import (  # type: ignore
     ExternalReference,
@@ -67,10 +68,7 @@ def initialize_sbom(
         type=ExternalReferenceType.WEBSITE,
     )
 
-    bom_ref = BomRef(
-        "An optional identifier which can be used "
-        "to reference the component elsewhere in the SBOM."
-    )
+    bom_ref = BomRef(str(uuid4()))
 
     metadata_component = Component(
         name=software_name,

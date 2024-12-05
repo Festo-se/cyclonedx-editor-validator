@@ -7,6 +7,7 @@ from collections.abc import Callable
 from itertools import chain
 from pathlib import Path
 from typing import TypedDict
+from uuid import UUID
 
 import pytest
 import toml
@@ -299,6 +300,15 @@ class TestInitSbom:
         # Verify that command completed successfully
         assert exit_code == Status.OK
 
+        # Verify bom ref is a valid UUID
+        assert UUID(actual["metadata"]["component"]["bom-ref"])
+
+        # Remove randomly generated bom ref for the comparison
+        actual["dependencies"][0].pop("ref")
+        actual["metadata"]["component"].pop("bom-ref")
+        expected["metadata"]["component"].pop("bom-ref")
+        expected["dependencies"][0].pop("ref")
+
         # Verify that output matches what is expected
         assert actual == expected
 
@@ -317,6 +327,15 @@ class TestInitSbom:
 
         # Verify that command completed successfully
         assert exit_code == Status.OK
+
+        # Verify bom ref is a valid UUID
+        assert UUID(actual["metadata"]["component"]["bom-ref"])
+
+        # Remove randomly generated bom ref for the comparison
+        actual["dependencies"][0].pop("ref")
+        actual["metadata"]["component"].pop("bom-ref")
+        expected["metadata"]["component"].pop("bom-ref")
+        expected["dependencies"][0].pop("ref")
 
         # Verify that output matches what is expected
         assert actual == expected

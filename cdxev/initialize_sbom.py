@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
-from uuid import uuid4
 from datetime import datetime
 from typing import Any, Union
+from uuid import uuid4
 
 from cyclonedx.model import (  # type: ignore
     ExternalReference,

@@ -3,11 +3,11 @@
 import json
 import os
 import re
-from uuid import UUID
 from collections.abc import Callable
 from itertools import chain
 from pathlib import Path
 from typing import TypedDict
+from uuid import UUID
 
 import pytest
 import toml

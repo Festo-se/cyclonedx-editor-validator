@@ -444,6 +444,11 @@ def create_merge_parser(
         help="Path to a folder with sboms to be merged",
         type=Path,
     )
+    parser.add_argument(
+        "--hierarchical",
+        help="Flag to determine if the components should be merged hierarchical",
+        action="store_true",
+    )
     add_output_argument(parser)
 
     parser.set_defaults(cmd_handler=invoke_merge, parser=parser)
@@ -879,7 +884,7 @@ def invoke_merge(args: argparse.Namespace) -> int:
         )
 
     inputs = [sbom for (sbom, _) in (read_sbom(input) for input in inputs)]
-    output = merge(inputs)
+    output = merge(inputs, hierarchical=args.hierarchical)
     write_sbom(output, args.output)
     return Status.OK
 

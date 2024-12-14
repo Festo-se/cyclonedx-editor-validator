@@ -9,7 +9,6 @@ from cdxev.auxiliary.sbomFunctions import (
     compare_vulnerabilities,
     copy_ratings,
     get_bom_refs_from_dependencies,
-    get_corresponding_reference_to_component,
     get_dependency_by_ref,
     get_ref_from_components,
     extract_components,
@@ -127,10 +126,12 @@ def merge_components(
     )
 
     list_of_merged_components += list_of_filtered_components
-    for key in add_to_existing.keys():
-        if hierarchical:
+
+    if hierarchical:
+        for key in add_to_existing.keys():
             present_component_identities[key].get(key, []) + add_to_existing[key]
-        else:
+    else:
+        for key in add_to_existing.keys():
             list_of_merged_components.append(add_to_existing[key])
 
     for component in dropped_components:
@@ -336,7 +337,9 @@ def merge_dependency_lists(
     return list_of_merged_dependencies
 
 
-def merge_2_sboms(original_sbom: dict, sbom_to_be_merged: dict) -> dict:
+def merge_2_sboms(
+    original_sbom: dict, sbom_to_be_merged: dict, hierarchical: bool = False
+) -> dict:
     """
     Function that merges two sboms.
 
@@ -354,7 +357,9 @@ def merge_2_sboms(original_sbom: dict, sbom_to_be_merged: dict) -> dict:
     components_of_sbom_to_be_merged.append(component_from_metadata)
     list_of_original_dependencies = original_sbom.get("dependencies", [])
     list_of_new_dependencies = sbom_to_be_merged.get("dependencies", [])
-    list_of_merged_components = merge_components(original_sbom, sbom_to_be_merged)
+    list_of_merged_components = merge_components(
+        original_sbom, sbom_to_be_merged, hierarchical
+    )
     merged_dependencies = merge_dependency_lists(
         list_of_original_dependencies,
         list_of_new_dependencies,
@@ -381,7 +386,7 @@ def merge_2_sboms(original_sbom: dict, sbom_to_be_merged: dict) -> dict:
     return merged_sbom
 
 
-def merge(sboms: t.Sequence[dict]) -> dict:
+def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     """
     Function that merges a list of sboms successively in to the first one and creates an JSON file.
     for the result
@@ -395,7 +400,7 @@ def merge(sboms: t.Sequence[dict]) -> dict:
     """
     merged_sbom = sboms[0]
     for k in range(1, len(sboms)):
-        merged_sbom = merge_2_sboms(merged_sbom, sboms[k])
+        merged_sbom = merge_2_sboms(merged_sbom, sboms[k], hierarchical)
     return merged_sbom
 
 

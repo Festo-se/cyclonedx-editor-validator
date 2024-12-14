@@ -78,14 +78,17 @@ def filter_component(
                 dropped_components,
                 add_to_existing,
             )
-            add_to_existing[component_id] = (
-                add_to_existing.get(component_id, []) + nested_components
-            )
+            if nested_components:
+                add_to_existing[component_id] = (
+                    add_to_existing.get(component_id, []) + nested_components
+                )
 
     return filtered_components
 
 
-def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[dict]:
+def merge_components(
+    governing_sbom: dict, sbom_to_be_merged: dict, hierarchical: bool = False
+) -> t.List[dict]:
     """
     Function that gets two lists of components and merges them unique into one.
 
@@ -122,7 +125,14 @@ def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[di
         dropped_components,
         add_to_existing,
     )
-    list_of_merged_components += list_of_filtered_components
+
+    if hierarchical:
+        list_of_merged_components += list_of_filtered_components
+    else:
+        list_of_merged_components += list_of_filtered_components
+        for key in add_to_existing.keys():
+            list_of_merged_components.append(add_to_existing[key])
+
     for component in dropped_components:
         # if the component in the sbom_to_be_merged has a different
         # bom-ref than the governing_sbom, then the bom-ref will be

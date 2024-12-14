@@ -126,11 +126,11 @@ def merge_components(
         add_to_existing,
     )
 
-    if hierarchical:
-        list_of_merged_components += list_of_filtered_components
-    else:
-        list_of_merged_components += list_of_filtered_components
-        for key in add_to_existing.keys():
+    list_of_merged_components += list_of_filtered_components
+    for key in add_to_existing.keys():
+        if hierarchical:
+            present_component_identities[key].get(key, []) + add_to_existing[key]
+        else:
             list_of_merged_components.append(add_to_existing[key])
 
     for component in dropped_components:

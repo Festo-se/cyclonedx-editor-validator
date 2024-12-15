@@ -8,10 +8,10 @@ from cdxev.auxiliary.sbomFunctions import (
     compare_time_flag_from_vulnerabilities,
     compare_vulnerabilities,
     copy_ratings,
+    extract_components,
     get_bom_refs_from_dependencies,
     get_dependency_by_ref,
     get_ref_from_components,
-    extract_components,
 )
 from cdxev.log import LogMessage
 

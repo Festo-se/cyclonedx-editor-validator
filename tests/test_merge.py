@@ -834,6 +834,12 @@ class TestMergeComponents(unittest.TestCase):
             ComponentIdentity.create(component_4_sub_1_sub_2, allow_unsafe=True),
         ]
 
+        present_components = [
+            copy.deepcopy(component_1),
+            copy.deepcopy(component_3),
+            copy.deepcopy(component_2_sub_1),
+            copy.deepcopy(component_4_sub_1_sub_2),
+        ]
         component_1["components"] = [component_1_sub_1]
 
         component_2["components"] = [component_2_sub_1, component_2_sub_2]
@@ -844,12 +850,7 @@ class TestMergeComponents(unittest.TestCase):
             component_4_sub_1_sub_1,
             component_4_sub_1_sub_2,
         ]
-        present_components = [
-            component_1,
-            component_3,
-            component_2_sub_1,
-            component_4_sub_1_sub_2,
-        ]
+
         new_components = [component_1, component_2, component_4]
 
         merged_components = merge.merge_components(

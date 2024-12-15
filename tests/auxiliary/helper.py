@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import typing as t
 import copy
+import typing as t
 
 
 def compare_sboms(first_sbom: dict, second_sbom: dict) -> bool:

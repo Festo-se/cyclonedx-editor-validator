@@ -501,6 +501,37 @@ class TestMerge:
         expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
         assert expected == actual
 
+    def test_hierarchical(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        input_folder = data_dir
+
+        input_1 = input_folder / "merge.input_1.cdx.json"
+        input_2 = input_folder / "merge.input_2_hierarchical.cdx.json"
+
+        component_sub_sub_program = {
+            "type": "library",
+            "bom-ref": "sub_sub_program",
+            "supplier": {"name": "Company Legal"},
+            "group": "com.company.governing",
+            "name": "sub_sub_program",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "T5.0.3.96",
+        }
+
+        argv("merge", str(input_1), str(input_2), "--hierarchical")
+        exit_code, actual, _ = run_main(capsys=capsys, parse_output="json")
+
+        assert exit_code == Status.OK
+
+        expected = load_sbom(data_dir / "merge.expected.cdx.json")
+        expected["components"][1]["components"] = [component_sub_sub_program]
+
+        assert expected == actual
+
     def test_order(
         self,
         argv: Callable[..., None],

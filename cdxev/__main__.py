@@ -339,7 +339,7 @@ def reflow_paragraphs(text: str, indent: int = 8) -> str:
 
 # noinspection PyUnresolvedReferences,PyProtectedMember
 def create_amend_parser(
-    subparsers: argparse._SubParsersAction, 
+    subparsers: argparse._SubParsersAction,
 ) -> argparse.ArgumentParser:
     description = (
         "The amend command splits its functionality into several operations.\n"

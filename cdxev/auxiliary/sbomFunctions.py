@@ -11,6 +11,8 @@ from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component
 from dateutil.parser import parse
 
+from cdxev.error import AppError
+
 logger = logging.getLogger(__name__)
 
 
@@ -415,8 +417,14 @@ def deserialize(sbom: dict) -> Bom:
         sbom.pop(
             "compositions"
         )  # compositions need to be removed till the model supports those
-    deserialized_bom = Bom.from_json(data=sbom)  # type: ignore
-    return deserialized_bom
+    deserialized_bom = Bom.from_json(data=sbom)
+    if isinstance(deserialized_bom, Bom):
+        return deserialized_bom
+    else:
+        raise AppError(
+            "Failed deserialization",
+            ("Deserialization of the SBOM into the CycloneDX Python Library failed."),
+        )
 
 
 def extract_cyclonedx_components(

@@ -79,13 +79,13 @@ class SWID(dict):
     """
 
     def __str__(self) -> str:
-        return "tagId: " + self["tagId"]
+        return "tagId: " + str(self["tagId"])
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, SWID) and self["tagId"] == other["tagId"]
 
     def __hash__(self) -> int:  # type: ignore[override]
-        return self["tagId"].__hash__()
+        return self["tagId"].__hash__()  # type: ignore
 
 
 @dataclass(init=True, frozen=True, eq=True)

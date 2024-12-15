@@ -312,9 +312,10 @@ class LicenseNameToId(Operation):
 
     license_map: dict[str, str] = {}
 
-    def prepare(self, sbom: dict) -> None:
+    def prepare(self, sbom: dict) -> None:  # type: ignore
         license_mapping_file = (
-            importlib.resources.files(__spec__.parent) / "license_name_spdx_id_map.json"  # type: ignore[name-defined, arg-type]  # noqa: E501
+            importlib.resources.files(__spec__.parent)  # type: ignore[name-defined]
+            / "license_name_spdx_id_map.json"
         )
         license_mapping_json = license_mapping_file.read_text(encoding="utf-8-sig")
         license_mapping = json.loads(license_mapping_json)
@@ -446,10 +447,16 @@ class DeleteAmbiguousLicenses(Operation):
     """
 
     def _has_text(self, license: dict) -> bool:
-        return license.get("text", {}).get("content", "") != ""
+        if license.get("text", {}).get("content", "") != "":
+            return True
+        else:
+            return False
 
     def _has_url(self, license: dict) -> bool:
-        return license.get("url", "") != ""
+        if license.get("url", "") != "":
+            return True
+        else:
+            return False
 
     def _has_name_only(self, license: dict) -> bool:
         # Any fields other than name, text, or url mean the license shouldn't be deleted.

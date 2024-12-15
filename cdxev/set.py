@@ -6,8 +6,8 @@ import sys
 import typing as t
 from dataclasses import dataclass, field, fields
 
-import univers.version_range  # type:ignore
-import univers.versions  # type:ignore
+import univers.version_range
+import univers.versions
 
 from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
 from cdxev.auxiliary.sbomFunctions import walk_components
@@ -150,7 +150,7 @@ class UpdateIdentity(ComponentIdentity):
                 group=component.get("group"),
                 version_range=component.get("version-range", ""),
             )
-            return UpdateIdentity(coordinates)  # type:ignore
+            return UpdateIdentity(coordinates)
 
         else:
             return super().create(component, allow_unsafe)

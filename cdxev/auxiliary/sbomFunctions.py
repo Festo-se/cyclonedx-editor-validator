@@ -417,7 +417,7 @@ def deserialize(sbom: dict) -> Bom:
         sbom.pop(
             "compositions"
         )  # compositions need to be removed till the model supports those
-    deserialized_bom = Bom.from_json(data=sbom)
+    deserialized_bom = Bom.from_json(data=sbom)  # type:ignore[attr-defined]
     if isinstance(deserialized_bom, Bom):
         return deserialized_bom
     else:

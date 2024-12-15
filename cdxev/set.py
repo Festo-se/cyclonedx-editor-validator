@@ -6,8 +6,8 @@ import sys
 import typing as t
 from dataclasses import dataclass, field, fields
 
-import univers.version_range
-import univers.versions
+import univers.version_range  # type:ignore[import-untyped]
+import univers.versions  # type:ignore[import-untyped]
 
 from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
 from cdxev.auxiliary.sbomFunctions import walk_components

@@ -495,6 +495,7 @@
         "affirmation": {
           "type": "object",
           "title": "Affirmation",
+          "description": "A concise statement affirmed by an individual regarding all declarations, often used for third-party auditor acceptance or recipient acknowledgment. It includes a list of authorized signatories who assert the validity of the document on behalf of the organization.",
           "additionalProperties": false,
           "properties": {
             "statement": {
@@ -847,7 +848,6 @@
     "organizationalEntity": {
       "type": "object",
       "title": "Organizational Entity",
-      "description": "",
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -911,7 +911,6 @@
     "organizationalContact": {
       "type": "object",
       "title": "Organizational Contact",
-      "description": "",
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -1555,8 +1554,13 @@
         "contentType": {
           "type": "string",
           "title": "Content-Type",
-          "description": "Specifies the content type of the text. Defaults to text/plain if not specified.",
-          "default": "text/plain"
+          "description": "Specifies the format and nature of the data being attached, helping systems correctly interpret and process the content. Common content type examples include `application/json` for JSON data and `text/plain` for plan text documents.\n [RFC 2045 section 5.1](https://www.ietf.org/rfc/rfc2045.html#section-5.1) outlines the structure and use of content types. For a comprehensive list of registered content types, refer to the [IANA media types registry](https://www.iana.org/assignments/media-types/media-types.xhtml).",
+          "default": "text/plain",
+          "examples": [
+            "text/plain",
+            "application/json",
+            "image/png"
+          ]
         },
         "encoding": {
           "type": "string",
@@ -1627,6 +1631,7 @@
     "license": {
       "type": "object",
       "title": "License",
+      "description": "Specifies the details and attributes related to a software license. It can either include a valid SPDX license identifier or a named license, along with additional properties such as license acknowledgment, comprehensive commercial licensing information, and the full text of the license.",
       "oneOf": [
         {
           "required": [
@@ -1649,7 +1654,7 @@
         "id": {
           "$ref": "spdx.schema.json",
           "title": "License ID (SPDX)",
-          "description": "A valid SPDX license ID",
+          "description": "A valid SPDX license identifier. If specified, this value must be one of the enumeration of valid SPDX license identifiers defined in the spdx.schema.json (or spdx.xml) subschema which is synchronized with the official SPDX license list.",
           "examples": [
             "Apache-2.0"
           ]
@@ -1658,7 +1663,7 @@
           "type": "string",
           "title": "License Name",
           "minLength": 1,
-          "description": "If SPDX does not define the license used, this field may be used to provide the license name",
+          "description": "The name of the license. This may include the name of a commercial or proprietary license or an open source license that may not be defined by SPDX.",
           "examples": [
             "Acme Software License"
           ]
@@ -2230,7 +2235,7 @@
             "poam": "Plans of Action and Milestones (POAM) complement an \"attestation\" external reference. POAM is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".",
             "electronic-signature": "An e-signature is commonly a scanned representation of a written signature or a stylized script of the person's name.",
             "digital-signature": "A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.",
-            "rfc-9116": "Document that complies with RFC-9116 (A File Format to Aid in Security Vulnerability Disclosure)",
+            "rfc-9116": "Document that complies with [RFC 9116](https://www.ietf.org/rfc/rfc9116.html) (A File Format to Aid in Security Vulnerability Disclosure)",
             "other": "Use this if no other types accurately describe the purpose of the external reference."
           }
         },
@@ -2289,7 +2294,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the service elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "provider": {
           "title": "Provider",
@@ -2361,7 +2366,7 @@
           "type": "array",
           "additionalItems": false,
           "$ref": "#/definitions/licenseChoice",
-          "title": "Component License(s)"
+          "title": "Service License(s)"
         },
         "externalReferences": {
           "type": "array",
@@ -2500,6 +2505,7 @@
     "copyright": {
       "type": "object",
       "title": "Copyright",
+      "description": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
       "required": [
         "text"
       ],
@@ -2507,7 +2513,8 @@
       "properties": {
         "text": {
           "type": "string",
-          "title": "Copyright Text"
+          "title": "Copyright Text",
+          "description": "The textual content of the copyright."
         }
       }
     },
@@ -2784,7 +2791,7 @@
         "pre-release",
         "internal"
       ],
-      "description": "The software versioning type. It is RECOMMENDED that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
+      "description": "The software versioning type. It is recommended that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
     },
     "note": {
       "type": "object",
@@ -3577,7 +3584,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "modelParameters": {
           "type": "object",
@@ -3654,6 +3661,7 @@
                           }
                         ],
                         "title": "Reference",
+                        "type": "string",
                         "description": "References a data component by the components bom-ref attribute"
                       }
                     }
@@ -3912,10 +3920,12 @@
       "properties": {
         "organization": {
           "title": "Organization",
+          "description": "The organization that is responsible for specific data governance role(s).",
           "$ref": "#/definitions/organizationalEntity"
         },
         "contact": {
           "title": "Individual",
+          "description": "The individual that is responsible for specific data governance role(s).",
           "$ref": "#/definitions/organizationalContact"
         }
       },
@@ -3965,7 +3975,7 @@
         },
         "image": {
           "title": "Graphic Image",
-          "description": "The graphic (vector or raster). Base64 encoding MUST be specified for binary images.",
+          "description": "The graphic (vector or raster). Base64 encoding must be specified for binary images.",
           "$ref": "#/definitions/attachment"
         }
       }
@@ -4077,6 +4087,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4147,6 +4158,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4233,6 +4245,7 @@
         "organization": {
           "type": "object",
           "title": "Organization",
+          "description": "The organization that provides energy.",
           "$ref": "#/definitions/organizationalEntity"
         },
         "energySource": {
@@ -4381,6 +4394,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4528,6 +4542,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4656,6 +4671,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4688,6 +4704,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4706,6 +4723,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4806,6 +4824,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4931,6 +4950,7 @@
         "conditions": {
           "type": "array",
           "title": "Conditions",
+          "description": "A list of conditions used to determine if a trigger should be activated.",
           "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/condition"
@@ -4969,6 +4989,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -5015,6 +5036,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -5109,6 +5131,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -5196,6 +5219,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -5261,6 +5285,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -5691,7 +5716,7 @@
             },
             "implementationPlatform": {
               "type": "string",
-              "title": "implementation platform",
+              "title": "Implementation platform",
               "description": "The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.",
               "enum": [
                 "generic",
@@ -6127,7 +6152,7 @@
                 "ke": {
                   "$ref": "#/definitions/cryptoRefArray",
                   "title": "Key Exchange Method (KE)",
-                  "description": "Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)"
+                  "description": "Transform Type 4: Key Exchange Method (KE) per [RFC 9370](https://www.ietf.org/rfc/rfc9370.html), formerly called Diffie-Hellman Group (D-H)."
                 },
                 "esn": {
                   "type": "boolean",

@@ -129,7 +129,11 @@ def merge_components(
 
     if hierarchical:
         for key in add_to_existing.keys():
-            present_component_identities[key].get(key, []) + add_to_existing[key]
+            list_of_subcomponents = (
+                present_component_identities[key].get("components", [])
+                + add_to_existing[key]
+            )
+            present_component_identities[key]["components"] = list_of_subcomponents
     else:
         for key in add_to_existing.keys():
             list_of_merged_components.append(add_to_existing[key])
@@ -358,7 +362,7 @@ def merge_2_sboms(
     list_of_original_dependencies = original_sbom.get("dependencies", [])
     list_of_new_dependencies = sbom_to_be_merged.get("dependencies", [])
     list_of_merged_components = merge_components(
-        original_sbom, sbom_to_be_merged, hierarchical
+        original_sbom, sbom_to_be_merged, hierarchical=hierarchical
     )
     merged_dependencies = merge_dependency_lists(
         list_of_original_dependencies,
@@ -400,7 +404,7 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     """
     merged_sbom = sboms[0]
     for k in range(1, len(sboms)):
-        merged_sbom = merge_2_sboms(merged_sbom, sboms[k], hierarchical)
+        merged_sbom = merge_2_sboms(merged_sbom, sboms[k], hierarchical=hierarchical)
     return merged_sbom
 
 

@@ -26,12 +26,6 @@ In mathematical terms: :math:`output = (((input_1 * input_2) * input_3) * input_
 The merge is per default not hierarchical, this means that new components that were listed under ``components`` of an already present component will just be added as new components under the SBOMs ``components``.
 The ``--hierarchical`` flag allows for hierarchical merges.
 
-```flow
-st=>start: Start
-op=>operation: Your Operation
-cond=>condition: Yes or No?
-e=>end
-
 A few notes on the merge algorithm:
 
 - The ``metadata`` field is always retained from the first input and never changed through a merge with the exception of the ``timestamp``.

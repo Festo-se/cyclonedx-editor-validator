@@ -2,6 +2,7 @@
 
 import logging
 import typing as t
+import copy
 
 from cdxev.auxiliary.identity import ComponentIdentity
 from cdxev.auxiliary.sbomFunctions import (
@@ -323,6 +324,86 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     for k in range(1, len(sboms)):
         merged_sbom = merge_2_sboms(merged_sbom, sboms[k], hierarchical=hierarchical)
     return merged_sbom
+
+
+def get_ids_from_vulnerability(vulnerability: dict) -> list[str]:
+    ids_vulnerability: list[str] = []
+
+    primary_id = vulnerability.get("id", None)
+    references = vulnerability.get("references", [])
+
+    if primary_id is not None:
+        ids_vulnerability.append(primary_id)
+
+    for reference in references:
+        id = reference.get("id", None)
+        if id is not None:
+            ids_vulnerability.append(id)
+
+    return ids_vulnerability
+
+
+def compare_vulnerability_entries(
+    first_vulnerability: dict, second_vulnerability: dict
+) -> bool:
+    ids_first_vulnerability = get_ids_from_vulnerability(first_vulnerability)
+    ids_second_vulnerability = get_ids_from_vulnerability(second_vulnerability)
+
+    is_equal = False
+    for id in ids_first_vulnerability:
+        if id in ids_second_vulnerability:
+            is_equal = True
+
+    return is_equal
+
+
+def merge_vulnerabilities_2(
+    list_of_original_vulnerabilities: list[dict],
+    list_of_new_vulnerabilities: list[dict],
+) -> list[dict]:
+    """
+    Merges the vulnerabilities of two sboms
+
+    Parameters
+    ----------
+    list_of_original_vulnerabilities : Sequence[dict]
+        The list of Vulnerabilities of the sbom in which should be merged
+    list_of_new_vulnerabilities: Sequence[dict]
+        The list of Vulnerabilities of the new sbom that will be merged in the other
+
+    Returns
+    -------
+    Sequence[dict]
+        List with the merged Vulnerabilities
+    """
+    # replace old bom-refs with the bom refs of the merged sbom
+    list_of_merged_vulnerabilities = copy.deepcopy(list_of_original_vulnerabilities)
+
+    for new_vulnerability in list_of_new_vulnerabilities:
+        is_in = False
+        for original_vulnerability in list_of_original_vulnerabilities:
+            if compare_vulnerabilities(new_vulnerability, original_vulnerability):
+                is_in = True
+                vuln_id = get_ids_from_vulnerability(new_vulnerability)
+                if len(vuln_id) == 0:
+                    vuln_id[0] = str(
+                        list_of_new_vulnerabilities.index(new_vulnerability)
+                    )
+
+                logger.warning(
+                    LogMessage(
+                        "Potential loss of information",
+                        (
+                            f"Dropping a duplicate vulnerability ({vuln_id[0]}) "
+                            "from the merge result."
+                        ),
+                    )
+                )
+
+        if not is_in:
+            list_of_merged_vulnerabilities.append(new_vulnerability)
+
+    return list_of_merged_vulnerabilities
 
 
 def merge_vulnerabilities(

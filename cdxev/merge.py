@@ -15,6 +15,7 @@ from cdxev.auxiliary.sbomFunctions import (
     get_ref_from_components,
 )
 from cdxev.log import LogMessage
+from univers.version_range import VersionRange
 
 logger = logging.getLogger(__name__)
 
@@ -343,9 +344,120 @@ def get_ids_from_vulnerability(vulnerability: dict) -> list[str]:
     return ids_vulnerability
 
 
-def compare_vulnerability_entries(
-    first_vulnerability: dict, second_vulnerability: dict
+def _only_one_item_is_none(
+    first_item: t.Union[t.any, None], second_item: t.Union[t.any, None]
 ) -> bool:
+    if first_item is None and second_item is not None:
+        return True
+
+    if first_item is not None and second_item is None:
+        return True
+
+    return False
+
+
+def compare_affects_version(
+    first_version: t.Union[str, None], second_version: t.Union[str, None]
+) -> bool:
+    if _only_one_item_is_none(first_version, second_version):
+        return False
+
+    if first_version != second_version:
+        return False
+    return True
+
+
+def compare_affects_range(
+    first_range: t.Union[str, None], second_range: t.Union[str, None]
+) -> int:
+    """
+    Function to compare two affects version ranges:
+    return:
+        -1 first_range <= second_range
+        0 first_range != second_range
+        1 first_range == second_range
+        2 first_range >= second_range
+    """
+    if _only_one_item_is_none(first_range, second_range):
+        return 2
+
+    first_range_object = VersionRange.from_string(second_range)
+    second_range_object = VersionRange.from_string(first_range)
+
+    if first_range_object == second_range_object:
+        return 1
+
+    if first_range_object <= second_range_object:
+        return -1
+
+    if first_range_object >= second_range_object:
+        return 2
+
+    return 1
+
+
+def compare_affects_objects(
+    first_affects_object: dict, second_affects_object: dict
+) -> int:
+    """
+    Compares two affect entries.
+
+    Returns:
+        -1 first_affects_object <= second_affects_object: dict
+        0 first_affects_object != second_affects_object: dict
+        1 first_affects_object == second_affects_object: dict
+        2 first_affects_object >= second_affects_object: dict
+    """
+    if first_affects_object.get("ref", "first_ref") != second_affects_object.get(
+        "ref", "second_ref"
+    ):
+        return 0
+
+    first_versions = first_affects_object.get("versions", None)
+    second_versions = second_affects_object.get("versions", None)
+
+
+# Check version against version range or at least try
+    if _only_one_item_is_none(first_versions, second_versions):
+        return# Check version against version range or at least try 
+
+    if first_versions is not None and second_versions is not None:
+        if not compare_affects_version(
+            first_versions.get("version", None), second_versions.get("version", None)
+        ):
+            return 0
+
+        range_comparison = compare_affects_range(
+            first_versions.get("range", None), second_versions.get("range", None)
+        )
+        if range_comparison == 0:
+            return 0
+
+        if range_comparison == 1:
+            return 1
+
+        if range_comparison == -1:
+            return -1
+            first_range = first_affects_entry.get("range", None)
+            second_range = second_affects_entry.get("range", None)
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    (
+                        "Affects have overlapping ranges."
+                        f" Keeping vulnerability with range ({first_range})"
+                        f" Dropping vulnerability with range ({second_range})"
+                    ),
+                )
+            )
+        return 2
+    else:
+        return 1
+
+
+def compare_vulnerability_ids(
+    first_vulnerability: dict, second_vulnerability: dict
+) -> int:
     ids_first_vulnerability = get_ids_from_vulnerability(first_vulnerability)
     ids_second_vulnerability = get_ids_from_vulnerability(second_vulnerability)
 
@@ -355,6 +467,35 @@ def compare_vulnerability_entries(
             is_equal = True
 
     return is_equal
+
+
+
+
+
+def vulnerability_affects_are_disjunct(
+    original_affects_list: list[dict], new_affects_list: list[dict]
+) -> bool:
+    return True
+
+
+def vulnerability_affects_is_contained_in(
+    original_affects_list: list[dict], new_affects_list: list[dict]
+) -> bool:
+    return True
+
+
+def vulnerability_affects_is_identical(
+    original_affects_list: list[dict], new_affects_list: list[dict]
+) -> bool:
+
+    for new_affects_object in new_affects_list:
+        is_in = False
+        for orginial_affects_object in original_affects_list:
+            if compare_affects_objects(new_affects_object, orginial_affects_object) == 1:
+                is_in = True
+        if not is_in:
+            return False
+    return is_in
 
 
 def merge_vulnerabilities_2(
@@ -382,8 +523,20 @@ def merge_vulnerabilities_2(
     for new_vulnerability in list_of_new_vulnerabilities:
         is_in = False
         for original_vulnerability in list_of_original_vulnerabilities:
-            if compare_vulnerabilities(new_vulnerability, original_vulnerability):
+            if compare_vulnerability_ids(new_vulnerability, original_vulnerability):
                 is_in = True
+                # Check affects: 3 cases
+                # 1. complete disjunct => two different vulnerability objects, keep both
+                # 2. new affects are a subset of the original vulnerabilities => drop with warning 
+                # 3. the affects have overlap => drop all already present affect objects and throw a warning
+                #    keep the "cleaned" vulnerability object
+
+                # TODO: This comparison takes only individual affect objects into account
+                # a holistic approach might be worth future consideration
+                # e.g. a vulnerability with the versions "<2.0.0" and "">=2.0.0|<=3.0.0"
+                # is equal to one with the entry "<=3.0.0" but for this the ranges must be checked
+                # as a whole
+
                 vuln_id = get_ids_from_vulnerability(new_vulnerability)
                 if len(vuln_id) == 0:
                     vuln_id[0] = str(

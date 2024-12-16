@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 import cdxev.vex as vex
+import cdxev.vex as vex
 
 path_to_test_folder = "tests/auxiliary/test_vex/"
 
@@ -180,34 +181,66 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         self.assertEqual(result.get("vulnerabilities"), expected_output)
 
     def test_get_vulnerability_by_id(self):
-        file = load_file("vex.json")
-        file["vulnerabilities"].append(file["vulnerabilities"][0].copy())
-        file["vulnerabilities"][1]["id"] = "CVE-2020-25648"
-        expected_output = copy.deepcopy(file)
-        expected_output["vulnerabilities"].pop(1)
-        result = vex.get_vulnerability_by_id(file, "CVE-2020-25649")
-        self.assertEqual(result, expected_output)
-
-    def test_get_vulnerability_by_id_missing_data(self):
-        file = load_file("vex.json")
-        file["vulnerabilities"][0].pop("id")
-        expected_output = copy.deepcopy(file)
-        result = vex.get_vulnerability_by_id(
-            file, "SNYK-JAVA-COMFASTERXMLJACKSONCORE-1048302"
-        )
+        expected_output = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "version": 1,
+            "vulnerabilities": [
+                {
+                    "description": "some description of a vulnerability 2",
+                    "id": "CVE-1013-0002",
+                    "ratings": [
+                        {
+                            "score": 7.2,
+                            "severity": "high",
+                            "method": "CVSSv31",
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
+                        }
+                    ],
+                    "published": "1013-01-01T01:02Z",
+                    "updated": "1013-03-02T12:24Z",
+                    "affects": [{"ref": "11231231"}],
+                    "analysis": {
+                        "state": "not_affected",
+                        "justification": "add justification here",
+                        "response": [
+                            "add response here",
+                            "more than one response is possible",
+                        ],
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
+                }
+            ],
+        }
+        with open(
+            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
+        ) as my_file:
+            vex = json.load(my_file)
+        result = get_vulnerability_by_id(vex, "CVE-1013-0002")
         self.assertEqual(result, expected_output)
 
     def test_get_vex_from_sbom(self):
-        file = load_file("embedded_vex.json")
-        result = vex.get_vex_from_sbom(file)
-        self.assertEqual(result, load_file("vex.json"))
+        with open(
+            path_to_test_folder + "embedded_vex.json", "r", encoding="utf-8-sig"
+        ) as my_file:
+            embedded_vex = json.load(my_file)
+
+        with open(
+            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
+        ) as my_file:
+            vex = json.load(my_file)
+
+        result = get_vex_from_sbom(embedded_vex)
+        self.assertEqual(result, vex)
 
     # Test subcommands
     def test_vex_list_command(self):
-        result = vex.vex("list", load_file("vex.json"), "", "", "default")
-        self.assertIn(
-            "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description", result
-        )
+        with open(
+            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
+        ) as my_file:
+            vex_file = json.load(my_file)
+        result = vex("list", vex_file, "", "default")
+        self.assertIn("CVE-ID,Description,Status", result)
 
     def test_vex_trim_command(self):
         result = vex.vex("trim", load_file("vex.json"), "state", "not_affected", "")

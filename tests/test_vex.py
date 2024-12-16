@@ -1,32 +1,26 @@
-
 import json
 import unittest
 
 from cdxev.vex import *
 
-path_to_test_folder = (
-    "tests/auxiliary/test_vex/"
-)
+path_to_test_folder = "tests/auxiliary/test_vex/"
+
 
 class TestVulnerabilityFunctions(unittest.TestCase):
 
     def test_init_vex_header(self):
-        expected_output = {
-            "bomFormat": "CycloneDX",
-            "specVersion": "1.3",
-            "version": 1
-        }
+        expected_output = {"bomFormat": "CycloneDX", "specVersion": "1.3", "version": 1}
 
         with open(
             path_to_test_folder + "bom.json", "r", encoding="utf-8-sig"
         ) as my_file:
             sbom = json.load(my_file)
         result = init_vex_header(sbom)
-            
+
         self.assertEquals(result, expected_output)
 
     def test_get_list_of_ids_default(self):
-        expected_output = ("CVE-ID,Description,Status\nCVE-1012-0001,some description of a vulnerability,exploitable\nCVE-1013-0002,some description of a vulnerability 2,not_affected\nCVE-1013-0003,some description of a vulnerability 3,exploitable\nCVE-1013-0004,some description of a vulnerability 4,exploitable\nCVE-1013-0005,some description of a vulnerability 5,not_affected\nCVE-1013-0006,some description of a vulnerability 5,not_affected\nCVE-1012-0007,some description of a vulnerability 6,exploitable\nCVE-1013-0008,some description of a vulnerability 7,not_affected\nCVE-1013-0009,some description of a vulnerability 8,not_affected\nCVE-1013-0010,some description of a vulnerability 9,not_affected\nCVE-1013-0011,some description of a vulnerability 10,not_affected\nCVE-1012-0012,some description of a vulnerability 11,exploitable\nCVE-1012-0013,some description of a vulnerability 12,not_affected\nCVE-1012-0014,some description of a vulnerability 13,exploitable\n")
+        expected_output = "CVE-ID,Description,Status\nCVE-1012-0001,some description of a vulnerability,exploitable\nCVE-1013-0002,some description of a vulnerability 2,not_affected\nCVE-1013-0003,some description of a vulnerability 3,exploitable\nCVE-1013-0004,some description of a vulnerability 4,exploitable\nCVE-1013-0005,some description of a vulnerability 5,not_affected\nCVE-1013-0006,some description of a vulnerability 5,not_affected\nCVE-1012-0007,some description of a vulnerability 6,exploitable\nCVE-1013-0008,some description of a vulnerability 7,not_affected\nCVE-1013-0009,some description of a vulnerability 8,not_affected\nCVE-1013-0010,some description of a vulnerability 9,not_affected\nCVE-1013-0011,some description of a vulnerability 10,not_affected\nCVE-1012-0012,some description of a vulnerability 11,exploitable\nCVE-1012-0013,some description of a vulnerability 12,not_affected\nCVE-1012-0014,some description of a vulnerability 13,exploitable\n"
         with open(
             path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
         ) as my_file:
@@ -57,25 +51,21 @@ class TestVulnerabilityFunctions(unittest.TestCase):
                             "score": 7.2,
                             "severity": "high",
                             "method": "CVSSv31",
-                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H"
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
                         }
                     ],
                     "published": "1013-01-01T01:02Z",
                     "updated": "1013-03-02T12:24Z",
-                    "affects": [
-                        {
-                            "ref": "11231231"
-                        }
-                    ],
+                    "affects": [{"ref": "11231231"}],
                     "analysis": {
                         "state": "not_affected",
                         "justification": "add justification here",
                         "response": [
                             "add response here",
-                            "more than one response is possible"
+                            "more than one response is possible",
                         ],
-                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
-                    }
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
                 },
                 {
                     "description": "some description of a vulnerability 5",
@@ -85,25 +75,21 @@ class TestVulnerabilityFunctions(unittest.TestCase):
                             "score": 9.8,
                             "severity": "critical",
                             "method": "CVSSv31",
-                            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
                         }
                     ],
                     "published": "1013-01-01T01:03Z",
                     "updated": "1013-03-03T12:24Z",
-                    "affects": [
-                        {
-                            "ref": "11231231"
-                        }
-                    ],
+                    "affects": [{"ref": "11231231"}],
                     "analysis": {
                         "state": "not_affected",
                         "justification": "add justification here",
                         "response": [
                             "add response here",
-                            "more than one response is possible"
+                            "more than one response is possible",
                         ],
-                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
-                    }
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
                 },
                 {
                     "description": "some description of a vulnerability 5",
@@ -113,25 +99,21 @@ class TestVulnerabilityFunctions(unittest.TestCase):
                             "score": 7.2,
                             "severity": "high",
                             "method": "CVSSv31",
-                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H"
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
                         }
                     ],
                     "published": "1013-01-01T01:03Z",
                     "updated": "1013-03-04T12:24Z",
-                    "affects": [
-                        {
-                            "ref": "11231231"
-                        }
-                    ],
+                    "affects": [{"ref": "11231231"}],
                     "analysis": {
                         "state": "not_affected",
                         "justification": "add justification here",
                         "response": [
                             "add response here",
-                            "more than one response is possible"
+                            "more than one response is possible",
                         ],
-                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
-                    }
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
                 },
                 {
                     "description": "some description of a vulnerability 7",
@@ -141,25 +123,21 @@ class TestVulnerabilityFunctions(unittest.TestCase):
                             "score": 7.2,
                             "severity": "high",
                             "method": "CVSSv31",
-                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H"
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
                         }
                     ],
                     "published": "1013-01-01T01:05Z",
                     "updated": "1013-03-07T12:24Z",
-                    "affects": [
-                        {
-                            "ref": "11231231"
-                        }
-                    ],
+                    "affects": [{"ref": "11231231"}],
                     "analysis": {
                         "state": "not_affected",
                         "justification": "add justification here",
                         "response": [
                             "add response here",
-                            "more than one response is possible"
+                            "more than one response is possible",
                         ],
-                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
-                    }
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
                 },
                 {
                     "description": "some description of a vulnerability 8",
@@ -169,25 +147,21 @@ class TestVulnerabilityFunctions(unittest.TestCase):
                             "score": 7.2,
                             "severity": "high",
                             "method": "CVSSv31",
-                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H"
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
                         }
                     ],
                     "published": "1013-01-01T01:05Z",
                     "updated": "1013-03-07T12:24Z",
-                    "affects": [
-                        {
-                            "ref": "11231231"
-                        }
-                    ],
+                    "affects": [{"ref": "11231231"}],
                     "analysis": {
                         "state": "not_affected",
                         "justification": "add justification here",
                         "response": [
                             "add response here",
-                            "more than one response is possible"
+                            "more than one response is possible",
                         ],
-                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
-                    }
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
                 },
                 {
                     "description": "some description of a vulnerability 9",
@@ -197,25 +171,21 @@ class TestVulnerabilityFunctions(unittest.TestCase):
                             "score": 7.2,
                             "severity": "high",
                             "method": "CVSSv31",
-                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H"
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
                         }
                     ],
                     "published": "1013-01-01T01:06Z",
                     "updated": "1013-03-08T12:24Z",
-                    "affects": [
-                        {
-                            "ref": "11231231"
-                        }
-                    ],
+                    "affects": [{"ref": "11231231"}],
                     "analysis": {
                         "state": "not_affected",
                         "justification": "add justification here",
                         "response": [
                             "add response here",
-                            "more than one response is possible"
+                            "more than one response is possible",
                         ],
-                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
-                    }
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
                 },
                 {
                     "description": "some description of a vulnerability 10",
@@ -225,25 +195,21 @@ class TestVulnerabilityFunctions(unittest.TestCase):
                             "score": 7.2,
                             "severity": "high",
                             "method": "CVSSv31",
-                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H"
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
                         }
                     ],
                     "published": "1013-01-01T01:06Z",
                     "updated": "1013-03-09T12:24Z",
-                    "affects": [
-                        {
-                            "ref": "11231231"
-                        }
-                    ],
+                    "affects": [{"ref": "11231231"}],
                     "analysis": {
                         "state": "not_affected",
                         "justification": "add justification here",
                         "response": [
                             "add response here",
-                            "more than one response is possible"
+                            "more than one response is possible",
                         ],
-                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
-                    }
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
                 },
                 {
                     "description": "some description of a vulnerability 12",
@@ -253,33 +219,29 @@ class TestVulnerabilityFunctions(unittest.TestCase):
                             "score": 5.3,
                             "severity": "medium",
                             "method": "CVSSv31",
-                            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
                         },
                         {
                             "score": 5.0,
                             "severity": "medium",
                             "method": "CVSSv2",
-                            "vector": "AV:N/AC:L/Au:N/C:N/I:P/A:N"
-                        }
+                            "vector": "AV:N/AC:L/Au:N/C:N/I:P/A:N",
+                        },
                     ],
                     "published": "1012-01-01T01:08Z",
                     "updated": "1013-03-12T12:24Z",
-                    "affects": [
-                        {
-                            "ref": "ref_first_component@1.3.3"
-                        }
-                    ],
+                    "affects": [{"ref": "ref_first_component@1.3.3"}],
                     "analysis": {
                         "state": "not_affected",
                         "justification": "add justification here",
                         "response": [
                             "add response here",
-                            "more than one response is possible"
+                            "more than one response is possible",
                         ],
-                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
-                    }
-                }
-            ]
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
+                },
+            ],
         }
         with open(
             path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
@@ -302,27 +264,23 @@ class TestVulnerabilityFunctions(unittest.TestCase):
                             "score": 7.2,
                             "severity": "high",
                             "method": "CVSSv31",
-                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H"
+                            "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
                         }
                     ],
                     "published": "1013-01-01T01:02Z",
                     "updated": "1013-03-02T12:24Z",
-                    "affects": [
-                        {
-                            "ref": "11231231"
-                        }
-                    ],
+                    "affects": [{"ref": "11231231"}],
                     "analysis": {
                         "state": "not_affected",
                         "justification": "add justification here",
                         "response": [
                             "add response here",
-                            "more than one response is possible"
+                            "more than one response is possible",
                         ],
-                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
-                    }
+                        "detail": "the fields state, justification and response are enums, please see CycloneDX specification",
+                    },
                 }
-            ]
+            ],
         }
         with open(
             path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
@@ -341,11 +299,11 @@ class TestVulnerabilityFunctions(unittest.TestCase):
             path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
         ) as my_file:
             vex = json.load(my_file)
-        
+
         result = get_vex_from_sbom(embedded_vex)
         self.assertEqual(result, vex)
 
-#Test subcommands
+    # Test subcommands
     def test_vex_list_command(self):
         with open(
             path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
@@ -377,11 +335,13 @@ class TestVulnerabilityFunctions(unittest.TestCase):
             embedded_vex = json.load(my_file)
         result = vex("extract", embedded_vex, "", "", "")
         self.assertEqual(result["vulnerabilities"], embedded_vex["vulnerabilities"])
-    
+
     def test_vex_invalid_subcommand(self):
         with open(
             path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
         ) as my_file:
             vex_file = json.load(my_file)
-        with self.assertRaises(ValueError):  # or return an error message if you handle it differently
+        with self.assertRaises(
+            ValueError
+        ):  # or return an error message if you handle it differently
             vex("invalid_command", vex_file, "", "")

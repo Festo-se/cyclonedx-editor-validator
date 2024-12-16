@@ -22,6 +22,7 @@ def init_vex_header(input_file: dict) -> dict:
     output_file["version"] = input_file.get("version", [])
     return output_file
 
+
 def get_list_of_ids(input_file: dict, scheme: str) -> str:
     """
     Get a list of vulnerability IDs.
@@ -41,13 +42,21 @@ def get_list_of_ids(input_file: dict, scheme: str) -> str:
     if scheme == "default":
         list_str += "CVE-ID,Description,Status\n"
         for vulnerability in input_file.get("vulnerabilities", []):
-            list_str += (vulnerability.get("id") + "," + vulnerability.get("description") + "," + vulnerability.get("analysis").get("state") + "\n")
+            list_str += (
+                vulnerability.get("id")
+                + ","
+                + vulnerability.get("description")
+                + ","
+                + vulnerability.get("analysis").get("state")
+                + "\n"
+            )
     elif scheme == "lightweight":
         list_str += "CVE-ID\n"
         for vulnerability in input_file.get("vulnerabilities", []):
-            list_str += ((vulnerability.get("id")) + "\n")
+            list_str += (vulnerability.get("id")) + "\n"
 
     return list_str
+
 
 def get_list_of_trimed_vulnerabilities(input_file: dict, state: str) -> dict:
     """
@@ -75,6 +84,7 @@ def get_list_of_trimed_vulnerabilities(input_file: dict, state: str) -> dict:
     output_file["vulnerabilities"] = trimmed_vulnerabilities
     return output_file
 
+
 def get_vulnerability_by_id(input_file: dict, id: str) -> dict:
     searched_vulnerability = []
     output_file = {}
@@ -85,6 +95,7 @@ def get_vulnerability_by_id(input_file: dict, id: str) -> dict:
     output_file = init_vex_header(input_file)
     output_file["vulnerabilities"] = searched_vulnerability
     return output_file
+
 
 def get_vex_from_sbom(input_file: dict) -> dict:
     """
@@ -105,7 +116,10 @@ def get_vex_from_sbom(input_file: dict) -> dict:
     output_file["vulnerabilities"] = input_file.get("vulnerabilities")
     return output_file
 
-def vex(sub_command: str, file: dict, state: str, scheme: str, vul_ID: str = None) -> dict:
+
+def vex(
+    sub_command: str, file: dict, state: str, scheme: str, vul_ID: str = None
+) -> dict:
     """
     Get different information about vulnerabilities in VEX file
 
@@ -119,7 +133,7 @@ def vex(sub_command: str, file: dict, state: str, scheme: str, vul_ID: str = Non
     file: dict
         A VEX dictionary to search for values
     state: string
-        A string containing the filtered state for the trim subcommand    
+        A string containing the filtered state for the trim subcommand
     scheme: string
         A string containing the output scheme for the list subcommand
     vul_ID: String
@@ -143,4 +157,6 @@ def vex(sub_command: str, file: dict, state: str, scheme: str, vul_ID: str = Non
     elif sub_command == "extract":
         return get_vex_from_sbom(file)
     else:
-        raise ValueError(f"Invalid sub_command: '{sub_command}'. Expected one of ['list', 'trim', 'search', 'extract'].")
+        raise ValueError(
+            f"Invalid sub_command: '{sub_command}'. Expected one of ['list', 'trim', 'search', 'extract']."
+        )

@@ -207,16 +207,16 @@ def add_output_argument(parser: argparse.ArgumentParser) -> None:
         type=Path,
     )
 
+
 def add_input_argument(parser: argparse.ArgumentParser) -> None:
     """Helper function to create uniform input options for all commands."""
     parser.add_argument(
         "input_file",
         metavar="<input_file>",
-        help=(
-            "The path to the input file. (SBOM or VEX file)"
-        ),
+        help=("The path to the input file. (SBOM or VEX file)"),
         type=Path,
     )
+
 
 @dataclass
 class _AmendOperationDetails:
@@ -496,29 +496,27 @@ def create_merge_vex_parser(
     parser.set_defaults(cmd_handler=invoke_merge_vex, parser=parser)
     return parser
 
+
 # noinspection PyUnresolvedReferences,PyProtectedMember
 def create_vex_parser(
     subparser: argparse._SubParsersAction,
-    ) -> argparse.ArgumentParser:
+) -> argparse.ArgumentParser:
     parser = subparser.add_parser(
         "vex",
-        help=(
-            "Executes commands [list, search, trim, extract] on VEX/SBOM files"
-        ),
+        help=("Executes commands [list, search, trim, extract] on VEX/SBOM files"),
     )
-       
-    subparsers = parser.add_subparsers(dest='sub_command', required=True)
+
+    subparsers = parser.add_subparsers(dest="sub_command", required=True)
 
     list_parser = subparsers.add_parser(
-        "list",
-        help="Returns a list of all vulnerability IDs."
+        "list", help="Returns a list of all vulnerability IDs."
     )
     list_parser.add_argument(
         "--scheme",
         help="Set scheme of return list",
         choices=["default", "lightweight"],
         default="default",
-        type=str
+        type=str,
     )
 
     list_parser.add_argument(
@@ -526,35 +524,38 @@ def create_vex_parser(
         help="Set format of return file",
         choices=["txt", "csv"],
         default="csv",
-        type=str
+        type=str,
     )
 
-    search_parser = subparsers.add_parser(
-        "search",
-        help="Get vulnerability by ID."
-    )
+    search_parser = subparsers.add_parser("search", help="Get vulnerability by ID.")
     search_parser.add_argument(
         "vul_ID",
         metavar="<vul_ID>",
         help="The ID of the vulnerability to search for.",
-        type=str
+        type=str,
     )
 
     trim_parser = subparsers.add_parser(
         "trim",
-        help="Trims a VEX to show only the vulnerabilities according to the selected state."
+        help="Trims a VEX to show only the vulnerabilities according to the selected state.",
     )
     trim_parser.add_argument(
         "--state",
         help="Specifies the state to be filtered",
-        choices=["resolved", "resolved_with_pedigree", "exploitable", "in_triage", "false_positive", "not_affected"],
+        choices=[
+            "resolved",
+            "resolved_with_pedigree",
+            "exploitable",
+            "in_triage",
+            "false_positive",
+            "not_affected",
+        ],
         default="exploitable",
-        type=str
+        type=str,
     )
 
     extract_parser = subparsers.add_parser(
-        "extract",
-        help="Extract a VEX file out of SBOM file."
+        "extract", help="Extract a VEX file out of SBOM file."
     )
 
     add_input_argument(list_parser)
@@ -1122,6 +1123,7 @@ def invoke_validate(args: argparse.Namespace) -> int:
         else Status.VALIDATION_ERROR
     )
 
+
 def invoke_vex(args: argparse.Namespace) -> int:
     file, _ = read_sbom(args.input_file)
     vul_ID = None
@@ -1135,11 +1137,11 @@ def invoke_vex(args: argparse.Namespace) -> int:
         scheme = args.scheme
 
     output = vex(
-        sub_command = args.sub_command,
-        file = file,
-        vul_ID = vul_ID,
-        state = state,
-        scheme = scheme   
+        sub_command=args.sub_command,
+        file=file,
+        vul_ID=vul_ID,
+        state=state,
+        scheme=scheme,
     )
 
     if args.sub_command == "list":

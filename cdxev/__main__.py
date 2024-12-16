@@ -1213,9 +1213,9 @@ def invoke_validate(args: argparse.Namespace) -> int:
 
 def invoke_vex(args: argparse.Namespace) -> int:
     file, _ = read_sbom(args.input_file)
-    vul_id = None
-    state = None
-    scheme = None
+    vul_id = ""
+    state = ""
+    scheme = ""
     if args.sub_command == "search":
         vul_id = args.vul_id
     if args.sub_command == "trim":
@@ -1234,7 +1234,8 @@ def invoke_vex(args: argparse.Namespace) -> int:
     if args.sub_command == "list":
         write_list(str(output), args.output, file, format=args.format)
     else:
-        write_sbom(output, args.output, update_metadata=False)
+        if isinstance(output, dict):
+            write_sbom(output, args.output, update_metadata=False)
 
     return Status.OK
 

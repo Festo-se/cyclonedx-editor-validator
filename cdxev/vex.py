@@ -248,5 +248,8 @@ def vex(
         return get_vex_from_sbom(file)
     else:
         raise ValueError(
-            f"Invalid sub_command: '{sub_command}'. Expected one of ['list', 'trim', 'search', 'extract']."
+            (
+                f"Invalid sub_command: '{sub_command}'",
+                "Expected one of ['list', 'trim', 'search', 'extract'].",
+            )
         )

@@ -118,7 +118,7 @@ def get_vex_from_sbom(input_file: dict) -> dict:
 
 
 def vex(
-    sub_command: str, file: dict, state: str, scheme: str, vul_ID: str = None
+    sub_command: str, file: dict, state: str, scheme: str, vul_id: str = None
 ) -> dict:
     """
     Get different information about vulnerabilities in VEX file
@@ -153,7 +153,7 @@ def vex(
     elif sub_command == "trim":
         return get_list_of_trimed_vulnerabilities(file, state)
     elif sub_command == "search":
-        return get_vulnerability_by_id(file, vul_ID)
+        return get_vulnerability_by_id(file, vul_id)
     elif sub_command == "extract":
         return get_vex_from_sbom(file)
     else:

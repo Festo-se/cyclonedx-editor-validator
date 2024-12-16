@@ -535,8 +535,8 @@ def create_vex_parser(
 
     search_parser = subparsers.add_parser("search", help="Get vulnerability by ID.")
     search_parser.add_argument(
-        "vul_ID",
-        metavar="<vul_ID>",
+        "vul_id",
+        metavar="<vul_id>",
         help="The ID of the vulnerability to search for.",
         type=str,
     )
@@ -1213,11 +1213,11 @@ def invoke_validate(args: argparse.Namespace) -> int:
 
 def invoke_vex(args: argparse.Namespace) -> int:
     file, _ = read_sbom(args.input_file)
-    vul_ID = None
+    vul_id = None
     state = None
     scheme = None
     if args.sub_command == "search":
-        vul_ID = args.vul_ID
+        vul_id = args.vul_id
     if args.sub_command == "trim":
         state = args.state
     if args.sub_command == "list":
@@ -1226,7 +1226,7 @@ def invoke_vex(args: argparse.Namespace) -> int:
     output = vex(
         sub_command=args.sub_command,
         file=file,
-        vul_ID=vul_ID,
+        vul_id=vul_id,
         state=state,
         scheme=scheme,
     )

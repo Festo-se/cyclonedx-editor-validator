@@ -31,6 +31,7 @@ from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
+from cdxev.vex import vex
 
 logger: logging.Logger
 
@@ -181,6 +182,7 @@ def create_parser() -> argparse.ArgumentParser:
     create_amend_parser(subparsers)
     create_merge_parser(subparsers)
     create_merge_vex_parser(subparsers)
+    create_vex_parser(subparsers)
     create_validation_parser(subparsers)
     create_set_parser(subparsers)
     create_build_public_bom_parser(subparsers)
@@ -205,6 +207,16 @@ def add_output_argument(parser: argparse.ArgumentParser) -> None:
         type=Path,
     )
 
+def add_input_argument(parser: argparse.ArgumentParser) -> None:
+    """Helper function to create uniform input options for all commands."""
+    parser.add_argument(
+        "input_file",
+        metavar="<input_file>",
+        help=(
+            "The path to the input file. (SBOM or VEX file)"
+        ),
+        type=Path,
+    )
 
 @dataclass
 class _AmendOperationDetails:
@@ -482,6 +494,80 @@ def create_merge_vex_parser(
     add_output_argument(parser)
 
     parser.set_defaults(cmd_handler=invoke_merge_vex, parser=parser)
+    return parser
+
+# noinspection PyUnresolvedReferences,PyProtectedMember
+def create_vex_parser(
+    subparser: argparse._SubParsersAction,
+    ) -> argparse.ArgumentParser:
+    parser = subparser.add_parser(
+        "vex",
+        help=(
+            "Executes commands [list, search, trim, extract] on VEX/SBOM files"
+        ),
+    )
+       
+    subparsers = parser.add_subparsers(dest='sub_command', required=True)
+
+    list_parser = subparsers.add_parser(
+        "list",
+        help="Returns a list of all vulnerability IDs."
+    )
+    list_parser.add_argument(
+        "--scheme",
+        help="Set scheme of return list",
+        choices=["default", "lightweight"],
+        default="default",
+        type=str
+    )
+
+    list_parser.add_argument(
+        "--format",
+        help="Set format of return file",
+        choices=["txt", "csv"],
+        default="csv",
+        type=str
+    )
+
+    search_parser = subparsers.add_parser(
+        "search",
+        help="Get vulnerability by ID."
+    )
+    search_parser.add_argument(
+        "vul_ID",
+        metavar="<vul_ID>",
+        help="The ID of the vulnerability to search for.",
+        type=str
+    )
+
+    trim_parser = subparsers.add_parser(
+        "trim",
+        help="Trims a VEX to show only the vulnerabilities according to the selected state."
+    )
+    trim_parser.add_argument(
+        "--state",
+        help="Specifies the state to be filtered",
+        choices=["resolved", "resolved_with_pedigree", "exploitable", "in_triage", "false_positive", "not_affected"],
+        default="exploitable",
+        type=str
+    )
+
+    extract_parser = subparsers.add_parser(
+        "extract",
+        help="Extract a VEX file out of SBOM file."
+    )
+
+    add_input_argument(list_parser)
+    add_input_argument(trim_parser)
+    add_input_argument(search_parser)
+    add_input_argument(extract_parser)
+
+    add_output_argument(list_parser)
+    add_output_argument(trim_parser)
+    add_output_argument(search_parser)
+    add_output_argument(extract_parser)
+
+    parser.set_defaults(cmd_handler=invoke_vex, parser=parser)
     return parser
 
 
@@ -1035,6 +1121,33 @@ def invoke_validate(args: argparse.Namespace) -> int:
         == Status.OK
         else Status.VALIDATION_ERROR
     )
+
+def invoke_vex(args: argparse.Namespace) -> int:
+    file, _ = read_sbom(args.input_file)
+    vul_ID = None
+    state = None
+    scheme = None
+    if args.sub_command == "search":
+        vul_ID = args.vul_ID
+    if args.sub_command == "trim":
+        state = args.state
+    if args.sub_command == "list":
+        scheme = args.scheme
+
+    output = vex(
+        sub_command = args.sub_command,
+        file = file,
+        vul_ID = vul_ID,
+        state = state,
+        scheme = scheme   
+    )
+
+    if args.sub_command == "list":
+        write_list(str(output), args.output, file, format=args.format)
+    else:
+        write_sbom(output, args.output, update_metadata=False)
+
+    return Status.OK
 
 
 def invoke_build_public_bom(args: argparse.Namespace) -> int:

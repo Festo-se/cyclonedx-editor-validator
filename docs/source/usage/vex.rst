@@ -1,5 +1,3 @@
-.. TODO: cdxev or cdx-ev in  examples?
-
 ============
 vex
 ============
@@ -22,8 +20,8 @@ list
 .. argparse::
     :filename: ./cdxev/__main__.py
     :func: create_parser
-    :prog: cdx-ev vex
-    :path: list
+    :prog: cdx-ev
+    :path: vex list
 
     This subcommand returns a list of all vulnerability-IDs inside the input file. There are two different options:
 
@@ -44,8 +42,8 @@ list
 
 Example::
 
-# Write all vulnerability-IDs to list_vex.json
-cdxev vex list --scheme default --format csv --output list_vex.json input_file.json 
+    # Write all vulnerability-IDs to list_vex.json
+    cdxev vex list --scheme default --format csv --output list_vex.json input_file.json 
 
 
 trim
@@ -53,8 +51,8 @@ trim
 .. argparse::
     :filename: ./cdxev/__main__.py
     :func: create_parser
-    :prog: cdx-ev vex
-    :path: trim
+    :prog: cdx-ev
+    :path: vex trim
 
     This subcommand returns a json file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by the state. Following states are supported:
     
@@ -67,8 +65,8 @@ trim
 
 Example::
 
-# Writes all vulnerabilities with state "not_affected" to new file
-cdxev vex trim --state not_affected --output not_affected_vex.json input_file.json
+    # Writes all vulnerabilities with state "not_affected" to new file
+    cdxev vex trim --state not_affected --output not_affected_vex.json input_file.json
 
 
 search
@@ -76,15 +74,15 @@ search
 .. argparse::
     :filename: ./cdxev/__main__.py
     :func: create_parser
-    :prog: cdx-ev vex
-    :path: search
+    :prog: cdx-ev
+    :path: vex search
 
-    This subcommand searches a file for a specific vulnerability basted on its ID. The command returns a .json file.
+    This subcommand searches a file for a specific vulnerability based on its ID. The command returns a .json file.
 
 Example::
 
-# Writes specific vulnerabilitiy with based on its ID to new file
-cdxev vex search --output searched_vul.json CVE-1013-0002 input_file.json
+    # Writes specific vulnerability with based on its ID to new file
+    cdxev vex search --output searched_vul.json CVE-1013-0002 input_file.json
 
 
 extract
@@ -92,19 +90,12 @@ extract
 .. argparse::
     :filename: ./cdxev/__main__.py
     :func: create_parser
-    :prog: cdx-ev vex
-    :path: extract
+    :prog: cdx-ev
+    :path: vex extract
 
     This subcommand extracts all vulnerabilities from a SBOM-file and returns it as a VEX-file in .json format
 
 Example::
 
-# Writes specific vulnerabilitiy with based on its ID to new file
-cdxev vex search --output searched_vul.json CVE-1013-0002 input_file.json 
-
-
-
-
-
-
-
+    # Writes specific vulnerability with based on its ID to new file
+    cdxev vex search --output searched_vul.json CVE-1013-0002 input_file.json 

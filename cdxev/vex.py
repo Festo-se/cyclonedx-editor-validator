@@ -1,6 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
+from typing import Any, Union
+
+
 def init_vex_header(input_file: dict) -> dict:
     """
     Copy important keys and values from input_file to output_file
@@ -118,8 +121,8 @@ def get_vex_from_sbom(input_file: dict) -> dict:
 
 
 def vex(
-    sub_command: str, file: dict, state: str, scheme: str, vul_id: str = None
-) -> dict:
+    sub_command: str, file: dict, state: str, scheme: str, vul_id: str = ""
+) -> Union[dict[str, Any], str]:
     """
     Get different information about vulnerabilities in VEX file
 

@@ -136,7 +136,8 @@ def merge_components(
             present_component_identities[key]["components"] = list_of_subcomponents
     else:
         for key in add_to_existing.keys():
-            list_of_merged_components.append(add_to_existing[key])
+            for new_component in add_to_existing[key]:
+                list_of_merged_components.append(new_component)
 
     for component in dropped_components:
         # if the component in the sbom_to_be_merged has a different

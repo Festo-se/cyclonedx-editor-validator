@@ -94,7 +94,7 @@ def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[di
                 )
                 list_of_merged_components.append(component)
                 list_of_merged_bom_refs.append(new_bom_ref)
-    return list_of_merged_components
+    return list_of_merged_components  # type:ignore [no-any-return]
 
 
 def merge_dependency(

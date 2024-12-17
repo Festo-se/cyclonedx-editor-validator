@@ -5,21 +5,14 @@ from datetime import datetime
 from typing import Any, Union
 from uuid import uuid4
 
-from cyclonedx.model import (  # type: ignore
-    ExternalReference,
-    ExternalReferenceType,
-    XsUri,
-)
-from cyclonedx.model.bom import Bom, BomMetaData  # type: ignore
-from cyclonedx.model.bom_ref import BomRef  # type: ignore
-from cyclonedx.model.component import Component, ComponentType  # type: ignore
-from cyclonedx.model.contact import (  # type: ignore
-    OrganizationalContact,
-    OrganizationalEntity,
-)
-from cyclonedx.model.dependency import Dependency  # type: ignore
+from cyclonedx.model import ExternalReference, ExternalReferenceType, XsUri
+from cyclonedx.model.bom import Bom, BomMetaData
+from cyclonedx.model.bom_ref import BomRef
+from cyclonedx.model.component import Component, ComponentType
+from cyclonedx.model.contact import OrganizationalContact, OrganizationalEntity
+from cyclonedx.model.dependency import Dependency
 from cyclonedx.model.tool import Tool
-from cyclonedx.output.json import JsonV1Dot6  # type: ignore
+from cyclonedx.output.json import JsonV1Dot6
 
 from cdxev import pkg
 

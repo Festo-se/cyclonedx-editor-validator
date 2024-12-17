@@ -10,6 +10,7 @@ from uuid import uuid4
 
 from cdxev import pkg
 from cdxev.auxiliary.filename_gen import generate_filename
+from cdxev.auxiliary.identity import ComponentIdentity
 from cdxev.auxiliary.sbomFunctions import CycloneDXVersion, SpecVersion
 from cdxev.error import AppError
 
@@ -99,6 +100,8 @@ def update_tools(sbom: dict) -> None:
             "version": pkg.VERSION,
         }
 
+    this_tool_id = ComponentIdentity.create(this_tool, allow_unsafe=True)
+
     if t.TYPE_CHECKING:
         # At this point we can be sure that tools is definitely a list.
         # This assertion is for mypy only and has no runtime relevance, because if tools isn't
@@ -106,7 +109,10 @@ def update_tools(sbom: dict) -> None:
         # the tool crash. Therefore, bandit error B101 is silenced.
         assert isinstance(tools, list)  # nosec
 
-    if any(tool for tool in tools if tool == this_tool):
+    if any(
+        ComponentIdentity.create(tool, allow_unsafe=True) == this_tool_id
+        for tool in tools
+    ):
         return
 
     tools.append(this_tool)

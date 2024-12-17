@@ -701,6 +701,20 @@ class TestReplaceBomRefs(unittest.TestCase):
 
 
 class TestMergeComponents(unittest.TestCase):
+    list_of_component_names = [
+        "component_1",
+        "component_2",
+        "component_3",
+        "component_4",
+        "component_1_sub_1",
+        "component_2_sub_1",
+        "component_2_sub_2",
+        "component_2_sub_1_sub_1",
+        "component_4_sub_1",
+        "component_4_sub_1_sub_1",
+        "component_4_sub_1_sub_2",
+    ]
+
     def test_merge_components(self) -> None:
         sub_sub_program = load_additional_sbom_dict()["sub_sub_program"]
         sub_program = load_sub_program()
@@ -730,7 +744,7 @@ class TestMergeComponents(unittest.TestCase):
         # - top level component not present, sublevel component present
         #   sub_sub component not present
         # - top level not present, sub_sub present
-        components = helper.create_components()
+        components = helper.create_components(self.list_of_component_names)
 
         component_1 = components["component_1"]
         component_2 = components["component_2"]
@@ -814,7 +828,7 @@ class TestMergeComponents(unittest.TestCase):
         self.assertTrue(kept_components_identical)
 
     def test_merge_hierarchical(self) -> None:
-        components = helper.create_components()
+        components = helper.create_components(self.list_of_component_names)
         component_1 = copy.deepcopy(components["component_1"])
         component_2 = copy.deepcopy(components["component_2"])
         component_3 = copy.deepcopy(components["component_3"])
@@ -860,36 +874,33 @@ class TestMergeComponents(unittest.TestCase):
         )
 
         # create expected result
-        components = helper.create_components()
-        component_1_expected = components["component_1"]
-        component_2_expected = components["component_2"]
-        component_3_expected = components["component_3"]
-        component_4_expected = components["component_4"]
-        component_1_sub_1_expected = components["component_1_sub_1"]
-        component_2_sub_1_expected = components["component_2_sub_1"]
-        component_2_sub_2_expected = components["component_2_sub_2"]
-        component_2_sub_1_sub_1_expected = components["component_2_sub_1_sub_1"]
-        component_4_sub_1_expected = components["component_4_sub_1"]
-        component_4_sub_1_sub_1_expected = components["component_4_sub_1_sub_1"]
-        component_4_sub_1_sub_2_expected = components["component_4_sub_1_sub_2"]
+        components_expected = helper.create_components(self.list_of_component_names)
 
-        component_1_expected["components"] = [component_1_sub_1_expected]
+        components_expected["component_1"]["components"] = [
+            components_expected["component_1_sub_1"]
+        ]
 
-        component_2_expected["components"] = [component_2_sub_2_expected]
-        component_2_sub_1_expected["components"] = [component_2_sub_1_sub_1_expected]
+        components_expected["component_2"]["components"] = [
+            components_expected["component_2_sub_2"]
+        ]
+        components_expected["component_2_sub_1"]["components"] = [
+            components_expected["component_2_sub_1_sub_1"]
+        ]
 
-        component_4_expected["components"] = [component_4_sub_1_expected]
-        component_4_sub_1_expected["components"] = [
-            component_4_sub_1_sub_1_expected,
+        components_expected["component_4"]["components"] = [
+            components_expected["component_4_sub_1"]
+        ]
+        components_expected["component_4_sub_1"]["components"] = [
+            components_expected["component_4_sub_1_sub_1"],
         ]
 
         expected_components = [
-            component_1_expected,
-            component_3_expected,
-            component_2_sub_1_expected,
-            component_4_sub_1_sub_2_expected,
-            component_2_expected,
-            component_4_expected,
+            components_expected["component_1"],
+            components_expected["component_3"],
+            components_expected["component_2_sub_1"],
+            components_expected["component_4_sub_1_sub_2"],
+            components_expected["component_2"],
+            components_expected["component_4"],
         ]
 
         self.assertEqual(merged_components, expected_components)

@@ -1228,8 +1228,8 @@ class TestVex:
                     "vex.expected_list_lightweight.csv",
                     "vex.expected_trim.json",
                     "vex.expected_search.json",
-                    "vex.json"
-                ]
+                    "vex.json",
+                ],
             }
         ],
     )
@@ -1251,7 +1251,7 @@ class TestVex:
             expected_list_lightweight=expected_list_lightweight,
             expected_trim_json=expected_trim_json,
             expected_search_json=expected_search_json,
-            expected_extract_json=expected_extract_json
+            expected_extract_json=expected_extract_json,
         )
 
     def test_list_no_state_vulnerabilities_from_embedded_file(
@@ -1292,7 +1292,13 @@ class TestVex:
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        argv("vex", "list", "--scheme", "lightweight", str(data["input_vex_embedded_path"]))
+        argv(
+            "vex",
+            "list",
+            "--scheme",
+            "lightweight",
+            str(data["input_vex_embedded_path"]),
+        )
         exit_code, actual, _ = run_main(capsys)
 
         # Verify that command completed successfully
@@ -1308,7 +1314,13 @@ class TestVex:
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        argv("vex", "trim", "--state", "not_affected", str(data["input_vex_embedded_path"]))
+        argv(
+            "vex",
+            "trim",
+            "--state",
+            "not_affected",
+            str(data["input_vex_embedded_path"]),
+        )
         exit_code, actual, _ = run_main(capsys)
 
         # Verify that command completed successfully

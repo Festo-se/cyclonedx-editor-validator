@@ -446,7 +446,7 @@ def create_merge_parser(
     )
     parser.add_argument(
         "--hierarchical",
-        help="Flag to determine if the components should be merged hierarchical",
+        help="Flag to determine if the components should be merged hierarchical.",
         action="store_true",
     )
     add_output_argument(parser)

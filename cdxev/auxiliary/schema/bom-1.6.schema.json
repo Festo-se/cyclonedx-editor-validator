@@ -16,7 +16,7 @@
     "bomFormat": {
       "type": "string",
       "title": "BOM Format",
-      "description": "Specifies the format of the BOM. This helps to identify the file as CycloneDX since BOMs do not have a filename convention, nor does JSON schema support namespaces. This value MUST be \"CycloneDX\".",
+      "description": "Specifies the format of the BOM. This helps to identify the file as CycloneDX since BOMs do not have a filename convention, nor does JSON schema support namespaces. This value must be \"CycloneDX\".",
       "enum": [
         "CycloneDX"
       ]
@@ -26,13 +26,13 @@
       "title": "CycloneDX Specification Version",
       "description": "The version of the CycloneDX specification the BOM conforms to.",
       "examples": [
-        "1.6"
+        "1.6.1"
       ]
     },
     "serialNumber": {
       "type": "string",
       "title": "BOM Serial Number",
-      "description": "Every BOM generated SHOULD have a unique serial number, even if the contents of the BOM have not changed over time. If specified, the serial number MUST conform to RFC-4122. Use of serial numbers is RECOMMENDED.",
+      "description": "Every BOM generated SHOULD have a unique serial number, even if the contents of the BOM have not changed over time. If specified, the serial number must conform to [RFC 4122](https://www.ietf.org/rfc/rfc4122.html). Use of serial numbers is recommended.",
       "examples": [
         "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
       ],
@@ -143,7 +143,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
               },
               "thirdParty": {
                 "type": "boolean",
@@ -278,7 +278,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
               },
               "target": {
                 "$ref": "#/definitions/refLinkType",
@@ -347,7 +347,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
               },
               "propertyName": {
                 "type": "string",
@@ -475,6 +475,7 @@
         "affirmation": {
           "type": "object",
           "title": "Affirmation",
+          "description": "A concise statement affirmed by an individual regarding all declarations, often used for third-party auditor acceptance or recipient acknowledgment. It includes a list of authorized signatories who assert the validity of the document on behalf of the organization.",
           "additionalProperties": false,
           "properties": {
             "statement": {
@@ -568,7 +569,7 @@
     "properties": {
       "type": "array",
       "title": "Properties",
-      "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+      "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
       "items": {
         "$ref": "#/definitions/property"
       }
@@ -770,7 +771,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
-          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -819,13 +820,12 @@
     "organizationalEntity": {
       "type": "object",
       "title": "Organizational Entity",
-      "description": "",
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "name": {
           "type": "string",
@@ -865,13 +865,12 @@
     "organizationalContact": {
       "type": "object",
       "title": "Organizational Contact",
-      "description": "",
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "name": {
           "type": "string",
@@ -929,7 +928,7 @@
           "meta:enum": {
             "application": "A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.",
             "framework": "A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.",
-            "library": "A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing)) for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is RECOMMENDED.",
+            "library": "A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing)) for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is recommended.",
             "container": "A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization).",
             "platform": "A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.",
             "operating-system": "A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system).",
@@ -959,7 +958,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "supplier": {
           "title": "Component Supplier",
@@ -1069,7 +1068,7 @@
         "purl": {
           "type": "string",
           "title": "Package URL (purl)",
-          "description": "Asserts the identity of the component using package-url (purl). The purl, if specified, MUST be valid and conform to the specification defined at: [https://github.com/package-url/purl-spec](https://github.com/package-url/purl-spec). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
+          "description": "Asserts the identity of the component using package-url (purl). The purl, if specified, must be valid and conform to the specification defined at: [https://github.com/package-url/purl-spec](https://github.com/package-url/purl-spec). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
           "examples": [
             "pkg:maven/com.acme/tomcat-catalina@9.0.14?packaging=jar"
           ]
@@ -1077,7 +1076,7 @@
         "omniborId": {
           "type": "array",
           "title": "OmniBOR Artifact Identifier (gitoid)",
-          "description": "Asserts the identity of the component using the OmniBOR Artifact ID. The OmniBOR, if specified, MUST be valid and conform to the specification defined at: [https://www.iana.org/assignments/uri-schemes/prov/gitoid](https://www.iana.org/assignments/uri-schemes/prov/gitoid). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
+          "description": "Asserts the identity of the component using the OmniBOR Artifact ID. The OmniBOR, if specified, must be valid and conform to the specification defined at: [https://www.iana.org/assignments/uri-schemes/prov/gitoid](https://www.iana.org/assignments/uri-schemes/prov/gitoid). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
           "items": {
             "type": "string"
           },
@@ -1088,8 +1087,8 @@
         },
         "swhid": {
           "type": "array",
-          "title": "SoftWare Heritage Identifier",
-          "description": "Asserts the identity of the component using the Software Heritage persistent identifier (SWHID). The SWHID, if specified, MUST be valid and conform to the specification defined at: [https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
+          "title": "Software Heritage Identifier",
+          "description": "Asserts the identity of the component using the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: [https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
           "items": {
             "type": "string"
           },
@@ -1197,7 +1196,7 @@
             "$ref": "#/definitions/componentData"
           },
           "title": "Data",
-          "description": "This object SHOULD be specified for any component of type `data` and MUST NOT be specified for other component types."
+          "description": "This object SHOULD be specified for any component of type `data` and must not be specified for other component types."
         },
         "cryptoProperties": {
           "$ref": "#/definitions/cryptoProperties",
@@ -1206,7 +1205,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
-          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -1285,8 +1284,13 @@
         "contentType": {
           "type": "string",
           "title": "Content-Type",
-          "description": "Specifies the content type of the text. Defaults to text/plain if not specified.",
-          "default": "text/plain"
+          "description": "Specifies the format and nature of the data being attached, helping systems correctly interpret and process the content. Common content type examples include `application/json` for JSON data and `text/plain` for plan text documents.\n [RFC 2045 section 5.1](https://www.ietf.org/rfc/rfc2045.html#section-5.1) outlines the structure and use of content types. For a comprehensive list of registered content types, refer to the [IANA media types registry](https://www.iana.org/assignments/media-types/media-types.xhtml).",
+          "default": "text/plain",
+          "examples": [
+            "text/plain",
+            "application/json",
+            "image/png"
+          ]
         },
         "encoding": {
           "type": "string",
@@ -1354,6 +1358,7 @@
     "license": {
       "type": "object",
       "title": "License",
+      "description": "Specifies the details and attributes related to a software license. It can either include a valid SPDX license identifier or a named license, along with additional properties such as license acknowledgment, comprehensive commercial licensing information, and the full text of the license.",
       "oneOf": [
         {
           "required": [
@@ -1371,12 +1376,12 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "id": {
           "$ref": "spdx.schema.json",
           "title": "License ID (SPDX)",
-          "description": "A valid SPDX license ID",
+          "description": "A valid SPDX license identifier. If specified, this value must be one of the enumeration of valid SPDX license identifiers defined in the spdx.schema.json (or spdx.xml) subschema which is synchronized with the official SPDX license list.",
           "examples": [
             "Apache-2.0"
           ]
@@ -1384,7 +1389,7 @@
         "name": {
           "type": "string",
           "title": "License Name",
-          "description": "If SPDX does not define the license used, this field may be used to provide the license name",
+          "description": "The name of the license. This may include the name of a commercial or proprietary license or an open source license that may not be defined by SPDX.",
           "examples": [
             "Acme Software License"
           ]
@@ -1576,7 +1581,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
-          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -1649,7 +1654,7 @@
                 "bom-ref": {
                   "$ref": "#/definitions/refType",
                   "title": "BOM Reference",
-                  "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                  "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
                 }
               }
             }
@@ -1971,10 +1976,10 @@
             "certification-report": "Industry, regulatory, or other certification from an accredited (if applicable) certification body.",
             "codified-infrastructure": "Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC).",
             "quality-metrics": "Report or system in which quality metrics can be obtained.",
-            "poam": "Plans of Action and Milestones (POAM) complement an \"attestation\" external reference. POAM is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".",
+            "poam": "Plans of Action and Milestones (POA&M) complement an \"attestation\" external reference. POA&M is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".",
             "electronic-signature": "An e-signature is commonly a scanned representation of a written signature or a stylized script of the person's name.",
             "digital-signature": "A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.",
-            "rfc-9116": "Document that complies with RFC-9116 (A File Format to Aid in Security Vulnerability Disclosure)",
+            "rfc-9116": "Document that complies with [RFC 9116](https://www.ietf.org/rfc/rfc9116.html) (A File Format to Aid in Security Vulnerability Disclosure)",
             "other": "Use this if no other types accurately describe the purpose of the external reference."
           }
         },
@@ -1991,7 +1996,7 @@
     "dependency": {
       "type": "object",
       "title": "Dependency",
-      "description": "Defines the direct dependencies of a component, service, or the components provided/implemented by a given component. Components or services that do not have their own dependencies MUST be declared as empty elements within the graph. Components or services that are not represented in the dependency graph MAY have unknown dependencies. It is RECOMMENDED that implementations assume this to be opaque and not an indicator of an object being dependency-free. It is RECOMMENDED to leverage compositions to indicate unknown dependency graphs.",
+      "description": "Defines the direct dependencies of a component, service, or the components provided/implemented by a given component. Components or services that do not have their own dependencies must be declared as empty elements within the graph. Components or services that are not represented in the dependency graph may have unknown dependencies. It is recommended that implementations assume this to be opaque and not an indicator of an object being dependency-free. It is recommended to leverage compositions to indicate unknown dependency graphs.",
       "required": [
         "ref"
       ],
@@ -2033,7 +2038,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the service elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the service elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "provider": {
           "title": "Provider",
@@ -2103,7 +2108,7 @@
         },
         "licenses": {
           "$ref": "#/definitions/licenseChoice",
-          "title": "Component License(s)"
+          "title": "Service License(s)"
         },
         "externalReferences": {
           "type": "array",
@@ -2130,7 +2135,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
-          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -2241,6 +2246,7 @@
     "copyright": {
       "type": "object",
       "title": "Copyright",
+      "description": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
       "required": [
         "text"
       ],
@@ -2248,7 +2254,8 @@
       "properties": {
         "text": {
           "type": "string",
-          "title": "Copyright Text"
+          "title": "Copyright Text",
+          "description": "The textual content of the copyright."
         }
       }
     },
@@ -2260,7 +2267,7 @@
       "properties": {
         "identity": {
           "title": "Identity Evidence",
-          "description": "Evidence that substantiates the identity of a component. The identify may be an object or an array of identity objects. Support for specifying identify as a single object was introduced in CycloneDX v1.5. Arrays were introduced in v1.6. It is RECOMMENDED that all implementations use arrays, even if only one identity object is specified.",
+          "description": "Evidence that substantiates the identity of a component. The identity may be an object or an array of identity objects. Support for specifying identity as a single object was introduced in CycloneDX v1.5. Arrays were introduced in v1.6. It is recommended that all implementations use arrays, even if only one identity object is specified.",
           "oneOf": [
             {
               "type": "array",
@@ -2291,7 +2298,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the occurrence elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                "description": "An optional identifier which can be used to reference the occurrence elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
               },
               "location": {
                 "type": "string",
@@ -2408,7 +2415,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "aggregate": {
           "$ref": "#/definitions/aggregateType",
@@ -2489,7 +2496,7 @@
     "property": {
       "type": "object",
       "title": "Lightweight name-value pair",
-      "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+      "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
       "required": [
         "name"
       ],
@@ -2511,7 +2518,7 @@
       "type": "string",
       "pattern": "^([a-z]{2})(-[A-Z]{2})?$",
       "title": "Locale",
-      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code MUST be lower case. If the country code is specified, the country code MUST be upper case. The language code and country code MUST be separated by a minus sign. Examples: en, en-US, fr, fr-CA"
+      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code must be lower case. If the country code is specified, the country code must be upper case. The language code and country code must be separated by a minus sign. Examples: en, en-US, fr, fr-CA"
     },
     "releaseType": {
       "type": "string",
@@ -2522,7 +2529,7 @@
         "pre-release",
         "internal"
       ],
-      "description": "The software versioning type. It is RECOMMENDED that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
+      "description": "The software versioning type. It is recommended that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
     },
     "note": {
       "type": "object",
@@ -2617,7 +2624,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
-          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -2817,7 +2824,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the vulnerability elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the vulnerability elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "id": {
           "type": "string",
@@ -3146,7 +3153,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
-          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -3213,7 +3220,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the annotation elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the annotation elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "subjects": {
           "type": "array",
@@ -3301,13 +3308,13 @@
       "$comment": "Model card support in CycloneDX is derived from TensorFlow Model Card Toolkit released under the Apache 2.0 license and available from https://github.com/tensorflow/model-card-toolkit/blob/main/model_card_toolkit/schema/v0.0.2/model_card.schema.json. In addition, CycloneDX model card support includes portions of VerifyML, also released under the Apache 2.0 license and available from https://github.com/cylynx/verifyml/blob/main/verifyml/model_card_toolkit/schema/v0.0.4/model_card.schema.json.",
       "type": "object",
       "title": "Model Card",
-      "description": "A model card describes the intended uses of a machine learning model and potential limitations, including biases and ethical considerations. Model cards typically contain the training parameters, which datasets were used to train the model, performance metrics, and other relevant data useful for ML transparency. This object SHOULD be specified for any component of type `machine-learning-model` and MUST NOT be specified for other component types.",
+      "description": "A model card describes the intended uses of a machine learning model and potential limitations, including biases and ethical considerations. Model cards typically contain the training parameters, which datasets were used to train the model, performance metrics, and other relevant data useful for ML transparency. This object SHOULD be specified for any component of type `machine-learning-model` and must not be specified for other component types.",
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "modelParameters": {
           "type": "object",
@@ -3384,6 +3391,7 @@
                           }
                         ],
                         "title": "Reference",
+                        "type": "string",
                         "description": "References a data component by the components bom-ref attribute"
                       }
                     }
@@ -3492,7 +3500,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
-          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -3526,7 +3534,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the dataset elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An optional identifier which can be used to reference the dataset elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "type": {
           "type": "string",
@@ -3642,10 +3650,12 @@
       "properties": {
         "organization": {
           "title": "Organization",
+          "description": "The organization that is responsible for specific data governance role(s).",
           "$ref": "#/definitions/organizationalEntity"
         },
         "contact": {
           "title": "Individual",
+          "description": "The individual that is responsible for specific data governance role(s).",
           "$ref": "#/definitions/organizationalContact"
         }
       },
@@ -3695,7 +3705,7 @@
         },
         "image": {
           "title": "Graphic Image",
-          "description": "The graphic (vector or raster). Base64 encoding MUST be specified for binary images.",
+          "description": "The graphic (vector or raster). Base64 encoding must be specified for binary images.",
           "$ref": "#/definitions/attachment"
         }
       }
@@ -3807,6 +3817,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -3877,6 +3888,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -3952,7 +3964,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the energy provider elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An optional identifier which can be used to reference the energy provider elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "description": {
@@ -3963,6 +3975,7 @@
         "organization": {
           "type": "object",
           "title": "Organization",
+          "description": "The organization that provides energy.",
           "$ref": "#/definitions/organizationalEntity"
         },
         "energySource": {
@@ -4019,7 +4032,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the address elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An optional identifier which can be used to reference the address elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "country": {
@@ -4077,7 +4090,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the formula elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An optional identifier which can be used to reference the formula elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "components": {
@@ -4111,6 +4124,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4131,7 +4145,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the workflow elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An optional identifier which can be used to reference the workflow elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "uid": {
@@ -4258,6 +4272,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4278,7 +4293,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the task elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An optional identifier which can be used to reference the task elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "uid": {
@@ -4386,6 +4401,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4418,6 +4434,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4436,6 +4453,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4454,7 +4472,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the workspace elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An optional identifier which can be used to reference the workspace elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "uid": {
@@ -4536,6 +4554,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4596,6 +4615,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4615,7 +4635,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the trigger elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An optional identifier which can be used to reference the trigger elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "uid": {
@@ -4661,6 +4681,7 @@
         "conditions": {
           "type": "array",
           "title": "Conditions",
+          "description": "A list of conditions used to determine if a trigger should be activated.",
           "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/condition"
@@ -4699,6 +4720,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4745,6 +4767,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4839,6 +4862,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4926,6 +4950,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -4991,6 +5016,7 @@
         "properties": {
           "type": "array",
           "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -5161,7 +5187,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
         },
         "name": {
           "type": "string",
@@ -5195,7 +5221,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
               },
               "identifier": {
                 "type": "string",
@@ -5240,7 +5266,7 @@
               "properties": {
                 "type": "array",
                 "title": "Properties",
-                "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+                "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
                 "items": {
                   "$ref": "#/definitions/property"
                 }
@@ -5268,7 +5294,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
               },
               "identifier": {
                 "type": "string",
@@ -5420,7 +5446,7 @@
             },
             "implementationPlatform": {
               "type": "string",
-              "title": "implementation platform",
+              "title": "Implementation platform",
               "description": "The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.",
               "enum": [
                 "generic",
@@ -5835,7 +5861,7 @@
             "ikev2TransformTypes": {
               "type": "object",
               "title": "IKEv2 Transform Types",
-              "description": "The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2, and additional properties.",
+              "description": "The IKEv2 transform types supported (types 1-4), defined in [RFC 7296 section 3.3.2](https://www.ietf.org/rfc/rfc7296.html#section-3.3.2), and additional properties.",
               "additionalProperties": false,
               "properties": {
                 "encr": {
@@ -5856,7 +5882,7 @@
                 "ke": {
                   "$ref": "#/definitions/cryptoRefArray",
                   "title": "Key Exchange Method (KE)",
-                  "description": "Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)"
+                  "description": "Transform Type 4: Key Exchange Method (KE) per [RFC 9370](https://www.ietf.org/rfc/rfc9370.html), formerly called Diffie-Hellman Group (D-H)."
                 },
                 "esn": {
                   "type": "boolean",

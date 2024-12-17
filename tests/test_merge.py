@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import copy
 import json
 import unittest
 
@@ -701,20 +700,6 @@ class TestReplaceBomRefs(unittest.TestCase):
 
 
 class TestMergeComponents(unittest.TestCase):
-    list_of_component_names = [
-        "component_1",
-        "component_2",
-        "component_3",
-        "component_4",
-        "component_1_sub_1",
-        "component_2_sub_1",
-        "component_2_sub_2",
-        "component_2_sub_1_sub_1",
-        "component_4_sub_1",
-        "component_4_sub_1_sub_1",
-        "component_4_sub_1_sub_2",
-    ]
-
     def test_merge_components(self) -> None:
         sub_sub_program = load_additional_sbom_dict()["sub_sub_program"]
         sub_program = load_sub_program()
@@ -744,39 +729,39 @@ class TestMergeComponents(unittest.TestCase):
         # - top level component not present, sublevel component present
         #   sub_sub component not present
         # - top level not present, sub_sub present
-        components = helper.create_components(self.list_of_component_names)
-
-        component_1 = components["component_1"]
-        component_2 = components["component_2"]
-        component_3 = components["component_3"]
-        component_4 = components["component_4"]
-        component_1_sub_1 = components["component_1_sub_1"]
-        component_2_sub_1 = components["component_2_sub_1"]
-        component_2_sub_2 = components["component_2_sub_2"]
-        component_2_sub_1_sub_1 = components["component_2_sub_1_sub_1"]
-        component_4_sub_1 = components["component_4_sub_1"]
-        component_4_sub_1_sub_1 = components["component_4_sub_1_sub_1"]
-        component_4_sub_1_sub_2 = components["component_4_sub_1_sub_2"]
-
+        components = load_sections_for_test_sbom()["hierarchical_components"]
         present_components = [
-            ComponentIdentity.create(component_1, allow_unsafe=True),
-            ComponentIdentity.create(component_3, allow_unsafe=True),
-            ComponentIdentity.create(component_2_sub_1, allow_unsafe=True),
-            ComponentIdentity.create(component_4_sub_1_sub_2, allow_unsafe=True),
+            ComponentIdentity.create(components["component_1"], allow_unsafe=True),
+            ComponentIdentity.create(components["component_3"], allow_unsafe=True),
+            ComponentIdentity.create(
+                components["component_2_sub_1"], allow_unsafe=True
+            ),
+            ComponentIdentity.create(
+                components["component_4_sub_1_sub_2"], allow_unsafe=True
+            ),
         ]
 
-        component_1["components"] = [component_1_sub_1]
+        components["component_1"]["components"] = [components["component_1_sub_1"]]
 
-        component_2["components"] = [component_2_sub_1, component_2_sub_2]
-        component_2_sub_1["components"] = [component_2_sub_1_sub_1]
-
-        component_4["components"] = [component_4_sub_1]
-        component_4_sub_1["components"] = [
-            component_4_sub_1_sub_1,
-            component_4_sub_1_sub_2,
+        components["component_2"]["components"] = [
+            components["component_2_sub_1"],
+            components["component_2_sub_2"],
+        ]
+        components["component_2_sub_1"]["components"] = [
+            components["component_2_sub_1_sub_1"]
         ]
 
-        new_components = [component_1, component_2, component_4]
+        components["component_4"]["components"] = [components["component_4_sub_1"]]
+        components["component_4_sub_1"]["components"] = [
+            components["component_4_sub_1_sub_1"],
+            components["component_4_sub_1_sub_2"],
+        ]
+
+        new_components = [
+            components["component_1"],
+            components["component_2"],
+            components["component_4"],
+        ]
 
         kept_components: list[dict] = []
         dropped_components: list[dict] = []
@@ -791,12 +776,12 @@ class TestMergeComponents(unittest.TestCase):
         )
 
         add_to_existing_expected = {
-            ComponentIdentity.create(component_1, allow_unsafe=True): [
-                component_1_sub_1
+            ComponentIdentity.create(components["component_1"], allow_unsafe=True): [
+                components["component_1_sub_1"]
             ],
-            ComponentIdentity.create(component_2_sub_1, allow_unsafe=True): [
-                component_2_sub_1_sub_1
-            ],
+            ComponentIdentity.create(
+                components["component_2_sub_1"], allow_unsafe=True
+            ): [components["component_2_sub_1_sub_1"]],
         }
 
         add_to_existing_identical = True
@@ -805,13 +790,13 @@ class TestMergeComponents(unittest.TestCase):
                 add_to_existing_identical = False
 
         kept_components_expected = [
-            component_2,
-            component_4_sub_1_sub_1,
-            component_4_sub_1,
-            component_2_sub_1_sub_1,
-            component_2_sub_2,
-            component_1_sub_1,
-            component_4,
+            components["component_2"],
+            components["component_4_sub_1_sub_1"],
+            components["component_4_sub_1"],
+            components["component_2_sub_1_sub_1"],
+            components["component_2_sub_2"],
+            components["component_1_sub_1"],
+            components["component_4"],
         ]
 
         kept_components_identical = True
@@ -828,44 +813,31 @@ class TestMergeComponents(unittest.TestCase):
         self.assertTrue(kept_components_identical)
 
     def test_merge_hierarchical(self) -> None:
-        components = helper.create_components(self.list_of_component_names)
-        component_1 = copy.deepcopy(components["component_1"])
-        component_2 = copy.deepcopy(components["component_2"])
-        component_3 = copy.deepcopy(components["component_3"])
-        component_4 = copy.deepcopy(components["component_4"])
-        component_1_sub_1 = copy.deepcopy(components["component_1_sub_1"])
-        component_2_sub_1 = copy.deepcopy(components["component_2_sub_1"])
-        component_2_sub_2 = copy.deepcopy(components["component_2_sub_2"])
-        component_2_sub_1_sub_1 = copy.deepcopy(components["component_2_sub_1_sub_1"])
-        component_4_sub_1 = copy.deepcopy(components["component_4_sub_1"])
-        component_4_sub_1_sub_1 = copy.deepcopy(components["component_4_sub_1_sub_1"])
-        component_4_sub_1_sub_2 = copy.deepcopy(components["component_4_sub_1_sub_2"])
+        components = load_sections_for_test_sbom()["hierarchical_components"]
 
         present_components = [
-            ComponentIdentity.create(component_1, allow_unsafe=True),
-            ComponentIdentity.create(component_3, allow_unsafe=True),
-            ComponentIdentity.create(component_2_sub_1, allow_unsafe=True),
-            ComponentIdentity.create(component_4_sub_1_sub_2, allow_unsafe=True),
+            ComponentIdentity.create(components["component_1"], allow_unsafe=True),
+            ComponentIdentity.create(components["component_3"], allow_unsafe=True),
+            ComponentIdentity.create(
+                components["component_2_sub_1"], allow_unsafe=True
+            ),
+            ComponentIdentity.create(
+                components["component_4_sub_1_sub_2"], allow_unsafe=True
+            ),
         ]
 
         present_components = [
-            copy.deepcopy(component_1),
-            copy.deepcopy(component_3),
-            copy.deepcopy(component_2_sub_1),
-            copy.deepcopy(component_4_sub_1_sub_2),
-        ]
-        component_1["components"] = [component_1_sub_1]
-
-        component_2["components"] = [component_2_sub_1, component_2_sub_2]
-        component_2_sub_1["components"] = [component_2_sub_1_sub_1]
-
-        component_4["components"] = [component_4_sub_1]
-        component_4_sub_1["components"] = [
-            component_4_sub_1_sub_1,
-            component_4_sub_1_sub_2,
+            components["component_1"],
+            components["component_3"],
+            components["component_2_sub_1"],
+            components["component_4_sub_1_sub_2"],
         ]
 
-        new_components = [component_1, component_2, component_4]
+        new_components = [
+            components["component_1"],
+            components["component_2"],
+            components["component_4"],
+        ]
 
         merged_components = merge.merge_components(
             {"components": present_components},
@@ -873,35 +845,7 @@ class TestMergeComponents(unittest.TestCase):
             hierarchical=True,
         )
 
-        # create expected result
-        components_expected = helper.create_components(self.list_of_component_names)
-
-        components_expected["component_1"]["components"] = [
-            components_expected["component_1_sub_1"]
-        ]
-
-        components_expected["component_2"]["components"] = [
-            components_expected["component_2_sub_2"]
-        ]
-        components_expected["component_2_sub_1"]["components"] = [
-            components_expected["component_2_sub_1_sub_1"]
-        ]
-
-        components_expected["component_4"]["components"] = [
-            components_expected["component_4_sub_1"]
-        ]
-        components_expected["component_4_sub_1"]["components"] = [
-            components_expected["component_4_sub_1_sub_1"],
-        ]
-
-        expected_components = [
-            components_expected["component_1"],
-            components_expected["component_3"],
-            components_expected["component_2_sub_1"],
-            components_expected["component_4_sub_1_sub_2"],
-            components_expected["component_2"],
-            components_expected["component_4"],
-        ]
+        expected_components = load_sections_for_test_sbom()["hierarchical_expected"]
 
         self.assertEqual(merged_components, expected_components)
 

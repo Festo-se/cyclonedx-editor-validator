@@ -1,22 +1,22 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
-  "version": 1,
+  "version": 2,
   "metadata": {
-    "timestamp": "2022-10-17T19:59:12",
+    "timestamp": "2024-12-17T21:55:36+00:00",
     "authors": [
       {
         "name": "automated"
       }
     ],
     "component": {
-      "type": "library",
-      "bom-ref": "sub_program",
+      "type": "application",
+      "bom-ref": "governing_program",
       "supplier": {
         "name": "Company Legal"
       },
       "group": "com.company.governing",
-      "name": "sub_program",
+      "name": "governing_program",
       "version": "T5.0.3.96",
       "licenses": [
         {
@@ -26,9 +26,163 @@
         }
       ],
       "copyright": "Company Legal 2022, all rights reserved"
+    },
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "cyclonedx-editor-validator",
+          "publisher": "Festo SE & Co. KG",
+          "version": "0.0.0"
+        }
+      ]
     }
   },
   "components": [
+    {
+      "type": "library",
+      "bom-ref": "sub_program",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "name": "sub_program",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "T5.0.3.96"
+    },
+    {
+      "type": "library",
+      "bom-ref": "gp_first_component-copy",
+      "supplier": {
+        "name": "The first component Contributors"
+      },
+      "name": "gp_first_component",
+      "version": "2.24.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "gov_comp_1",
+      "name": "gov_comp_1",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "5.0.3.96",
+      "components": [
+        {
+          "type": "library",
+          "bom-ref": "gov_comp_1_sub_1",
+          "name": "gov_comp_1_sub_1",
+          "supplier": {
+            "name": "Company Legal"
+          },
+          "group": "com.company.governing",
+          "copyright": "Company Legal 2022, all rights reserved",
+          "version": "5.0.3.96",
+          "components": [
+            {
+              "type": "library",
+              "bom-ref": "gov_comp_1_sub_1_sub_1",
+              "name": "gov_comp_1_sub_1_sub_1",
+              "supplier": {
+                "name": "Company Legal"
+              },
+              "group": "com.company.governing",
+              "copyright": "Company Legal 2022, all rights reserved",
+              "version": "5.0.3.96"
+            },
+            {
+              "type": "library",
+              "bom-ref": "gov_comp_1_sub_1_sub_2",
+              "name": "gov_comp_1_sub_1_sub_2",
+              "supplier": {
+                "name": "Company Legal"
+              },
+              "group": "com.company.governing",
+              "copyright": "Company Legal 2022, all rights reserved",
+              "version": "5.0.3.96"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "bom-ref": "gov_comp_1_sub_2",
+          "name": "gov_comp_1_sub_2",
+          "supplier": {
+            "name": "Company Legal"
+          },
+          "group": "com.company.governing",
+          "copyright": "Company Legal 2022, all rights reserved",
+          "version": "5.0.3.96"
+        },
+        {
+          "type": "library",
+          "bom-ref": "Should not disappear!",
+          "name": "some deep sub component",
+          "supplier": {
+            "name": "Company Legal"
+          },
+          "group": "com.company.governing",
+          "copyright": "Company Legal 2022, all rights reserved",
+          "version": "5.0.3.96"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "gov_comp_2",
+      "name": "gov_comp_2",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "5.0.3.96",
+      "components": [
+        {
+          "type": "library",
+          "bom-ref": "gov_comp_2_sub_1",
+          "name": "gov_comp_2_sub_1",
+          "supplier": {
+            "name": "Company Legal"
+          },
+          "group": "com.company.governing",
+          "copyright": "Company Legal 2022, all rights reserved",
+          "version": "5.0.3.96"
+        },
+        {
+          "type": "library",
+          "bom-ref": "gov_comp_2_sub_2",
+          "name": "gov_comp_2_sub_2",
+          "supplier": {
+            "name": "Company Legal"
+          },
+          "group": "com.company.governing",
+          "copyright": "Company Legal 2022, all rights reserved",
+          "version": "5.0.3.96",
+          "components": []
+        },
+        {
+          "type": "library",
+          "bom-ref": "gov_comp_2_sub_3",
+          "name": "gov_comp_2_sub_3",
+          "supplier": {
+            "name": "Company Legal"
+          },
+          "group": "com.company.governing",
+          "copyright": "Company Legal 2022, all rights reserved",
+          "version": "5.0.3.96"
+        }
+      ]
+    },
     {
       "type": "library",
       "bom-ref": "sp_first_component",
@@ -411,46 +565,47 @@
     },
     {
       "type": "library",
-      "bom-ref": "gp_first_component-copy",
+      "bom-ref": "merged_comp_1",
+      "name": "merged_comp_1",
       "supplier": {
-        "name": "The first component Contributors"
+        "name": "Company Legal"
       },
-      "name": "gp_first_component",
-      "version": "2.24.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
+      "group": "com.company.governing",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "5.0.3.96",
       "components": [
         {
           "type": "library",
-          "bom-ref": "sub_sub_program",
+          "bom-ref": "merged_comp_1_sub_1",
+          "name": "merged_comp_1_sub_1",
           "supplier": {
             "name": "Company Legal"
           },
           "group": "com.company.governing",
-          "name": "sub_sub_program",
           "copyright": "Company Legal 2022, all rights reserved",
-          "version": "T5.0.3.96"
+          "version": "5.0.3.96"
         },
         {
           "type": "library",
-          "bom-ref": "gp_first_component-copy",
+          "bom-ref": "merged_comp_1_sub_2",
+          "name": "merged_comp_1_sub_2",
           "supplier": {
-            "name": "The first component Contributors"
+            "name": "Company Legal"
           },
-          "name": "gp_first_component",
-          "version": "2.24.0",
-          "licenses": [
-            {
-              "license": {
-                "id": "Apache-2.0"
-              }
-            }
-          ]
+          "group": "com.company.governing",
+          "copyright": "Company Legal 2022, all rights reserved",
+          "version": "5.0.3.96"
+        },
+        {
+          "type": "library",
+          "bom-ref": "merged_comp_1_sub_3",
+          "name": "merged_comp_1_sub_3",
+          "supplier": {
+            "name": "Company Legal"
+          },
+          "group": "com.company.governing",
+          "copyright": "Company Legal 2022, all rights reserved",
+          "version": "5.0.3.96"
         }
       ]
     }
@@ -541,20 +696,25 @@
     {
       "ref": "sp_fifteenth_component",
       "dependsOn": []
+    },
+    {
+      "ref": "governing_program",
+      "dependsOn": [
+        "sub_program",
+        "gp_first_component-copy"
+      ]
+    },
+    {
+      "ref": "gp_first_component-copy",
+      "dependsOn": []
     }
   ],
   "compositions": [
     {
-      "aggregate": "complete",
-      "assemblies": [
-        "sp_first_component",
-        "sp_second_component",
-        "sp_fourth_component"
-      ]
-    },
-    {
       "aggregate": "incomplete",
       "assemblies": [
+        "sub_program",
+        "gp_first_component-copy",
         "sp_fifth_component",
         "sp_sixth_component",
         "sp_seventh_component",
@@ -568,6 +728,14 @@
         "sp_sixteenth_component",
         "sp_seventeenth_component",
         "sp_fifteenth_component"
+      ]
+    },
+    {
+      "aggregate": "complete",
+      "assemblies": [
+        "sp_first_component",
+        "sp_second_component",
+        "sp_fourth_component"
       ]
     }
   ],
@@ -641,5 +809,6 @@
         }
       ]
     }
-  ]
+  ],
+  "serialNumber": "urn:uuid:d1feafb2-b64a-46ac-9231-2576172cd354"
 }

@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import copy
 import typing as t
 
 
@@ -95,12 +94,12 @@ def search_entry(haystack: dict, key: t.Any, value: t.Any) -> t.Optional[dict]:
     return _recurse(haystack)
 
 
-def create_components() -> dict:
+def create_test_component(name: str, version: str = "1.0.0") -> dict:
     components_list: list[dict] = []
-    base_component = {
-        "name": "base_component",
+    return {
+        "name": name,
         "version": "1.0.0",
-        "bom-ref": "base_component",
+        "bom-ref": name,
         "components": components_list,
         "type": "library",
         "supplier": {"name": "Company Legal"},
@@ -108,61 +107,10 @@ def create_components() -> dict:
         "copyright": "Company Legal 2022, all rights reserved",
     }
 
-    component_1 = copy.deepcopy(base_component)
-    component_1["name"] = "component_1"
-    component_1["bom-ref"] = "component_1"
 
-    component_2 = copy.deepcopy(base_component)
-    component_2["name"] = "component_2"
-    component_2["bom-ref"] = "component_2"
+def create_components(list_of_names: list[str]) -> dict:
+    components: dict[str, dict] = {}
+    for name in list_of_names:
+        components[name] = create_test_component(name)
 
-    component_3 = copy.deepcopy(base_component)
-    component_3["name"] = "component_3"
-    component_3["bom-ref"] = "component_3"
-
-    component_4 = copy.deepcopy(base_component)
-    component_4["name"] = "component_4"
-    component_4["bom-ref"] = "component_4"
-
-    component_1_sub_1 = copy.deepcopy(base_component)
-    component_1_sub_1["name"] = "component_1_sub_1"
-    component_1_sub_1["bom-ref"] = "component_1_sub_1"
-
-    component_2_sub_1 = copy.deepcopy(base_component)
-    component_2_sub_1["name"] = "component_2_sub_1"
-    component_2_sub_1["bom-ref"] = "component_2_sub_1"
-
-    component_2_sub_2 = copy.deepcopy(base_component)
-    component_2_sub_2["name"] = "component_2_sub_2"
-    component_2_sub_2["bom-ref"] = "component_2_sub_2"
-
-    component_2_sub_1_sub_1 = copy.deepcopy(base_component)
-    component_2_sub_1_sub_1["name"] = "component_2_sub_1_sub_1"
-    component_2_sub_1_sub_1["bom-ref"] = "component_2_sub_1_sub_1"
-
-    component_4_sub_1 = copy.deepcopy(base_component)
-    component_4_sub_1["name"] = "component_4_sub_1"
-    component_4_sub_1["bom-ref"] = "component_4_sub_1"
-
-    component_4_sub_1_sub_1 = copy.deepcopy(base_component)
-    component_4_sub_1_sub_1["name"] = "component_4_sub_1_sub_1"
-    component_4_sub_1_sub_1["bom-ref"] = "component_4_sub_1_sub_1"
-
-    component_4_sub_1_sub_2 = copy.deepcopy(base_component)
-    component_4_sub_1_sub_2["name"] = "component_4_sub_1_sub_2"
-    component_4_sub_1_sub_2["bom-ref"] = "component_4_sub_1_sub_2"
-
-    components = {
-        "component_1": component_1,
-        "component_2": component_2,
-        "component_3": component_3,
-        "component_4": component_4,
-        "component_1_sub_1": component_1_sub_1,
-        "component_2_sub_1": component_2_sub_1,
-        "component_2_sub_2": component_2_sub_2,
-        "component_2_sub_1_sub_1": component_2_sub_1_sub_1,
-        "component_4_sub_1": component_4_sub_1,
-        "component_4_sub_1_sub_1": component_4_sub_1_sub_1,
-        "component_4_sub_1_sub_2": component_4_sub_1_sub_2,
-    }
     return components

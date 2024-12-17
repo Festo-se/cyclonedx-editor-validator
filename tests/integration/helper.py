@@ -17,6 +17,12 @@ def load_sbom(path: Path) -> dict:
     return sbom
 
 
+def load_list(path: Path) -> dict:
+    with path.open() as f:
+        list = f.read()
+    return list
+
+
 def delete_non_reproducible(sbom: dict):
     """
     Deletes any fields from the SBOM that are typically not reproducible between builds.
@@ -24,8 +30,11 @@ def delete_non_reproducible(sbom: dict):
     """
     _delete_tool_version(sbom)
 
-    del sbom["serialNumber"]
-    del sbom["metadata"]["timestamp"]
+    if "serialNumber" in sbom:
+        del sbom["serialNumber"]
+    if "metadata" in sbom:
+        if "timestamp" in sbom["metadata"]:
+            del sbom["metadata"]["timestamp"]
 
 
 def _delete_tool_version(sbom: dict):

@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import copy
 import json
 import unittest
-import copy
 
 from cdxev import merge
 from cdxev.auxiliary import sbomFunctions as sbF

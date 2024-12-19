@@ -2,6 +2,7 @@
 
 import json
 import unittest
+import copy
 
 from cdxev import merge
 from cdxev.auxiliary import sbomFunctions as sbF
@@ -811,6 +812,27 @@ class TestMergeComponents(unittest.TestCase):
         self.assertTrue(len(kept_components) == len(kept_components_expected))
         self.assertTrue(add_to_existing_identical)
         self.assertTrue(kept_components_identical)
+
+    def test_individual_merge_cases(self) -> None:
+        test_cases = load_sections_for_test_sbom()["singled_out_test_cases"]
+
+        for key in test_cases.keys():
+            original = test_cases[key]["original"]
+            new = test_cases[key]["new"]
+            merged_hr = test_cases[key]["merged_hr"]
+            merged_nm = test_cases[key]["merged_normal"]
+            merged_hierarchical = merge.merge_components(
+                copy.deepcopy({"components": original}),
+                copy.deepcopy({"components": new}),
+                hierarchical=True,
+            )
+            merged_normal = merge.merge_components(
+                copy.deepcopy({"components": original}),
+                copy.deepcopy({"components": new}),
+            )
+
+            self.assertCountEqual(merged_hierarchical, merged_hr)
+            self.assertCountEqual(merged_normal, merged_nm)
 
     def test_merge_hierarchical(self) -> None:
         components = load_sections_for_test_sbom()["hierarchical_components"]

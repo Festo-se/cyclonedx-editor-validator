@@ -92,25 +92,3 @@ def search_entry(haystack: dict, key: t.Any, value: t.Any) -> t.Optional[dict]:
         return None
 
     return _recurse(haystack)
-
-
-def create_test_component(name: str, version: str = "1.0.0") -> dict:
-    components_list: list[dict] = []
-    return {
-        "name": name,
-        "version": "1.0.0",
-        "bom-ref": name,
-        "components": components_list,
-        "type": "library",
-        "supplier": {"name": "Company Legal"},
-        "group": "com.company.governing",
-        "copyright": "Company Legal 2022, all rights reserved",
-    }
-
-
-def create_components(list_of_names: list[str]) -> dict:
-    components: dict[str, dict] = {}
-    for name in list_of_names:
-        components[name] = create_test_component(name)
-
-    return components

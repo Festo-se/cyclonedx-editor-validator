@@ -29,7 +29,10 @@ The ``--hierarchical`` flag allows for hierarchical merges.
 .. image:: /img/merge_hierarchical_structure_1.svg
     :alt: Merge components structure default and hierarchical.
 
-    .. image:: /img/merge_hierarchical_structure_2.svg
+.. image:: /img/merge_hierarchical_structure_2.svg
+    :alt: Merge components structure and hierarchical.
+
+.. image:: /img/merge_hierarchical_structure_3.svg
     :alt: Merge components structure and hierarchical.
 
 A few notes on the merge algorithm:

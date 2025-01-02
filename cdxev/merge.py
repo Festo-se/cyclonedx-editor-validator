@@ -16,6 +16,7 @@ from cdxev.auxiliary.sbomFunctions import (
 )
 from cdxev.log import LogMessage
 from univers.version_range import VersionRange
+from univers.versions import nuget
 
 logger = logging.getLogger(__name__)
 
@@ -345,7 +346,7 @@ def get_ids_from_vulnerability(vulnerability: dict) -> list[str]:
 
 
 def _only_one_item_is_none(
-    first_item: t.Union[t.any, None], second_item: t.Union[t.any, None]
+    first_item: t.Union[t.Any, None], second_item: t.Union[t.Any, None]
 ) -> bool:
     if first_item is None and second_item is not None:
         return True
@@ -396,11 +397,28 @@ def compare_affects_range(
     return 1
 
 
+def version_is_in_version_range(version: str, version_range: str) -> bool:
+
+    range_object = VersionRange.from_string(version_range)
+    version_class = range_object.version_class
+    try:
+        if version_class.is_valid(version):
+            return version_class(version) in range_object
+        else:
+            return False
+    except nuget.InvalidNuGetVersion:
+        return False
+
+
 def compare_affects_objects(
     first_affects_object: dict, second_affects_object: dict
 ) -> int:
     """
     Compares two affect entries.
+    Intersections of version ranges are not considered.
+    E.g. ">=2.0.0" "<=2.0.0" are considered != even through
+    they share the intersection "2.0.0".
+
 
     Returns:
         -1 first_affects_object <= second_affects_object: dict
@@ -416,17 +434,29 @@ def compare_affects_objects(
     first_versions = first_affects_object.get("versions", None)
     second_versions = second_affects_object.get("versions", None)
 
-
-# Check version against version range or at least try
     if _only_one_item_is_none(first_versions, second_versions):
-        return# Check version against version range or at least try 
-
+        return 0
     if first_versions is not None and second_versions is not None:
+        # Check if the version in the second object id is part of the range in the first
+        if first_versions.get("range", "") and second_versions.get("version", ""):
+            if version_is_in_version_range(
+                first_versions.get("range", ""), second_versions.get("version", "")
+            ):
+                return 2
+
+        # Check if the version in the first object id is part of the range in the second
+        if first_versions.get("version", "") and second_versions.get("range", ""):
+            if version_is_in_version_range(
+                second_versions.get("range", ""), first_versions.get("version", "")
+            ):
+                return -1
+
         if not compare_affects_version(
             first_versions.get("version", None), second_versions.get("version", None)
         ):
             return 0
 
+        # TODO: check for intersections of version ranges
         range_comparison = compare_affects_range(
             first_versions.get("range", None), second_versions.get("range", None)
         )
@@ -438,18 +468,7 @@ def compare_affects_objects(
 
         if range_comparison == -1:
             return -1
-            first_range = first_affects_entry.get("range", None)
-            second_range = second_affects_entry.get("range", None)
-            logger.warning(
-                LogMessage(
-                    "Potential loss of information",
-                    (
-                        "Affects have overlapping ranges."
-                        f" Keeping vulnerability with range ({first_range})"
-                        f" Dropping vulnerability with range ({second_range})"
-                    ),
-                )
-            )
+
         return 2
     else:
         return 1
@@ -467,9 +486,6 @@ def compare_vulnerability_ids(
             is_equal = True
 
     return is_equal
-
-
-
 
 
 def vulnerability_affects_are_disjunct(
@@ -491,7 +507,10 @@ def vulnerability_affects_is_identical(
     for new_affects_object in new_affects_list:
         is_in = False
         for orginial_affects_object in original_affects_list:
-            if compare_affects_objects(new_affects_object, orginial_affects_object) == 1:
+            if (
+                compare_affects_objects(new_affects_object, orginial_affects_object)
+                == 1
+            ):
                 is_in = True
         if not is_in:
             return False
@@ -527,8 +546,9 @@ def merge_vulnerabilities_2(
                 is_in = True
                 # Check affects: 3 cases
                 # 1. complete disjunct => two different vulnerability objects, keep both
-                # 2. new affects are a subset of the original vulnerabilities => drop with warning 
-                # 3. the affects have overlap => drop all already present affect objects and throw a warning
+                # 2. new affects are a subset of the original vulnerabilities => drop with warning
+                # 3. the affects have overlap => drop all already present affect objects and throw
+                #    a warning
                 #    keep the "cleaned" vulnerability object
 
                 # TODO: This comparison takes only individual affect objects into account

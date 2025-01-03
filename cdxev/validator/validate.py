@@ -100,9 +100,11 @@ def validate_sbom(
         )
         for error in sorted(v.iter_errors(sbom), key=str):
             try:
-                if error.validator == "required" and error.validator_value == [
-                    "this_is_an_externally_described_component"
-                ]:
+                if (
+                    error.validator == "required"  # type: ignore[comparison-overlap]
+                    and error.validator_value
+                    == ["this_is_an_externally_described_component"]
+                ):
                     # This requirement in the schema allows us to produce warnings.
                     comp = t.cast(dict, error.instance)
                     if "bom-ref" in comp:
@@ -202,7 +204,7 @@ def validate_sbom(
                     errors.append(
                         f"{error_path}'{error.absolute_path[-1]}' should not be empty"
                     )
-                elif error.validator == "pattern":
+                elif error.validator == "pattern":  # type: ignore[comparison-overlap]
                     errors.append(error_path + error.message.replace("\\", ""))
                 else:
                     errors.append(error_path + error.message)

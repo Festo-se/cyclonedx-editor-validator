@@ -339,62 +339,28 @@ def get_ids_from_vulnerability(vulnerability: dict) -> list[str]:
 
     for reference in references:
         id = reference.get("id", None)
-        if id is not None:
+        if id is not None and id not in ids_vulnerability:
             ids_vulnerability.append(id)
 
     return ids_vulnerability
 
 
-def _only_one_item_is_none(
-    first_item: t.Union[t.Any, None], second_item: t.Union[t.Any, None]
-) -> bool:
-    if first_item is None and second_item is not None:
+def compare_version_range(first_range: str, second_range: str) -> bool:
+    # TODO extend to compare <= >= when supported
+
+    # first compare the strings themselves
+    # if the version scheme is unknown, but
+    # the strings are identical a comparison can still be performed
+    if first_range == second_range:
         return True
-
-    if first_item is not None and second_item is None:
-        return True
-
-    return False
-
-
-def compare_affects_version(
-    first_version: t.Union[str, None], second_version: t.Union[str, None]
-) -> bool:
-    if _only_one_item_is_none(first_version, second_version):
-        return False
-
-    if first_version != second_version:
-        return False
-    return True
-
-
-def compare_affects_range(
-    first_range: t.Union[str, None], second_range: t.Union[str, None]
-) -> int:
-    """
-    Function to compare two affects version ranges:
-    return:
-        -1 first_range <= second_range
-        0 first_range != second_range
-        1 first_range == second_range
-        2 first_range >= second_range
-    """
-    if _only_one_item_is_none(first_range, second_range):
-        return 2
 
     first_range_object = VersionRange.from_string(second_range)
     second_range_object = VersionRange.from_string(first_range)
 
     if first_range_object == second_range_object:
-        return 1
+        return True
 
-    if first_range_object <= second_range_object:
-        return -1
-
-    if first_range_object >= second_range_object:
-        return 2
-
-    return 1
+    return False
 
 
 def version_is_in_version_range(version: str, version_range: str) -> bool:
@@ -410,68 +376,145 @@ def version_is_in_version_range(version: str, version_range: str) -> bool:
         return False
 
 
-def compare_affects_objects(
+def compare_affects_versions_object(
     first_affects_object: dict, second_affects_object: dict
 ) -> int:
     """
-    Compares two affect entries.
-    Intersections of version ranges are not considered.
-    E.g. ">=2.0.0" "<=2.0.0" are considered != even through
-    they share the intersection "2.0.0".
+    Function to compare two affects version objects.
+    If version and range are present and both are not none, version will be considered.
 
-
-    Returns:
-        -1 first_affects_object <= second_affects_object: dict
-        0 first_affects_object != second_affects_object: dict
-        1 first_affects_object == second_affects_object: dict
-        2 first_affects_object >= second_affects_object: dict
+    return:
+        -1 first_affects_versions_object <= second_affects_versions_object
+        0 first_affects_versions_object != second_affects_versions_object
+        1 first_affects_versions_object == second_affects_versions_object
+        2 first_affects_versions_object >= second_affects_versions_object
+        3 inconclusive
     """
-    if first_affects_object.get("ref", "first_ref") != second_affects_object.get(
-        "ref", "second_ref"
+    if (
+        first_affects_object.get("version", None) is not None
+        and second_affects_object.get("version", None) is not None
     ):
-        return 0
-
-    first_versions = first_affects_object.get("versions", None)
-    second_versions = second_affects_object.get("versions", None)
-
-    if _only_one_item_is_none(first_versions, second_versions):
-        return 0
-    if first_versions is not None and second_versions is not None:
-        # Check if the version in the second object id is part of the range in the first
-        if first_versions.get("range", "") and second_versions.get("version", ""):
-            if version_is_in_version_range(
-                first_versions.get("range", ""), second_versions.get("version", "")
-            ):
-                return 2
-
-        # Check if the version in the first object id is part of the range in the second
-        if first_versions.get("version", "") and second_versions.get("range", ""):
-            if version_is_in_version_range(
-                second_versions.get("range", ""), first_versions.get("version", "")
-            ):
-                return -1
-
-        if not compare_affects_version(
-            first_versions.get("version", None), second_versions.get("version", None)
+        if first_affects_object.get("version", None) == second_affects_object.get(
+            "version", None
         ):
+            return 1
+        else:
             return 0
 
-        # TODO: check for intersections of version ranges
-        range_comparison = compare_affects_range(
-            first_versions.get("range", None), second_versions.get("range", None)
-        )
-        if range_comparison == 0:
+    if (
+        first_affects_object.get("range", None) is not None
+        and second_affects_object.get("version", None) is not None
+    ):
+
+        if version_is_in_version_range(
+            second_affects_object.get("version", ""),
+            first_affects_object.get("range", ""),
+        ):
+            return 2
+        else:
             return 0
 
-        if range_comparison == 1:
+    if (
+        first_affects_object.get("version", None) is not None
+        and second_affects_object.get("range", None) is not None
+    ):
+
+        if version_is_in_version_range(
+            first_affects_object.get("version", ""),
+            second_affects_object.get("range", ""),
+        ):
+            return -1
+        else:
+            return 0
+
+    if (
+        first_affects_object.get("range", None) is not None
+        and second_affects_object.get("range", None) is not None
+    ):  # TODO extend to support >= and <= for version ranges when supported
+        if compare_version_range(
+            first_affects_object.get("range", None),
+            second_affects_object.get("range", None),
+        ):
             return 1
 
-        if range_comparison == -1:
-            return -1
+    return 0
 
-        return 2
-    else:
-        return 1
+
+def get_new_affects_versions(
+    original_versions_list: list[dict],
+    new_versions_list: list[dict],
+    vuln_id: str,
+    ref: str,
+) -> list[dict]:
+    kept_versions: list[dict] = []
+    for new_version in new_versions_list:
+        for original_version in original_versions_list:
+            result = compare_affects_versions_object(original_version, new_version)
+
+            if result == 0:
+                kept_versions.append(new_version)
+
+            if result == -1:
+                (
+                    new_version.get("range", "")
+                    + "|!="
+                    + original_version.get("version", "")
+                )
+                kept_versions.append(new_version)
+
+            if result == 3:
+                logger.warning(
+                    LogMessage(
+                        "Potential loss of information",
+                        (
+                            f"Dropping a duplicate affects entry ({ref}) "
+                            "due to not comparable version ranges"
+                            f"in vulnerability {vuln_id}."
+                        ),
+                    )
+                )
+
+            if result in [1, 2]:
+                logger.warning(
+                    LogMessage(
+                        "Potential loss of information",
+                        (
+                            f"Dropping a duplicate affects entry ({ref})"
+                            f"in vulnerability {vuln_id}."
+                        ),
+                    )
+                )
+
+    return kept_versions
+
+
+def extract_new_affects(
+    original_affects_list: list[dict], new_affects_list: list[dict], vuln_id: str
+) -> list[dict]:
+    kept_affects: list[dict] = []
+
+    for new_affect in new_affects_list:
+        new_versions = new_affect.get("versions", [])
+        ref_is_in = False
+        for original_affect in original_affects_list:
+            if new_affect.get("ref", "new_ref") == original_affect.get("ref", ""):
+                ref_is_in = True
+                original_versions = original_affect.get("versions", [])
+                kept_affect_versions = get_new_affects_versions(
+                    original_versions,
+                    new_versions,
+                    vuln_id,
+                    original_affect.get("ref", ""),
+                )
+                new_affect_copy = copy.deepcopy(new_affect)
+                if kept_affect_versions:
+                    new_affect_copy["versions"] = kept_affect_versions
+                    kept_affects.append(new_affect_copy)
+
+        if not ref_is_in:
+            kept_affects.append(new_affect)
+
+    return kept_affects
 
 
 def compare_vulnerability_ids(
@@ -488,33 +531,36 @@ def compare_vulnerability_ids(
     return is_equal
 
 
-def vulnerability_affects_are_disjunct(
-    original_affects_list: list[dict], new_affects_list: list[dict]
+def versions_object_is_in_list(
+    versions_object: dict, list_of_versions_objects: list[dict]
 ) -> bool:
-    return True
+    for list_entry in list_of_versions_objects:
+        if compare_affects_versions_object(versions_object, list_entry) in [1, -1]:
+            return True
+    return False
 
 
-def vulnerability_affects_is_contained_in(
-    original_affects_list: list[dict], new_affects_list: list[dict]
-) -> bool:
-    return True
-
-
-def vulnerability_affects_is_identical(
-    original_affects_list: list[dict], new_affects_list: list[dict]
-) -> bool:
-
-    for new_affects_object in new_affects_list:
-        is_in = False
-        for orginial_affects_object in original_affects_list:
-            if (
-                compare_affects_objects(new_affects_object, orginial_affects_object)
-                == 1
-            ):
-                is_in = True
-        if not is_in:
-            return False
-    return is_in
+def collect_affects_of_vulnerabilities(
+    list_of_original_vulnerabilities: list[dict],
+) -> dict[str, list[dict]]:
+    collected_affects: dict[str, list[dict]] = {}
+    if list_of_original_vulnerabilities:
+        for n in range(len(list_of_original_vulnerabilities) - 1):
+            ids = get_ids_from_vulnerability(list_of_original_vulnerabilities[n])
+            affects = copy.deepcopy(
+                list_of_original_vulnerabilities[n].get("affects", [])
+            )
+            for k in range(n + 1, len(list_of_original_vulnerabilities)):
+                if (
+                    ids[0] not in collected_affects.keys()
+                    and get_ids_from_vulnerability(list_of_original_vulnerabilities[k])[
+                        0
+                    ]
+                    == ids[0]
+                ):
+                    affects += list_of_original_vulnerabilities[k].get("affects", [])
+            collected_affects[ids[0]] = affects
+    return collected_affects
 
 
 def merge_vulnerabilities_2(
@@ -522,7 +568,7 @@ def merge_vulnerabilities_2(
     list_of_new_vulnerabilities: list[dict],
 ) -> list[dict]:
     """
-    Merges the vulnerabilities of two sboms
+    Merges the vulnerabilities of two SBOMs
 
     Parameters
     ----------
@@ -538,6 +584,9 @@ def merge_vulnerabilities_2(
     """
     # replace old bom-refs with the bom refs of the merged sbom
     list_of_merged_vulnerabilities = copy.deepcopy(list_of_original_vulnerabilities)
+    collected_affects = collect_affects_of_vulnerabilities(
+        list_of_original_vulnerabilities
+    )
 
     for new_vulnerability in list_of_new_vulnerabilities:
         is_in = False
@@ -557,21 +606,24 @@ def merge_vulnerabilities_2(
                 # is equal to one with the entry "<=3.0.0" but for this the ranges must be checked
                 # as a whole
 
-                vuln_id = get_ids_from_vulnerability(new_vulnerability)
-                if len(vuln_id) == 0:
-                    vuln_id[0] = str(
-                        list_of_new_vulnerabilities.index(new_vulnerability)
-                    )
-
-                logger.warning(
-                    LogMessage(
-                        "Potential loss of information",
-                        (
-                            f"Dropping a duplicate vulnerability ({vuln_id[0]}) "
-                            "from the merge result."
-                        ),
-                    )
+                id = get_ids_from_vulnerability(original_vulnerability)
+                new_affects = extract_new_affects(
+                    collected_affects[id[0]],
+                    new_vulnerability.get("affects", []),
+                    id[0],
                 )
+
+                if new_affects:
+                    new_vulnerability["affects"] = new_affects
+                    list_of_merged_vulnerabilities.append(new_vulnerability)
+                    logger.warning(
+                        LogMessage(
+                            "Potential loss of information",
+                            (
+                                f"Dropping a duplicate affects entries in vulnerability ({id[0]})"
+                            ),
+                        )
+                    )
 
         if not is_in:
             list_of_merged_vulnerabilities.append(new_vulnerability)

@@ -1089,18 +1089,18 @@ dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments
 
 [[package]]
 name = "pytest-subtests"
-version = "0.13.1"
+version = "0.14.1"
 description = "unittest subTest() support and subtests fixture"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 files = [
-    {file = "pytest_subtests-0.13.1-py3-none-any.whl", hash = "sha256:ab616a22f64cd17c1aee65f18af94dbc30c444f8683de2b30895c3778265e3bd"},
-    {file = "pytest_subtests-0.13.1.tar.gz", hash = "sha256:989e38f0f1c01bc7c6b2e04db7d9fd859db35d77c2c1a430c831a70cbf3fde2d"},
+    {file = "pytest_subtests-0.14.1-py3-none-any.whl", hash = "sha256:e92a780d98b43118c28a16044ad9b841727bd7cb6a417073b38fd2d7ccdf052d"},
+    {file = "pytest_subtests-0.14.1.tar.gz", hash = "sha256:350c00adc36c3aff676a66135c81aed9e2182e15f6c3ec8721366918bbbf7580"},
 ]
 
 [package.dependencies]
 attrs = ">=19.2.0"
-pytest = ">=7.0"
+pytest = ">=7.4"
 
 [[package]]
 name = "python-dateutil"
@@ -1837,4 +1837,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9.0"
-content-hash = "32c517d400826a64ede74e82544f84845aee18314519ec0e850b20583d20e19e"
+content-hash = "32ca7bda8365cd04ad4f13141ff88599c54322b8137473a5a7681d363a74df1e"

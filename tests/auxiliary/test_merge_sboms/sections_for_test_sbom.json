@@ -1362,1635 +1362,421 @@
       ]
     }
   ],
-  "hierarchical_components": {
-    "component_1": {
-      "name": "component_1",
-      "version": "1.0.0",
-      "bom-ref": "component_1",
-      "components": [
+  "merge_vulnerabilities_tests": {
+    "test_get_new_affects_versions": {
+      "original_versions_list": [
         {
-          "name": "component_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_2": {
-      "name": "component_2",
-      "version": "1.0.0",
-      "bom-ref": "component_2",
-      "components": [
-        {
-          "name": "component_2_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_1",
-          "components": [
-            {
-              "name": "component_2_sub_1_sub_1",
-              "version": "1.0.0",
-              "bom-ref": "component_2_sub_1_sub_1",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "version": "2.4"
         },
         {
-          "name": "component_2_sub_2",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_3": {
-      "name": "component_3",
-      "version": "1.0.0",
-      "bom-ref": "component_3",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_4": {
-      "name": "component_4",
-      "version": "1.0.0",
-      "bom-ref": "component_4",
-      "components": [
-        {
-          "name": "component_4_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1",
-          "components": [
-            {
-              "name": "component_4_sub_1_sub_1",
-              "version": "1.0.0",
-              "bom-ref": "component_4_sub_1_sub_1",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            },
-            {
-              "name": "component_4_sub_1_sub_2",
-              "version": "1.0.0",
-              "bom-ref": "component_4_sub_1_sub_2",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_1_sub_1": {
-      "name": "component_1_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_1_sub_1",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_2_sub_1": {
-      "name": "component_2_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_2_sub_1",
-      "components": [
-        {
-          "name": "component_2_sub_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_2_sub_2": {
-      "name": "component_2_sub_2",
-      "version": "1.0.0",
-      "bom-ref": "component_2_sub_2",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_2_sub_1_sub_1": {
-      "name": "component_2_sub_1_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_2_sub_1_sub_1",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_4_sub_1": {
-      "name": "component_4_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_4_sub_1",
-      "components": [
-        {
-          "name": "component_4_sub_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "version": "2.6"
         },
         {
-          "name": "component_4_sub_1_sub_2",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1_sub_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_4_sub_1_sub_1": {
-      "name": "component_4_sub_1_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_4_sub_1_sub_1",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    "component_4_sub_1_sub_2": {
-      "name": "component_4_sub_1_sub_2",
-      "version": "1.0.0",
-      "bom-ref": "component_4_sub_1_sub_2",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    }
-  },
-  "test_filter_component_new_components": [
-    {
-      "name": "component_1",
-      "version": "1.0.0",
-      "bom-ref": "component_1",
-      "components": [
-        {
-          "name": "component_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_2",
-      "version": "1.0.0",
-      "bom-ref": "component_2",
-      "components": [
-        {
-          "name": "component_2_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_1",
-          "components": [
-            {
-              "name": "component_2_sub_1_sub_1",
-              "version": "1.0.0",
-              "bom-ref": "component_2_sub_1_sub_1",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "range": "vers:generic/>=2.9|<=4.1"
         },
         {
-          "name": "component_2_sub_2",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "range": "vers:generic/>=9.9|<=10.1"
         }
       ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4",
-      "version": "1.0.0",
-      "bom-ref": "component_4",
-      "components": [
+      "new_versions_list": [
         {
-          "name": "component_4_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1",
-          "components": [
-            {
-              "name": "component_4_sub_1_sub_1",
-              "version": "1.0.0",
-              "bom-ref": "component_4_sub_1_sub_1",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            },
-            {
-              "name": "component_4_sub_1_sub_2",
-              "version": "1.0.0",
-              "bom-ref": "component_4_sub_1_sub_2",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    }
-  ],
-  "test_filter_component_kept_components_expected": [
-    {
-      "name": "component_2",
-      "version": "1.0.0",
-      "bom-ref": "component_2",
-      "components": [
-        {
-          "name": "component_2_sub_2",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4_sub_1_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_4_sub_1_sub_1",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_4_sub_1",
-      "components": [
-        {
-          "name": "component_4_sub_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_2_sub_1_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_2_sub_1_sub_1",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_2_sub_2",
-      "version": "1.0.0",
-      "bom-ref": "component_2_sub_2",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_1_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_1_sub_1",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4",
-      "version": "1.0.0",
-      "bom-ref": "component_4",
-      "components": [
-        {
-          "name": "component_4_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1",
-          "components": [
-            {
-              "name": "component_4_sub_1_sub_1",
-              "version": "1.0.0",
-              "bom-ref": "component_4_sub_1_sub_1",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    }
-  ],
-  "test_merge_hierarchical_present_components": [
-    {
-      "name": "component_1",
-      "version": "1.0.0",
-      "bom-ref": "component_1",
-      "components": [
-        {
-          "name": "component_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_3",
-      "version": "1.0.0",
-      "bom-ref": "component_3",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_2_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_2_sub_1",
-      "components": [
-        {
-          "name": "component_2_sub_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4_sub_1_sub_2",
-      "version": "1.0.0",
-      "bom-ref": "component_4_sub_1_sub_2",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    }
-  ],
-  "test_merge_hierarchical_new_components": [
-    {
-      "name": "component_1",
-      "version": "1.0.0",
-      "bom-ref": "component_1",
-      "components": [
-        {
-          "name": "component_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_2",
-      "version": "1.0.0",
-      "bom-ref": "component_2",
-      "components": [
-        {
-          "name": "component_2_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_1",
-          "components": [
-            {
-              "name": "component_2_sub_1_sub_1",
-              "version": "1.0.0",
-              "bom-ref": "component_2_sub_1_sub_1",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "version": "2.4",
+          "status": "removed"
         },
         {
-          "name": "component_2_sub_2",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4",
-      "version": "1.0.0",
-      "bom-ref": "component_4",
-      "components": [
-        {
-          "name": "component_4_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1",
-          "components": [
-            {
-              "name": "component_4_sub_1_sub_1",
-              "version": "1.0.0",
-              "bom-ref": "component_4_sub_1_sub_1",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            },
-            {
-              "name": "component_4_sub_1_sub_2",
-              "version": "1.0.0",
-              "bom-ref": "component_4_sub_1_sub_2",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    }
-  ],
-  "hierarchical_expected": [
-    {
-      "name": "component_1",
-      "version": "1.0.0",
-      "bom-ref": "component_1",
-      "components": [
-        {
-          "name": "component_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_3",
-      "version": "1.0.0",
-      "bom-ref": "component_3",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_2_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_2_sub_1",
-      "components": [
-        {
-          "name": "component_2_sub_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4_sub_1_sub_2",
-      "version": "1.0.0",
-      "bom-ref": "component_4_sub_1_sub_2",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_2",
-      "version": "1.0.0",
-      "bom-ref": "component_2",
-      "components": [
-        {
-          "name": "component_2_sub_2",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4",
-      "version": "1.0.0",
-      "bom-ref": "component_4",
-      "components": [
-        {
-          "name": "component_4_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1",
-          "components": [
-            {
-              "name": "component_4_sub_1_sub_1",
-              "version": "1.0.0",
-              "bom-ref": "component_4_sub_1_sub_1",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    }
-  ],
-  "singled_out_test_cases": {
-    "test_case_merge_two_sub_components_to_existing_component": {
-      "original": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "version": "2.7",
+          "status": "be kept"
         },
         {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "new": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [
-            {
-              "name": "comp_3",
-              "version": "1.0.0",
-              "bom-ref": "comp_3",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            },
-            {
-              "name": "comp_4",
-              "version": "1.0.0",
-              "bom-ref": "comp_4",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "merged_hr": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [
-            {
-              "name": "comp_3",
-              "version": "1.0.0",
-              "bom-ref": "comp_3",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            },
-            {
-              "name": "comp_4",
-              "version": "1.0.0",
-              "bom-ref": "comp_4",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "range": "vers:generic/>=2.5|<=4.1",
+          "status": "2.6 removed"
         },
         {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "merged_normal": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_4",
-          "version": "1.0.0",
-          "bom-ref": "comp_4",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "range": "vers:generic/<=10.1|>=9.9",
+          "status": "removed"
         }
       ]
     },
-    "test_case_merge_two_sub_sub_components_to_existing_component": {
-      "original": [
+    "extract_new_affects": {
+      "original_affects": [
         {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "new": [
-        {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [
+          "ref": "product 1",
+          "versions": [
             {
-              "name": "comp_1",
-              "version": "1.0.0",
-              "bom-ref": "comp_1",
-              "components": [
-                {
-                  "name": "comp_4",
-                  "version": "1.0.0",
-                  "bom-ref": "comp_4",
-                  "components": [],
-                  "type": "library",
-                  "supplier": {
-                    "name": "Company Legal"
-                  },
-                  "group": "com.company.governing",
-                  "copyright": "Company Legal 2022, all rights reserved"
-                },
-                {
-                  "name": "comp_5",
-                  "version": "1.0.0",
-                  "bom-ref": "comp_5",
-                  "components": [],
-                  "type": "library",
-                  "supplier": {
-                    "name": "Company Legal"
-                  },
-                  "group": "com.company.governing",
-                  "copyright": "Company Legal 2022, all rights reserved"
-                }
-              ],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "merged_hr": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [
-            {
-              "name": "comp_4",
-              "version": "1.0.0",
-              "bom-ref": "comp_4",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
+              "version": "2.4",
+              "status": "affected"
             },
             {
-              "name": "comp_5",
-              "version": "1.0.0",
-              "bom-ref": "comp_5",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
             }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          ]
         },
         {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "5.4",
+              "status": "affected"
+            },
+            {
+              "version": "5.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=9.9|<=10.1",
+              "status": "affected"
+            }
+          ]
         },
         {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "1.4",
+              "status": "affected"
+            },
+            {
+              "version": "1.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "15.4",
+              "status": "affected"
+            },
+            {
+              "version": "15.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=19.9|<=20.1",
+              "status": "affected"
+            }
+          ]
         }
       ],
-      "merged_normal": [
+      "new_affects": [
         {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "1.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.2",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=1.1|<=1.2",
+              "status": "affected"
+            }
+          ]
         },
         {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "10.0",
+              "status": "gone"
+            },
+            {
+              "version": "3.0",
+              "status": "gone"
+            },
+            {
+              "range": "vers:generic/>=9.9|<=10.1",
+              "status": "gone"
+            }
+          ]
         },
         {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "1.4",
+              "status": "affected"
+            },
+            {
+              "version": "1.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
         },
         {
-          "name": "comp_4",
-          "version": "1.0.0",
-          "bom-ref": "comp_4",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_5",
-          "version": "1.0.0",
-          "bom-ref": "comp_5",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "ref": "product 3",
+          "versions": [
+            {
+              "version": "1.4",
+              "status": "affected"
+            }
+          ]
         }
       ]
     },
-    "test_case_remove_sub_sub_components_to_existing_component": {
-      "original": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+    "collect_affects_of_vulnerabilities": [
+      {
+        "id": "CVE-1021-44228",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-1021-44228"
         },
-        {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "new": [
-        {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [
-            {
-              "name": "comp_1",
-              "version": "1.0.0",
-              "bom-ref": "comp_1",
-              "components": [
-                {
-                  "name": "comp_4",
-                  "version": "1.0.0",
-                  "bom-ref": "comp_4",
-                  "components": [],
-                  "type": "library",
-                  "supplier": {
-                    "name": "Company Legal"
-                  },
-                  "group": "com.company.governing",
-                  "copyright": "Company Legal 2022, all rights reserved"
-                }
-              ],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "merged_hr": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [
-            {
-              "name": "comp_4",
-              "version": "1.0.0",
-              "bom-ref": "comp_4",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "merged_normal": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_4",
-          "version": "1.0.0",
-          "bom-ref": "comp_4",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ]
-    },
-    "test_case_remove_sub_sub_components_to_existing_sub_component": {
-      "original": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [
-            {
-              "name": "comp_5",
-              "version": "1.0.0",
-              "bom-ref": "comp_5",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "new": [
-        {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [
-            {
-              "name": "comp_1",
-              "version": "1.0.0",
-              "bom-ref": "comp_1",
-              "components": [
-                {
-                  "name": "comp_5",
-                  "version": "1.0.0",
-                  "bom-ref": "comp_5",
-                  "components": [],
-                  "type": "library",
-                  "supplier": {
-                    "name": "Company Legal"
-                  },
-                  "group": "com.company.governing",
-                  "copyright": "Company Legal 2022, all rights reserved"
-                },
-                {
-                  "name": "comp_4",
-                  "version": "1.0.0",
-                  "bom-ref": "comp_4",
-                  "components": [],
-                  "type": "library",
-                  "supplier": {
-                    "name": "Company Legal"
-                  },
-                  "group": "com.company.governing",
-                  "copyright": "Company Legal 2022, all rights reserved"
-                }
-              ],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "merged_hr": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [
-            {
-              "name": "comp_5",
-              "version": "1.0.0",
-              "bom-ref": "comp_5",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
+        "ratings": [
+          {
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&version=3.1"
             },
-            {
-              "name": "comp_4",
-              "version": "1.0.0",
-              "bom-ref": "comp_4",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
+            "score": 10.0,
+            "severity": "critical",
+            "method": "CVSSv31",
+            "vector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+          }
+        ],
+        "analysis": {
+          "state": "exploitable",
+          "response": [
+            "will_not_fix",
+            "update"
           ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "detail": "Versions of Product ABC are affected by the vulnerability. Customers are advised to upgrade to the latest release."
         },
-        {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        },
-        {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "merged_normal": [
-        {
-          "name": "comp_1",
-          "version": "1.0.0",
-          "bom-ref": "comp_1",
-          "components": [
-            {
-              "name": "comp_5",
-              "version": "1.0.0",
-              "bom-ref": "comp_5",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
+        "affects": [
+          {
+            "ref": "product 1",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
               },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
+              {
+                "version": "2.6",
+                "status": "affected"
+              },
+              {
+                "range": "vers:generic/>=2.9|<=4.1",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "product 2",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "xxx",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/xxx"
+        },
+        "ratings": [
+          {
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&version=3.1"
+            },
+            "score": 10.0,
+            "severity": "critical",
+            "method": "CVSSv31",
+            "vector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+          }
+        ],
+        "references": [
+          {
+            "id": "CVE-1021-44228"
+          }
+        ],
+        "analysis": {
+          "state": "exploitable",
+          "response": [
+            "will_not_fix",
+            "update"
           ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+          "detail": "Versions of Product ABC are affected by the vulnerability. Customers are advised to upgrade to the latest release."
         },
-        {
-          "name": "comp_2",
-          "version": "1.0.0",
-          "bom-ref": "comp_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+        "affects": [
+          {
+            "ref": "product 2",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              },
+              {
+                "version": "2.6",
+                "status": "affected"
+              },
+              {
+                "range": "vers:generic/>=2.9|<=4.1",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "CVE-1013-44228",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-1013-44228"
         },
-        {
-          "name": "comp_3",
-          "version": "1.0.0",
-          "bom-ref": "comp_3",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
+        "ratings": [
+          {
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&version=3.1"
+            },
+            "score": 10.0,
+            "severity": "critical",
+            "method": "CVSSv31",
+            "vector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+          }
+        ],
+        "analysis": {
+          "state": "exploitable",
+          "response": [
+            "will_not_fix",
+            "update"
+          ],
+          "detail": "Versions of Product ABC are affected by the vulnerability. Customers are advised to upgrade to the latest release."
         },
-        {
-          "name": "comp_4",
-          "version": "1.0.0",
-          "bom-ref": "comp_4",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
+        "affects": [
+          {
+            "ref": "product 2",
+            "versions": [
+              {
+                "version": "22.4",
+                "status": "affected"
+              },
+              {
+                "version": "22.6",
+                "status": "affected"
+              },
+              {
+                "range": "vers:generic/>=12.9|<=14.1",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "get_identities_for_vulnerabilities": [
+      {
+        "id": "ref 1",
+        "references": [
+          {
+            "id": "ref 2"
+          }
+        ]
+      },
+      {
+        "id": "ref 2",
+        "references": [
+          {
+            "id": "ref 3"
           },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ]
-    }
+          {
+            "id": "ref 4"
+          }
+        ]
+      },
+      {
+        "id": "ref 5",
+        "references": [
+          {
+            "id": "ref 6"
+          }
+        ]
+      }
+    ],
+    "test_identities_for_vulnerabilities": [
+      {
+        "id": "ref 1",
+        "references": [
+          {
+            "id": "ref 2"
+          }
+        ]
+      },
+      {
+        "id": "ref 2",
+        "references": [
+          {
+            "id": "ref 3"
+          },
+          {
+            "id": "ref 4"
+          }
+        ]
+      },
+      {
+        "id": "ref 5",
+        "references": [
+          {
+            "id": "ref 4"
+          }
+        ]
+      },
+      {
+        "id": "ref 3",
+        "references": [
+          {
+            "id": "ref 6"
+          }
+        ]
+      },
+      {
+        "id": "ref 7",
+        "references": [
+          {
+            "id": "ref 8"
+          }
+        ]
+      },
+      {
+        "id": "ref 7",
+        "references": [
+          {
+            "id": "ref 6"
+          }
+        ]
+      },
+      {
+        "id": "ref 8",
+        "references": [
+          {
+            "id": "ref 9"
+          },
+          {
+            "id": "ref 10"
+          }
+        ]
+      }
+    ]
   }
 }

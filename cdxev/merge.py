@@ -1,8 +1,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import copy
+import json
 import logging
 import typing as t
-import copy
+from dataclasses import dataclass
+
+from univers.version_range import VersionRange
+from univers.versions import nuget
 
 from cdxev.auxiliary.identity import ComponentIdentity
 from cdxev.auxiliary.sbomFunctions import (
@@ -15,8 +20,6 @@ from cdxev.auxiliary.sbomFunctions import (
     get_ref_from_components,
 )
 from cdxev.log import LogMessage
-from univers.version_range import VersionRange
-from univers.versions import nuget
 
 logger = logging.getLogger(__name__)
 
@@ -448,43 +451,48 @@ def get_new_affects_versions(
 ) -> list[dict]:
     kept_versions: list[dict] = []
     for new_version in new_versions_list:
+        is_in = False
         for original_version in original_versions_list:
             result = compare_affects_versions_object(original_version, new_version)
 
-            if result == 0:
-                kept_versions.append(new_version)
-
             if result == -1:
-                (
+                new_range = (
                     new_version.get("range", "")
                     + "|!="
                     + original_version.get("version", "")
                 )
-                kept_versions.append(new_version)
+                new_version_range = copy.deepcopy(new_version)
+                new_version_range["range"] = new_range
+                kept_versions.append(new_version_range)
+                is_in = True
 
             if result == 3:
                 logger.warning(
                     LogMessage(
                         "Potential loss of information",
                         (
-                            f"Dropping a duplicate affects entry ({ref}) "
+                            f"Dropping a possible duplicate affects entry ({ref}) "
                             "due to not comparable version ranges"
                             f"in vulnerability {vuln_id}."
                         ),
                     )
                 )
+                is_in = True
 
             if result in [1, 2]:
                 logger.warning(
                     LogMessage(
                         "Potential loss of information",
                         (
-                            f"Dropping a duplicate affects entry ({ref})"
+                            f"Dropping a duplicate affects entry ({ref}) "
                             f"in vulnerability {vuln_id}."
                         ),
                     )
                 )
+                is_in = True
 
+        if not is_in:
+            kept_versions.append(new_version)
     return kept_versions
 
 
@@ -492,24 +500,29 @@ def extract_new_affects(
     original_affects_list: list[dict], new_affects_list: list[dict], vuln_id: str
 ) -> list[dict]:
     kept_affects: list[dict] = []
+    collected_original_affects = join_affect_versions_with_same_references(
+        original_affects_list
+    )
 
     for new_affect in new_affects_list:
         new_versions = new_affect.get("versions", [])
         ref_is_in = False
-        for original_affect in original_affects_list:
-            if new_affect.get("ref", "new_ref") == original_affect.get("ref", ""):
-                ref_is_in = True
-                original_versions = original_affect.get("versions", [])
-                kept_affect_versions = get_new_affects_versions(
-                    original_versions,
-                    new_versions,
-                    vuln_id,
-                    original_affect.get("ref", ""),
-                )
+        if new_affect.get("ref", "new_ref") in collected_original_affects.keys():
+            ref_is_in = True
+            original_versions = collected_original_affects.get(
+                new_affect.get("ref", "new_ref"), []
+            )
+            kept_affect_versions = get_new_affects_versions(
+                original_versions,
+                new_versions,
+                vuln_id,
+                new_affect.get("ref", ""),
+            )
+
+            if kept_affect_versions:
                 new_affect_copy = copy.deepcopy(new_affect)
-                if kept_affect_versions:
-                    new_affect_copy["versions"] = kept_affect_versions
-                    kept_affects.append(new_affect_copy)
+                new_affect_copy["versions"] = kept_affect_versions
+                kept_affects.append(new_affect_copy)
 
         if not ref_is_in:
             kept_affects.append(new_affect)
@@ -531,13 +544,128 @@ def compare_vulnerability_ids(
     return is_equal
 
 
-def versions_object_is_in_list(
-    versions_object: dict, list_of_versions_objects: list[dict]
-) -> bool:
-    for list_entry in list_of_versions_objects:
-        if compare_affects_versions_object(versions_object, list_entry) in [1, -1]:
+def join_affect_versions_with_same_references(
+    affects_list: list[dict],
+) -> dict[str, list[dict]]:
+    # join all versions with the same ref in one object
+    collected_versions: dict[str, list[dict]] = {}
+    if affects_list:
+        for n in range(len(affects_list) - 1):
+            id = affects_list[n].get("ref", "")
+            affects = copy.deepcopy(affects_list[n].get("versions", []))
+            if id not in collected_versions.keys():
+                for k in range(n + 1, len(affects_list)):
+                    if affects_list[k].get("ref", "") == id:
+                        affects += affects_list[k].get("versions", [])
+                    collected_versions[id] = affects
+    return collected_versions
+
+
+@dataclass(frozen=True, init=True)
+class VulnerabilityIdentity:
+    id: str
+    aliases: list[str]
+
+    @classmethod
+    def from_vulnerability(cls, vulnerability: dict) -> "VulnerabilityIdentity":
+        id = vulnerability.get("id", "")
+        aliases = get_ids_from_vulnerability(vulnerability)
+        return cls(id, aliases)
+
+    @classmethod
+    def from_string(cls, id: str) -> "VulnerabilityIdentity":
+        aliases = id.split("_|_")
+        return cls(aliases[0], aliases)
+
+    def id_is_in(self, other_id: str) -> bool:
+        if other_id == self.id:
             return True
-    return False
+
+        if other_id in self.aliases:
+            return True
+        else:
+            return False
+
+    def one_of_ids_is_in(self, other_ids: list[str]) -> bool:
+        for id in other_ids:
+            if id == self.id:
+                return True
+            if id in self.aliases:
+                return True
+        return False
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compares two vulnerability objects based on the described vulnerability.
+        Fields like affects or analysis are not taken into account.
+        """
+        if not isinstance(other, VulnerabilityIdentity):
+            raise TypeError(f"Can not compare {type(other)} with VulnerabilityIdentity")
+        return self.one_of_ids_is_in(other.aliases)
+
+    def __str__(self) -> str:
+        if id not in self.aliases:
+            string = self.id
+        for ref in self.aliases:
+            if ref not in string:
+                string += "_|_" + ref
+        return string
+
+    def string(self) -> str:
+        return self.__str__()
+
+
+def get_identities_for_vulnerabilities(
+    list_of_vulnerabilities: list[dict],
+) -> dict[str, VulnerabilityIdentity]:
+    identities: dict[str, VulnerabilityIdentity] = {}
+    for vulnerability in list_of_vulnerabilities:
+        if vulnerability not in list(identities.keys()):
+            aliases = get_ids_from_vulnerability(vulnerability)
+
+            # check if identity was already created
+            is_present = False
+            temp_dictionary: dict[str, VulnerabilityIdentity] = {}
+            for identity_object in identities.values():
+                if identity_object.one_of_ids_is_in(aliases):
+                    temp_dictionary[json.dumps(vulnerability, sort_keys=True)] = (
+                        identity_object
+                    )
+                    is_present = True
+                    continue
+            identities.update(temp_dictionary)
+
+            # create a identity for the vulnerability
+            if not is_present:
+                len_aliases = len(aliases)
+                new_len_aliases = 0
+                while len_aliases != new_len_aliases:
+                    len_aliases = len(aliases)
+                    for vulnerability_object in list_of_vulnerabilities:
+                        vulnerability_aliases = get_ids_from_vulnerability(
+                            vulnerability_object
+                        )
+
+                        # check if one of the vulnerability identifiers
+                        # is in the current vulnerability
+                        is_present = False
+                        for vuln_id in vulnerability_aliases:
+                            if vuln_id in aliases:
+                                is_present = True
+                                # add new identifiers to the list
+                                #  of the aliases of the vulnerability
+                        if is_present:
+                            for vuln_id in vulnerability_aliases:
+                                if vuln_id not in aliases:
+                                    aliases.append(vuln_id)
+
+                    new_len_aliases = len(aliases)
+
+                identities[json.dumps(vulnerability, sort_keys=True)] = (
+                    VulnerabilityIdentity(aliases[0], aliases)
+                )
+
+    return identities
 
 
 def collect_affects_of_vulnerabilities(
@@ -545,27 +673,36 @@ def collect_affects_of_vulnerabilities(
 ) -> dict[str, list[dict]]:
     collected_affects: dict[str, list[dict]] = {}
     if list_of_original_vulnerabilities:
-        for n in range(len(list_of_original_vulnerabilities) - 1):
-            ids = get_ids_from_vulnerability(list_of_original_vulnerabilities[n])
+        identities = get_identities_for_vulnerabilities(
+            list_of_original_vulnerabilities
+        )
+        for n in range(len(list_of_original_vulnerabilities)):
+            # use json string of vulnerability in case the vulnerability does not contain any id
+            id = identities[
+                json.dumps(list_of_original_vulnerabilities[n], sort_keys=True)
+            ]
             affects = copy.deepcopy(
                 list_of_original_vulnerabilities[n].get("affects", [])
             )
-            for k in range(n + 1, len(list_of_original_vulnerabilities)):
-                if (
-                    ids[0] not in collected_affects.keys()
-                    and get_ids_from_vulnerability(list_of_original_vulnerabilities[k])[
-                        0
+            if id.string() not in collected_affects.keys():
+                for k in range(n + 1, len(list_of_original_vulnerabilities)):
+                    new_id = identities[
+                        json.dumps(list_of_original_vulnerabilities[k], sort_keys=True)
                     ]
-                    == ids[0]
-                ):
-                    affects += list_of_original_vulnerabilities[k].get("affects", [])
-            collected_affects[ids[0]] = affects
+
+                    if id == new_id:
+                        affects += list_of_original_vulnerabilities[k].get(
+                            "affects", []
+                        )
+
+                collected_affects[id.string()] = affects
     return collected_affects
 
 
 def merge_vulnerabilities_2(
     list_of_original_vulnerabilities: list[dict],
     list_of_new_vulnerabilities: list[dict],
+    vulnerability_identities: dict[str, VulnerabilityIdentity],
 ) -> list[dict]:
     """
     Merges the vulnerabilities of two SBOMs
@@ -590,8 +727,16 @@ def merge_vulnerabilities_2(
 
     for new_vulnerability in list_of_new_vulnerabilities:
         is_in = False
+        id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
+        id_object_new_vulnerability = vulnerability_identities[id_str_new_vulnerability]
         for original_vulnerability in list_of_original_vulnerabilities:
-            if compare_vulnerability_ids(new_vulnerability, original_vulnerability):
+            id_str_original_vulnerability = json.dumps(
+                original_vulnerability, sort_keys=True
+            )
+            id_object_original_vulnerability = vulnerability_identities[
+                id_str_original_vulnerability
+            ]
+            if id_object_new_vulnerability == id_object_original_vulnerability:
                 is_in = True
                 # Check affects: 3 cases
                 # 1. complete disjunct => two different vulnerability objects, keep both
@@ -606,11 +751,10 @@ def merge_vulnerabilities_2(
                 # is equal to one with the entry "<=3.0.0" but for this the ranges must be checked
                 # as a whole
 
-                id = get_ids_from_vulnerability(original_vulnerability)
                 new_affects = extract_new_affects(
-                    collected_affects[id[0]],
+                    collected_affects[id_object_original_vulnerability.string()],
                     new_vulnerability.get("affects", []),
-                    id[0],
+                    original_vulnerability.get("id", ""),
                 )
 
                 if new_affects:
@@ -620,7 +764,8 @@ def merge_vulnerabilities_2(
                         LogMessage(
                             "Potential loss of information",
                             (
-                                f"Dropping a duplicate affects entries in vulnerability ({id[0]})"
+                                "Dropping a duplicate affects entries "
+                                f'in vulnerability ({original_vulnerability.get("id", "")})'
                             ),
                         )
                     )

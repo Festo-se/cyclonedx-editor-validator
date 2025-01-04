@@ -894,5 +894,282 @@ class TestMergeCompositions(unittest.TestCase):
         self.assertEqual(compositions_1, merged_compositions)
 
 
+class TestVulnerabilities(unittest.TestCase):
+    def test_get_ids_from_vulnerability(self) -> None:
+        vulnerability = {
+            "id": "CVE-2021-39182",
+            "references": [
+                {"id": "CVE-2021-39182"},
+                {"id": "GHSA-35m5-8cvj-8783"},
+                {"id": "SNYK-PYTHON-ENROCRYPT-1912876"},
+            ],
+        }
+
+        ids = merge.get_ids_from_vulnerability(vulnerability)
+        self.assertEqual(
+            ids,
+            [
+                "CVE-2021-39182",
+                "GHSA-35m5-8cvj-8783",
+                "SNYK-PYTHON-ENROCRYPT-1912876",
+            ],
+        )
+
+    def test_compare_version_range(self) -> None:
+        self.assertTrue(
+            merge.compare_version_range(
+                "vers:tomee/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0",
+                "vers:tomee/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0",
+            )
+        )
+
+        self.assertFalse(
+            merge.compare_version_range(
+                "vers:pypi/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0",
+                "vers:pypi/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2",
+            )
+        )
+
+        self.assertTrue(
+            merge.compare_version_range(
+                "vers:pypi/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0",
+                "vers:pypi/>=1.0.0-beta1|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0|<=1.7.5|>=7.0.0",
+            )
+        )
+
+    def test_version_is_in_version_range(self) -> None:
+        self.assertTrue(
+            merge.version_is_in_version_range("8.0.0", "vers:cargo/<9.0.14")
+        )
+        self.assertFalse(
+            merge.version_is_in_version_range("10.0.0", "vers:cargo/<9.0.14")
+        )
+
+    def test_compare_affects_version_object(self) -> None:
+        self.assertEqual(
+            merge.compare_affects_versions_object(
+                {"range": "vers:cargo/>9.0.14"}, {"range": "vers:cargo/<9.0.14"}
+            ),
+            0,
+        )
+        self.assertEqual(
+            merge.compare_affects_versions_object(
+                {
+                    "range": "vers:pypi/>=1.0.0|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0"
+                },
+                {
+                    "range": "vers:pypi/>=1.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0|<=1.7.5|>=7.0.0"
+                },
+            ),
+            1,
+        )
+        self.assertEqual(
+            merge.compare_affects_versions_object(
+                {"version": "9.0.14", "range": "vers:cargo/<9.0.14"},
+                {"version": "9.0.0", "range": "vers:cargo/<9.0.14"},
+            ),
+            0,
+        )
+        self.assertEqual(
+            merge.compare_affects_versions_object(
+                {"version": "8.0.0", "range": "vers:cargo/<9.0.14"},
+                {"version": "8.0.0", "range": "vers:cargo/>9.0.14"},
+            ),
+            1,
+        )
+
+        self.assertEqual(
+            merge.compare_affects_versions_object(
+                {"range": "vers:cargo/<9.0.14"}, {"version": "8.0.0"}
+            ),
+            2,
+        )
+
+        self.assertEqual(
+            merge.compare_affects_versions_object(
+                {"version": "8.0.0"}, {"range": "vers:cargo/<9.0.14"}
+            ),
+            -1,
+        )
+
+        self.assertEqual(
+            merge.compare_affects_versions_object(
+                {"range": "vers:cargo/<9.0.14"},
+                {"version": "8.0.0", "range": "vers:cargo/<9.0.14"},
+            ),
+            2,
+        )
+
+        self.assertEqual(
+            merge.compare_affects_versions_object(
+                {"version": "8.0.0", "range": "vers:cargo/<9.0.14"},
+                {"range": "vers:cargo/<9.0.14"},
+            ),
+            -1,
+        )
+
+    def test_get_new_affects_versions(self) -> None:
+        lists = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_get_new_affects_versions"
+        ]
+        kept_versions = merge.get_new_affects_versions(
+            lists["original_versions_list"],
+            lists["new_versions_list"],
+            "vuln_id",
+            "ref",
+        )
+        self.assertEqual(
+            kept_versions,
+            [
+                {"version": "2.7", "status": "be kept"},
+                {"range": "vers:generic/>=2.5|<=4.1|!=2.6", "status": "2.6 removed"},
+            ],
+        )
+
+    def test_join_affect_versions_with_same_references(self) -> None:
+        lists = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "extract_new_affects"
+        ]["original_affects"]
+        joined_lists = merge.join_affect_versions_with_same_references(lists)
+
+        self.assertEqual(joined_lists["product 2"], lists[2]["versions"])
+        self.assertEqual(
+            joined_lists["product 1"],
+            lists[0]["versions"] + lists[1]["versions"] + lists[3]["versions"],
+        )
+
+    def test_extract_new_affects(self) -> None:
+        lists = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "extract_new_affects"
+        ]
+        kept_affects = merge.extract_new_affects(
+            lists["original_affects"], lists["new_affects"], "vuln_id"
+        )
+
+        self.assertEqual(
+            kept_affects,
+            [
+                {
+                    "ref": "product 1",
+                    "versions": [
+                        {"version": "1.4", "status": "affected"},
+                        {"version": "2.2", "status": "affected"},
+                        {"range": "vers:generic/>=1.1|<=1.2", "status": "affected"},
+                    ],
+                },
+                {
+                    "ref": "product 3",
+                    "versions": [{"version": "1.4", "status": "affected"}],
+                },
+            ],
+        )
+
+    def test_vulnerability_identity_Class(self) -> None:
+        identity = merge.VulnerabilityIdentity("id", ["ref 1", "ref 2"])
+        self.assertEqual(identity.__str__(), "id_|_ref 1_|_ref 2")
+        self.assertEqual(identity.aliases, ["ref 1", "ref 2"])
+        self.assertTrue(identity.id_is_in("id"))
+        self.assertTrue(identity.one_of_ids_is_in(["ll", "ref 2", ".l"]))
+        self.assertFalse(identity.id_is_in("id 2"))
+        self.assertFalse(identity.one_of_ids_is_in(["ll", "ref 22", ".l"]))
+        self.assertEqual(
+            identity,
+            merge.VulnerabilityIdentity.from_vulnerability(
+                {
+                    "id": "id",
+                    "references": [{"id": "ref 1"}, {"id": "ref 2"}],
+                },
+            ),
+        )
+        self.assertEqual(
+            merge.VulnerabilityIdentity.from_string("id_|_ref 1_|_ref 2_|_ref 3"),
+            merge.VulnerabilityIdentity("id", ["id", "ref 1", "ref 2", "ref 3"]),
+        )
+        self.assertTrue(
+            merge.VulnerabilityIdentity.from_string("id_|_ref 1_|_ref 2_|_ref 3")
+            == merge.VulnerabilityIdentity("id", ["id", "ref 1", "ref 2", "ref 3"])
+        )
+        self.assertTrue(
+            merge.VulnerabilityIdentity.from_string("id_|_ref 1_|_ref 2_|_ref 3")
+            == merge.VulnerabilityIdentity("", ["id", "ref 1", "ref 2", "ref 3"])
+        )
+        self.assertTrue(
+            merge.VulnerabilityIdentity.from_string("id2_|_ref 11_|_ref 22_|_ref 3")
+            == merge.VulnerabilityIdentity("", ["id", "ref 1", "ref 2", "ref 3"])
+        )
+
+    def test_get_identities_for_vulnerabilities(self) -> None:
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "get_identities_for_vulnerabilities"
+        ]
+        identities = merge.get_identities_for_vulnerabilities(vulnerabilities)
+        self.assertEqual(len(identities.keys()), 3)
+        self.assertEqual(
+            identities[json.dumps(vulnerabilities[0], sort_keys=True)],
+            identities[json.dumps(vulnerabilities[1], sort_keys=True)],
+        )
+        self.assertEqual(
+            identities[json.dumps(vulnerabilities[2], sort_keys=True)].aliases,
+            merge.get_ids_from_vulnerability(vulnerabilities[2]),
+        )
+
+    def test_identities_for_vulnerabilities(self) -> None:
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_identities_for_vulnerabilities"
+        ]
+        identities = merge.get_identities_for_vulnerabilities(vulnerabilities)
+        self.assertEqual(
+            set(identities[json.dumps(vulnerabilities[0], sort_keys=True)].aliases),
+            set(
+                [
+                    "ref 1",
+                    "ref 2",
+                    "ref 3",
+                    "ref 4",
+                    "ref 5",
+                    "ref 6",
+                    "ref 7",
+                    "ref 8",
+                    "ref 9",
+                    "ref 10",
+                ]
+            ),
+        )
+
+    def test_collect_affects_of_vulnerabilities(self) -> None:
+        lists = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "collect_affects_of_vulnerabilities"
+        ]
+        identities = merge.get_identities_for_vulnerabilities(lists)
+        collected = merge.collect_affects_of_vulnerabilities(lists)
+
+        vuln_id = identities[json.dumps(lists[0], sort_keys=True)].string()
+        self.assertEqual(
+            collected[vuln_id],
+            [
+                {
+                    "ref": "product 1",
+                    "versions": [
+                        {"version": "2.4", "status": "affected"},
+                        {"version": "2.6", "status": "affected"},
+                        {"range": "vers:generic/>=2.9|<=4.1", "status": "affected"},
+                    ],
+                },
+                {
+                    "ref": "product 2",
+                    "versions": [{"version": "3.4", "status": "affected"}],
+                },
+                {
+                    "ref": "product 2",
+                    "versions": [
+                        {"version": "2.4", "status": "affected"},
+                        {"version": "2.6", "status": "affected"},
+                        {"range": "vers:generic/>=2.9|<=4.1", "status": "affected"},
+                    ],
+                },
+            ],
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

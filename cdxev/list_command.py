@@ -12,27 +12,18 @@ from cdxev.log import LogMessage
 logger = logging.getLogger(__name__)
 
 
-def print_license(license: dict) -> str:
-    if license.get("expression", ""):
-        return license.get("expression", "")
-    elif license.get("license", {}).get("id", ""):
-        return license.get("license", {}).get("id", "")
-    else:
-        return license.get("license", {}).get("name", "")
-
-
 def extract_string_from_license(license: License) -> str:
     if isinstance(license, DisjunctiveLicense):
         if license.id is not None:
-            return license.id
+            return str(license.id)
         elif license.name is not None:
-            return license.name
+            return str(license.name)
         else:
             return ""
 
     elif isinstance(license, LicenseExpression):
         if license.value is not None:
-            return license.value
+            return str(license.value)
         else:
             return ""
     else:
@@ -48,7 +39,7 @@ def extract_license_strings_from_licenses(licenses: list[License]) -> list[str]:
     return license_list
 
 
-def extract_metadata_license_information(metadata: BomMetaData) -> dict:
+def extract_metadata_license_information(metadata: BomMetaData) -> dict[str, Any]:
     if metadata.component is not None:
         metadata_component = metadata.component
         software_information: dict[str, Any] = {}
@@ -115,7 +106,7 @@ def write_list_to_str(str_list: list[str], division_character: str = "\n") -> st
     return string
 
 
-def write_license_dict_to_txt(info_dict: dict) -> str:
+def write_license_dict_to_txt(info_dict: dict[str, Any]) -> str:
     string = ""
 
     if info_dict.get("name", ""):
@@ -137,7 +128,7 @@ def write_license_dict_to_txt(info_dict: dict) -> str:
     return string
 
 
-def write_license_dict_to_csv(info_dict: dict) -> str:
+def write_license_dict_to_csv(info_dict: dict[str, Any]) -> str:
     string = ""
 
     string += '"' + info_dict.get("name", "") + '"'
@@ -153,7 +144,7 @@ def write_license_dict_to_csv(info_dict: dict) -> str:
 
 
 def write_license_information_to_txt(
-    software_information: dict, component_information: list[dict]
+    software_information: dict[str, Any], component_information: list[dict[str, Any]]
 ) -> str:
 
     string = write_license_dict_to_txt(software_information)
@@ -176,8 +167,8 @@ def write_license_information_to_txt(
 
 
 def write_license_information_to_csv(
-    software_information: dict,
-    component_information: list[dict],
+    software_information: dict[str, Any],
+    component_information: list[dict[str, Any]],
 ) -> str:
     string = "Name,Copyright,Licenses"
 
@@ -293,7 +284,7 @@ def list_components(sbom: Bom, format: str = "txt") -> str:
     return string
 
 
-def list_command(sbom: dict, operation: str, format: str = "txt") -> str:
+def list_command(sbom: dict, operation: str, format: str = "txt") -> str:  # type: ignore
     """
     Lists specific content of the SBOM.
 

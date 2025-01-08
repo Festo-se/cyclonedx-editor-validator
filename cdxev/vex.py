@@ -50,7 +50,14 @@ def get_list_of_ids(input_file: dict[str, Any], scheme: str) -> str:
             vul_description = vulnerability.get("description", "-")
             vul_state = vulnerability.get("analysis", {}).get("state", "-")
             list_str += (
-                vul_id + "," + vul_ref_id + "," + vul_description + "," + vul_state + "\n"
+                vul_id
+                + ","
+                + vul_ref_id
+                + ","
+                + vul_description
+                + ","
+                + vul_state
+                + "\n"
             )
     elif scheme == "lightweight":
         list_str += "ID,RefID\n"

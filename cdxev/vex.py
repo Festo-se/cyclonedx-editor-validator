@@ -20,9 +20,9 @@ def init_vex_header(input_file: dict) -> dict:
     """
 
     output_file = {}
-    output_file["bomFormat"] = input_file.get("bomFormat", [])
-    output_file["specVersion"] = input_file.get("specVersion", [])
-    output_file["version"] = input_file.get("version", [])
+    output_file["bomFormat"] = input_file.get("bomFormat", "")
+    output_file["specVersion"] = input_file.get("specVersion", "")
+    output_file["version"] = input_file.get("version", 0)
     return output_file
 
 
@@ -43,20 +43,26 @@ def get_list_of_ids(input_file: dict, scheme: str) -> str:
 
     list_str = ""
     if scheme == "default":
-        list_str += "CVE-ID,Description,Status\n"
+        list_str += "ID,RefID,Description,Status\n"
         for vulnerability in input_file.get("vulnerabilities", []):
+            vulID = vulnerability.get("id", "-")
+            vulRefID = vulnerability.get("references", {}).get("id", "-")
+            vulDescription = vulnerability.get("description", "-")
+            vulState = vulnerability.get("analysis", {}).get("state", "-")
             list_str += (
-                vulnerability.get("id")
+                vulID
                 + ","
-                + vulnerability.get("description")
+                + vulRefID
                 + ","
-                + vulnerability.get("analysis").get("state")
+                + vulDescription
+                + ","
+                + vulState
                 + "\n"
             )
     elif scheme == "lightweight":
-        list_str += "CVE-ID\n"
+        list_str += "ID,RefID\n"
         for vulnerability in input_file.get("vulnerabilities", []):
-            list_str += (vulnerability.get("id")) + "\n"
+            list_str += (vulnerability.get("id", "-") + ", " + vulnerability.get("references", {}).get("id", "-") + "\n")
 
     return list_str
 
@@ -80,7 +86,7 @@ def get_list_of_trimed_vulnerabilities(input_file: dict, state: str) -> dict:
     trimmed_vulnerabilities = []
     output_file = {}
     for vulnerability in input_file.get("vulnerabilities", []):
-        if vulnerability.get("analysis", []).get("state", []) == state:
+        if vulnerability.get("analysis", {}).get("state", "") == state:
             trimmed_vulnerabilities.append(vulnerability)
 
     output_file = init_vex_header(input_file)
@@ -92,7 +98,7 @@ def get_vulnerability_by_id(input_file: dict, id: str) -> dict:
     searched_vulnerability = []
     output_file = {}
     for vulnerability in input_file.get("vulnerabilities", []):
-        if vulnerability.get("id", []) == id:
+        if vulnerability.get("id", "-") == id or vulnerability.get("references", {}).get("id", "") == id:
             searched_vulnerability.append(vulnerability)
 
     output_file = init_vex_header(input_file)
@@ -116,7 +122,7 @@ def get_vex_from_sbom(input_file: dict) -> dict:
     """
 
     output_file = init_vex_header(input_file)
-    output_file["vulnerabilities"] = input_file.get("vulnerabilities")
+    output_file["vulnerabilities"] = input_file.get("vulnerabilities", [])
     return output_file
 
 
@@ -159,10 +165,3 @@ def vex(
         return get_vulnerability_by_id(file, vul_id)
     elif sub_command == "extract":
         return get_vex_from_sbom(file)
-    else:
-        raise ValueError(
-            (
-                f"Invalid sub_command: '{sub_command}'",
-                "Expected one of ['list', 'trim', 'search', 'extract'].",
-            )
-        )

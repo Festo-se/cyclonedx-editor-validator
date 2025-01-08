@@ -46,68 +46,21 @@ def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
     """
 
     list_str = ""
-    if schema == "default":
-        list_str += "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description\n"
-        for vulnerability in input_file.get("vulnerabilities", []):
-            vul_id = vulnerability.get("id", "-")
-            vul_ref_id = vulnerability.get("references", [{"id": "-"}])[0].get(
-                "id", "-"
-            )
-            # write cwe string
-            cwes = vulnerability.get("cwes", [])
-            cwe_str = ""
-            for cwe in cwes:
-                if cwe_str != "":
-                    cwe_str += ","
-                cwe_str += f"{cwe}"
-            if len(cwes) == 0:
-                cwe_str = "-"
-            vul_state = vulnerability.get("analysis", {}).get("state", "-")
-            ratings = vulnerability.get("ratings", [])
-            severity_string = ""
-            # write rating string
-            for rating in ratings:
-                if severity_string != "":
-                    severity_string += ","
-                severity_string += (
-                    f"{rating.get('method', '')}:"
-                    f"{rating.get('score', '')}"
-                    f"({rating.get('severity', '')})"
-                )
-            if len(ratings) == 0:
-                severity_string = "-"
-            publish_date = vulnerability.get("published", "-")
-            update_date = vulnerability.get("updated", "-")
-            vul_description = re.sub(
-                r"[\t\n\r\|]+", "", vulnerability.get("description", "-")
-            )
-            list_str += (
-                vul_id
-                + "|"
-                + vul_ref_id
-                + "|"
-                + cwe_str
-                + "|"
-                + severity_string
-                + "|"
-                + vul_state
-                + "|"
-                + publish_date
-                + "|"
-                + update_date
-                + "|"
-                + vul_description
-                + "\n"
-            )
-    elif schema == "lightweight":
-        list_str += "ID|RefID\n"
+    if scheme == "default":
+        list_str += "CVE-ID,Description,Status\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             list_str += (
-                vulnerability.get("id", "-")
-                + "|"
-                + vulnerability.get("references", [{"id": "-"}])[0].get("id", "-")
+                vulnerability.get("id")
+                + ","
+                + vulnerability.get("description")
+                + ","
+                + vulnerability.get("analysis").get("state")
                 + "\n"
             )
+    elif scheme == "lightweight":
+        list_str += "CVE-ID\n"
+        for vulnerability in input_file.get("vulnerabilities", []):
+            list_str += (vulnerability.get("id")) + "\n"
 
     return list_str
 
@@ -163,7 +116,7 @@ def get_list_of_trimed_vulnerabilities(
     output_file = {}
 
     for vulnerability in input_file.get("vulnerabilities", []):
-        if search_key(vulnerability, key, value):
+        if vulnerability.get("analysis", []).get("state", []) == state:
             trimmed_vulnerabilities.append(vulnerability)
 
     output_file = init_vex_header(input_file)
@@ -175,10 +128,8 @@ def get_vulnerability_by_id(input_file: dict[str, Any], id: str) -> dict[str, An
     found_vulnerabilities = []
     output_file = {}
     for vulnerability in input_file.get("vulnerabilities", []):
-        if vulnerability.get("id", "-") == id or any(
-            vul.get("id", "") == id for vul in vulnerability.get("references", [])
-        ):
-            found_vulnerabilities.append(vulnerability)
+        if vulnerability.get("id", []) == id:
+            searched_vulnerability.append(vulnerability)
 
     output_file = init_vex_header(input_file)
     output_file["vulnerabilities"] = found_vulnerabilities
@@ -249,10 +200,3 @@ def vex(
         return get_vulnerability_by_id(file, vul_id)
     elif sub_command == "extract":
         return get_vex_from_sbom(file)
-    else:
-        raise ValueError(
-            (
-                f"Invalid sub_command: '{sub_command}'",
-                "Expected one of ['list', 'trim', 'search', 'extract'].",
-            )
-        )

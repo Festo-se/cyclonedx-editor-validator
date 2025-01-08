@@ -4,11 +4,7 @@
 from typing import Any, Union
 
 
-import re
-from typing import Any, Union
-
-
-def init_vex_header(input_file: dict[str, Any]) -> dict[str, Any]:
+def init_vex_header(input_file: dict) -> dict:
     """
     Copy important keys and values from input_file to output_file.
 
@@ -30,7 +26,7 @@ def init_vex_header(input_file: dict[str, Any]) -> dict[str, Any]:
     return output_file
 
 
-def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
+def get_list_of_ids(input_file: dict, scheme: str) -> str:
     """
     Get a list of vulnerability IDs.
 
@@ -50,53 +46,24 @@ def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
         list_str += "CVE-ID,Description,Status\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             list_str += (
-                vulnerability.get("id")
+                vulID
                 + ","
-                + vulnerability.get("description")
+                + vulRefID
                 + ","
-                + vulnerability.get("analysis").get("state")
+                + vulDescription
+                + ","
+                + vulState
                 + "\n"
             )
     elif scheme == "lightweight":
         list_str += "CVE-ID\n"
         for vulnerability in input_file.get("vulnerabilities", []):
-            list_str += (vulnerability.get("id")) + "\n"
+            list_str += (vulnerability.get("id", "-") + ", " + vulnerability.get("references", {}).get("id", "-") + "\n")
 
     return list_str
 
 
-def search_key(data: dict[str, Any], key: str, value: str) -> bool:
-    """
-    Searches a (nested) dicionary for a key-value pair.
-    Returns True if found, False if not found.
-
-    Parameters
-    ----------
-    data: dict
-        A dictionary to be searched
-    key: str
-        The key to search for
-    value: str
-        The value associated with the key
-
-
-    Returns
-    -------
-    bool
-        True if found, False if not found
-    """
-    if key in data and data[key] == value:
-        return True
-    for k, v in data.items():
-        if isinstance(v, dict):
-            if search_key(v, key, value):
-                return True
-    return False
-
-
-def get_list_of_trimed_vulnerabilities(
-    input_file: dict[str, Any], key: str, value: str
-) -> dict[str, Any]:
+def get_list_of_trimed_vulnerabilities(input_file: dict, state: str) -> dict:
     """
     Get a file with vulnerabilities filtered by a key-value pair.
 
@@ -124,11 +91,11 @@ def get_list_of_trimed_vulnerabilities(
     return output_file
 
 
-def get_vulnerability_by_id(input_file: dict[str, Any], id: str) -> dict[str, Any]:
-    found_vulnerabilities = []
+def get_vulnerability_by_id(input_file: dict, id: str) -> dict:
+    searched_vulnerability = []
     output_file = {}
     for vulnerability in input_file.get("vulnerabilities", []):
-        if vulnerability.get("id", []) == id:
+        if vulnerability.get("id", "-") == id or vulnerability.get("references", {}).get("id", "") == id:
             searched_vulnerability.append(vulnerability)
 
     output_file = init_vex_header(input_file)
@@ -157,12 +124,7 @@ def get_vex_from_sbom(input_file: dict[str, Any]) -> dict[str, Any]:
 
 
 def vex(
-    sub_command: str,
-    file: dict[str, Any],
-    key: str = "",
-    value: str = "",
-    schema: str = "",
-    vul_id: str = "",
+    sub_command: str, file: dict, state: str, scheme: str, vul_id: str = ""
 ) -> Union[dict[str, Any], str]:
     """
     Get different information about vulnerabilities in VEX file.
@@ -200,3 +162,5 @@ def vex(
         return get_vulnerability_by_id(file, vul_id)
     elif sub_command == "extract":
         return get_vex_from_sbom(file)
+    else:
+        return {}

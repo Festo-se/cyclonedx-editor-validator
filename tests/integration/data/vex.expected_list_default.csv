@@ -1,15 +1,15 @@
-CVE-ID,Description,Status
-CVE-1012-0001,some description of a vulnerability,exploitable
-CVE-1013-0002,some description of a vulnerability 2,not_affected
-CVE-1013-0003,some description of a vulnerability 3,exploitable
-CVE-1013-0004,some description of a vulnerability 4,exploitable
-CVE-1013-0005,some description of a vulnerability 5,not_affected
-CVE-1013-0006,some description of a vulnerability 5,not_affected
-CVE-1012-0007,some description of a vulnerability 6,exploitable
-CVE-1013-0008,some description of a vulnerability 7,not_affected
-CVE-1013-0009,some description of a vulnerability 8,not_affected
-CVE-1013-0010,some description of a vulnerability 9,not_affected
-CVE-1013-0011,some description of a vulnerability 10,not_affected
-CVE-1012-0012,some description of a vulnerability 11,exploitable
-CVE-1012-0013,some description of a vulnerability 12,not_affected
-CVE-1012-0014,some description of a vulnerability 13,exploitable
+ID,RefID,Description,Status
+CVE-1012-0001,-,some description of a vulnerability,exploitable
+CVE-1013-0002,-,some description of a vulnerability 2,not_affected
+CVE-1013-0003,-,some description of a vulnerability 3,exploitable
+CVE-1013-0004,-,some description of a vulnerability 4,exploitable
+CVE-1013-0005,-,some description of a vulnerability 5,not_affected
+CVE-1013-0006,-,some description of a vulnerability 5,not_affected
+CVE-1012-0007,-,some description of a vulnerability 6,exploitable
+CVE-1013-0008,-,some description of a vulnerability 7,not_affected
+CVE-1013-0009,-,some description of a vulnerability 8,not_affected
+CVE-1013-0010,-,some description of a vulnerability 9,not_affected
+CVE-1013-0011,-,some description of a vulnerability 10,not_affected
+CVE-1012-0012,-,some description of a vulnerability 11,exploitable
+CVE-1012-0013,-,some description of a vulnerability 12,not_affected
+CVE-1012-0014,-,some description of a vulnerability 13,exploitable

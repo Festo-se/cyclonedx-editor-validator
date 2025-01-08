@@ -9,6 +9,7 @@ import re
 import shutil
 import sys
 import textwrap
+import typing as t
 from collections.abc import MutableSequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -43,7 +44,7 @@ class Status(enum.IntEnum):
     VALIDATION_ERROR = 4
 
 
-def main() -> int:
+def main() -> t.Union[int, t.Any]:
     """Main entry point for this tool."""
     args = parse_cli()
 
@@ -94,7 +95,7 @@ def read_sbom(sbom_file: Path, file_type: Optional[str] = None) -> Tuple[dict, s
     return sbom, file_type
 
 
-def load_json(path: Path) -> dict:
+def load_json(path: Path) -> t.Any:
     """Loads a JSON file into a dictionary."""
     try:
         with path.open(encoding="utf-8-sig") as file:

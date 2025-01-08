@@ -166,4 +166,4 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         ) as my_file:
             vex_file = json.load(my_file)
         result = vex.vex("invalid_command", vex_file, "", "")
-        self.assertEqual(result, None)
+        self.assertEqual(result, {})

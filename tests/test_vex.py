@@ -129,6 +129,18 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         result = vex.get_list_of_ids(file, "default")
         self.assertEqual(result, expected_output)
 
+    def test_get_list_of_ids_default_missing_data(self):
+        with open(
+            path_to_test_folder + "list_default_missing_data.csv", "r", encoding="utf-8-sig"
+        ) as my_file:
+            expected_output = my_file.read()
+        with open(
+            path_to_test_folder + "vex_missing_data.json", "r", encoding="utf-8-sig"
+        ) as my_file:
+            vex_file = json.load(my_file)
+        result = vex.get_list_of_ids(vex_file, "default")
+        self.assertEqual(result, expected_output)
+
     def test_get_list_of_ids_lightweight(self):
         file = load_file("vex.json")
         expected_output = (
@@ -217,6 +229,19 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         ) as my_file:
             vex = json.load(my_file)
         result = get_vulnerability_by_id(vex, "CVE-1013-0002")
+        self.assertEqual(result, expected_output)
+
+    def test_get_vulnerability_by_id_missing_data(self):
+        with open(
+            path_to_test_folder + "searched_vex_missing_data.json", "r", encoding="utf-8-sig"
+        ) as my_file:
+            expected_output = json.load(my_file)
+
+        with open(
+            path_to_test_folder + "vex_missing_data.json", "r", encoding="utf-8-sig"
+        ) as my_file:
+            vex_file = json.load(my_file)
+        result = vex.get_vulnerability_by_id(vex_file, "CVE-1013-0005")
         self.assertEqual(result, expected_output)
 
     def test_get_vex_from_sbom(self):

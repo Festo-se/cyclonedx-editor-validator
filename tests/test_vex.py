@@ -131,7 +131,9 @@ class TestVulnerabilityFunctions(unittest.TestCase):
 
     def test_get_list_of_ids_default_missing_data(self):
         with open(
-            path_to_test_folder + "list_default_missing_data.csv", "r", encoding="utf-8-sig"
+            path_to_test_folder + "list_default_missing_data.csv",
+            "r",
+            encoding="utf-8-sig",
         ) as my_file:
             expected_output = my_file.read()
         with open(
@@ -233,7 +235,9 @@ class TestVulnerabilityFunctions(unittest.TestCase):
 
     def test_get_vulnerability_by_id_missing_data(self):
         with open(
-            path_to_test_folder + "searched_vex_missing_data.json", "r", encoding="utf-8-sig"
+            path_to_test_folder + "searched_vex_missing_data.json",
+            "r",
+            encoding="utf-8-sig",
         ) as my_file:
             expected_output = json.load(my_file)
 
@@ -284,5 +288,9 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         self.assertEqual(result["vulnerabilities"], embedded_vex["vulnerabilities"])
 
     def test_vex_invalid_subcommand(self):
-        result = vex.vex("invalid_command", load_file("vex.json"), "", "", "")
-        self.assertEqual(result, {})
+        with open(
+            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
+        ) as my_file:
+            vex_file = json.load(my_file)
+        result = vex.vex("invalid_command", vex_file, "", "")
+        self.assertEqual(result, None) 

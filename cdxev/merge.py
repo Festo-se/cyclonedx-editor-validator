@@ -18,6 +18,7 @@ from cdxev.auxiliary.sbomFunctions import (
     get_bom_refs_from_dependencies,
     get_dependency_by_ref,
     get_ref_from_components,
+    extract_components,
 )
 from cdxev.log import LogMessage
 
@@ -971,5 +972,162 @@ def replace_ref_in_sbom(
         for affected in vulnerability.get("affects", []):
             if affected.get("ref", "") == reference_to_be_replaced:
                 affected["ref"] = new_reference
-                break  # per vulnerability every ref should only appear once
     return True
+
+
+def get_ref_components_mapping(
+    components_list: list[dict],
+) -> dict[str, ComponentIdentity]:
+    component_dict: dict[str, ComponentIdentity] = {}
+    for component in components_list:
+        if component != {}:
+            ref = component.get("bom-ref", "")
+            identity = ComponentIdentity.create(component, allow_unsafe=True)
+            if not ref:
+                component["bom-ref"] = str(identity)
+            component_dict[ref] = identity
+    return component_dict
+
+
+def make_bom_refs_unique(list_of_sboms: list[dict]) -> None:
+    list_of_used_references: list[str] = []
+    for n in range(len(list_of_sboms)):
+        primary_sbom = list_of_sboms[n]
+        retained_components = get_ref_components_mapping(
+            primary_sbom.get("components", [])
+            + [primary_sbom.get("metadata", {}).get("component", {})]
+        )
+        list_of_used_references += list(retained_components.keys())
+        for k in range(n + 1, len(list_of_sboms)):
+            secondary_sbom = list_of_sboms[k]
+            new_components = get_ref_components_mapping(
+                secondary_sbom.get("components", [])
+                + [secondary_sbom.get("metadata", {}).get("component", {})]
+            )
+
+            for reference in new_components.keys():
+                if (
+                    reference in new_components.keys()
+                    and retained_components.get(reference, "")
+                    != new_components[reference]
+                ):
+                    new_reference = str(new_components[reference])
+                    index = 1
+                    while new_reference in list_of_used_references:
+                        new_reference = str(new_components[reference]) + str(index)
+                        index += 1
+
+                    replace_ref_in_components(
+                        secondary_sbom.get("components", [])
+                        + [secondary_sbom.get("metadata", {}).get("component", {})],
+                        reference,
+                        new_reference,
+                    )
+                    replace_ref_in_dependencies(
+                        secondary_sbom.get("dependencies", []), reference, new_reference
+                    )
+                    replace_ref_in_compositions(
+                        secondary_sbom.get("compositions", []), reference, new_reference
+                    )
+                    replace_ref_in_vulnerabilities(
+                        secondary_sbom.get("vulnerabilities", []),
+                        reference,
+                        new_reference,
+                    )
+
+                else:
+                    list_of_used_references.append(reference)
+
+
+def unify_bom_refs(list_of_sboms: list[dict]) -> None:
+    for n in range(len(list_of_sboms)):
+        primary_sbom = list_of_sboms[n]
+        primary_components = extract_components(
+            primary_sbom.get("components", [])
+            + [primary_sbom.get("metadata", {}).get("component", {})]
+        )
+        for k in range(n + 1, len(list_of_sboms)):
+            secondary_sbom = list_of_sboms[k]
+            new_components = extract_components(
+                secondary_sbom.get("components", [])
+                + [secondary_sbom.get("metadata", {}).get("component", {})]
+            )
+            for new_component in new_components:
+                for primary_component in primary_components:
+                    if ComponentIdentity.create(
+                        new_component, allow_unsafe=True
+                    ) == ComponentIdentity.create(
+                        primary_component, allow_unsafe=True
+                    ) and new_component.get(
+                        "bom-ref", ""
+                    ) != primary_component.get(
+                        "bom-ref", ""
+                    ):
+                        reference = new_component.get("bom-ref", "")
+                        new_reference = primary_component.get("bom-ref", "")
+                        replace_ref_in_components(
+                            secondary_sbom.get("components", [])
+                            + [secondary_sbom.get("metadata", {}).get("component", {})],
+                            reference,
+                            new_reference,
+                        )
+                        replace_ref_in_dependencies(
+                            secondary_sbom.get("dependencies", []),
+                            reference,
+                            new_reference,
+                        )
+                        replace_ref_in_compositions(
+                            secondary_sbom.get("compositions", []),
+                            reference,
+                            new_reference,
+                        )
+                        replace_ref_in_vulnerabilities(
+                            secondary_sbom.get("vulnerabilities", []),
+                            reference,
+                            new_reference,
+                        )
+
+
+def replace_ref_in_components(
+    components: list[dict], reference: str, new_reference: str
+) -> None:
+    for component in components:
+        if component.get("bom-ref", "") == reference:
+            component["bom-ref"] = new_reference
+
+
+def replace_ref_in_dependencies(
+    dependencies: list[dict], reference: str, new_reference: str
+) -> None:
+    for dependency in dependencies:
+        if dependency.get("ref", "") == reference:
+            dependency["ref"] = new_reference
+        else:  # component should not depend on itself
+            dependson = dependency.get("dependsOn", [])
+            if reference in dependson:
+                new_dependson = [
+                    new_reference if entry == reference else entry
+                    for entry in dependson
+                ]
+                dependency["dependsOn"] = new_dependson
+
+
+def replace_ref_in_compositions(
+    compositions: list[dict], reference: str, new_reference: str
+) -> None:
+    for composition in compositions:
+        assemblies = composition.get("assemblies", [])
+        if reference in assemblies:
+            new_assemblies = [
+                new_reference if entry == reference else entry for entry in assemblies
+            ]
+            composition["assemblies"] = new_assemblies
+
+
+def replace_ref_in_vulnerabilities(
+    vulnerabilities: list[dict], reference: str, new_reference: str
+) -> None:
+    for vulnerability in vulnerabilities:
+        for affected in vulnerability.get("affects", []):
+            if affected.get("ref", "") == reference:
+                affected["ref"] = new_reference

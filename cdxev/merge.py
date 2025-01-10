@@ -11,10 +11,6 @@ from univers.versions import nuget
 
 from cdxev.auxiliary.identity import ComponentIdentity
 from cdxev.auxiliary.sbomFunctions import (
-    compare_time_flag_from_vulnerabilities,
-    compare_vulnerabilities,
-    copy_ratings,
-    extract_components,
     get_bom_refs_from_dependencies,
     get_dependency_by_ref,
     get_ref_from_components,
@@ -324,10 +320,14 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     0
 
     """
+    # make the bom-refs unique and synchronize them across all SBOMs
+    make_bom_refs_unique(sboms)
+    unify_bom_refs(sboms)
+
+    # create identity object for all vulnerabilities
     concatenated_vulnerabilities: list[dict] = []
     for k in range(1, len(sboms)):
         concatenated_vulnerabilities += sboms[k].get("vulnerabilities", [])
-
     identities = get_identities_for_vulnerabilities(concatenated_vulnerabilities)
 
     merged_sbom = sboms[0]
@@ -748,120 +748,6 @@ def merge_vulnerabilities(
     return list_of_merged_vulnerabilities
 
 
-def merge_vulnerabilities_old(
-    list_of_original_vulnerabilities: t.Sequence[dict],
-    list_of_new_vulnerabilities: t.Sequence[dict],
-) -> t.Sequence[dict]:
-    """
-    Merges the vulnerabilities of two sboms
-
-    Parameters
-    ----------
-    list_of_original_vulnerabilities : Sequence[dict]
-        The list of Vulnerabilities of the sbom in which should be merged
-    list_of_new_vulnerabilities: Sequence[dict]
-        The list of Vulnerabilities of the new sbom that will be merged in the other
-
-    Returns
-    -------
-    Sequence[dict]
-        List with the merged Vulnerabilities
-    """
-    # replace old bom-refs with the bom refs of the merged sbom
-    list_of_merged_vulnerabilities = []
-    for vulnerability in list_of_new_vulnerabilities:
-        affected = vulnerability.get("affects", [])
-        is_in = False
-        for original_vulnerability in list_of_original_vulnerabilities:
-            if compare_vulnerabilities(vulnerability, original_vulnerability):
-                time_flag = compare_time_flag_from_vulnerabilities(
-                    original_vulnerability, vulnerability
-                )
-                if time_flag == 2:
-                    entry_of_merged_vulnerability = vulnerability.copy()
-                else:
-                    entry_of_merged_vulnerability = original_vulnerability.copy()
-                is_in = True
-                merged_affects = original_vulnerability.get("affects", [])
-                for references in affected:
-                    if references not in merged_affects:
-                        merged_affects.append(references)
-                if original_vulnerability.get("ratings", []) and vulnerability.get(
-                    "ratings", []
-                ):
-                    merged_ratings = merge_ratings(
-                        original_vulnerability.get("ratings", []),
-                        vulnerability.get("ratings", 2),
-                        time_flag,
-                    )
-                    entry_of_merged_vulnerability["ratings"] = merged_ratings
-                elif original_vulnerability.get("ratings", []):
-                    entry_of_merged_vulnerability["ratings"] = (
-                        original_vulnerability.get("ratings", 2)
-                    )
-                elif vulnerability.get("ratings", []):
-                    entry_of_merged_vulnerability["ratings"] = vulnerability.get(
-                        "ratings", 2
-                    )
-                list_of_merged_vulnerabilities.append(entry_of_merged_vulnerability)
-        if not is_in:
-            list_of_merged_vulnerabilities.append(vulnerability)
-    return list_of_merged_vulnerabilities
-
-
-def merge_ratings(
-    original_ratings: t.Sequence[dict],
-    ratings_to_be_merged: t.Sequence[dict],
-    time_flag: int = 0,
-) -> list:
-    """
-    Merges two lists of ratings from two vulnerabilities. If two ratings used the same methods,
-    the rating with the higher risk is used
-    if a flag is given, the entry from the designated input is used
-    if time_flag == 1 the rating from the first input is used,
-    for time_flag == 2 the second is used
-    for time_flag == 0 (default) the higher rating is used
-
-    Parameters
-    ----------
-    original_ratings: list
-        A list of ratings from a vulnerability
-    ratings_to_be_merged: list
-        A list of ratings from a vulnerability
-    time_flag: int
-        Flag to determine which rating should be used
-
-    Returns
-    -------
-    list:
-        List with the merged ratings
-    """
-    merged_ratings = copy_ratings(original_ratings)
-    list_of_merged_rating_methods = [
-        rating.get("method", "")
-        for rating in original_ratings
-        if rating.get("method", "")
-    ]
-    for rating in ratings_to_be_merged:
-        if not rating.get("method", "") in list_of_merged_rating_methods and rating.get(
-            "method", ""
-        ):
-            list_of_merged_rating_methods.append(rating.get("method", 1))
-            merged_ratings.append(rating)
-        else:
-            for entry_of_merged_ratings in merged_ratings:
-                if not rating.get("method", 2) == entry_of_merged_ratings.get(
-                    "method", 1
-                ):
-                    continue
-                if time_flag == 2:
-                    entry_of_merged_ratings["score"] = rating.get("score", "")
-                elif time_flag == 0:
-                    if rating.get("score", 2) > entry_of_merged_ratings.get("score", 2):
-                        entry_of_merged_ratings["score"] = rating.get("score", 2)
-    return merged_ratings
-
-
 def merge_compositions(
     list_to_be_merged_in: list,
     list_of_new_compositions: list,
@@ -989,8 +875,24 @@ def get_ref_components_mapping(
     return component_dict
 
 
-def make_bom_refs_unique(list_of_sboms: list[dict]) -> None:
+def replace_bom_ref_in_sbom(sbom: dict, reference: str, new_reference: str) -> None:
+    replace_ref_in_components(
+        sbom.get("components", []) + [sbom.get("metadata", {}).get("component", {})],
+        reference,
+        new_reference,
+    )
+    replace_ref_in_dependencies(sbom.get("dependencies", []), reference, new_reference)
+    replace_ref_in_compositions(sbom.get("compositions", []), reference, new_reference)
+    replace_ref_in_vulnerabilities(
+        sbom.get("vulnerabilities", []),
+        reference,
+        new_reference,
+    )
+
+
+def make_bom_refs_unique(list_of_sboms: t.Sequence[dict]) -> None:
     list_of_used_references: list[str] = []
+    assigned_bom_refs: dict[ComponentIdentity, str] = {}
     for n in range(len(list_of_sboms)):
         primary_sbom = list_of_sboms[n]
         retained_components = get_ref_components_mapping(
@@ -1007,39 +909,36 @@ def make_bom_refs_unique(list_of_sboms: list[dict]) -> None:
 
             for reference in new_components.keys():
                 if (
-                    reference in new_components.keys()
-                    and retained_components.get(reference, "")
-                    != new_components[reference]
+                    reference in retained_components.keys()
+                    and retained_components[reference] != new_components[reference]
+                    and new_components[reference] not in assigned_bom_refs.keys()
                 ):
+
                     new_reference = str(new_components[reference])
                     index = 1
                     while new_reference in list_of_used_references:
-                        new_reference = str(new_components[reference]) + str(index)
+                        new_reference = (
+                            str(new_components[reference]) + "-" + str(index)
+                        )
                         index += 1
+                    list_of_used_references.append(new_reference)
 
-                    replace_ref_in_components(
-                        secondary_sbom.get("components", [])
-                        + [secondary_sbom.get("metadata", {}).get("component", {})],
+                    assigned_bom_refs[new_components[reference]] = new_reference
+
+                    replace_bom_ref_in_sbom(secondary_sbom, reference, new_reference)
+
+                elif new_components[reference] in assigned_bom_refs.keys():
+                    replace_bom_ref_in_sbom(
+                        secondary_sbom,
                         reference,
-                        new_reference,
-                    )
-                    replace_ref_in_dependencies(
-                        secondary_sbom.get("dependencies", []), reference, new_reference
-                    )
-                    replace_ref_in_compositions(
-                        secondary_sbom.get("compositions", []), reference, new_reference
-                    )
-                    replace_ref_in_vulnerabilities(
-                        secondary_sbom.get("vulnerabilities", []),
-                        reference,
-                        new_reference,
+                        assigned_bom_refs[new_components[reference]],
                     )
 
                 else:
                     list_of_used_references.append(reference)
 
 
-def unify_bom_refs(list_of_sboms: list[dict]) -> None:
+def unify_bom_refs(list_of_sboms: t.Sequence[dict]) -> None:
     for n in range(len(list_of_sboms)):
         primary_sbom = list_of_sboms[n]
         primary_components = extract_components(
@@ -1065,26 +964,9 @@ def unify_bom_refs(list_of_sboms: list[dict]) -> None:
                     ):
                         reference = new_component.get("bom-ref", "")
                         new_reference = primary_component.get("bom-ref", "")
-                        replace_ref_in_components(
-                            secondary_sbom.get("components", [])
-                            + [secondary_sbom.get("metadata", {}).get("component", {})],
-                            reference,
-                            new_reference,
-                        )
-                        replace_ref_in_dependencies(
-                            secondary_sbom.get("dependencies", []),
-                            reference,
-                            new_reference,
-                        )
-                        replace_ref_in_compositions(
-                            secondary_sbom.get("compositions", []),
-                            reference,
-                            new_reference,
-                        )
-                        replace_ref_in_vulnerabilities(
-                            secondary_sbom.get("vulnerabilities", []),
-                            reference,
-                            new_reference,
+
+                        replace_bom_ref_in_sbom(
+                            secondary_sbom, reference, new_reference
                         )
 
 

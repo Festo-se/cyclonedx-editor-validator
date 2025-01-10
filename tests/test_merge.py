@@ -3,11 +3,13 @@
 import copy
 import json
 import unittest
+import copy
 
 from cdxev import merge
 from cdxev.auxiliary import sbomFunctions as sbF
 from cdxev.auxiliary.identity import ComponentIdentity
 from tests.auxiliary import helper as helper
+from cdxev.auxiliary.identity import ComponentIdentity
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
 
@@ -595,6 +597,209 @@ class TestReplaceBomRefs(unittest.TestCase):
             merge.replace_ref_in_sbom("gp_first_component-copy", "sub_program", sbom)
         )
 
+    def test_replace_ref_in_component(self) -> None:
+        component = {
+            "type": "library",
+            "bom-ref": "sub_program",
+            "supplier": {"name": "Company Legal"},
+            "group": "com.company.governing",
+            "name": "sub_program",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "T5.0.3.96",
+        }
+        component_2 = {"bom-ref": "value"}
+        component_3: dict = {}
+        reference = "sub_program"
+        new_reference = "new"
+        component_list: list[dict] = [component, component_2, {}]
+        component_list_copy = copy.deepcopy(component_list)
+
+        merge.replace_ref_in_components(component_list, "...", new_reference)
+        self.assertEqual(component_list, component_list_copy)
+
+        merge.replace_ref_in_components(
+            [component, component_2, component_3], reference, new_reference
+        )
+        self.assertEqual(component["bom-ref"], new_reference)
+        self.assertEqual(component_2["bom-ref"], "value")
+
+    def test_replace_ref_in_dependencies(self) -> None:
+        dependencies = [
+            {"ref": "sp_second_component", "dependsOn": []},
+            {
+                "ref": "sp_fourth_component",
+                "dependsOn": ["sp_second_component", "sp_second_component", "other"],
+            },
+        ]
+        dependencies_copy = copy.deepcopy(dependencies)
+
+        reference = "sp_second_component"
+        new_reference = "new"
+
+        merge.replace_ref_in_dependencies(dependencies, "...", new_reference)
+        self.assertEqual(dependencies, dependencies_copy)
+
+        merge.replace_ref_in_dependencies(dependencies, reference, new_reference)
+        self.assertEqual(dependencies[0]["ref"], new_reference)
+        self.assertEqual(dependencies[1]["ref"], "sp_fourth_component")
+        self.assertEqual(
+            dependencies[1]["dependsOn"], [new_reference, new_reference, "other"]
+        )
+
+    def test_replace_ref_in_compositions(self) -> None:
+        compositions = [
+            {
+                "aggregate": "complete",
+                "assemblies": [
+                    "sp_first_component",
+                    "sp_second_component",
+                    "sp_fourth_component",
+                ],
+            },
+            {
+                "aggregate": "incomplete",
+                "assemblies": [
+                    "sp_fifth_component",
+                    "sp_sixth_component",
+                    "sp_second_component",
+                    "sp_second_component",
+                ],
+            },
+        ]
+        compositions_copy = copy.deepcopy(compositions)
+        reference = "sp_second_component"
+        new_reference = "new"
+
+        merge.replace_ref_in_compositions(compositions, "...", new_reference)
+        self.assertEqual(compositions, compositions_copy)
+
+        compositions_copy[0]["assemblies"][1] = new_reference  # type:ignore
+        compositions_copy[1]["assemblies"][2] = new_reference  # type:ignore
+        compositions_copy[1]["assemblies"][3] = new_reference  # type:ignore
+
+        merge.replace_ref_in_compositions(compositions, reference, new_reference)
+        self.assertEqual(compositions, compositions_copy)
+
+    def test_replace_ref_in_vulnerabilities(self) -> None:
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]["original_vulnerabilities"]
+        vulnerabilities_replaced = load_sections_for_test_sbom()[
+            "vulnerabilities_ref_product_3_replaced"
+        ]
+        reference = "product 3"
+        new_reference = "new"
+        merge.replace_ref_in_vulnerabilities(vulnerabilities, reference, new_reference)
+        self.assertEqual(vulnerabilities, vulnerabilities_replaced)
+
+    def test_get_ref_components_mapping(self) -> None:
+        components = [
+            {"name": "comp 1", "version": "1.0.0", "bom-ref": "com-1"},
+            {"name": "comp 3", "version": "1.0.0", "bom-ref": "com-2"},
+            {"name": "comp 3", "version": "1.0.0", "bom-ref": "com-3"},
+        ]
+        ref_mapping = merge.get_ref_components_mapping(components)
+        self.assertEqual(
+            ref_mapping,
+            {
+                "com-1": ComponentIdentity.create(components[0], allow_unsafe=True),
+                "com-2": ComponentIdentity.create(components[1], allow_unsafe=True),
+                "com-3": ComponentIdentity.create(components[2], allow_unsafe=True),
+            },
+        )
+
+    def test_make_bom_refs_unique(self) -> None:
+        sbom_1 = load_sections_for_test_sbom()["sbom_replace_references_1"]
+        sbom_2 = load_sections_for_test_sbom()["sbom_replace_references_2"]
+        sbom_3 = load_sections_for_test_sbom()["sbom_replace_references_3"]
+        sbom_4 = load_sections_for_test_sbom()["sbom_replace_references_4"]
+
+        sbom_2_replaced = load_sections_for_test_sbom()[
+            "sbom_replace_references_2_replaced"
+        ]
+        sbom_3_replaced = load_sections_for_test_sbom()[
+            "sbom_replace_references_3_replaced"
+        ]
+        sbom_4_replaced = load_sections_for_test_sbom()[
+            "sbom_replace_references_4_replaced"
+        ]
+
+        sbom_1_copy = copy.deepcopy(sbom_1)
+        merge.make_bom_refs_unique([sbom_1, sbom_2, sbom_3, sbom_4])
+
+        with open(
+            "sbom_2_replaced_vulnerabilities.json", "w", encoding="utf8"
+        ) as json_file:
+            json.dump(sbom_2, json_file, indent=4)
+
+        self.assertEqual(sbom_1, sbom_1_copy)
+        self.assertEqual(sbom_2_replaced, sbom_2)
+        self.assertEqual(sbom_3_replaced, sbom_3)
+        self.assertEqual(sbom_4_replaced, sbom_4)
+
+    def test_unify_bom_refs(self) -> None:
+        sbom_1 = load_sections_for_test_sbom()["sbom_unify_references_1"]
+        sbom_2 = load_sections_for_test_sbom()["sbom_unify_references_2"]
+        sbom_3 = copy.deepcopy(sbom_1)
+        sbom_3["vulnerabilities"] = copy.deepcopy(sbom_2["vulnerabilities"])
+        merge.replace_ref_in_vulnerabilities(
+            sbom_3["vulnerabilities"], "comp 3 -", "comp 3"
+        )
+        merge.replace_ref_in_vulnerabilities(
+            sbom_3["vulnerabilities"], "comp 2 -", "comp 2"
+        )
+        merge.replace_ref_in_vulnerabilities(
+            sbom_3["vulnerabilities"], "comp 1 -", "comp 1"
+        )
+        sbom_3["components"][2] = copy.deepcopy(sbom_2["components"][2])
+        sbom_3["components"][2]["bom-ref"] = "comp 3"
+
+        sbom_3_expected = copy.deepcopy(sbom_1)
+        sbom_3_expected["components"][2] = copy.deepcopy(sbom_2["components"][2])
+        sbom_3_expected["vulnerabilities"] = copy.deepcopy(sbom_2["vulnerabilities"])
+        merge.replace_ref_in_components(
+            sbom_3_expected["components"], "comp 3", "comp 3 -"
+        )
+        merge.replace_ref_in_compositions(
+            sbom_3_expected["compositions"], "comp 3", "comp 3 -"
+        )
+        merge.replace_ref_in_dependencies(
+            sbom_3_expected["dependencies"], "comp 3", "comp 3 -"
+        )
+
+        merge.replace_ref_in_vulnerabilities(
+            sbom_3_expected["vulnerabilities"], "comp 1 -", "comp 1"
+        )
+
+        merge.replace_ref_in_vulnerabilities(
+            sbom_3_expected["vulnerabilities"], "comp 2 -", "comp 2"
+        )
+
+        sbom_2_expected = copy.deepcopy(sbom_1)
+        sbom_2_expected["vulnerabilities"] = copy.deepcopy(
+            sbom_3_expected["vulnerabilities"]
+        )
+
+        sbom_2_expected["components"][2] = copy.deepcopy(sbom_2["components"][2])
+        merge.replace_ref_in_components(
+            sbom_2_expected["components"], "comp 3", "comp 3 -"
+        )
+        merge.replace_ref_in_compositions(
+            sbom_2_expected["compositions"], "comp 3", "comp 3 -"
+        )
+        merge.replace_ref_in_dependencies(
+            sbom_2_expected["dependencies"], "comp 3", "comp 3 -"
+        )
+        merge.replace_ref_in_vulnerabilities(
+            sbom_2_expected["vulnerabilities"], "comp 3", "comp 3 -"
+        )
+
+        merge.unify_bom_refs([sbom_1, sbom_2, sbom_3])
+
+        self.assertEqual(sbom_1, sbom_1)
+        self.assertEqual(sbom_2, sbom_2_expected)
+        self.assertEqual(sbom_3, sbom_3_expected)
+
 
 class TestMergeComponents(unittest.TestCase):
     def test_merge_components(self) -> None:
@@ -1171,6 +1376,20 @@ class TestVulnerabilities(unittest.TestCase):
         self.assertEqual(new_vulnerabilities, actual_merged_2)
         self.assertEqual(original_vulnerabilities, actual_merged_3)
         self.assertEqual(new_vulnerabilities, actual_merged_4)
+
+    """
+    def test_merge_replace_ref(self) -> None:
+        sections = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
+        original_sbom = sections["merge.input_1"]
+        new_sbom = sections["merge.input_2"]
+
+        merged_sbom = merge.merge_2_sboms(original_sbom, new_sbom)
+
+        with open("merged_sbom.json", "w", encoding="utf8") as json_file:
+            json.dump(merged_sbom, json_file, indent=4)
+    """
 
 
 # TODO write tests that verify the replacement of refs!!

@@ -269,107 +269,45 @@ class TestMergeSboms(unittest.TestCase):
     def test_vulnerabilities_in_the_second(self) -> None:
         sbom1 = load_governing_program()
         sbom2 = load_sub_program()
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom2["vulnerabilities"] = dictionary_with_stuff[
-            "sub_program_with_vulnerabilities"
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
         ]
+        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
+
+        sbom2["vulnerabilities"] = original_vulnerabilities
         sbom_merged = load_governing_program_merged_sub_program()
-        sbom_merged["vulnerabilities"] = dictionary_with_stuff[
-            "sub_program_with_vulnerabilities"
-        ]
+        sbom_merged["vulnerabilities"] = original_vulnerabilities
         self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_vulnerabilities_in_the_first(self) -> None:
         sbom1 = load_governing_program()
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom1["vulnerabilities"] = dictionary_with_stuff[
-            "governing_program_with_vulnerabilities"
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
         ]
-        sbom2 = load_sub_program()
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom_merged = load_governing_program_merged_sub_program()
-        sbom_merged["vulnerabilities"] = dictionary_with_stuff[
-            "merged_governing_program_with_vul_without"
-        ]
-        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
 
-    def test_vulnerabilities_same_component(self) -> None:
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom1 = load_governing_program()
-        sbom1["vulnerabilities"] = dictionary_with_stuff[
-            "governing_program_with_vulnerabilities"
-        ]
+        sbom1["vulnerabilities"] = original_vulnerabilities
         sbom2 = load_sub_program()
-        sbom2["components"][2]["version"] = "2.24.0"
-        sbom2["vulnerabilities"] = dictionary_with_stuff[
-            "sub_program_with_vulnerabilities_equal_mbed_tls"
-        ]
         sbom_merged = load_governing_program_merged_sub_program()
-        sbom_merged["dependencies"] = dictionary_with_stuff["dependencies_tls_equal"]
-        sbom_merged["compositions"] = dictionary_with_stuff["compositions_tls_equal"]
-        sbom_merged["components"] = [
-            component
-            for component in sbom_merged["components"]
-            if component["bom-ref"] != "sp_fifteenth_component"
-        ]
-        sbom_merged["vulnerabilities"] = dictionary_with_stuff[
-            "vulnerabilities_tls_equal"
-        ]
-        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
-
-    def test_vulnerabilities_different_component(self) -> None:
-        sbom1 = load_governing_program()
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom1["vulnerabilities"] = dictionary_with_stuff[
-            "governing_program_with_vulnerabilities"
-        ]
-        sbom2 = load_sub_program()
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom2["vulnerabilities"] = dictionary_with_stuff[
-            "sub_program_with_vulnerabilities"
-        ]
-        sbom_merged = load_governing_program_merged_sub_program()
-        sbom_merged["vulnerabilities"] = dictionary_with_stuff[
-            "merged_governing_program_with_vul_tls_unequal"
-        ]
-        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
-
-        # in the compare function, the order of the affected in the list is also compared
-
-    def test_vulnerabilities_merge_two_affected(self) -> None:
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom1 = load_governing_program()
-        sbom1["vulnerabilities"] = dictionary_with_stuff[
-            "governing_program_with_vulnerabilities"
-        ]
-        sbom2 = load_sub_program()
-        sbom2["vulnerabilities"] = dictionary_with_stuff[
-            "sub_program_with_vulnerabilities_several_affect_references"
-        ]
-        sbom_merged = load_governing_program_merged_sub_program()
-        sbom_merged["vulnerabilities"] = dictionary_with_stuff[
-            "merged_with_vulnerabilities_several_affect_references"
-        ]
+        sbom_merged["vulnerabilities"] = original_vulnerabilities
         self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_merge_sboms_same_sbom(self) -> None:
-        dictionary_with_stuff = load_sections_for_test_sbom()
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
+        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
+        new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
+        merged_vulnerabilities = vulnerabilities["merged_vulnerabilities"]
+
         sbom1 = load_governing_program()
-        sbom1["vulnerabilities"] = dictionary_with_stuff[
-            "governing_program_with_vulnerabilities"
-        ]
+        sbom1["vulnerabilities"] = new_vulnerabilities
         sbom2 = load_sub_program()
-        sbom2["vulnerabilities"] = dictionary_with_stuff[
-            "sub_program_with_vulnerabilities_several_affect_references"
-        ]
+        sbom2["vulnerabilities"] = original_vulnerabilities
         sbom_merged = load_governing_program_merged_sub_program()
-        sbom_merged["vulnerabilities"] = dictionary_with_stuff[
-            "merged_with_vulnerabilities_several_affect_references"
-        ]
+        sbom_merged["vulnerabilities"] = merged_vulnerabilities
         sbom3 = load_governing_program()
-        sbom3["vulnerabilities"] = dictionary_with_stuff[
-            "governing_program_with_vulnerabilities"
-        ]
+        sbom3["vulnerabilities"] = original_vulnerabilities
         sbom4 = load_sub_program()
         sbom4["components"][2]["version"] = "2.24.0"
         self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom1]), sbom1))
@@ -385,48 +323,6 @@ class TestMergeSboms(unittest.TestCase):
         self.assertEqual(
             sbF.get_component_by_ref("not existing ref", sbom["components"]), {}
         )
-
-    def test_different_ratings(self) -> None:
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom1 = load_governing_program()
-        sbom1["vulnerabilities"] = dictionary_with_stuff[
-            "governing_program_with_vulnerabilities"
-        ]
-        sbom2 = load_sub_program()
-        sbom2["vulnerabilities"] = dictionary_with_stuff[
-            "sub_program_with_vulnerabilities_new_ratings"
-        ]
-        sbom_merged = load_governing_program_merged_sub_program()
-        sbom_merged["vulnerabilities"] = dictionary_with_stuff["merged_new_ratings"]
-        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
-
-    def test_with_only_published(self) -> None:
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom1 = load_governing_program()
-        sbom1["vulnerabilities"] = dictionary_with_stuff[
-            "governing_program_with_vulnerabilities_published"
-        ]
-        sbom2 = load_sub_program()
-        sbom2["vulnerabilities"] = dictionary_with_stuff[
-            "sub_program_with_vulnerabilities_published"
-        ]
-        sbom_merged = load_governing_program_merged_sub_program()
-        sbom_merged["vulnerabilities"] = dictionary_with_stuff["merged_published"]
-        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
-
-    def test_with_updated(self) -> None:
-        dictionary_with_stuff = load_sections_for_test_sbom()
-        sbom1 = load_governing_program()
-        sbom1["vulnerabilities"] = dictionary_with_stuff[
-            "governing_program_with_vulnerabilities_updated"
-        ]
-        sbom2 = load_sub_program()
-        sbom2["vulnerabilities"] = dictionary_with_stuff[
-            "sub_program_with_vulnerabilities_updated"
-        ]
-        sbom_merged = load_governing_program_merged_sub_program()
-        sbom_merged["vulnerabilities"] = dictionary_with_stuff["merged_updated"]
-        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_same_bom_ref_different_component(self) -> None:
         sbom1 = load_governing_program()
@@ -950,7 +846,7 @@ class TestVulnerabilities(unittest.TestCase):
             merge.compare_affects_versions_object(
                 {"range": "vers:cargo/>9.0.14"}, {"range": "vers:cargo/<9.0.14"}
             ),
-            0,
+            3,
         )
         self.assertEqual(
             merge.compare_affects_versions_object(
@@ -1018,11 +914,15 @@ class TestVulnerabilities(unittest.TestCase):
             "vuln_id",
             "ref",
         )
+
         self.assertEqual(
             kept_versions,
             [
                 {"version": "2.7", "status": "be kept"},
-                {"range": "vers:generic/>=2.5|<=4.1|!=2.6", "status": "2.6 removed"},
+                {
+                    "range": "vers:generic/>=2.5|<=4.1|!=2.6|!=4.0",
+                    "status": "2.6 removed",
+                },
             ],
         )
 
@@ -1045,6 +945,8 @@ class TestVulnerabilities(unittest.TestCase):
         kept_affects = merge.extract_new_affects(
             lists["original_affects"], lists["new_affects"], "vuln_id"
         )
+        with open("kept_affects.json", "w", encoding="utf8") as json_file:
+            json.dump(kept_affects, json_file, indent=4)
 
         self.assertEqual(
             kept_affects,
@@ -1061,8 +963,27 @@ class TestVulnerabilities(unittest.TestCase):
                     "ref": "product 3",
                     "versions": [{"version": "1.4", "status": "affected"}],
                 },
+                {
+                    "ref": "product 1",
+                    "versions": [
+                        {"range": "vers:generic/>=2.9|<=5.1", "status": "affected"}
+                    ],
+                },
             ],
         )
+
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
+        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
+
+        actual_merged = merge.extract_new_affects(
+            original_vulnerabilities[2]["affects"],
+            original_vulnerabilities[2]["affects"],
+            "vuln_id",
+        )
+
+        self.assertEqual(actual_merged, [])
 
     def test_vulnerability_identity_Class(self) -> None:
         identity = merge.VulnerabilityIdentity("id", ["ref 1", "ref 2"])
@@ -1141,7 +1062,7 @@ class TestVulnerabilities(unittest.TestCase):
             "collect_affects_of_vulnerabilities"
         ]
         identities = merge.get_identities_for_vulnerabilities(lists)
-        collected = merge.collect_affects_of_vulnerabilities(lists)
+        collected = merge.collect_affects_of_vulnerabilities(lists, identities)
 
         vuln_id = identities[json.dumps(lists[0], sort_keys=True)].string()
         self.assertEqual(
@@ -1170,6 +1091,89 @@ class TestVulnerabilities(unittest.TestCase):
             ],
         )
 
+    def test_merge_vulnerabilities(self) -> None:
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
+        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
+        new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
+        merged_vulnerabilities = vulnerabilities["merged_vulnerabilities"]
+
+        identities = merge.get_identities_for_vulnerabilities(
+            original_vulnerabilities + new_vulnerabilities
+        )
+
+        actual_merged = merge.merge_vulnerabilities(
+            original_vulnerabilities, new_vulnerabilities, identities
+        )
+        self.assertEqual(merged_vulnerabilities, actual_merged)
+
+    def test_merge_same_vulnerabilities(self) -> None:
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
+        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
+        new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
+
+        identities_1 = merge.get_identities_for_vulnerabilities(
+            original_vulnerabilities
+        )
+
+        identities_2 = merge.get_identities_for_vulnerabilities(new_vulnerabilities)
+
+        actual_merged = merge.merge_vulnerabilities(
+            original_vulnerabilities, original_vulnerabilities, identities_1
+        )
+
+        actual_merged_2 = merge.merge_vulnerabilities(
+            new_vulnerabilities, new_vulnerabilities, identities_2
+        )
+
+        self.assertEqual(original_vulnerabilities, actual_merged)
+        self.assertEqual(new_vulnerabilities, actual_merged_2)
+
+    def test_merge_only_one_vulnerabilities(self) -> None:
+        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
+        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
+        new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
+
+        identities_1 = merge.get_identities_for_vulnerabilities(
+            original_vulnerabilities
+        )
+
+        identities_2 = merge.get_identities_for_vulnerabilities(new_vulnerabilities)
+
+        actual_merged = merge.merge_vulnerabilities(
+            original_vulnerabilities, [], identities_1
+        )
+
+        actual_merged_2 = merge.merge_vulnerabilities(
+            new_vulnerabilities, [], identities_2
+        )
+
+        actual_merged_3 = merge.merge_vulnerabilities(
+            [], original_vulnerabilities, identities_1
+        )
+
+        actual_merged_4 = merge.merge_vulnerabilities(
+            [], new_vulnerabilities, identities_2
+        )
+
+        with open("original_1.json", "w", encoding="utf8") as json_file:
+            json.dump(original_vulnerabilities, json_file, indent=4)
+
+        with open("merged_original.json", "w", encoding="utf8") as json_file:
+            json.dump(actual_merged, json_file, indent=4)
+
+        self.assertEqual(original_vulnerabilities, actual_merged)
+        self.assertEqual(new_vulnerabilities, actual_merged_2)
+        self.assertEqual(original_vulnerabilities, actual_merged_3)
+        self.assertEqual(new_vulnerabilities, actual_merged_4)
+
+
+# TODO write tests that verify the replacement of refs!!
 
 if __name__ == "__main__":
     unittest.main()

@@ -24,76 +24,61 @@ from cdxev.log import LogMessage
 logger = logging.getLogger(__name__)
 
 
-def filter_component(
-    present_components: list[ComponentIdentity],
-    components_to_add: list,
-    kept_components: list,
-    dropped_components: list,
-    add_to_existing: dict,
-) -> list[dict]:
-    """
-    Function that goes through a list of components and their nested sub components
-    and determine if they are present in a provided list with component identities.
+@dataclass(frozen=True, init=True)
+class VulnerabilityIdentity:
+    id: str
+    aliases: list[str]
 
-    The function operates directly on the lists and dictionary provided and returns
-    a list of filtered top level components that were not found in present_components.
-    Filtered means, that the nested components are also not already present.
+    @classmethod
+    def from_vulnerability(cls, vulnerability: dict) -> "VulnerabilityIdentity":
+        id = vulnerability.get("id", "")
+        aliases = get_ids_from_vulnerability(vulnerability)
+        return cls(id, aliases)
 
-    param present_components: a list of component identities that are already present in the SBOM.
-    param components_to_add: a list of components that shall be compared against the list of
-                            already present components.
-    param kept_components: list of components not present in the list of provided components,
-                           including nested components.
-    param dropped_components: list of added components that are already present.
-    param add_to_existing: list of nested components that have to be added to present_components.
+    @classmethod
+    def from_string(cls, id: str) -> "VulnerabilityIdentity":
+        aliases = id.split("_|_")
+        return cls(aliases[0], aliases)
 
-    returns: filtered_components: list of top level components not present in present_components
-    """
-    filtered_components: list[dict] = []
-    for component in components_to_add:
-        component_id = ComponentIdentity.create(component, allow_unsafe=True)
-        # component is new
-        if component_id not in present_components:
-            nested_components = filter_component(
-                present_components,
-                component.get("components", []),
-                kept_components,
-                dropped_components,
-                add_to_existing,
-            )
-            if component.get("components", []):
-                component["components"] = nested_components
-            filtered_components.append(component)
-            kept_components.append(component)
+    def id_is_in(self, other_id: str) -> bool:
+        if other_id == self.id:
+            return True
 
-        # component already present
-        # contained components get filtered and added to the component in the main sbom
+        if other_id in self.aliases:
+            return True
         else:
-            logger.warning(
-                LogMessage(
-                    "Potential loss of information",
-                    f"Dropping a duplicate component ({component_id}) from the merge result.",
-                )
-            )
-            dropped_components.append(component)
-            nested_components = filter_component(
-                present_components,
-                component.get("components", []),
-                kept_components,
-                dropped_components,
-                add_to_existing,
-            )
-            if nested_components:
-                add_to_existing[component_id] = (
-                    add_to_existing.get(component_id, []) + nested_components
-                )
+            return False
 
-    return filtered_components
+    def one_of_ids_is_in(self, other_ids: list[str]) -> bool:
+        for id in other_ids:
+            if id == self.id:
+                return True
+            if id in self.aliases:
+                return True
+        return False
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compares two vulnerability objects based on the described vulnerability.
+        Fields like affects or analysis are not taken into account.
+        """
+        if not isinstance(other, VulnerabilityIdentity):
+            raise TypeError(f"Can not compare {type(other)} with VulnerabilityIdentity")
+        return self.one_of_ids_is_in(other.aliases)
+
+    def __str__(self) -> str:
+        if id not in self.aliases:
+            string = self.id
+        for ref in self.aliases:
+            if ref not in string:
+                string += "_|_" + ref
+        return string
+
+    def string(self) -> str:
+        return self.__str__()
 
 
-def merge_components(
-    governing_sbom: dict, sbom_to_be_merged: dict, hierarchical: bool = False
-) -> t.List[dict]:
+def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[dict]:
     """
     Function that gets two lists of components and merges them unique into one.
 
@@ -265,7 +250,9 @@ def merge_dependency_lists(
 
 
 def merge_2_sboms(
-    original_sbom: dict, sbom_to_be_merged: dict, hierarchical: bool = False
+    original_sbom: dict,
+    sbom_to_be_merged: dict,
+    vulnerability_identities: dict[str, VulnerabilityIdentity] = {},
 ) -> dict:
     """
     Function that merges two sboms.
@@ -278,6 +265,15 @@ def merge_2_sboms(
         merged_sbom: sbom, with sbom_to_be_merged merged in original_sbom
 
     """
+    if (
+        vulnerability_identities == {}
+        and original_sbom.get("vulnerabilities", []) != []
+        and sbom_to_be_merged.get("vulnerabilities", []) != []
+    ):
+        vulnerability_identities = get_identities_for_vulnerabilities(
+            original_sbom["vulnerabilities"] + sbom_to_be_merged["vulnerabilities"]
+        )
+
     merged_sbom = original_sbom
     component_from_metadata = sbom_to_be_merged.get("metadata", {}).get("component", {})
     components_of_sbom_to_be_merged = sbom_to_be_merged.get("components", [])
@@ -295,12 +291,14 @@ def merge_2_sboms(
     list_of_new_vulnerabilities = sbom_to_be_merged.get("vulnerabilities", [])
     if list_of_original_vulnerabilities and list_of_new_vulnerabilities:
         list_of_merged_vulnerabilities = merge_vulnerabilities(
-            list_of_original_vulnerabilities, list_of_new_vulnerabilities
+            list_of_original_vulnerabilities,
+            list_of_new_vulnerabilities,
+            vulnerability_identities,
         )
         merged_sbom["vulnerabilities"] = list_of_merged_vulnerabilities
     elif list_of_new_vulnerabilities:
         list_of_merged_vulnerabilities = merge_vulnerabilities(
-            [], list_of_new_vulnerabilities
+            [], list_of_new_vulnerabilities, vulnerability_identities
         )
         merged_sbom["vulnerabilities"] = list_of_merged_vulnerabilities
     merged_sbom["components"] = list_of_merged_components
@@ -325,9 +323,15 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     0
 
     """
+    concatenated_vulnerabilities: list[dict] = []
+    for k in range(1, len(sboms)):
+        concatenated_vulnerabilities += sboms[k].get("vulnerabilities", [])
+
+    identities = get_identities_for_vulnerabilities(concatenated_vulnerabilities)
+
     merged_sbom = sboms[0]
     for k in range(1, len(sboms)):
-        merged_sbom = merge_2_sboms(merged_sbom, sboms[k], hierarchical=hierarchical)
+        merged_sbom = merge_2_sboms(merged_sbom, sboms[k], identities)
     return merged_sbom
 
 
@@ -439,6 +443,9 @@ def compare_affects_versions_object(
             second_affects_object.get("range", None),
         ):
             return 1
+        # If the version ranges are not identical, no further conclusions can be drawn
+        else:
+            return 3
 
     return 0
 
@@ -452,32 +459,28 @@ def get_new_affects_versions(
     kept_versions: list[dict] = []
     for new_version in new_versions_list:
         is_in = False
+        new_version_copy = copy.deepcopy(new_version)
         for original_version in original_versions_list:
             result = compare_affects_versions_object(original_version, new_version)
 
             if result == -1:
                 new_range = (
-                    new_version.get("range", "")
+                    new_version_copy.get("range", "")
                     + "|!="
                     + original_version.get("version", "")
                 )
-                new_version_range = copy.deepcopy(new_version)
-                new_version_range["range"] = new_range
-                kept_versions.append(new_version_range)
-                is_in = True
+                new_version_copy["range"] = new_range
 
             if result == 3:
                 logger.warning(
                     LogMessage(
-                        "Potential loss of information",
+                        "Potential duplicate retained",
                         (
-                            f"Dropping a possible duplicate affects entry ({ref}) "
-                            "due to not comparable version ranges"
+                            f"Inconclusive version comparison, keeping entry ({ref}) "
                             f"in vulnerability {vuln_id}."
                         ),
                     )
                 )
-                is_in = True
 
             if result in [1, 2]:
                 logger.warning(
@@ -490,9 +493,8 @@ def get_new_affects_versions(
                     )
                 )
                 is_in = True
-
         if not is_in:
-            kept_versions.append(new_version)
+            kept_versions.append(new_version_copy)
     return kept_versions
 
 
@@ -550,69 +552,15 @@ def join_affect_versions_with_same_references(
     # join all versions with the same ref in one object
     collected_versions: dict[str, list[dict]] = {}
     if affects_list:
-        for n in range(len(affects_list) - 1):
+        for n in range(len(affects_list)):
             id = affects_list[n].get("ref", "")
             affects = copy.deepcopy(affects_list[n].get("versions", []))
             if id not in collected_versions.keys():
                 for k in range(n + 1, len(affects_list)):
                     if affects_list[k].get("ref", "") == id:
                         affects += affects_list[k].get("versions", [])
-                    collected_versions[id] = affects
+                collected_versions[id] = affects
     return collected_versions
-
-
-@dataclass(frozen=True, init=True)
-class VulnerabilityIdentity:
-    id: str
-    aliases: list[str]
-
-    @classmethod
-    def from_vulnerability(cls, vulnerability: dict) -> "VulnerabilityIdentity":
-        id = vulnerability.get("id", "")
-        aliases = get_ids_from_vulnerability(vulnerability)
-        return cls(id, aliases)
-
-    @classmethod
-    def from_string(cls, id: str) -> "VulnerabilityIdentity":
-        aliases = id.split("_|_")
-        return cls(aliases[0], aliases)
-
-    def id_is_in(self, other_id: str) -> bool:
-        if other_id == self.id:
-            return True
-
-        if other_id in self.aliases:
-            return True
-        else:
-            return False
-
-    def one_of_ids_is_in(self, other_ids: list[str]) -> bool:
-        for id in other_ids:
-            if id == self.id:
-                return True
-            if id in self.aliases:
-                return True
-        return False
-
-    def __eq__(self, other: object) -> bool:
-        """
-        Compares two vulnerability objects based on the described vulnerability.
-        Fields like affects or analysis are not taken into account.
-        """
-        if not isinstance(other, VulnerabilityIdentity):
-            raise TypeError(f"Can not compare {type(other)} with VulnerabilityIdentity")
-        return self.one_of_ids_is_in(other.aliases)
-
-    def __str__(self) -> str:
-        if id not in self.aliases:
-            string = self.id
-        for ref in self.aliases:
-            if ref not in string:
-                string += "_|_" + ref
-        return string
-
-    def string(self) -> str:
-        return self.__str__()
 
 
 def get_identities_for_vulnerabilities(
@@ -620,7 +568,8 @@ def get_identities_for_vulnerabilities(
 ) -> dict[str, VulnerabilityIdentity]:
     identities: dict[str, VulnerabilityIdentity] = {}
     for vulnerability in list_of_vulnerabilities:
-        if vulnerability not in list(identities.keys()):
+        vulnerability_string = json.dumps(vulnerability, sort_keys=True)
+        if vulnerability_string not in list(identities.keys()):
             aliases = get_ids_from_vulnerability(vulnerability)
 
             # check if identity was already created
@@ -628,9 +577,7 @@ def get_identities_for_vulnerabilities(
             temp_dictionary: dict[str, VulnerabilityIdentity] = {}
             for identity_object in identities.values():
                 if identity_object.one_of_ids_is_in(aliases):
-                    temp_dictionary[json.dumps(vulnerability, sort_keys=True)] = (
-                        identity_object
-                    )
+                    temp_dictionary[vulnerability_string] = identity_object
                     is_present = True
                     continue
             identities.update(temp_dictionary)
@@ -661,8 +608,8 @@ def get_identities_for_vulnerabilities(
 
                     new_len_aliases = len(aliases)
 
-                identities[json.dumps(vulnerability, sort_keys=True)] = (
-                    VulnerabilityIdentity(aliases[0], aliases)
+                identities[vulnerability_string] = VulnerabilityIdentity(
+                    aliases[0], aliases
                 )
 
     return identities
@@ -670,12 +617,10 @@ def get_identities_for_vulnerabilities(
 
 def collect_affects_of_vulnerabilities(
     list_of_original_vulnerabilities: list[dict],
+    identities: dict[str, VulnerabilityIdentity],
 ) -> dict[str, list[dict]]:
     collected_affects: dict[str, list[dict]] = {}
     if list_of_original_vulnerabilities:
-        identities = get_identities_for_vulnerabilities(
-            list_of_original_vulnerabilities
-        )
         for n in range(len(list_of_original_vulnerabilities)):
             # use json string of vulnerability in case the vulnerability does not contain any id
             id = identities[
@@ -699,13 +644,23 @@ def collect_affects_of_vulnerabilities(
     return collected_affects
 
 
-def merge_vulnerabilities_2(
-    list_of_original_vulnerabilities: list[dict],
-    list_of_new_vulnerabilities: list[dict],
+def merge_vulnerabilities(
+    list_of_original_vulnerabilities_input: list[dict],
+    list_of_new_vulnerabilities_input: list[dict],
     vulnerability_identities: dict[str, VulnerabilityIdentity],
 ) -> list[dict]:
     """
-    Merges the vulnerabilities of two SBOMs
+    Merges the vulnerabilities of two SBOMs.
+
+    The vulnerabilities in list_of_original_vulnerabilities are
+    kept unchanged.
+    If a vulnerability in list_of_new_vulnerabilities is not yet present,
+    it will be added.
+    If the vulnerability already exists, its "affects" field is compared entries
+    already present in a Vulnerability in list_of_original_vulnerabilities will be removed.
+    In case of version ranges, for an already present version a != constrained is appended.
+
+    version ranged can not be compared with each other, here exists a risk of information loss.
 
     Parameters
     ----------
@@ -719,16 +674,32 @@ def merge_vulnerabilities_2(
     Sequence[dict]
         List with the merged Vulnerabilities
     """
+    # Create copies in case both inputs are the same object
+    # what would cause a crash
+    list_of_original_vulnerabilities = copy.deepcopy(
+        list_of_original_vulnerabilities_input
+    )
+    list_of_new_vulnerabilities = copy.deepcopy(list_of_new_vulnerabilities_input)
+
     # replace old bom-refs with the bom refs of the merged sbom
-    list_of_merged_vulnerabilities = copy.deepcopy(list_of_original_vulnerabilities)
+    list_of_merged_vulnerabilities = copy.deepcopy(
+        list_of_original_vulnerabilities_input
+    )
     collected_affects = collect_affects_of_vulnerabilities(
-        list_of_original_vulnerabilities
+        list_of_merged_vulnerabilities, vulnerability_identities
     )
 
     for new_vulnerability in list_of_new_vulnerabilities:
         is_in = False
         id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
         id_object_new_vulnerability = vulnerability_identities[id_str_new_vulnerability]
+
+        # The loop is over the original vulnerabilities and not the merged ones to avoid
+        # data losses in the case of duplicate entries in new_vulnerabilities
+        # both of those will be kept since the comparison used dose not take fields like
+        # "analysis" or the "status" of "affects" into consideration.
+        # A cleanup of such duplicates might be performed in a dedicated function to be implemented
+        # in the tool.
         for original_vulnerability in list_of_original_vulnerabilities:
             id_str_original_vulnerability = json.dumps(
                 original_vulnerability, sort_keys=True
@@ -769,14 +740,14 @@ def merge_vulnerabilities_2(
                             ),
                         )
                     )
-
+                break
         if not is_in:
             list_of_merged_vulnerabilities.append(new_vulnerability)
 
     return list_of_merged_vulnerabilities
 
 
-def merge_vulnerabilities(
+def merge_vulnerabilities_old(
     list_of_original_vulnerabilities: t.Sequence[dict],
     list_of_new_vulnerabilities: t.Sequence[dict],
 ) -> t.Sequence[dict]:

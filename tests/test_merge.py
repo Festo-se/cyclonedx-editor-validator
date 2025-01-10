@@ -944,7 +944,7 @@ class TestMergeCompositions(unittest.TestCase):
         compositions_2 = [
             {"aggregate": "incomplete", "assemblies": ["first_ref", "second_ref"]}
         ]
-        compositions_1 = []
+        compositions_1: list[dict] = []
         merge.merge_compositions(compositions_1, compositions_2)
         self.assertEqual(compositions_1, compositions_2)
 

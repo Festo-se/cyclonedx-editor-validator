@@ -735,7 +735,7 @@
         "version": "T5.0.3.96"
       },
       {
-        "bom-ref": "COORDINATES[2_sub_program_2@1.0.0]",
+        "bom-ref": "2_comp 2",
         "name": "2_sub_program_2",
         "version": "1.0.0"
       },
@@ -749,12 +749,12 @@
       {
         "ref": "comp 1",
         "dependsOn": [
-          "COORDINATES[2_sub_program_2@1.0.0]",
+          "2_comp 2",
           "COORDINATES[2_sub_program_3@2.0.0]"
         ]
       },
       {
-        "ref": "COORDINATES[2_sub_program_2@1.0.0]",
+        "ref": "2_comp 2",
         "dependsOn": [
           "COORDINATES[2_sub_program_3@2.0.0]"
         ]
@@ -769,7 +769,7 @@
         "aggregate": "complete",
         "assemblies": [
           "comp 1",
-          "COORDINATES[2_sub_program_2@1.0.0]",
+          "2_comp 2",
           "COORDINATES[2_sub_program_3@2.0.0]"
         ]
       }
@@ -806,7 +806,7 @@
             ]
           },
           {
-            "ref": "COORDINATES[2_sub_program_2@1.0.0]",
+            "ref": "2_comp 2",
             "versions": [
               {
                 "version": "3.4",
@@ -829,7 +829,7 @@
         ],
         "affects": [
           {
-            "ref": "COORDINATES[2_sub_program_2@1.0.0]",
+            "ref": "2_comp 2",
             "versions": [
               {
                 "version": "2.4",
@@ -879,7 +879,7 @@
             ]
           },
           {
-            "ref": "COORDINATES[2_sub_program_2@1.0.0]",
+            "ref": "2_comp 2",
             "versions": [
               {
                 "version": "3.4",

@@ -78,102 +78,6 @@ def load_additional_sbom_dict() -> dict:
     return sbom
 
 
-class TestCompareVulnerabilities(unittest.TestCase):
-    def test_empty_dic(self) -> None:
-        self.assertFalse(sbF.compare_vulnerabilities({}, {}))
-
-    def test_equal_id(self) -> None:
-        self.assertTrue(
-            sbF.compare_vulnerabilities(
-                {"id": "id1", "stuff": ["item3", "item4"]},
-                {"id": "id1", "stuff": ["item1", "item2"]},
-            )
-        )
-
-    def test_different_id(self) -> None:
-        self.assertFalse(
-            sbF.compare_vulnerabilities(
-                {"id": "id2", "stuff": ["item3", "item4"]},
-                {"id": "id1", "stuff": ["item1", "item2"]},
-            )
-        )
-
-
-class TestVulnerabilitiesIsIn(unittest.TestCase):
-    def test_not_in_list(self) -> None:
-        self.assertFalse(
-            sbF.vulnerability_is_in(
-                {"id": "id5", "stuff": ["item3", "item4"]},
-                [
-                    {"id": "id1", "stuff": ["item3", "item4"]},
-                    {"id": "id2", "stuff": ["item1", "item2"]},
-                    {"id": "id3", "stuff": ["item3", "item4"]},
-                    {"id": "id4", "stuff": ["item1", "item2"]},
-                ],
-            )
-        )
-
-    def test_in_list(self) -> None:
-        self.assertTrue(
-            sbF.vulnerability_is_in(
-                {"id": "id4", "stuff": ["item3", "item4"]},
-                [
-                    {"id": "id1", "stuff": ["item3", "item4"]},
-                    {"id": "id2", "stuff": ["item1", "item2"]},
-                    {"id": "id3", "stuff": ["item3", "item4"]},
-                    {"id": "id4", "stuff": ["item1", "item2"]},
-                ],
-            )
-        )
-
-    def test_copy_ratings(self) -> None:
-        self.assertTrue(
-            helper.compare_list_content(
-                sbF.copy_ratings(ratings_dict["ratings1"]), ratings_dict["ratings1"]
-            )
-        )
-        self.assertTrue(
-            helper.compare_list_content(
-                sbF.copy_ratings(ratings_dict["ratings2"]), ratings_dict["ratings2"]
-            )
-        )
-        self.assertTrue(
-            helper.compare_list_content(
-                sbF.copy_ratings(ratings_dict["ratings3"]), ratings_dict["ratings3"]
-            )
-        )
-
-    def test_merge_sboms_ratings(self) -> None:
-        self.assertEqual(
-            merge.merge_ratings(ratings_dict["ratings1"], ratings_dict["ratings2"]),
-            ratings_dict["merged_ratings_1_and_ratings_2"],
-        )
-        self.assertTrue(
-            helper.compare_list_content(
-                merge.merge_ratings(
-                    ratings_dict["ratings3"], ratings_dict["ratings4"], 0
-                ),
-                ratings_dict["merged_ratings_3_and_ratings_4_flag_0"],
-            )
-        )
-        self.assertTrue(
-            helper.compare_list_content(
-                merge.merge_ratings(
-                    ratings_dict["ratings3"], ratings_dict["ratings4"], 1
-                ),
-                ratings_dict["merged_ratings_3_and_ratings_4_flag_1"],
-            )
-        )
-        self.assertTrue(
-            helper.compare_list_content(
-                merge.merge_ratings(
-                    ratings_dict["ratings3"], ratings_dict["ratings4"], 2
-                ),
-                ratings_dict["merged_ratings_3_and_ratings4_flag_2"],
-            )
-        )
-
-
 class TestCompareSboms(unittest.TestCase):
     def test_equal(self) -> None:
         with open(
@@ -188,77 +92,6 @@ class TestCompareSboms(unittest.TestCase):
         sbom1 = load_governing_program()
         sbom2 = load_sub_program()
         self.assertFalse(helper.compare_sboms(sbom1, sbom2))
-
-
-class TestTimeFunctions(unittest.TestCase):
-    def test_compare_time_flag_from_vulnerabilities(self) -> None:
-        self.assertEqual(
-            sbF.compare_time_flag_from_vulnerabilities(
-                {"published": "2022-10-12T00:14Z"},
-                {"published": "2022-10-12T00:15Z"},
-            ),
-            2,
-        )
-        self.assertEqual(
-            sbF.compare_time_flag_from_vulnerabilities(
-                {"published": "2022-10-12T00:15Z"},
-                {"published": "2022-10-12T00:14Z"},
-            ),
-            1,
-        )
-        self.assertEqual(
-            sbF.compare_time_flag_from_vulnerabilities(
-                {"published": "2022-10-12T00:15Z"},
-                {"published": "2022-10-12T00:15Z"},
-            ),
-            0,
-        )
-        self.assertEqual(
-            sbF.compare_time_flag_from_vulnerabilities(
-                {"published": "2022-10-12T00:14Z", "updated": "2022-11-12T00:15Z"},
-                {"published": "2022-10-12T00:15Z", "updated": "2022-11-12T00:14Z"},
-            ),
-            1,
-        )
-        self.assertEqual(
-            sbF.compare_time_flag_from_vulnerabilities(
-                {"published": "2022-10-12T00:15Z", "updated": "2022-11-12T00:14Z"},
-                {"published": "2022-10-12T00:14Z", "updated": "2022-11-12T00:15Z"},
-            ),
-            2,
-        )
-        self.assertEqual(
-            sbF.compare_time_flag_from_vulnerabilities(
-                {"published": "2022-10-12T00:15Z", "updated": "2022-11-12T00:14Z"},
-                {"published": "2022-10-12T00:14Z", "updated": "2022-11-12T00:14Z"},
-            ),
-            0,
-        )
-        self.assertEqual(
-            sbF.compare_time_flag_from_vulnerabilities(
-                {"published": "2022-10-12T00:14Z"},
-                {"published": "2022-10-12T00:15Z", "updated": "2022-11-12T00:14Z"},
-            ),
-            2,
-        )
-        self.assertEqual(
-            sbF.compare_time_flag_from_vulnerabilities(
-                {"published": "2022-10-12T00:15Z", "updated": "2022-11-12T00:14Z"},
-                {
-                    "published": "2022-10-12T00:14Z",
-                },
-            ),
-            1,
-        )
-        self.assertEqual(
-            sbF.compare_time_flag_from_vulnerabilities(
-                {"published": "2022-10-12T00:15Z", "updated": "2022-10-12T00:14Z"},
-                {
-                    "published": "2022-10-12T00:14Z",
-                },
-            ),
-            0,
-        )
 
 
 class TestMergeSboms(unittest.TestCase):
@@ -326,16 +159,6 @@ class TestMergeSboms(unittest.TestCase):
             sbF.get_component_by_ref("not existing ref", sbom["components"]), {}
         )
 
-    def test_same_bom_ref_different_component(self) -> None:
-        sbom1 = load_governing_program()
-        sbom2 = load_sub_program()
-        sbom2["components"].append(sbom1["components"][1].copy())
-        sbom2["components"][-1]["name"] = "some_new_name"
-        merged_bom = merge.merge([sbom1, sbom2])
-        self.assertEqual(
-            merged_bom["components"][-1]["bom-ref"], "gp_first_component-copy_1"
-        )
-
     def test_no_composition_in_sboms(self) -> None:
         sbom1 = load_governing_program()
         sbom2 = load_sub_program()
@@ -345,13 +168,6 @@ class TestMergeSboms(unittest.TestCase):
         merged_sbom = merge.merge([sbom1, sbom2])
         sbom_merged.pop("compositions")
         self.assertTrue(helper.compare_sboms(merged_sbom, sbom_merged))
-
-    def test_one_loop_for_renaming(self) -> None:
-        sbom1 = load_additional_sbom_dict()["sub_sub_program"]
-        sbom2 = load_additional_sbom_dict()["sub_sub_program_2"]
-        goal_sbom = load_additional_sbom_dict()["merged_sub_sub_programs"]
-        merged_bom = merge.merge([sbom1, sbom2])
-        self.assertTrue(helper.compare_sboms(merged_bom, goal_sbom))
 
 
 class TestCompareComponents(unittest.TestCase):

@@ -5,11 +5,11 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import total_ordering
 from re import fullmatch
-from typing import Any, Callable, Literal, Optional, Sequence, Union
+from typing import Any, Callable, Optional, Sequence
 
 from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component
-from dateutil.parser import parse
+
 
 from cdxev.error import AppError
 
@@ -202,122 +202,6 @@ def extract_components(list_of_components: Sequence[dict]) -> Sequence[dict]:
             extracted_components.append(component)
             extracted_components += extract_components(component.get("components", []))
     return extracted_components
-
-
-def compare_vulnerabilities(
-    first_vulnerability: dict, second_vulnerability: dict
-) -> bool:
-    """
-    Function that compares two vulnerability dictionaries
-
-    Parameters
-    ----------
-    :first_vulnerability : dict
-        A vulnerability dictionary
-    :second_vulnerability : dict
-        A vulnerability dictionary
-
-    Returns
-    -------
-    bool
-        Boolean that describes if the given vulnerabilities are identical
-    """
-    # two vulnerabilities are defined as identical, iff their id is the same
-    if first_vulnerability.get("id", 1) == second_vulnerability.get("id", 2):
-        return True
-    return False
-
-
-def vulnerability_is_in(
-    first_vulnerability: dict, list_of_vulnerabilities: Sequence[dict]
-) -> bool:
-    """
-    Checks if a specific vulnerability is in a given list of vulnerabilities
-
-    Parameters
-    ----------
-    first_vulnerability : dict
-        A vulnerability dictionary
-    list_of_vulnerabilities: Sequence[dict]
-        A list of vulnerability dictionaries
-
-    Returns
-    -------
-    bool
-        Boolean that describes if the given vulnerability is in the list of vulnerabilities
-    """
-    for vulnerability in list_of_vulnerabilities:
-        if compare_vulnerabilities(first_vulnerability, vulnerability):
-            return True
-    return False
-
-
-def copy_ratings(ratings: Sequence[dict]) -> list[dict]:
-    """
-    Creates a Copy of a list of rating dictionaries
-
-    Parameters
-    ----------
-    ratings: list
-        A list of ratings from a vulnerability
-
-    Returns
-    -------
-    list[dict]:
-        Copy of ratings
-    """
-    new_ratings = []
-    for rating in ratings:
-        new_dictionary = {}
-        for key in rating.keys():
-            new_dictionary[key] = rating[key]
-        new_ratings.append(new_dictionary)
-    return new_ratings
-
-
-def compare_time_flag_from_vulnerabilities(
-    first_vulnerability: dict, second_vulnerability: dict
-) -> Union[Literal[0], Literal[1], Literal[2]]:
-    """
-    Compares two vulnerabilities based on the last time
-    they were updated. If the first vulnerability got
-    published/updated more recently, a 2 is returned.
-    If they contain the same date, a 0 is returned
-    and if the second one is newer, a 1 ist returned.
-
-    Parameter
-    ----------
-    first_vulnerability: dict
-        A dict with content of one vulnerability
-
-    second_vulnerability: dict
-        A dict with content of one vulnerability
-
-    Returns
-    -------
-    int:
-        0 If the vulnerabilities are of the same date
-        1 If the second vulnerability is newer
-        2 If the first vulnerability is newer
-    """
-    first_timestr: Optional[str] = first_vulnerability.get(
-        "updated", first_vulnerability.get("published", None)
-    )
-    second_timestr: Optional[str] = second_vulnerability.get(
-        "updated", second_vulnerability.get("published", None)
-    )
-
-    if first_timestr is not None and second_timestr is not None:
-        first_timestamp = parse(first_timestr)
-        second_timestamp = parse(second_timestr)
-        if first_timestamp < second_timestamp:
-            return 2
-        if first_timestamp == second_timestamp:
-            return 0
-
-        return 1
-    else:
-        return 0
 
 
 def get_dependency_by_ref(reference: str, list_of_dependencies: Sequence[dict]) -> dict:

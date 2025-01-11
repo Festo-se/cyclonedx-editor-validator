@@ -30,7 +30,7 @@ Make changes to CycloneDX Editor Validator
 Prerequisites
 -------------
 
-* For compatibility reasons, the code should be compliant to python 3.9 or higher.
+* For compatibility reasons, the code should be compliant to python 3.10 or higher.
 * Make sure to use the latest code by performing a :code:`git pull`.
 * For a major change it is recommended that you get in touch with us by :ref:`creating an issue <contributing:create issues>` to discuss changes prior to dedicating time and resources. This process allows us to better coordinate our efforts and prevent duplication of work.
 * Commit your changes using a descriptive commit message that follows our :ref:`commit message format <contributing:commit message format>`. The same applies for titles of PRs. This is required as we generate our release notes from these messages.
@@ -74,7 +74,7 @@ The following things are to consider before submitting a pull request.
 
 4. All submitted code should conform to `PEP8 <pep8_url>`_ and `black <black_url>`_.
 
-5. The code should be python 3.9 compliant.
+5. The code should be python 3.10 compliant.
 
 .. _black_url: https://black.readthedocs.io/en/stable/index.html
 .. _pep8_url: https://www.python.org/dev/peps/pep-0008/

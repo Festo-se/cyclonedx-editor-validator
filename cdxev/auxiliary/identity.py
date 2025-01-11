@@ -184,3 +184,74 @@ class ComponentIdentity:
             coordinates = None
 
         return ComponentIdentity(cpe, purl, swid, coordinates)
+
+
+@dataclass(frozen=True, init=True)
+class VulnerabilityIdentity:
+    id: str
+    aliases: list[str]
+
+    @classmethod
+    def from_vulnerability(cls, vulnerability: dict) -> "VulnerabilityIdentity":
+        id = vulnerability.get("id", "")
+        aliases = cls.get_ids_from_vulnerability(vulnerability)
+        return cls(id, aliases)
+
+    @classmethod
+    def from_string(cls, id: str) -> "VulnerabilityIdentity":
+        aliases = id.split("_|_")
+        return cls(aliases[0], aliases)
+
+    @classmethod
+    def get_ids_from_vulnerability(cls, vulnerability: dict) -> list[str]:
+        ids_vulnerability: list[str] = []
+
+        primary_id = vulnerability.get("id", None)
+        references = vulnerability.get("references", [])
+
+        if primary_id is not None:
+            ids_vulnerability.append(primary_id)
+
+        for reference in references:
+            id = reference.get("id", None)
+            if id is not None and id not in ids_vulnerability:
+                ids_vulnerability.append(id)
+
+        return ids_vulnerability
+
+    def id_is_in(self, other_id: str) -> bool:
+        if other_id == self.id:
+            return True
+
+        if other_id in self.aliases:
+            return True
+        else:
+            return False
+
+    def one_of_ids_is_in(self, other_ids: list[str]) -> bool:
+        for id in other_ids:
+            if id == self.id:
+                return True
+            if id in self.aliases:
+                return True
+        return False
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compares two vulnerability objects based on the described vulnerability.
+        Fields like affects or analysis are not taken into account.
+        """
+        if not isinstance(other, VulnerabilityIdentity):
+            raise TypeError(f"Can not compare {type(other)} with VulnerabilityIdentity")
+        return self.one_of_ids_is_in(other.aliases)
+
+    def __str__(self) -> str:
+        if id not in self.aliases:
+            string = self.id
+        for ref in self.aliases:
+            if ref not in string:
+                string += "_|_" + ref
+        return string
+
+    def string(self) -> str:
+        return self.__str__()

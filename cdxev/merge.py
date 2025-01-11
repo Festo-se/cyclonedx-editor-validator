@@ -4,74 +4,20 @@ import copy
 import json
 import logging
 import typing as t
-from dataclasses import dataclass
 
-from univers.version_range import VersionRange
-from univers.versions import nuget
-
-from cdxev.auxiliary.identity import ComponentIdentity
+from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.auxiliary.sbomFunctions import (
+    collect_affects_of_vulnerabilities,
+    extract_new_affects,
     get_bom_refs_from_dependencies,
     get_dependency_by_ref,
-    extract_components,
+    get_identities_for_vulnerabilities,
+    make_bom_refs_unique,
+    unify_bom_refs,
 )
 from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass(frozen=True, init=True)
-class VulnerabilityIdentity:
-    id: str
-    aliases: list[str]
-
-    @classmethod
-    def from_vulnerability(cls, vulnerability: dict) -> "VulnerabilityIdentity":
-        id = vulnerability.get("id", "")
-        aliases = get_ids_from_vulnerability(vulnerability)
-        return cls(id, aliases)
-
-    @classmethod
-    def from_string(cls, id: str) -> "VulnerabilityIdentity":
-        aliases = id.split("_|_")
-        return cls(aliases[0], aliases)
-
-    def id_is_in(self, other_id: str) -> bool:
-        if other_id == self.id:
-            return True
-
-        if other_id in self.aliases:
-            return True
-        else:
-            return False
-
-    def one_of_ids_is_in(self, other_ids: list[str]) -> bool:
-        for id in other_ids:
-            if id == self.id:
-                return True
-            if id in self.aliases:
-                return True
-        return False
-
-    def __eq__(self, other: object) -> bool:
-        """
-        Compares two vulnerability objects based on the described vulnerability.
-        Fields like affects or analysis are not taken into account.
-        """
-        if not isinstance(other, VulnerabilityIdentity):
-            raise TypeError(f"Can not compare {type(other)} with VulnerabilityIdentity")
-        return self.one_of_ids_is_in(other.aliases)
-
-    def __str__(self) -> str:
-        if id not in self.aliases:
-            string = self.id
-        for ref in self.aliases:
-            if ref not in string:
-                string += "_|_" + ref
-        return string
-
-    def string(self) -> str:
-        return self.__str__()
 
 
 def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[dict]:
@@ -223,9 +169,7 @@ def merge_2_sboms(
         merged_sbom: sbom, with sbom_to_be_merged merged in original_sbom
 
     """
-
-    make_bom_refs_unique([original_sbom, sbom_to_be_merged])
-    unify_bom_refs([original_sbom, sbom_to_be_merged])
+    # before used make_bom_refs_unique() and unify_bom_refs must be run on the input
 
     if (
         vulnerability_identities == {}
@@ -307,313 +251,48 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     return merged_sbom
 
 
-def get_ids_from_vulnerability(vulnerability: dict) -> list[str]:
-    ids_vulnerability: list[str] = []
-
-    primary_id = vulnerability.get("id", None)
-    references = vulnerability.get("references", [])
-
-    if primary_id is not None:
-        ids_vulnerability.append(primary_id)
-
-    for reference in references:
-        id = reference.get("id", None)
-        if id is not None and id not in ids_vulnerability:
-            ids_vulnerability.append(id)
-
-    return ids_vulnerability
-
-
-def compare_version_range(first_range: str, second_range: str) -> bool:
-    # TODO extend to compare <= >= when supported
-
-    # first compare the strings themselves
-    # if the version scheme is unknown, but
-    # the strings are identical a comparison can still be performed
-    if first_range == second_range:
-        return True
-
-    first_range_object = VersionRange.from_string(second_range)
-    second_range_object = VersionRange.from_string(first_range)
-
-    if first_range_object == second_range_object:
-        return True
-
-    return False
-
-
-def version_is_in_version_range(version: str, version_range: str) -> bool:
-
-    range_object = VersionRange.from_string(version_range)
-    version_class = range_object.version_class
-    try:
-        if version_class.is_valid(version):
-            return version_class(version) in range_object
-        else:
-            return False
-    except nuget.InvalidNuGetVersion:
-        return False
-
-
-def compare_affects_versions_object(
-    first_affects_object: dict, second_affects_object: dict
-) -> int:
+def merge_compositions(
+    list_to_be_merged_in: list,
+    list_of_new_compositions: list,
+) -> None:
     """
-    Function to compare two affects version objects.
-    If version and range are present and both are not none, version will be considered.
+    The function get two lists with compositions
+    and merges the content of the second list provided
+    into the first list.
 
-    return:
-        -1 first_affects_versions_object <= second_affects_versions_object
-        0 first_affects_versions_object != second_affects_versions_object
-        1 first_affects_versions_object == second_affects_versions_object
-        2 first_affects_versions_object >= second_affects_versions_object
-        3 inconclusive
+    Parameters
+    ----------
+    list_to_be_merged_in: list
+        A list with compositions, the operation will be
+        performed on this one
+    list_of_new_compositions: list
+        Compositions to be merged in
+
+    Returns
+    -------
+    None:
     """
-    if (
-        first_affects_object.get("version", None) is not None
-        and second_affects_object.get("version", None) is not None
-    ):
-        if first_affects_object.get("version", None) == second_affects_object.get(
-            "version", None
-        ):
-            return 1
+    if not list_to_be_merged_in:
+        for composition in list_of_new_compositions:
+            list_to_be_merged_in.append(composition)
+    else:
+        if not list_of_new_compositions:
+            return
         else:
-            return 0
-
-    if (
-        first_affects_object.get("range", None) is not None
-        and second_affects_object.get("version", None) is not None
-    ):
-
-        if version_is_in_version_range(
-            second_affects_object.get("version", ""),
-            first_affects_object.get("range", ""),
-        ):
-            return 2
-        else:
-            return 0
-
-    if (
-        first_affects_object.get("version", None) is not None
-        and second_affects_object.get("range", None) is not None
-    ):
-
-        if version_is_in_version_range(
-            first_affects_object.get("version", ""),
-            second_affects_object.get("range", ""),
-        ):
-            return -1
-        else:
-            return 0
-
-    if (
-        first_affects_object.get("range", None) is not None
-        and second_affects_object.get("range", None) is not None
-    ):  # TODO extend to support >= and <= for version ranges when supported
-        if compare_version_range(
-            first_affects_object.get("range", None),
-            second_affects_object.get("range", None),
-        ):
-            return 1
-        # If the version ranges are not identical, no further conclusions can be drawn
-        else:
-            return 3
-
-    return 0
-
-
-def get_new_affects_versions(
-    original_versions_list: list[dict],
-    new_versions_list: list[dict],
-    vuln_id: str,
-    ref: str,
-) -> list[dict]:
-    kept_versions: list[dict] = []
-    for new_version in new_versions_list:
-        is_in = False
-        new_version_copy = copy.deepcopy(new_version)
-        for original_version in original_versions_list:
-            result = compare_affects_versions_object(original_version, new_version)
-
-            if result == -1:
-                new_range = (
-                    new_version_copy.get("range", "")
-                    + "|!="
-                    + original_version.get("version", "")
-                )
-                new_version_copy["range"] = new_range
-
-            if result == 3:
-                logger.warning(
-                    LogMessage(
-                        "Potential duplicate retained",
-                        (
-                            f"Inconclusive version comparison, keeping entry ({ref}) "
-                            f"in vulnerability {vuln_id}."
-                        ),
-                    )
-                )
-
-            if result in [1, 2]:
-                logger.warning(
-                    LogMessage(
-                        "Potential loss of information",
-                        (
-                            f"Dropping a duplicate affects entry ({ref}) "
-                            f"in vulnerability {vuln_id}."
-                        ),
-                    )
-                )
-                is_in = True
-        if not is_in:
-            kept_versions.append(new_version_copy)
-    return kept_versions
-
-
-def extract_new_affects(
-    original_affects_list: list[dict], new_affects_list: list[dict], vuln_id: str
-) -> list[dict]:
-    kept_affects: list[dict] = []
-    collected_original_affects = join_affect_versions_with_same_references(
-        original_affects_list
-    )
-
-    for new_affect in new_affects_list:
-        new_versions = new_affect.get("versions", [])
-        ref_is_in = False
-        if new_affect.get("ref", "new_ref") in collected_original_affects.keys():
-            ref_is_in = True
-            original_versions = collected_original_affects.get(
-                new_affect.get("ref", "new_ref"), []
-            )
-            kept_affect_versions = get_new_affects_versions(
-                original_versions,
-                new_versions,
-                vuln_id,
-                new_affect.get("ref", ""),
-            )
-
-            if kept_affect_versions:
-                new_affect_copy = copy.deepcopy(new_affect)
-                new_affect_copy["versions"] = kept_affect_versions
-                kept_affects.append(new_affect_copy)
-
-        if not ref_is_in:
-            kept_affects.append(new_affect)
-
-    return kept_affects
-
-
-def compare_vulnerability_ids(
-    first_vulnerability: dict, second_vulnerability: dict
-) -> int:
-    ids_first_vulnerability = get_ids_from_vulnerability(first_vulnerability)
-    ids_second_vulnerability = get_ids_from_vulnerability(second_vulnerability)
-
-    is_equal = False
-    for id in ids_first_vulnerability:
-        if id in ids_second_vulnerability:
-            is_equal = True
-
-    return is_equal
-
-
-def join_affect_versions_with_same_references(
-    affects_list: list[dict],
-) -> dict[str, list[dict]]:
-    # join all versions with the same ref in one object
-    collected_versions: dict[str, list[dict]] = {}
-    if affects_list:
-        for n in range(len(affects_list)):
-            id = affects_list[n].get("ref", "")
-            affects = copy.deepcopy(affects_list[n].get("versions", []))
-            if id not in collected_versions.keys():
-                for k in range(n + 1, len(affects_list)):
-                    if affects_list[k].get("ref", "") == id:
-                        affects += affects_list[k].get("versions", [])
-                collected_versions[id] = affects
-    return collected_versions
-
-
-def get_identities_for_vulnerabilities(
-    list_of_vulnerabilities: list[dict],
-) -> dict[str, VulnerabilityIdentity]:
-    identities: dict[str, VulnerabilityIdentity] = {}
-    for vulnerability in list_of_vulnerabilities:
-        vulnerability_string = json.dumps(vulnerability, sort_keys=True)
-        if vulnerability_string not in list(identities.keys()):
-            aliases = get_ids_from_vulnerability(vulnerability)
-
-            # check if identity was already created
-            is_present = False
-            temp_dictionary: dict[str, VulnerabilityIdentity] = {}
-            for identity_object in identities.values():
-                if identity_object.one_of_ids_is_in(aliases):
-                    temp_dictionary[vulnerability_string] = identity_object
-                    is_present = True
-                    continue
-            identities.update(temp_dictionary)
-
-            # create a identity for the vulnerability
-            if not is_present:
-                len_aliases = len(aliases)
-                new_len_aliases = 0
-                while len_aliases != new_len_aliases:
-                    len_aliases = len(aliases)
-                    for vulnerability_object in list_of_vulnerabilities:
-                        vulnerability_aliases = get_ids_from_vulnerability(
-                            vulnerability_object
-                        )
-
-                        # check if one of the vulnerability identifiers
-                        # is in the current vulnerability
-                        is_present = False
-                        for vuln_id in vulnerability_aliases:
-                            if vuln_id in aliases:
-                                is_present = True
-                                # add new identifiers to the list
-                                #  of the aliases of the vulnerability
-                        if is_present:
-                            for vuln_id in vulnerability_aliases:
-                                if vuln_id not in aliases:
-                                    aliases.append(vuln_id)
-
-                    new_len_aliases = len(aliases)
-
-                identities[vulnerability_string] = VulnerabilityIdentity(
-                    aliases[0], aliases
-                )
-
-    return identities
-
-
-def collect_affects_of_vulnerabilities(
-    list_of_original_vulnerabilities: list[dict],
-    identities: dict[str, VulnerabilityIdentity],
-) -> dict[str, list[dict]]:
-    collected_affects: dict[str, list[dict]] = {}
-    if list_of_original_vulnerabilities:
-        for n in range(len(list_of_original_vulnerabilities)):
-            # use json string of vulnerability in case the vulnerability does not contain any id
-            id = identities[
-                json.dumps(list_of_original_vulnerabilities[n], sort_keys=True)
-            ]
-            affects = copy.deepcopy(
-                list_of_original_vulnerabilities[n].get("affects", [])
-            )
-            if id.string() not in collected_affects.keys():
-                for k in range(n + 1, len(list_of_original_vulnerabilities)):
-                    new_id = identities[
-                        json.dumps(list_of_original_vulnerabilities[k], sort_keys=True)
-                    ]
-
-                    if id == new_id:
-                        affects += list_of_original_vulnerabilities[k].get(
-                            "affects", []
-                        )
-
-                collected_affects[id.string()] = affects
-    return collected_affects
+            for new_composition in list_of_new_compositions:
+                found_matching_aggregate = False
+                for original_composition in list_to_be_merged_in:
+                    if original_composition.get(
+                        "aggregate", "original"
+                    ) == new_composition.get("aggregate", "new"):
+                        found_matching_aggregate = True
+                        merged_assemblies = original_composition.get("assemblies", [])
+                        for reference in new_composition.get("assemblies", []):
+                            if reference not in merged_assemblies:
+                                merged_assemblies.append(reference)
+                if not found_matching_aggregate:
+                    list_to_be_merged_in.append(new_composition)
+    return
 
 
 def merge_vulnerabilities(
@@ -717,209 +396,3 @@ def merge_vulnerabilities(
             list_of_merged_vulnerabilities.append(new_vulnerability)
 
     return list_of_merged_vulnerabilities
-
-
-def merge_compositions(
-    list_to_be_merged_in: list,
-    list_of_new_compositions: list,
-) -> None:
-    """
-    The function get two lists with compositions
-    and merges the content of the second list provided
-    into the first list.
-
-    Parameters
-    ----------
-    list_to_be_merged_in: list
-        A list with compositions, the operation will be
-        performed on this one
-    list_of_new_compositions: list
-        Compositions to be merged in
-
-    Returns
-    -------
-    None:
-    """
-    if not list_to_be_merged_in:
-        for composition in list_of_new_compositions:
-            list_to_be_merged_in.append(composition)
-    else:
-        if not list_of_new_compositions:
-            return
-        else:
-            for new_composition in list_of_new_compositions:
-                found_matching_aggregate = False
-                for original_composition in list_to_be_merged_in:
-                    if original_composition.get(
-                        "aggregate", "original"
-                    ) == new_composition.get("aggregate", "new"):
-                        found_matching_aggregate = True
-                        merged_assemblies = original_composition.get("assemblies", [])
-                        for reference in new_composition.get("assemblies", []):
-                            if reference not in merged_assemblies:
-                                merged_assemblies.append(reference)
-                if not found_matching_aggregate:
-                    list_to_be_merged_in.append(new_composition)
-    return
-
-
-def get_ref_components_mapping(
-    components_list: list[dict],
-) -> dict[str, ComponentIdentity]:
-    component_dict: dict[str, ComponentIdentity] = {}
-    for component in components_list:
-        if component != {}:
-            ref = component.get("bom-ref", "")
-            identity = ComponentIdentity.create(component, allow_unsafe=True)
-            if not ref:
-                component["bom-ref"] = str(identity)
-            component_dict[ref] = identity
-    return component_dict
-
-
-def replace_bom_ref_in_sbom(sbom: dict, reference: str, new_reference: str) -> None:
-    replace_ref_in_components(
-        sbom.get("components", []) + [sbom.get("metadata", {}).get("component", {})],
-        reference,
-        new_reference,
-    )
-    replace_ref_in_dependencies(sbom.get("dependencies", []), reference, new_reference)
-    replace_ref_in_compositions(sbom.get("compositions", []), reference, new_reference)
-    replace_ref_in_vulnerabilities(
-        sbom.get("vulnerabilities", []),
-        reference,
-        new_reference,
-    )
-
-
-def make_bom_refs_unique(list_of_sboms: t.Sequence[dict]) -> None:
-
-    # TODO reintroduce the components mapped to refs to add refs of already existing components
-    # Probably just do the unifying also in here.... its half of the job
-    assigned_bom_refs: dict[ComponentIdentity, str] = {}
-
-    if list_of_sboms:
-        retained_components = get_ref_components_mapping(
-            list_of_sboms[0].get("components", [])
-            + [list_of_sboms[0].get("metadata", {}).get("component", {})]
-        )
-
-        for k in range(1, len(list_of_sboms)):
-            secondary_sbom = list_of_sboms[k]
-            new_components = get_ref_components_mapping(
-                secondary_sbom.get("components", [])
-                + [secondary_sbom.get("metadata", {}).get("component", {})]
-            )
-
-            for reference in new_components.keys():
-                # reference exists in primary sbom
-                # component is not identical to the one in primary sbom
-                # the component did not receive a new bom-ref already
-
-                if (
-                    reference in retained_components.keys()
-                    and retained_components[reference] != new_components[reference]
-                    and new_components[reference] not in assigned_bom_refs.keys()
-                ):
-                    new_bom_ref = str(new_components[reference])
-                    index = 1
-                    while (
-                        new_bom_ref in retained_components.keys()
-                        or new_bom_ref in new_components.keys()
-                    ):
-                        new_bom_ref = str(new_components[reference]) + "-" + str(index)
-                        index += 1
-
-                    replace_bom_ref_in_sbom(secondary_sbom, reference, new_bom_ref)
-                    retained_components[new_bom_ref] = new_components[reference]
-
-                    assigned_bom_refs[new_components[reference]] = new_bom_ref
-
-                elif new_components[reference] in assigned_bom_refs.keys():
-
-                    replace_bom_ref_in_sbom(
-                        secondary_sbom,
-                        reference,
-                        assigned_bom_refs[new_components[reference]],
-                    )
-                    retained_components[new_bom_ref] = new_components[reference]
-
-                else:
-                    retained_components[reference] = new_components[reference]
-
-
-def unify_bom_refs(list_of_sboms: t.Sequence[dict]) -> None:
-    for n in range(len(list_of_sboms)):
-        primary_sbom = list_of_sboms[n]
-        primary_components = extract_components(
-            primary_sbom.get("components", [])
-            + [primary_sbom.get("metadata", {}).get("component", {})]
-        )
-        for k in range(n + 1, len(list_of_sboms)):
-            secondary_sbom = list_of_sboms[k]
-            new_components = extract_components(
-                secondary_sbom.get("components", [])
-                + [secondary_sbom.get("metadata", {}).get("component", {})]
-            )
-            for new_component in new_components:
-                for primary_component in primary_components:
-                    if ComponentIdentity.create(
-                        new_component, allow_unsafe=True
-                    ) == ComponentIdentity.create(
-                        primary_component, allow_unsafe=True
-                    ) and new_component.get(
-                        "bom-ref", ""
-                    ) != primary_component.get(
-                        "bom-ref", ""
-                    ):
-                        reference = new_component.get("bom-ref", "")
-                        new_reference = primary_component.get("bom-ref", "")
-
-                        replace_bom_ref_in_sbom(
-                            secondary_sbom, reference, new_reference
-                        )
-
-
-def replace_ref_in_components(
-    components: list[dict], reference: str, new_reference: str
-) -> None:
-    for component in components:
-        if component.get("bom-ref", "") == reference:
-            component["bom-ref"] = new_reference
-
-
-def replace_ref_in_dependencies(
-    dependencies: list[dict], reference: str, new_reference: str
-) -> None:
-    for dependency in dependencies:
-        if dependency.get("ref", "") == reference:
-            dependency["ref"] = new_reference
-        else:  # component should not depend on itself
-            dependson = dependency.get("dependsOn", [])
-            if reference in dependson:
-                new_dependson = [
-                    new_reference if entry == reference else entry
-                    for entry in dependson
-                ]
-                dependency["dependsOn"] = new_dependson
-
-
-def replace_ref_in_compositions(
-    compositions: list[dict], reference: str, new_reference: str
-) -> None:
-    for composition in compositions:
-        assemblies = composition.get("assemblies", [])
-        if reference in assemblies:
-            new_assemblies = [
-                new_reference if entry == reference else entry for entry in assemblies
-            ]
-            composition["assemblies"] = new_assemblies
-
-
-def replace_ref_in_vulnerabilities(
-    vulnerabilities: list[dict], reference: str, new_reference: str
-) -> None:
-    for vulnerability in vulnerabilities:
-        for affected in vulnerability.get("affects", []):
-            if affected.get("ref", "") == reference:
-                affected["ref"] = new_reference

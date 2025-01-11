@@ -817,7 +817,7 @@
       },
       {
         "type": "library",
-        "bom-ref": "gp_first_component-copy_2",
+        "bom-ref": "COORDINATES[com.acme.internal/First Component@1.0.0]",
         "supplier": {
           "name": "Acme, Inc."
         },
@@ -864,12 +864,12 @@
       {
         "ref": "sp_first_component",
         "dependsOn": [
-          "gp_first_component-copy_2",
+          "COORDINATES[com.acme.internal/First Component@1.0.0]",
           "gp_first_component-copy_1"
         ]
       },
       {
-        "ref": "gp_first_component-copy_2",
+        "ref": "COORDINATES[com.acme.internal/First Component@1.0.0]",
         "dependsOn": []
       },
       {
@@ -992,7 +992,7 @@
           "sp_sixteenth_component",
           "sp_seventeenth_component",
           "sp_fifteenth_component",
-          "gp_first_component-copy_2",
+          "COORDINATES[com.acme.internal/First Component@1.0.0]",
           "gp_first_component-copy_1"
         ]
       }
@@ -1443,7 +1443,7 @@
       },
       {
         "type": "library",
-        "bom-ref": "gp_first_component-copy_2",
+        "bom-ref": "COORDINATES[com.acme.internal/First Component@1.0.0]",
         "supplier": {
           "name": "Acme, Inc."
         },
@@ -1487,7 +1487,7 @@
       },
       {
         "type": "library",
-        "bom-ref": "gp_first_component-copy_3",
+        "bom-ref": "COORDINATES[com.acme.internal/Test_component_for_1_test@1.0.0]",
         "supplier": {
           "name": "Acme, Inc."
         },
@@ -1534,12 +1534,12 @@
       {
         "ref": "sp_fourth_component",
         "dependsOn": [
-          "gp_first_component-copy_3",
+          "COORDINATES[com.acme.internal/Test_component_for_1_test@1.0.0]",
           "comp2"
         ]
       },
       {
-        "ref": "gp_first_component-copy_3",
+        "ref": "COORDINATES[com.acme.internal/Test_component_for_1_test@1.0.0]",
         "dependsOn": []
       },
       {
@@ -1549,12 +1549,12 @@
       {
         "ref": "sp_first_component",
         "dependsOn": [
-          "gp_first_component-copy_2",
+          "COORDINATES[com.acme.internal/First Component@1.0.0]",
           "gp_first_component-copy_1"
         ]
       },
       {
-        "ref": "gp_first_component-copy_2",
+        "ref": "COORDINATES[com.acme.internal/First Component@1.0.0]",
         "dependsOn": []
       },
       {
@@ -1673,9 +1673,9 @@
           "sp_sixteenth_component",
           "sp_seventeenth_component",
           "sp_fifteenth_component",
-          "gp_first_component-copy_2",
+          "COORDINATES[com.acme.internal/First Component@1.0.0]",
           "gp_first_component-copy_1",
-          "gp_first_component-copy_3",
+          "COORDINATES[com.acme.internal/Test_component_for_1_test@1.0.0]",
           "comp2"
         ]
       }

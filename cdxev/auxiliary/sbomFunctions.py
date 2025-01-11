@@ -15,9 +15,8 @@ from univers.version_range import VersionRange  # type: ignore[import-untyped]
 from univers.versions import nuget  # type: ignore[import-untyped]
 
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
-from cdxev.log import LogMessage
-
 from cdxev.error import AppError
+from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
 

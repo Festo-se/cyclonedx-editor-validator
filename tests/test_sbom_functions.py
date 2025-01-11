@@ -57,8 +57,11 @@ class TestComponentFunctions(unittest.TestCase):
             },
         ]
         components = sbF.extract_components(example_list)
+        list_of_references = []
+        for comp in components:
+            list_of_references.append(comp["bom-ref"])
         self.assertEqual(
-            set(sbF.get_ref_from_components(components)),
+            set(list_of_references),
             set(
                 [
                     "first_level_1",

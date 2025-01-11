@@ -30,7 +30,6 @@ from cdxev.initialize_sbom import initialize_sbom
 from cdxev.list_command import list_command
 from cdxev.log import configure_logging
 from cdxev.merge import merge
-from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
 from cdxev.vex import vex
 
@@ -978,15 +977,6 @@ def invoke_merge(args: argparse.Namespace) -> int:
 
     inputs = [sbom for (sbom, _) in (read_sbom(input) for input in inputs)]
     output = merge(inputs, hierarchical=args.hierarchical)
-    write_sbom(output, args.output)
-    return Status.OK
-
-
-def invoke_merge_vex(args: argparse.Namespace) -> int:
-    sbom, _ = read_sbom(args.sbom_file)
-    vex, _ = read_sbom(args.vex_file)
-
-    output = merge_vex(sbom, vex)
     write_sbom(output, args.output)
     return Status.OK
 

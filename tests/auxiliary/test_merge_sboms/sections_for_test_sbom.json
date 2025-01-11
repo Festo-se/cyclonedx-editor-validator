@@ -386,6 +386,11 @@
         "bom-ref": "comp 3",
         "name": "2_sub_program_3",
         "version": "2.0.0"
+      },
+      {
+        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "name": "2_sub_program_3_2",
+        "version": "2.0.0"
       }
     ],
     "dependencies": [
@@ -740,8 +745,13 @@
         "version": "1.0.0"
       },
       {
-        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
         "name": "2_sub_program_3",
+        "version": "2.0.0"
+      },
+      {
+        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "name": "2_sub_program_3_2",
         "version": "2.0.0"
       }
     ],
@@ -750,17 +760,17 @@
         "ref": "comp 1",
         "dependsOn": [
           "2_comp 2",
-          "COORDINATES[2_sub_program_3@2.0.0]"
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
         ]
       },
       {
         "ref": "2_comp 2",
         "dependsOn": [
-          "COORDINATES[2_sub_program_3@2.0.0]"
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
         ]
       },
       {
-        "ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
         "dependsOn": []
       }
     ],
@@ -770,7 +780,7 @@
         "assemblies": [
           "comp 1",
           "2_comp 2",
-          "COORDINATES[2_sub_program_3@2.0.0]"
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
         ]
       }
     ],
@@ -870,7 +880,7 @@
         ],
         "affects": [
           {
-            "ref": "COORDINATES[2_sub_program_3@2.0.0]",
+            "ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
             "versions": [
               {
                 "version": "2.4",
@@ -888,7 +898,7 @@
             ]
           },
           {
-            "ref": "COORDINATES[2_sub_program_3@2.0.0]",
+            "ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
             "versions": [
               {
                 "version": "3.4",
@@ -942,7 +952,7 @@
         "version": "1.0.0"
       },
       {
-        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
         "name": "2_sub_program_3",
         "version": "2.0.0"
       }
@@ -952,17 +962,17 @@
         "ref": "comp 1",
         "dependsOn": [
           "COORDINATES[2_sub_program_2@1.0.0]",
-          "COORDINATES[2_sub_program_3@2.0.0]"
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
         ]
       },
       {
         "ref": "COORDINATES[2_sub_program_2@1.0.0]",
         "dependsOn": [
-          "COORDINATES[2_sub_program_3@2.0.0]"
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
         ]
       },
       {
-        "ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
         "dependsOn": []
       }
     ],
@@ -972,7 +982,7 @@
         "assemblies": [
           "comp 1",
           "COORDINATES[2_sub_program_2@1.0.0]",
-          "COORDINATES[2_sub_program_3@2.0.0]"
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
         ]
       }
     ]

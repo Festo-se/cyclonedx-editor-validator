@@ -39,7 +39,7 @@ def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[di
     Output:
     list_of_merged_components: List with the uniquely merged components of the submitted sboms
     """
-    list_of_merged_components: t.List[dict] = governing_sbom.get("components", [])
+    list_of_merged_components: list[dict] = governing_sbom.get("components", [])
     list_of_added_components = sbom_to_be_merged.get("components", [])
     for component in list_of_added_components:
         is_in_list, _ = get_corresponding_reference_to_component(
@@ -54,37 +54,8 @@ def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[di
                 )
             )
         else:
-            if not (component.get("bom-ref", 1) in list_of_merged_bom_refs):
-                list_of_merged_components.append(component)
-                list_of_merged_bom_refs.append(component.get("bom-ref"))
-            else:
-                # if the bom-ref already exists in the components, add a incrementing number to
-                # the bom-ref
-                list_of_bom_refs_to_be_added = get_ref_from_components(
-                    sbom_to_be_merged.get("components", [])
-                )
-                list_of_bom_refs_to_be_added.append(
-                    sbom_to_be_merged.get("metadata", {})
-                    .get("component", {})
-                    .get("bom-ref", "")
-                )
-                bom_ref_is_not_unique = False
-                new_bom_ref = component.get("bom-ref")
-                n = 0
-                while new_bom_ref in list_of_merged_bom_refs or bom_ref_is_not_unique:
-                    n += 1
-                    new_bom_ref = component.get("bom-ref") + "_" + str(n)
-                    # The new bom-ref must not appear in either of the sboms
-                    if new_bom_ref in list_of_bom_refs_to_be_added:
-                        bom_ref_is_not_unique = True
-                    else:
-                        bom_ref_is_not_unique = False
-                replace_ref_in_sbom(
-                    new_bom_ref, component.get("bom-ref", ""), sbom_to_be_merged
-                )
-                list_of_merged_components.append(component)
-                list_of_merged_bom_refs.append(new_bom_ref)
-    return list_of_merged_components  # type:ignore [no-any-return]
+            list_of_merged_components.append(component)
+    return list_of_merged_components
 
 
 def merge_dependency(

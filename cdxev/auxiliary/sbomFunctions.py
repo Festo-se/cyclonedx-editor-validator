@@ -11,8 +11,8 @@ from typing import Any, Callable, Optional, Sequence
 
 from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component
-from univers.version_range import VersionRange
-from univers.versions import nuget
+from univers.version_range import VersionRange  # type: ignore[import-untyped]
+from univers.versions import nuget  # type: ignore[import-untyped]
 
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.log import LogMessage

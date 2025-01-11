@@ -387,8 +387,23 @@ class TestMergeVulnerabilities(unittest.TestCase):
 
         self.assertEqual(merged_sbom, goal_sbom)
 
+    def test_merge_with_only_vex(self) -> None:
+        vulnerabilities = helper.load_sections_for_test_sbom()[
+            "merge_vulnerabilities_tests"
+        ]["test_merge_vulnerabilities"]
+        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
+        new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
+        merged_vulnerabilities = vulnerabilities["merged_vulnerabilities"]
 
-# TODO write tests that verify the replacement of refs!!
+        actual_merged = merge.merge(
+            [
+                {"vulnerabilities": original_vulnerabilities},
+                {"vulnerabilities": new_vulnerabilities},
+            ]
+        )
+
+        self.assertEqual(actual_merged["vulnerabilities"], merged_vulnerabilities)
+
 
 if __name__ == "__main__":
     unittest.main()

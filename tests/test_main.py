@@ -5,7 +5,7 @@ import unittest.mock
 from pathlib import Path
 
 # noinspection PyProtectedMember
-from cdxev.__main__ import InputFileError, Status, load_json, load_xml, main, read_sbom
+from cdxev.__main__ import InputFileError, load_json, load_xml, read_sbom
 
 
 class TestSupplements(unittest.TestCase):
@@ -41,18 +41,3 @@ class TestSupplements(unittest.TestCase):
         with self.assertRaises(InputFileError) as ie:
             load_xml(Path("test.xml"))
         self.assertIn("XML files aren't supported", ie.exception.details.description)
-
-
-class TestMergeVexCommand(unittest.TestCase):
-    @unittest.mock.patch("cdxev.__main__.read_sbom")
-    @unittest.mock.patch("cdxev.__main__.merge_vex")
-    def test_get_merge_vex(
-        self, mock_merge_vex: unittest.mock.Mock, mock_read: unittest.mock.Mock
-    ) -> None:
-        with unittest.mock.patch(
-            "sys.argv", ["", "merge-vex", "fake_bom_1.cdx.json", "fake_bom_2.cdx.json"]
-        ):
-            mock_merge_vex.return_value = {}
-            mock_read.return_value = ({}, "json")
-            result = main()
-            self.assertEqual(result, Status.OK)

@@ -334,12 +334,6 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     make_bom_refs_unique(sboms)
     unify_bom_refs(sboms)
 
-    with open("sbom_1.json", "w", encoding="utf8") as json_file:
-        json.dump(sboms[0], json_file, indent=4)
-
-    with open("sbom_2.json", "w", encoding="utf8") as json_file:
-        json.dump(sboms[1], json_file, indent=4)
-
     # create identity object for all vulnerabilities
     concatenated_vulnerabilities: list[dict] = []
     for k in range(1, len(sboms)):
@@ -705,16 +699,10 @@ def merge_vulnerabilities(
     collected_affects = collect_affects_of_vulnerabilities(
         list_of_merged_vulnerabilities, vulnerability_identities
     )
-    print(" ")
-    for key in vulnerability_identities.keys():
-        print(key)
-    print(" ")
+
     for new_vulnerability in list_of_new_vulnerabilities:
         is_in = False
         id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
-        print(" ")
-        print(id_str_new_vulnerability)
-        print(" ")
         id_object_new_vulnerability = vulnerability_identities[id_str_new_vulnerability]
 
         # The loop is over the original vulnerabilities and not the merged ones to avoid

@@ -24,8 +24,11 @@ def delete_non_reproducible(sbom: dict):
     """
     _delete_tool_version(sbom)
 
-    del sbom["serialNumber"]
-    del sbom["metadata"]["timestamp"]
+    if sbom.get("serialNumber", ""):
+        del sbom["serialNumber"]
+
+    if sbom.get("metadata", {}).get("timestamp", ""):
+        del sbom["metadata"]["timestamp"]
 
 
 def _delete_tool_version(sbom: dict):

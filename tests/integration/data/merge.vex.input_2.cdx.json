@@ -1,0 +1,276 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "vulnerabilities": [
+    {
+      "id": "Vulnerability 1",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+      },
+      "references": [
+        {
+          "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "3.4",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Vulnerability 1 Alias new Vulnerability",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias new Vulnerability"
+      },
+      "references": [
+        {
+          "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "version": "30",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "3.4",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Vulnerability 1: Vulnerabilities 2",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Vulnerabilities 2"
+      },
+      "affects": [
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "12.4",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "13.4",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Vulnerability 1 Alias 2 new Vulnerability",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias 2 new Vulnerability"
+      },
+      "references": [
+        {
+          "id": "Vulnerability 1 Alias new Vulnerability"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "3.0",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Vulnerability 1 Alias 3 New Vulnerabilities",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+      },
+      "references": [
+        {
+          "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "3.4",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 3",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 4",
+          "versions": [
+            {
+              "version": "3.4",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 3",
+          "versions": [
+            {
+              "version": "10",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 3",
+          "versions": [
+            {
+              "version": "11",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "12.4",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "13.4",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product new",
+          "versions": [
+            {
+              "version": "13.4",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Vulnerability 1",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+      },
+      "references": [
+        {
+          "id": "Vulnerability 1: Alias 1"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "range": "vers:generic/>=2.3|<=2.7",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

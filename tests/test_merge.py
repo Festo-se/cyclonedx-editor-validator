@@ -5,7 +5,6 @@ import unittest
 from cdxev import merge
 from tests.auxiliary import helper as helper
 
-
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
 
 

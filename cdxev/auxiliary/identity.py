@@ -246,7 +246,7 @@ class VulnerabilityIdentity:
         return self.one_of_ids_is_in(other.aliases)
 
     def __str__(self) -> str:
-        if id not in self.aliases:
+        if id not in self.aliases:  # type: ignore[comparison-overlap]
             string = self.id
         for ref in self.aliases:
             if ref not in string:

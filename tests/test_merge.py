@@ -370,6 +370,7 @@ class TestMergeSeveralSboms(unittest.TestCase):
         sub_sub_program = load_additional_sbom_dict()["sub_sub_program"]
         goal_sbom = load_additional_sbom_dict()["merge_goverment_sub_sub_sub"]
         merged_bom = merge.merge([governing_program, sub_program, sub_sub_program])
+
         self.assertTrue(helper.compare_sboms(merged_bom, goal_sbom))
 
     def test_merge_4_sboms(self) -> None:
@@ -383,6 +384,7 @@ class TestMergeSeveralSboms(unittest.TestCase):
         merged_bom = merge.merge(
             [governing_program, sub_program, sub_sub_program, sub_sub_program_2]
         )
+
         self.assertTrue(helper.compare_sboms(merged_bom, goal_sbom))
 
 
@@ -547,6 +549,41 @@ class TestReplaceBomRefs(unittest.TestCase):
         self.assertEqual(sbom_2_replaced, sbom_2)
         self.assertEqual(sbom_3_replaced, sbom_3)
         self.assertEqual(sbom_4_replaced, sbom_4)
+
+    def test_make_bom_ref_unique_several_loops(self) -> None:
+        components_1 = {
+            "components": [
+                {
+                    "name": "comp 1",
+                    "version": "1.0.0",
+                    "bom-ref": "COORDINATES[comp 1@2.0.0]",
+                }
+            ]
+        }
+        components_2 = {
+            "components": [
+                {
+                    "name": "comp 1",
+                    "version": "2.0.0",
+                    "bom-ref": "COORDINATES[comp 1@2.0.0]",
+                },
+                {
+                    "name": "comp 3",
+                    "version": "1.0.0",
+                    "bom-ref": "COORDINATES[comp 1@2.0.0]-1",
+                },
+                {
+                    "name": "comp 3",
+                    "version": "1.0.0",
+                    "bom-ref": "COORDINATES[comp 1@2.0.0]-2",
+                },
+            ]
+        }
+        merge.make_bom_refs_unique([components_1, components_2])
+
+        self.assertEqual(
+            components_2["components"][0]["bom-ref"], "COORDINATES[comp 1@2.0.0]-3"
+        )
 
     def test_unify_bom_refs(self) -> None:
         sbom_1 = load_sections_for_test_sbom()["sbom_unify_references_1"]
@@ -1186,11 +1223,11 @@ class TestVulnerabilities(unittest.TestCase):
         ]
         original_sbom = sections["merge.input_1"]
         new_sbom = sections["merge.input_2"]
+        goal_sbom = sections["test_merge_replace_ref_goal"]
 
         merged_sbom = merge.merge_2_sboms(original_sbom, new_sbom)
 
-        with open("merged_sbom.json", "w", encoding="utf8") as json_file:
-            json.dump(merged_sbom, json_file, indent=4)
+        self.assertEqual(merged_sbom, goal_sbom)
 
 
 # TODO write tests that verify the replacement of refs!!

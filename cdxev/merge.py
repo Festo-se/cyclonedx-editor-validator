@@ -262,11 +262,16 @@ def merge_2_sboms(
         merged_sbom: sbom, with sbom_to_be_merged merged in original_sbom
 
     """
+
+    make_bom_refs_unique([original_sbom, sbom_to_be_merged])
+    unify_bom_refs([original_sbom, sbom_to_be_merged])
+
     if (
         vulnerability_identities == {}
         and original_sbom.get("vulnerabilities", []) != []
         and sbom_to_be_merged.get("vulnerabilities", []) != []
     ):
+
         vulnerability_identities = get_identities_for_vulnerabilities(
             original_sbom["vulnerabilities"] + sbom_to_be_merged["vulnerabilities"]
         )
@@ -277,15 +282,16 @@ def merge_2_sboms(
     components_of_sbom_to_be_merged.append(component_from_metadata)
     list_of_original_dependencies = original_sbom.get("dependencies", [])
     list_of_new_dependencies = sbom_to_be_merged.get("dependencies", [])
-    list_of_merged_components = merge_components(
-        original_sbom, sbom_to_be_merged, hierarchical=hierarchical
-    )
+    list_of_original_vulnerabilities = original_sbom.get("vulnerabilities", [])
+    list_of_new_vulnerabilities = sbom_to_be_merged.get("vulnerabilities", [])
+
+    list_of_merged_components = merge_components(original_sbom, sbom_to_be_merged)
+
     merged_dependencies = merge_dependency_lists(
         list_of_original_dependencies,
         list_of_new_dependencies,
     )
-    list_of_original_vulnerabilities = original_sbom.get("vulnerabilities", [])
-    list_of_new_vulnerabilities = sbom_to_be_merged.get("vulnerabilities", [])
+
     if list_of_original_vulnerabilities and list_of_new_vulnerabilities:
         list_of_merged_vulnerabilities = merge_vulnerabilities(
             list_of_original_vulnerabilities,
@@ -293,18 +299,22 @@ def merge_2_sboms(
             vulnerability_identities,
         )
         merged_sbom["vulnerabilities"] = list_of_merged_vulnerabilities
+
     elif list_of_new_vulnerabilities:
         list_of_merged_vulnerabilities = merge_vulnerabilities(
             [], list_of_new_vulnerabilities, vulnerability_identities
         )
         merged_sbom["vulnerabilities"] = list_of_merged_vulnerabilities
+
     merged_sbom["components"] = list_of_merged_components
     merged_sbom["dependencies"] = merged_dependencies
+
     if merged_sbom.get("compositions", []) or sbom_to_be_merged.get("compositions", []):
         merge_compositions(
             merged_sbom.get("compositions", []),
             sbom_to_be_merged.get("compositions", []),
         )
+
     return merged_sbom
 
 
@@ -323,6 +333,12 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     # make the bom-refs unique and synchronize them across all SBOMs
     make_bom_refs_unique(sboms)
     unify_bom_refs(sboms)
+
+    with open("sbom_1.json", "w", encoding="utf8") as json_file:
+        json.dump(sboms[0], json_file, indent=4)
+
+    with open("sbom_2.json", "w", encoding="utf8") as json_file:
+        json.dump(sboms[1], json_file, indent=4)
 
     # create identity object for all vulnerabilities
     concatenated_vulnerabilities: list[dict] = []
@@ -689,10 +705,16 @@ def merge_vulnerabilities(
     collected_affects = collect_affects_of_vulnerabilities(
         list_of_merged_vulnerabilities, vulnerability_identities
     )
-
+    print(" ")
+    for key in vulnerability_identities.keys():
+        print(key)
+    print(" ")
     for new_vulnerability in list_of_new_vulnerabilities:
         is_in = False
         id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
+        print(" ")
+        print(id_str_new_vulnerability)
+        print(" ")
         id_object_new_vulnerability = vulnerability_identities[id_str_new_vulnerability]
 
         # The loop is over the original vulnerabilities and not the merged ones to avoid
@@ -891,16 +913,18 @@ def replace_bom_ref_in_sbom(sbom: dict, reference: str, new_reference: str) -> N
 
 
 def make_bom_refs_unique(list_of_sboms: t.Sequence[dict]) -> None:
-    list_of_used_references: list[str] = []
+
+    # TODO reintroduce the components mapped to refs to add refs of already existing components
+    # Probably just do the unifying also in here.... its half of the job
     assigned_bom_refs: dict[ComponentIdentity, str] = {}
-    for n in range(len(list_of_sboms)):
-        primary_sbom = list_of_sboms[n]
+
+    if list_of_sboms:
         retained_components = get_ref_components_mapping(
-            primary_sbom.get("components", [])
-            + [primary_sbom.get("metadata", {}).get("component", {})]
+            list_of_sboms[0].get("components", [])
+            + [list_of_sboms[0].get("metadata", {}).get("component", {})]
         )
-        list_of_used_references += list(retained_components.keys())
-        for k in range(n + 1, len(list_of_sboms)):
+
+        for k in range(1, len(list_of_sboms)):
             secondary_sbom = list_of_sboms[k]
             new_components = get_ref_components_mapping(
                 secondary_sbom.get("components", [])
@@ -908,34 +932,40 @@ def make_bom_refs_unique(list_of_sboms: t.Sequence[dict]) -> None:
             )
 
             for reference in new_components.keys():
+                # reference exists in primary sbom
+                # component is not identical to the one in primary sbom
+                # the component did not receive a new bom-ref already
+
                 if (
                     reference in retained_components.keys()
                     and retained_components[reference] != new_components[reference]
                     and new_components[reference] not in assigned_bom_refs.keys()
                 ):
-
-                    new_reference = str(new_components[reference])
+                    new_bom_ref = str(new_components[reference])
                     index = 1
-                    while new_reference in list_of_used_references:
-                        new_reference = (
-                            str(new_components[reference]) + "-" + str(index)
-                        )
+                    while (
+                        new_bom_ref in retained_components.keys()
+                        or new_bom_ref in new_components.keys()
+                    ):
+                        new_bom_ref = str(new_components[reference]) + "-" + str(index)
                         index += 1
-                    list_of_used_references.append(new_reference)
 
-                    assigned_bom_refs[new_components[reference]] = new_reference
+                    replace_bom_ref_in_sbom(secondary_sbom, reference, new_bom_ref)
+                    retained_components[new_bom_ref] = new_components[reference]
 
-                    replace_bom_ref_in_sbom(secondary_sbom, reference, new_reference)
+                    assigned_bom_refs[new_components[reference]] = new_bom_ref
 
                 elif new_components[reference] in assigned_bom_refs.keys():
+
                     replace_bom_ref_in_sbom(
                         secondary_sbom,
                         reference,
                         assigned_bom_refs[new_components[reference]],
                     )
+                    retained_components[new_bom_ref] = new_components[reference]
 
                 else:
-                    list_of_used_references.append(reference)
+                    retained_components[reference] = new_components[reference]
 
 
 def unify_bom_refs(list_of_sboms: t.Sequence[dict]) -> None:

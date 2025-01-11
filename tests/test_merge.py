@@ -543,11 +543,6 @@ class TestReplaceBomRefs(unittest.TestCase):
         sbom_1_copy = copy.deepcopy(sbom_1)
         merge.make_bom_refs_unique([sbom_1, sbom_2, sbom_3, sbom_4])
 
-        with open(
-            "sbom_2_replaced_vulnerabilities.json", "w", encoding="utf8"
-        ) as json_file:
-            json.dump(sbom_2, json_file, indent=4)
-
         self.assertEqual(sbom_1, sbom_1_copy)
         self.assertEqual(sbom_2_replaced, sbom_2)
         self.assertEqual(sbom_3_replaced, sbom_3)
@@ -966,8 +961,6 @@ class TestVulnerabilities(unittest.TestCase):
         kept_affects = merge.extract_new_affects(
             lists["original_affects"], lists["new_affects"], "vuln_id"
         )
-        with open("kept_affects.json", "w", encoding="utf8") as json_file:
-            json.dump(kept_affects, json_file, indent=4)
 
         self.assertEqual(
             kept_affects,
@@ -1182,18 +1175,11 @@ class TestVulnerabilities(unittest.TestCase):
             [], new_vulnerabilities, identities_2
         )
 
-        with open("original_1.json", "w", encoding="utf8") as json_file:
-            json.dump(original_vulnerabilities, json_file, indent=4)
-
-        with open("merged_original.json", "w", encoding="utf8") as json_file:
-            json.dump(actual_merged, json_file, indent=4)
-
         self.assertEqual(original_vulnerabilities, actual_merged)
         self.assertEqual(new_vulnerabilities, actual_merged_2)
         self.assertEqual(original_vulnerabilities, actual_merged_3)
         self.assertEqual(new_vulnerabilities, actual_merged_4)
 
-    """
     def test_merge_replace_ref(self) -> None:
         sections = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
             "test_merge_vulnerabilities"
@@ -1205,7 +1191,6 @@ class TestVulnerabilities(unittest.TestCase):
 
         with open("merged_sbom.json", "w", encoding="utf8") as json_file:
             json.dump(merged_sbom, json_file, indent=4)
-    """
 
 
 # TODO write tests that verify the replacement of refs!!

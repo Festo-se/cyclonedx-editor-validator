@@ -503,39 +503,23 @@ class TestMerge:
         expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
         assert expected == actual
 
-    def test_hierarchical(
+    def test_vex(
         self,
         argv: Callable[..., None],
         data_dir: Path,
         capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        input_folder = data_dir
+    ):
 
-        input_1 = input_folder / "merge.input_1.cdx.json"
-        input_2 = input_folder / "merge.input_2.cdx.json"
+        input_1 = data_dir / "merge.vex.input_1.cdx.json"
+        input_2 = data_dir / "merge.vex.input_2.cdx.json"
 
-        argv("merge", str(input_1), str(input_2), "--hierarchical")
+        argv("merge", str(input_1), str(input_2))
         exit_code, actual, _ = run_main(capsys=capsys, parse_output="json")
 
         assert exit_code == Status.OK
 
-        expected = load_sbom(data_dir / "merge.expected_hierarchical.cdx.json")
-
+        expected = load_sbom(data_dir / "merge.vex.expected.cdx.json")
         assert expected == actual
-
-    def test_same_sbom_warning_duplicate(
-        self,
-        argv: Callable[..., None],
-        data_dir: Path,
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-
-        input_1 = data_dir / "merge.input_1.cdx.json"
-
-        argv("merge", str(input_1), str(input_1), "--hierarchical")
-        _, _, warnings = run_main(capsys=capsys, parse_output="json")
-
-        assert "Dropping a duplicate component" in warnings
 
     def test_order(
         self,
@@ -558,6 +542,7 @@ class TestMerge:
         # file. We don't care what the output is truly, only that it's different from the regular
         # test.
         not_expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
+
         assert output != not_expected
 
     def test_from_folder(

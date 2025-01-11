@@ -174,25 +174,6 @@ def get_bom_refs_from_dependencies(dependencies: Sequence[dict]) -> list[str]:
     return list_of_bom_refs
 
 
-def get_ref_from_components(list_of_components: Sequence[dict]) -> list[str]:
-    """
-    Function that returns a list of bom-refs from a list of components.
-    This also includes nested components.
-
-    Input:
-    list_of_components: list with dicts of components
-
-    Output:
-    list_of_bom_refs: List of bom-refs from the components in the submitted list
-    """
-    list_of_all_components = extract_components(list_of_components)
-    list_of_bom_refs = []
-    for component in list_of_all_components:
-        bom_ref = component.get("bom-ref", "")
-        list_of_bom_refs.append(bom_ref)
-    return list_of_bom_refs
-
-
 def extract_components(list_of_components: Sequence[dict]) -> Sequence[dict]:
     extracted_components = []
     for component in list_of_components:

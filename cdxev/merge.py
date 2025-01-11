@@ -297,8 +297,8 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
 
     # create identity object for all vulnerabilities
     concatenated_vulnerabilities: list[dict] = []
-    for k in range(1, len(sboms)):
-        concatenated_vulnerabilities += sboms[k].get("vulnerabilities", [])
+    for bom in sboms:
+        concatenated_vulnerabilities += bom.get("vulnerabilities", [])
     identities = get_identities_for_vulnerabilities(concatenated_vulnerabilities)
 
     merged_sbom = sboms[0]

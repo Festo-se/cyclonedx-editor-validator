@@ -372,7 +372,7 @@
       }
     ]
   },
-  "merge_goverment_sub_sub_sub": {
+  "merge_government_sub_sub_sub": {
     "bomFormat": "CycloneDX",
     "specVersion": "1.3",
     "version": 1,
@@ -998,7 +998,7 @@
       }
     ]
   },
-  "merge_goverment_sub_sub_sub_and_sub_sub_2": {
+  "merge_government_sub_sub_sub_and_sub_sub_2": {
     "bomFormat": "CycloneDX",
     "specVersion": "1.3",
     "version": 1,

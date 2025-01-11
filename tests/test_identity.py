@@ -214,7 +214,7 @@ class IdentityTestCase(unittest.TestCase):
 
 
 class TestVulnerabilityIdentity(unittest.TestCase):
-    def test_vulnerability_identity_Class(self) -> None:
+    def test_vulnerability_identity_class(self) -> None:
         identity = VulnerabilityIdentity("id", ["ref 1", "ref 2"])
         self.assertEqual(identity.__str__(), "id_|_ref 1_|_ref 2")
         self.assertEqual(identity.aliases, ["ref 1", "ref 2"])

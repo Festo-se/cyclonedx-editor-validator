@@ -1,11 +1,10 @@
-import unittest
 import json
+import unittest
+from copy import deepcopy
 from typing import Sequence
 
 from cdxev.auxiliary import sbomFunctions as sbF
 from cdxev.auxiliary.identity import ComponentIdentity
-from copy import deepcopy
-
 from tests.auxiliary.helper import load_sections_for_test_sbom, load_sub_program
 
 

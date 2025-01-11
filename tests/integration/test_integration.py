@@ -501,6 +501,24 @@ class TestMerge:
         expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
         assert expected == actual
 
+    def test_vex(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ):
+
+        input_1 = data_dir / "merge.vex.input_1.cdx.json"
+        input_2 = data_dir / "merge.vex.input_2.cdx.json"
+
+        argv("merge", str(input_1), str(input_2))
+        exit_code, actual, _ = run_main(capsys=capsys, parse_output="json")
+
+        assert exit_code == Status.OK
+
+        expected = load_sbom(data_dir / "merge.vex.expected.cdx.json")
+        assert expected == actual
+
     def test_order(
         self,
         argv: Callable[..., None],
@@ -522,6 +540,7 @@ class TestMerge:
         # file. We don't care what the output is truly, only that it's different from the regular
         # test.
         not_expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
+
         assert output != not_expected
 
     def test_from_folder(

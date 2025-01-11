@@ -211,8 +211,13 @@ def merge_2_sboms(
         )
         merged_sbom["vulnerabilities"] = list_of_merged_vulnerabilities
 
-    merged_sbom["components"] = list_of_merged_components
-    merged_sbom["dependencies"] = merged_dependencies
+    if original_sbom.get("components", []) and sbom_to_be_merged.get("components", []):
+        merged_sbom["components"] = list_of_merged_components
+
+    if original_sbom.get("dependencies", []) and sbom_to_be_merged.get(
+        "dependencies", []
+    ):
+        merged_sbom["dependencies"] = merged_dependencies
 
     if merged_sbom.get("compositions", []) or sbom_to_be_merged.get("compositions", []):
         merge_compositions(

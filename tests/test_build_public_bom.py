@@ -13,8 +13,7 @@ path_to_sbom = (
 )
 
 path_to_nested_comp_sbom = (
-    "tests/auxiliary/test_build_public_bom_sboms/"
-    "sbom_nested_components.json"
+    "tests/auxiliary/test_build_public_bom_sboms/sbom_nested_components.json"
 )
 
 

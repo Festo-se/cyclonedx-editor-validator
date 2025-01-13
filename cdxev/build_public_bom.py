@@ -4,11 +4,36 @@ import json
 import re
 import typing as t
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 from jsonschema import Draft7Validator, FormatChecker
 
 from cdxev.auxiliary.sbomFunctions import extract_components
+
+
+def check_internal_sbom(metadata: dict[str, Any]) -> bool:
+    """
+    Checks if the sbom is internal.
+
+    Parameters
+    ----------
+    metadata: dict
+        metadata of the sbom
+
+    Returns
+    -------
+    bool
+        True if sbom is internal,
+        False if sbom is not internal
+    """
+    properties = metadata.get("component", {}).get("properties", [])
+    for property in properties:
+        if (
+            property.get("name") == "internal:component:status"
+            and property.get("value") == "internal"
+        ):
+            return True
+    return False
 
 
 def remove_internal_information_from_properties(component: dict) -> None:
@@ -149,8 +174,14 @@ def build_public_bom(sbom: dict, path_to_schema: t.Union[Path, None]) -> dict:
         A sbom dictionary with internal components removed
 
     """
+    metadata = sbom.get("metadata", [])
     components = sbom.get("components", [])
     dependencies = sbom.get("dependencies", [])
+    if check_internal_sbom(metadata):
+        print(
+            "Warning: The SBOM is internal and should not be published! Check metadata.component"
+            "--> internal:component:status = interal"
+        )
     (
         list_of_removed_components,
         cleared_components,

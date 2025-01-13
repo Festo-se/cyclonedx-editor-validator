@@ -4,14 +4,14 @@ import json
 import re
 import typing as t
 from pathlib import Path
-from typing import Sequence
+from typing import Sequence, Any
 
 from jsonschema import Draft7Validator, FormatChecker
 
 from cdxev.auxiliary.sbomFunctions import extract_components
 
 
-def remove_internal_information_from_properties(component: dict) -> None:
+def remove_internal_information_from_properties(component: dict[str, Any]) -> None:
     """
     Removes information from properties, that are
     tagged as internal. See
@@ -40,7 +40,7 @@ def remove_internal_information_from_properties(component: dict) -> None:
 
 
 def remove_component_tagged_internal(
-    components: Sequence[dict], path_to_schema: t.Union[Path, None]
+    components: t.List[dict], path_to_schema: t.Union[Path, None]
 ) -> t.Tuple[t.List[str], t.List[dict]]:
     """
     Removes the components marked as internal,
@@ -131,7 +131,7 @@ def merge_dependency_for_removed_component(
     return new_dependencies
 
 
-def build_public_bom(sbom: dict, path_to_schema: t.Union[Path, None]) -> dict:
+def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) -> dict:
     """
     Removes the components with the property internal
     from a sbom and resolves the dependencies

@@ -39,6 +39,16 @@ def remove_internal_information_from_properties(component: dict[str, Any]) -> No
         component["properties"] = new_properties
 
 
+def process_component(component: dict[str, Any]) -> t.List[dict]:
+    cleared_components = []
+    remove_internal_information_from_properties(component)
+    cleared_components.append(component)
+    sub_components = extract_components(component.get("components", []))
+    for sub_component in sub_components:
+        process_component(sub_component)
+    return cleared_components
+
+
 def remove_component_tagged_internal(
     components: t.List[dict], path_to_schema: t.Union[Path, None]
 ) -> t.Tuple[t.List[str], t.List[dict]]:
@@ -82,13 +92,10 @@ def remove_component_tagged_internal(
                 for comp in sub_components:
                     list_of_removed_component_bom_refs.append(comp.get("bom-ref", ""))
             else:
-                remove_internal_information_from_properties(component)
-                cleared_components.append(component)
+                cleared_components.extend(process_component(component))
     else:
         for component in components:
-            remove_internal_information_from_properties(component)
-            cleared_components.append(component)
-
+            cleared_components.extend(process_component(component))
     return list_of_removed_component_bom_refs, cleared_components
 
 

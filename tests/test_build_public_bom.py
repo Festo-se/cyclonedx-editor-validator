@@ -12,8 +12,18 @@ path_to_sbom = (
     "Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
+path_to_nested_comp_sbom = (
+    "tests/auxiliary/test_build_public_bom_sboms/"
+    "sbom_nested_components.json"
+)
+
+
 path_to_public_sbom = (
     "tests/auxiliary/test_build_public_bom_sboms/internal_removed_sbom.json"
+)
+
+path_to_public_sbom_nested = (
+    "tests/auxiliary/test_build_public_bom_sboms/expected_sbom_deleted_nested_component.json"
 )
 
 path_to_docu_sbom_dic = (
@@ -73,7 +83,19 @@ def get_test_sbom(pathsbom: str = path_to_sbom) -> dict:
     return sbom
 
 
+def get_test_sbom_nested(pathsbom: str = path_to_nested_comp_sbom) -> dict:
+    with open(pathsbom, "r") as read_file:
+        sbom = json.load(read_file)
+    return sbom
+
+
 def get_public_sbom(pathsbom: str = path_to_public_sbom) -> dict:
+    with open(pathsbom, "r") as read_file:
+        sbom = json.load(read_file)
+    return sbom
+
+
+def get_public_sbom_nested(pathsbom: str = path_to_public_sbom_nested) -> dict:
     with open(pathsbom, "r") as read_file:
         sbom = json.load(read_file)
     return sbom
@@ -261,23 +283,8 @@ class TestCreateExternalBom(unittest.TestCase):
         ]
         self.assertDictEqual(external_bom, public_sbom)
 
-    def test_build_public_delete_nested_components(self) -> None:
-        sbom = get_test_sbom()
-        sbom["components"][0]["group"] = "com.acme.internal"
-        public_sbom = get_test_sbom()
-        public_sbom["components"].pop(0)
-        public_sbom["compositions"][0]["assemblies"].pop(0)
-        public_sbom["compositions"][0]["assemblies"].pop(0)
-        public_sbom["dependencies"][0]["dependsOn"].pop(0)
-        public_sbom["dependencies"][0]["dependsOn"].append("comp4")
-        public_sbom["dependencies"].pop(1)
-        public_sbom["dependencies"].pop(1)
-        public_sbom["metadata"]["component"]["properties"].pop(1)
-        public_sbom["components"][0]["properties"].pop(1)
-        public_sbom["components"][0]["properties"].pop(2)
-        public_sbom["components"][5]["properties"].pop(0)
-        public_sbom["components"][2]["properties"].pop(0)
-        public_sbom["components"][1]["properties"].pop(0)
-        public_sbom["components"][4]["properties"].pop(0)
+    def test_build_public_deleted_nested_components(self) -> None:
+        sbom = get_test_sbom_nested()
+        public_sbom = get_public_sbom_nested()
         external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
         self.assertDictEqual(external_bom, public_sbom)

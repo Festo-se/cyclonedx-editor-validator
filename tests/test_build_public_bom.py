@@ -23,7 +23,8 @@ path_to_public_sbom = (
 )
 
 path_to_public_sbom_nested = (
-    "tests/auxiliary/test_build_public_bom_sboms/expected_sbom_deleted_nested_component.json"
+    "tests/auxiliary/test_build_public_bom_sboms/"
+    "expected_sbom_deleted_nested_component.json"
 )
 
 path_to_docu_sbom_dic = (

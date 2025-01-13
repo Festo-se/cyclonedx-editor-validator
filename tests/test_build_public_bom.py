@@ -281,3 +281,14 @@ class TestCreateExternalBom(unittest.TestCase):
         public_sbom["components"][4]["properties"].pop(0)
         external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
         self.assertDictEqual(external_bom, public_sbom)
+
+    def test_build_public_internal_sbom_warning(self) -> None:
+        sbom = get_test_sbom()
+        metadata = sbom.get("metadata", [])
+        self.assertTrue(b_p_b.check_internal_sbom(metadata))
+
+    def test_build_public_internal_sbom_missing_properties(self) -> None:
+        sbom = get_test_sbom()
+        metadata = sbom.get("metadata", [])
+        metadata["component"].pop("properties")
+        self.assertFalse(b_p_b.check_internal_sbom(metadata))

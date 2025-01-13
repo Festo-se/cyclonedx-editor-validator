@@ -77,20 +77,19 @@ def remove_component_tagged_internal(
         A list of components without the property
         "internal"
     """
-    # create validator, to check if a component is internal
     list_of_removed_component_bom_refs = []
     cleared_components = []
 
     if path_to_schema is not None:
         validator_for_being_internal = create_internal_validator(path_to_schema)
-        for component in components:
+        for pos, component in enumerate(components):
             # if it is a internal component, the whole component will be removed,
             # if not, the property within namespace internal will be removed
             if validator_for_being_internal.is_valid(component):
                 list_of_removed_component_bom_refs.append(component.get("bom-ref", ""))
-                sub_components = extract_components(component.get("components", []))
-                for comp in sub_components:
-                    list_of_removed_component_bom_refs.append(comp.get("bom-ref", ""))
+                sub_components = component.get("components", [])
+                for sub_component in reversed(sub_components):
+                    components.insert(pos + 1, sub_component)
             else:
                 cleared_components.extend(process_component(component))
     else:

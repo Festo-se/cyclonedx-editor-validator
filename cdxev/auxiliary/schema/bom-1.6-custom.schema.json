@@ -785,11 +785,9 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
-          "title": "Component License(s)"
+          "title": "BOM License(s)",
+          "description": "The license information for the BOM document.\nThis may be different from the license(s) of the component(s) that the BOM describes.",
+          "$ref": "#/definitions/licenseChoice"
         },
         "properties": {
           "type": "array",
@@ -1099,11 +1097,7 @@
           }
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
+          "$ref": "#/definitions/licenseChoice",
           "title": "Component License(s)"
         },
         "copyright": {
@@ -1887,32 +1881,63 @@
       }
     },
     "licenseChoice": {
-      "type": "object",
-      "title": "License(s)",
-      "additionalProperties": false,
-      "properties": {
-        "license": {
-          "$ref": "#/definitions/license"
-        },
-        "expression": {
-          "type": "string",
-          "minLength": 1,
-          "title": "SPDX License Expression",
-          "examples": [
-            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-            "GPL-3.0-only WITH Classpath-exception-2.0"
-          ]
-        }
-      },
+      "title": "License Choice",
+      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "type": "array",
       "oneOf": [
         {
-          "required": [
-            "license"
-          ]
+          "title": "Multiple licenses",
+          "description": "A list of SPDX licenses and/or named licenses.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "title": "License",
+            "required": [
+              "license"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "license": {
+                "$ref": "#/definitions/license"
+              }
+            }
+          }
         },
         {
-          "required": [
-            "expression"
+          "title": "SPDX License Expression",
+          "description": "A tuple of exactly one SPDX License Expression.",
+          "type": "array",
+          "additionalItems": false,
+          "minItems": 1,
+          "maxItems": 1,
+          "items": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "expression"
+              ],
+              "properties": {
+                "expression": {
+                  "type": "string",
+                  "title": "SPDX License Expression",
+                  "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements",
+                  "minLength": 1,
+                  "examples": [
+                    "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                    "GPL-3.0-only WITH Classpath-exception-2.0"
+                  ]
+                },
+                "acknowledgement": {
+                  "$ref": "#/definitions/licenseAcknowledgementEnumeration"
+                },
+                "bom-ref": {
+                  "$ref": "#/definitions/refType",
+                  "title": "BOM Reference",
+                  "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                }
+              }
+            }
           ]
         }
       ]
@@ -2363,8 +2388,6 @@
           "description": "Specifies information about the data including the directional flow of data and the data classification."
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
           "$ref": "#/definitions/licenseChoice",
           "title": "Service License(s)"
         },

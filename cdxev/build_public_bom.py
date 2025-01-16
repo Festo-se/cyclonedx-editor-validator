@@ -39,19 +39,36 @@ def remove_internal_information_from_properties(component: dict[str, Any]) -> No
         component["properties"] = new_properties
 
 
-def process_component(component: dict[str, Any]) -> t.List[dict]:
-    cleared_components = []
+def clear_component(component: dict[str, Any]) -> dict:
+    """
+    Removes all internal information of the component
+    and applies the same process to all sub-components
+    contained within the component.
+
+    Parameters
+    -----------
+    component: dict[str, Any]
+        A dictionary representing the component,
+        which may contain sub-components
+
+    Returns
+    -------
+    dict:
+        The processed component dictionary with internal information removed
+        from the component and its sub-components.
+    """
     remove_internal_information_from_properties(component)
-    cleared_components.append(component)
+    # The 'extract_components' function processes any nested components recursively,
+    # ensuring that all levels of sub-components are handled.
     sub_components = extract_components(component.get("components", []))
     for sub_component in sub_components:
-        process_component(sub_component)
-    return cleared_components
+        remove_internal_information_from_properties(sub_component)
+    return component
 
 
 def remove_component_tagged_internal(
-    components: t.List[dict], path_to_schema: t.Union[Path, None]
-) -> t.Tuple[t.List[str], t.List[dict]]:
+    components: list[dict], path_to_schema: t.Union[Path, None]
+) -> t.Tuple[list[str], list[dict]]:
     """
     Removes the components marked as internal,
     from a list of components.
@@ -89,12 +106,15 @@ def remove_component_tagged_internal(
                 list_of_removed_component_bom_refs.append(component.get("bom-ref", ""))
                 sub_components = component.get("components", [])
                 for sub_component in reversed(sub_components):
+                    # The inverted list keeps components in the correct order in the new SBOM,
+                    # as each is inserted last --> at the top of the dict,
+                    # preventing sub_components from being reversed.
                     components.insert(pos + 1, sub_component)
             else:
-                cleared_components.extend(process_component(component))
+                cleared_components.append(clear_component(component))
     else:
         for component in components:
-            cleared_components.extend(process_component(component))
+            cleared_components.append(clear_component(component))
     return list_of_removed_component_bom_refs, cleared_components
 
 

@@ -4,14 +4,14 @@ import json
 import re
 import typing as t
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 from jsonschema import Draft7Validator, FormatChecker
 
 from cdxev.auxiliary.sbomFunctions import extract_components
 
 
-def remove_internal_information_from_properties(component: dict) -> None:
+def remove_internal_information_from_properties(component: dict[str, Any]) -> None:
     """
     Removes information from properties, that are
     tagged as internal. See
@@ -39,9 +39,36 @@ def remove_internal_information_from_properties(component: dict) -> None:
         component["properties"] = new_properties
 
 
+def clear_component(component: dict[str, Any]) -> dict:
+    """
+    Removes all internal information of the component
+    and applies the same process to all sub-components
+    contained within the component.
+
+    Parameters
+    -----------
+    component: dict[str, Any]
+        A dictionary representing the component,
+        which may contain sub-components
+
+    Returns
+    -------
+    dict:
+        The processed component dictionary with internal information removed
+        from the component and its sub-components.
+    """
+    remove_internal_information_from_properties(component)
+    # The 'extract_components' function processes any nested components recursively,
+    # ensuring that all levels of sub-components are handled.
+    sub_components = extract_components(component.get("components", []))
+    for sub_component in sub_components:
+        remove_internal_information_from_properties(sub_component)
+    return component
+
+
 def remove_component_tagged_internal(
-    components: Sequence[dict], path_to_schema: t.Union[Path, None]
-) -> t.Tuple[t.List[str], t.List[dict]]:
+    components: list[dict], path_to_schema: t.Union[Path, None]
+) -> t.Tuple[list[str], list[dict]]:
     """
     Removes the components marked as internal,
     from a list of components.
@@ -67,28 +94,27 @@ def remove_component_tagged_internal(
         A list of components without the property
         "internal"
     """
-    # create validator, to check if a component is internal
     list_of_removed_component_bom_refs = []
     cleared_components = []
 
     if path_to_schema is not None:
         validator_for_being_internal = create_internal_validator(path_to_schema)
-        for component in components:
+        for pos, component in enumerate(components):
             # if it is a internal component, the whole component will be removed,
             # if not, the property within namespace internal will be removed
             if validator_for_being_internal.is_valid(component):
                 list_of_removed_component_bom_refs.append(component.get("bom-ref", ""))
-                sub_components = extract_components(component.get("components", []))
-                for comp in sub_components:
-                    list_of_removed_component_bom_refs.append(comp.get("bom-ref", ""))
+                sub_components = component.get("components", [])
+                for sub_component in reversed(sub_components):
+                    # The inverted list keeps components in the correct order in the new SBOM,
+                    # as each is inserted last --> at the top of the dict,
+                    # preventing sub_components from being reversed.
+                    components.insert(pos + 1, sub_component)
             else:
-                remove_internal_information_from_properties(component)
-                cleared_components.append(component)
+                cleared_components.append(clear_component(component))
     else:
         for component in components:
-            remove_internal_information_from_properties(component)
-            cleared_components.append(component)
-
+            cleared_components.append(clear_component(component))
     return list_of_removed_component_bom_refs, cleared_components
 
 
@@ -131,7 +157,7 @@ def merge_dependency_for_removed_component(
     return new_dependencies
 
 
-def build_public_bom(sbom: dict, path_to_schema: t.Union[Path, None]) -> dict:
+def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) -> dict:
     """
     Removes the components with the property internal
     from a sbom and resolves the dependencies

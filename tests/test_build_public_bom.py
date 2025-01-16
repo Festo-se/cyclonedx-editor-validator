@@ -77,39 +77,7 @@ path_to_documentation_schema_4 = Path(
 )
 
 
-def get_test_sbom(pathsbom: str = path_to_sbom) -> dict:
-    with open(pathsbom, "r") as read_file:
-        sbom = json.load(read_file)
-    return sbom
-
-
-def get_test_sbom_nested(pathsbom: str = path_to_nested_comp_sbom) -> dict:
-    with open(pathsbom, "r") as read_file:
-        sbom = json.load(read_file)
-    return sbom
-
-
-def get_public_sbom(pathsbom: str = path_to_public_sbom) -> dict:
-    with open(pathsbom, "r") as read_file:
-        sbom = json.load(read_file)
-    return sbom
-
-
-def get_public_sbom_nested(pathsbom: str = path_to_public_sbom_nested) -> dict:
-    with open(pathsbom, "r") as read_file:
-        sbom = json.load(read_file)
-    return sbom
-
-
-def get_dic_with_documentation_sboms(pathsbom: str = path_to_docu_sbom_dic) -> dict:
-    with open(pathsbom, "r") as read_file:
-        sbom = json.load(read_file)
-    return sbom
-
-
-def get_dic_with_public_documentation_sboms(
-    pathsbom: str = path_to_public_docu_sbom_dic,
-) -> dict:
+def get_sbom(pathsbom: str) -> dict:
     with open(pathsbom, "r") as read_file:
         sbom = json.load(read_file)
     return sbom
@@ -174,14 +142,14 @@ class TestRemoveInternalInformationFromProperties(unittest.TestCase):
 
 class TestCreateExternalBom(unittest.TestCase):
     def test_build_public_group_is_internal(self) -> None:
-        sbom = get_test_sbom()
-        public_sbom = get_public_sbom()
+        sbom = get_sbom(path_to_sbom)
+        public_sbom = get_sbom(path_to_public_sbom)
         external_bom = b_p_b.build_public_bom(sbom, path_to_example_schema_1)
         self.assertDictEqual(public_sbom, external_bom)
 
     def test_build_public_group_is_internal_name_contained_is_public(self) -> None:
-        sbom = get_test_sbom()
-        public_sbom = get_test_sbom()
+        sbom = get_sbom(path_to_sbom)
+        public_sbom = get_sbom(path_to_sbom)
         public_sbom["metadata"]["component"]["properties"] = [
             {"name": "notinternal:stuff", "value": "something"}
         ]
@@ -199,32 +167,32 @@ class TestCreateExternalBom(unittest.TestCase):
         self.assertDictEqual(public_sbom, external_bom)
 
     def test_build_public_from_documentation_1(self) -> None:
-        sbom = get_dic_with_documentation_sboms()["sbom_for_docu_schema_1_and_2"]
-        public_sbom = get_dic_with_public_documentation_sboms()["public_sbom_schema_1"]
+        sbom = get_sbom(path_to_docu_sbom_dic)["sbom_for_docu_schema_1_and_2"]
+        public_sbom = get_sbom(path_to_public_docu_sbom_dic)["public_sbom_schema_1"]
         external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
         self.assertDictEqual(external_bom, public_sbom)
 
     def test_build_public_from_documentation_2(self) -> None:
-        sbom = get_dic_with_documentation_sboms()["sbom_for_docu_schema_1_and_2"]
-        public_sbom = get_dic_with_public_documentation_sboms()["public_sbom_schema_2"]
+        sbom = get_sbom(path_to_docu_sbom_dic)["sbom_for_docu_schema_1_and_2"]
+        public_sbom = get_sbom(path_to_public_docu_sbom_dic)["public_sbom_schema_2"]
         external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_2)
         self.assertDictEqual(external_bom, public_sbom)
 
     def test_build_public_from_documentation_3(self) -> None:
-        sbom = get_dic_with_documentation_sboms()["sbom_for_docu_schema_3"]
-        public_sbom = get_dic_with_public_documentation_sboms()["public_sbom_schema_3"]
+        sbom = get_sbom(path_to_docu_sbom_dic)["sbom_for_docu_schema_3"]
+        public_sbom = get_sbom(path_to_public_docu_sbom_dic)["public_sbom_schema_3"]
         external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_3)
         self.assertDictEqual(external_bom, public_sbom)
 
     def test_build_public_from_documentation_4(self) -> None:
-        sbom = get_dic_with_documentation_sboms()["sbom_for_docu_schema_4"]
-        public_sbom = get_dic_with_public_documentation_sboms()["public_sbom_schema_4"]
+        sbom = get_sbom(path_to_docu_sbom_dic)["sbom_for_docu_schema_4"]
+        public_sbom = get_sbom(path_to_public_docu_sbom_dic)["public_sbom_schema_4"]
         external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_4)
         self.assertDictEqual(external_bom, public_sbom)
 
     def test_build_public_no_schema(self) -> None:
-        sbom = get_test_sbom()
-        public_sbom = get_test_sbom()
+        sbom = get_sbom(path_to_sbom)
+        public_sbom = get_sbom(path_to_sbom)
         public_sbom["metadata"]["component"]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(2)
@@ -252,8 +220,8 @@ class TestCreateExternalBom(unittest.TestCase):
         self.assertDictEqual(external_bom, public_sbom)
 
     def test_deletion_of_orphaned_bom_refs(self) -> None:
-        sbom = get_test_sbom()
-        public_sbom = get_test_sbom()
+        sbom = get_sbom(path_to_sbom)
+        public_sbom = get_sbom(path_to_sbom)
         public_sbom["metadata"]["component"]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(2)
@@ -283,8 +251,62 @@ class TestCreateExternalBom(unittest.TestCase):
         ]
         self.assertDictEqual(external_bom, public_sbom)
 
-    def test_build_public_deleted_nested_components(self) -> None:
-        sbom = get_test_sbom_nested()
-        public_sbom = get_public_sbom_nested()
+    def test_build_public_delete_nested_components(self) -> None:
+        sbom = get_sbom(path_to_sbom)
+        sbom["components"][0]["group"] = "com.acme.internal"
+        public_sbom = get_sbom(path_to_sbom)
+        public_sbom["components"][0] = public_sbom["components"][0]["components"][0]
+        public_sbom["compositions"][0]["assemblies"].pop(0)
+        public_sbom["dependencies"][0]["dependsOn"].pop(0)
+        public_sbom["dependencies"][0]["dependsOn"].append("sub_comp1")
+        public_sbom["dependencies"][0]["dependsOn"].append("comp4")
+        public_sbom["dependencies"].pop(1)
+        public_sbom["metadata"]["component"]["properties"].pop(1)
+        public_sbom["components"][1]["properties"].pop(1)
+        public_sbom["components"][1]["properties"].pop(2)
+        public_sbom["components"][2]["properties"].pop(0)
+        public_sbom["components"][3]["properties"].pop(0)
+        public_sbom["components"][5]["properties"].pop(0)
+        public_sbom["components"][6]["properties"].pop(0)
         external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
         self.assertDictEqual(external_bom, public_sbom)
+
+    def test_build_public_clear_component_func(self) -> None:
+        component = {
+            "properties": [
+                {
+                    "name": "internal:stuff",
+                    "value": "gone"
+                },
+                {
+                    "name": "stuff",
+                    "value": "not gone"
+                }
+            ],
+            "components": [
+                {
+                    "properties": [
+                        {
+                            "name": "internal:stuff",
+                            "value": "gone"
+                        }
+                    ],
+                    "components": [
+                        {
+                            "properties": [
+                                {
+                                    "name": "internal:stuff",
+                                    "value": "gone"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        expected_component = component
+        expected_component["properties"].pop(1)
+        expected_component["components"][0]["properties"].pop(0)
+        expected_component["components"][0]["components"][0]["properties"].pop(0)
+        component = b_p_b.clear_component(component)
+        self.assertDictEqual(component, expected_component)

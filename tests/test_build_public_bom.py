@@ -274,35 +274,17 @@ class TestCreateExternalBom(unittest.TestCase):
     def test_build_public_clear_component_func(self) -> None:
         component = {
             "properties": [
-                {
-                    "name": "internal:stuff",
-                    "value": "gone"
-                },
-                {
-                    "name": "stuff",
-                    "value": "not gone"
-                }
+                {"name": "internal:stuff", "value": "gone"},
+                {"name": "stuff", "value": "not gone"},
             ],
             "components": [
                 {
-                    "properties": [
-                        {
-                            "name": "internal:stuff",
-                            "value": "gone"
-                        }
-                    ],
+                    "properties": [{"name": "internal:stuff", "value": "gone"}],
                     "components": [
-                        {
-                            "properties": [
-                                {
-                                    "name": "internal:stuff",
-                                    "value": "gone"
-                                }
-                            ]
-                        }
-                    ]
+                        {"properties": [{"name": "internal:stuff", "value": "gone"}]}
+                    ],
                 }
-            ]
+            ],
         }
         expected_component = component
         expected_component["properties"].pop(1)

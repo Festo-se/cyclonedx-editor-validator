@@ -4,11 +4,41 @@ import json
 import re
 import typing as t
 from pathlib import Path
-from typing import Sequence
-
+from typing import Any, Sequence
+import logging
+from cdxev.log import LogMessage
 from jsonschema import Draft7Validator, FormatChecker
-
 from cdxev.auxiliary.sbomFunctions import extract_components
+
+logger = logging.getLogger(__name__)
+
+def check_affected_metadata(metadata: dict[str, Any], path_to_schema: str) -> bool:
+    """
+    Checks if the metadata.component is affected by the schema. 
+    If so, the function prints a warning.
+    Parameters
+    ----------
+    metadata: dict
+        metadata of the SBOM
+    path_to_schema: str
+        str/path to schema
+
+    Returns
+    -------
+    bool
+        True metadata.component is affected,
+        False if not
+    """
+    validator_for_being_internal = create_internal_validator(path_to_schema)
+    if validator_for_being_internal.is_valid(metadata.get("component", [])):
+        logger.warning(
+                LogMessage(
+                    "Warning: `metadata.component` is not affected by the JSON schema!",
+                    "Please check manually."
+                )
+            )
+        return True
+    return False
 
 
 def remove_internal_information_from_properties(component: dict) -> None:
@@ -134,23 +164,25 @@ def merge_dependency_for_removed_component(
 def build_public_bom(sbom: dict, path_to_schema: t.Union[Path, None]) -> dict:
     """
     Removes the components with the property internal
-    from a sbom and resolves the dependencies
+    from a SBOM and resolves the dependencies
 
     Parameters
     ----------
     sbom: dict
-        A sbom dictionary
+        A SBOM dictionary
     path_to_schema:
         The path to json schema for defining internal components
 
     Returns
     -------
     sbom: dict
-        A sbom dictionary with internal components removed
+        A SBOM dictionary with internal components removed
 
     """
+    metadata = sbom.get("metadata", [])
     components = sbom.get("components", [])
     dependencies = sbom.get("dependencies", [])
+    check_affected_metadata(metadata, path_to_schema)
     (
         list_of_removed_components,
         cleared_components,

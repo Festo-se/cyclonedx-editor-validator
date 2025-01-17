@@ -16,6 +16,9 @@ build-public
     The actions are performed in this order, meaning that *internal* properties will be taken into account when matching the JSON schema.
     If a component containing nested components is deleted, those nested components are deleted as well.
 
+    .. warning::
+        **Warning!** The ``metadata.component`` is not affected by the JSON schema. 
+
     The JSON schema must be formulated according to the Draft 7 specification.
 
 Dependency-resolution

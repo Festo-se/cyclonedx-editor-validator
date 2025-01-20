@@ -1,20 +1,23 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
+import logging
 import re
 import typing as t
 from pathlib import Path
 from typing import Any, Sequence
-import logging
-from cdxev.log import LogMessage
+
 from jsonschema import Draft7Validator, FormatChecker
+
 from cdxev.auxiliary.sbomFunctions import extract_components
+from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
 
-def check_affected_metadata(metadata: dict[str, Any], path_to_schema: str) -> bool:
+
+def check_affected_metadata(metadata: dict[str, Any], path_to_schema: Path) -> bool:
     """
-    Checks if the metadata.component is affected by the schema. 
+    Checks if the metadata.component is affected by the schema.
     If so, the function prints a warning.
     Parameters
     ----------
@@ -32,11 +35,11 @@ def check_affected_metadata(metadata: dict[str, Any], path_to_schema: str) -> bo
     validator_for_being_internal = create_internal_validator(path_to_schema)
     if validator_for_being_internal.is_valid(metadata.get("component", [])):
         logger.warning(
-                LogMessage(
-                    "Warning: `metadata.component` is not affected by the JSON schema!",
-                    "Please check manually."
-                )
+            LogMessage(
+                "Warning: `metadata.component` is not affected by the JSON schema!",
+                "Please check manually.",
             )
+        )
         return True
     return False
 
@@ -182,7 +185,8 @@ def build_public_bom(sbom: dict, path_to_schema: t.Union[Path, None]) -> dict:
     metadata = sbom.get("metadata", [])
     components = sbom.get("components", [])
     dependencies = sbom.get("dependencies", [])
-    check_affected_metadata(metadata, path_to_schema)
+    if path_to_schema:
+        check_affected_metadata(metadata, path_to_schema)
     (
         list_of_removed_components,
         cleared_components,

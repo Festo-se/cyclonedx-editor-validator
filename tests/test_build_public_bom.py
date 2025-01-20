@@ -286,4 +286,6 @@ class TestCreateExternalBom(unittest.TestCase):
         sbom = get_test_sbom()
         metadata = sbom.get("metadata", [])
         metadata["component"]["group"] = "com.acme.internal"
-        self.assertTrue(b_p_b.check_affected_metadata(metadata, path_to_documentation_schema_1))
+        self.assertTrue(
+            b_p_b.check_affected_metadata(metadata, path_to_documentation_schema_1)
+        )

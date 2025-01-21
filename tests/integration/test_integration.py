@@ -15,7 +15,7 @@ import toml
 from cdxev.__main__ import Status
 from cdxev.amend.operations import AddLicenseText
 from tests.auxiliary.helper import search_entry
-from tests.integration.helper import load_list, load_sbom, run_main
+from tests.integration.helper import load_sbom, run_main
 
 
 def test_help(argv: Callable[..., None], capsys: pytest.CaptureFixture[str]):
@@ -1509,5 +1509,5 @@ class TestVex:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        expected_output = data["expected_extract_json"]
+        expected_output = data["expected_vex"]
         assert json.loads(actual) == expected_output

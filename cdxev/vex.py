@@ -46,7 +46,7 @@ def get_list_of_ids(input_file: dict[str, Any], scheme: str) -> str:
         list_str += "ID,RefID,Description,Status\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             vul_id = vulnerability.get("id", "-")
-            vul_ref_id = vulnerability.get("references", {}).get("id", "-")
+            vul_ref_id = vulnerability.get("references", [])[0].get("id", "-")
             vul_description = vulnerability.get("description", "-")
             vul_state = vulnerability.get("analysis", {}).get("state", "-")
             list_str += (
@@ -64,8 +64,8 @@ def get_list_of_ids(input_file: dict[str, Any], scheme: str) -> str:
         for vulnerability in input_file.get("vulnerabilities", []):
             list_str += (
                 vulnerability.get("id", "-")
-                + ", "
-                + vulnerability.get("references", {}).get("id", "-")
+                + ","
+                + vulnerability.get("references", [])[0].get("id", "-")
                 + "\n"
             )
 
@@ -102,17 +102,16 @@ def get_list_of_trimed_vulnerabilities(
 
 
 def get_vulnerability_by_id(input_file: dict[str, Any], id: str) -> dict[str, Any]:
-    searched_vulnerability = []
+    found_vulnerabilities = []
     output_file = {}
     for vulnerability in input_file.get("vulnerabilities", []):
-        if (
-            vulnerability.get("id", "-") == id
-            or vulnerability.get("references", {}).get("id", "") == id
+        if vulnerability.get("id", "-") == id or any(
+            vul.get("id", "") == id for vul in vulnerability.get("references", [])
         ):
-            searched_vulnerability.append(vulnerability)
+            found_vulnerabilities.append(vulnerability)
 
     output_file = init_vex_header(input_file)
-    output_file["vulnerabilities"] = searched_vulnerability
+    output_file["vulnerabilities"] = found_vulnerabilities
     return output_file
 
 
@@ -155,8 +154,8 @@ def vex(
         A string containing the filtered state for the trim subcommand
     scheme: string
         A string containing the output scheme for the list subcommand
-    vul_ID: String
-        A string containing the sreached vulnerability-ID for the search subcommand
+    vul_ID: string
+        A string containing the searched vulnerability-ID for the search subcommand
 
     Returns
     -------

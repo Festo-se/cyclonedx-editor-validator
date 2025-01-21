@@ -509,7 +509,7 @@ def create_vex_parser(
 ) -> argparse.ArgumentParser:
     parser = subparser.add_parser(
         "vex",
-        help=("Executes commands [list, search, trim, extract] on VEX/SBOM files"),
+        help="Executes commands [list, search, trim, extract] on VEX/SBOM files.",
     )
 
     subparsers = parser.add_subparsers(dest="sub_command", required=True)
@@ -519,7 +519,7 @@ def create_vex_parser(
     )
     list_parser.add_argument(
         "--scheme",
-        help="Set scheme of return list",
+        help="Set scheme of return list.",
         choices=["default", "lightweight"],
         default="default",
         type=str,
@@ -527,13 +527,13 @@ def create_vex_parser(
 
     list_parser.add_argument(
         "--format",
-        help="Set format of return file",
+        help="Set format of return file.",
         choices=["txt", "csv"],
         default="csv",
         type=str,
     )
 
-    search_parser = subparsers.add_parser("search", help="Get vulnerability by ID.")
+    search_parser = subparsers.add_parser("search", help="Get vulnerabilities by ID.")
     search_parser.add_argument(
         "vul_id",
         metavar="<vul_id>",
@@ -547,7 +547,7 @@ def create_vex_parser(
     )
     trim_parser.add_argument(
         "--state",
-        help="Specifies the state to be filtered",
+        help="Specifies the state to be filtered.",
         choices=[
             "resolved",
             "resolved_with_pedigree",

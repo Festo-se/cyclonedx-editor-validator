@@ -290,5 +290,5 @@ class TestCreateExternalBom(unittest.TestCase):
         expected_component["properties"].pop(1)
         expected_component["components"][0]["properties"].pop(0)
         expected_component["components"][0]["components"][0]["properties"].pop(0)
-        component = b_p_b.clear_component(component)
+        b_p_b.clear_component(component)
         self.assertDictEqual(component, expected_component)

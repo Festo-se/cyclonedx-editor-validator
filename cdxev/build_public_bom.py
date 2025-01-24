@@ -39,7 +39,7 @@ def remove_internal_information_from_properties(component: dict[str, Any]) -> No
         component["properties"] = new_properties
 
 
-def clear_component(component: dict[str, Any]) -> dict:
+def clear_component(component: dict[str, Any]) -> None:
     """
     Removes all internal information of the component
     and applies the same process to all sub-components
@@ -53,9 +53,7 @@ def clear_component(component: dict[str, Any]) -> dict:
 
     Returns
     -------
-    dict:
-        The processed component dictionary with internal information removed
-        from the component and its sub-components.
+    None
     """
     remove_internal_information_from_properties(component)
     # The 'extract_components' function processes any nested components recursively,
@@ -63,7 +61,6 @@ def clear_component(component: dict[str, Any]) -> dict:
     sub_components = extract_components(component.get("components", []))
     for sub_component in sub_components:
         remove_internal_information_from_properties(sub_component)
-    return component
 
 
 def remove_component_tagged_internal(

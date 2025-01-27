@@ -64,55 +64,58 @@ def clear_component(component: dict[str, Any]) -> None:
 
 
 def remove_component_tagged_internal(
-    components: list[dict], path_to_schema: t.Union[Path, None]
+    component: dict, validator: Draft7Validator
 ) -> t.Tuple[list[str], list[dict]]:
     """
-    Removes the components marked as internal,
-    from a list of components.
-    If the component contains a properties field
-    that declares it as public, it will not be removed.
-    Internal Information will also be removed from properties fields
-    tagged with a name containing "^internal:".
+    Removes the components marked as internal (components which are valid
+    according to the schema), from a list of components. The nested
+    components will then replace the removed component if present.
+    If a component is not marked as internal, the function is
+    recursivly checking its nested components.
 
     Parameters
     ----------
     components: list[dict]
         A list of components
-    path_to_schema: Path
-        The path to a json schema defining a
-        internal component
+    validator: Draft7Validator
+        A validator to check if component is valid
+        according to the schema
 
     Returns
     -------
     list[str]
         A list with the bom-refs from the removed
         components
-    list[dict]:
-        A list of components without the property
-        "internal"
     """
-    list_of_removed_component_bom_refs = []
-    cleared_components = []
 
-    if path_to_schema is not None:
-        validator_for_being_internal = create_internal_validator(path_to_schema)
-        for pos, component in enumerate(components):
-            # if it is a internal component, the whole component will be removed,
-            # if not, the property within namespace internal will be removed
-            if validator_for_being_internal.is_valid(component):
-                list_of_removed_component_bom_refs.append(component.get("bom-ref", ""))
-                sub_components = component.get("components", [])
-                for sub_component in reversed(sub_components):
-                    # The inverted list keeps components in the correct order in the new SBOM,
-                    # as each is inserted last --> at the top of the dict,
-                    # preventing sub_components from being reversed.
-                    components.insert(pos + 1, sub_component)
-            else:
-                cleared_components.append(clear_component(component))
-    else:
-        for component in components:
-            cleared_components.append(clear_component(component))
-    return list_of_removed_component_bom_refs, cleared_components
+    list_of_removed_bom_refs = []
+    sub_components = component.get("components", [])
+    list_of_public_component = []
+    # create copy of component without nested components inside a list
+    # must be a list because the component could be internal and
+    # would then be replaced by one or multipe sub components
+    list_of_public_component.append(component.copy())
+    list_of_public_component[0]["components"] = []
+    # loop trough nested components and remove recursivly internal tagged components
+    for sub_component in sub_components:
+        list_of_removed_sub_bom_refs, list_of_public_sub_component = (
+            remove_component_tagged_internal(sub_component, validator)
+        )
+        # add (not internal) sub components to parent component
+        for new_sub_component in list_of_public_sub_component:
+            list_of_public_component[0]["components"].append(new_sub_component)
+        for removed_bom_ref in list_of_removed_sub_bom_refs:
+            list_of_removed_bom_refs.append(removed_bom_ref)
+    # remove key if no value if there are no nested components
+    if list_of_public_component[0].get("components", []) == []:
+        list_of_public_component[0].pop("components")
+    # check if component is tagged internal
+    # if so, then replace list containing only the parent component
+    # with a list of all (not internal) sub components
+    if validator.is_valid(component):
+        list_of_public_component = list_of_public_component[0].get("components", [])
+        list_of_removed_bom_refs.append(component.get("bom-ref", ""))
+    return list_of_removed_bom_refs, list_of_public_component
 
 
 def merge_dependency_for_removed_component(
@@ -174,21 +177,39 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
     """
     components = sbom.get("components", [])
     dependencies = sbom.get("dependencies", [])
-    (
-        list_of_removed_components,
-        cleared_components,
-    ) = remove_component_tagged_internal(components, path_to_schema)
-    for bom_ref in list_of_removed_components:
+    cleared_components = []
+    list_of_removed_component_bom_refs = []
+
+    # if a schema is provided, the validator will check each component
+    # wether it is tagged internal by the schema or not
+    if path_to_schema is not None:
+        validator = create_internal_validator(path_to_schema)
+        for component in components:
+            removed_component_bom_refs, noninternal_components = (
+                remove_component_tagged_internal(component, validator)
+            )
+            list_of_removed_component_bom_refs.extend(removed_component_bom_refs)
+            # loop trough list of removed (internal) components
+            # and remove internal properties from all (sub-) components
+            for noninternal_component in noninternal_components:
+                clear_component(noninternal_component)
+                cleared_components.append(noninternal_component)
+    else:
+        # remove internal properties from all (sub-) components
+        for component in components:
+            clear_component(component)
+            cleared_components.append(component)
+    sbom["components"] = cleared_components
+    for bom_ref in list_of_removed_component_bom_refs:
         dependencies = merge_dependency_for_removed_component(bom_ref, dependencies)
     remove_internal_information_from_properties(
         sbom.get("metadata", {}).get("component", {})
     )
-    sbom["components"] = cleared_components
     sbom["dependencies"] = dependencies
     for composition in sbom.get("compositions", []):
         new_assemblies = composition.get("assemblies").copy()
         for bom_ref in composition.get("assemblies"):
-            if bom_ref in list_of_removed_components:
+            if bom_ref in list_of_removed_component_bom_refs:
                 new_assemblies.remove(bom_ref)
         composition["assemblies"] = new_assemblies
     return sbom

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import copy
 import json
 import os
 import unittest
@@ -251,25 +252,51 @@ class TestCreateExternalBom(unittest.TestCase):
         ]
         self.assertDictEqual(external_bom, public_sbom)
 
-    def test_build_public_delete_nested_components(self) -> None:
+    def test_rearange_nested_component(self) -> None:
         sbom = get_sbom(path_to_sbom)
-        sbom["components"][0]["group"] = "com.acme.internal"
-        public_sbom = get_sbom(path_to_sbom)
-        public_sbom["components"][0] = public_sbom["components"][0]["components"][0]
-        public_sbom["compositions"][0]["assemblies"].pop(0)
-        public_sbom["dependencies"][0]["dependsOn"].pop(0)
-        public_sbom["dependencies"][0]["dependsOn"].append("sub_comp1")
-        public_sbom["dependencies"][0]["dependsOn"].append("comp4")
-        public_sbom["dependencies"].pop(1)
-        public_sbom["metadata"]["component"]["properties"].pop(1)
-        public_sbom["components"][1]["properties"].pop(1)
-        public_sbom["components"][1]["properties"].pop(2)
-        public_sbom["components"][2]["properties"].pop(0)
-        public_sbom["components"][3]["properties"].pop(0)
-        public_sbom["components"][5]["properties"].pop(0)
-        public_sbom["components"][6]["properties"].pop(0)
-        external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
-        self.assertDictEqual(external_bom, public_sbom)
+        component = sbom["components"][0]
+        component["group"] = "com.acme.internal"
+        expected_component = [component["components"][0]]
+        validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
+        public_component = b_p_b.remove_component_tagged_internal(component, validator)
+        self.assertEqual(expected_component, public_component[1])
+
+    def test_rearange_multiple_nested_components(self) -> None:
+        sbom = get_sbom(path_to_sbom)
+        component = sbom["components"][0]
+        component["group"] = "com.acme.internal"
+        component["components"].append(component["components"][0])
+        component["components"][1]["bom-ref"] = "sub_comp2"
+        expected_component = [component["components"][0], component["components"][1]]
+        validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
+        public_component = b_p_b.remove_component_tagged_internal(component, validator)
+        self.assertEqual(expected_component, public_component[1])
+
+    def test_delete_nested_components(self) -> None:
+        sbom = get_sbom(path_to_sbom)
+        component = sbom["components"][0]
+        component["components"][0]["components"] = [
+            {"bom-ref": "sub_sub_com1", "group": "com.acme.internal"},
+            {"bom-ref": "sub_sub_com2", "group": "com.acme.public"},
+        ]
+        expected_component = [copy.deepcopy(component)]
+        expected_component[0]["components"][0]["components"].pop(0)
+        validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
+        public_component = b_p_b.remove_component_tagged_internal(component, validator)
+        print(public_component[1])
+        self.assertEqual(expected_component, public_component[1])
+
+    def test_delete_last_nested_components(self) -> None:
+        sbom = get_sbom(path_to_sbom)
+        component = sbom["components"][0]
+        expected_component = [copy.deepcopy(component)]
+        component["components"][0]["components"] = [
+            {"bom-ref": "sub_sub_com1", "group": "com.acme.internal"}
+        ]
+        validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
+        public_component = b_p_b.remove_component_tagged_internal(component, validator)
+        print(public_component[1])
+        self.assertEqual(expected_component, public_component[1])
 
     def test_build_public_clear_component_func(self) -> None:
         component = {

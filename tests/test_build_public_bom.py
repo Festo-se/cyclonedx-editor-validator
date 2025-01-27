@@ -13,18 +13,8 @@ path_to_sbom = (
     "Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
-path_to_nested_comp_sbom = (
-    "tests/auxiliary/test_build_public_bom_sboms/sbom_nested_components.json"
-)
-
-
 path_to_public_sbom = (
     "tests/auxiliary/test_build_public_bom_sboms/internal_removed_sbom.json"
-)
-
-path_to_public_sbom_nested = (
-    "tests/auxiliary/test_build_public_bom_sboms/"
-    "expected_sbom_deleted_nested_component.json"
 )
 
 path_to_docu_sbom_dic = (

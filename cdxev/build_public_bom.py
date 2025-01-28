@@ -65,7 +65,7 @@ def clear_component(component: dict[str, Any]) -> None:
 
 def remove_component_tagged_internal(
     component: dict, validator: Draft7Validator
-) -> t.Tuple[list[str], list[dict]]:
+) -> tuple[list[str], list[dict]]:
     """
     Removes the top-level component if it is marked as internal (internal, if valid
     according to the schema). The nested components then replace

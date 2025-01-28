@@ -282,10 +282,11 @@ class TestCreateExternalBom(unittest.TestCase):
         external_bom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
         self.assertDictEqual(external_bom, public_sbom)
 
-    def test_build_public_affected_metadata_warning(self) -> None:
+    def test_build_public_metadata_warning(self) -> None:
         sbom = get_test_sbom()
         metadata = sbom.get("metadata", [])
         metadata["component"]["group"] = "com.acme.internal"
-        self.assertTrue(
-            b_p_b.check_affected_metadata(metadata, path_to_documentation_schema_1)
-        )
+        with self.assertLogs() as log:
+            b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
+        expected_message = "metadata.component not removed"
+        self.assertTrue(expected_message, log.output)

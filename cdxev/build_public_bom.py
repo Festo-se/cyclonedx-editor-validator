@@ -67,16 +67,15 @@ def remove_component_tagged_internal(
     component: dict, validator: Draft7Validator
 ) -> t.Tuple[list[str], list[dict]]:
     """
-    Removes the components marked as internal (components which are valid
-    according to the schema), from a list of components. The nested
-    components will then replace the removed component if present.
-    If a component is not marked as internal, the function is
-    recursivly checking its nested components.
+    Removes the top-level component if it is marked as internal (internal, if valid
+    according to the schema). The nested components then replace
+    the removed component if present. If a top-level component is not marked as internal,
+    the function recursively checks and removes its nested internal marked components.
 
     Parameters
     ----------
-    components: list[dict]
-        A list of components
+    components: dict
+        A dictionary of the top-level component
     validator: Draft7Validator
         A validator to check if component is valid
         according to the schema
@@ -86,6 +85,8 @@ def remove_component_tagged_internal(
     list[str]
         A list with the bom-refs from the removed
         components
+    list[dict]
+        A list with the new top-level component(s)
     """
 
     list_of_removed_bom_refs = []

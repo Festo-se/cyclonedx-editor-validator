@@ -28,25 +28,105 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         result = vex.get_list_of_ids(file, "default")
         expected_output = (
             "ID,RefID,Description,Status\n"
-            + file.get("vulnerabilities", [])[0].get("id", "-")
+            + file["vulnerabilities"][0]["id"]
             + ","
-            + file.get("vulnerabilities", [])[0].get("references", [])[0].get("id", "-")
+            + file["vulnerabilities"][0]["references"][0]["id"]
             + ","
-            + file.get("vulnerabilities", [])[0].get("description", "-")
+            + file["vulnerabilities"][0]["description"]
             + ","
-            + file.get("vulnerabilities", [])[0].get("analysis", {}).get("state", "-")
+            + file["vulnerabilities"][0]["analysis"]["state"]
             + "\n"
         )
         self.assertEqual(result, expected_output)
 
-    def test_get_list_of_ids_default_missing_data(self):
+    def test_get_list_of_ids_default_missing_id(self):
         file = load_file("vex.json")
-        file.get("vulnerabilities", [])[0].pop("id")
-        file.get("vulnerabilities", [])[0].pop("description")
-        file.get("vulnerabilities", [])[0].get("references", [])[0].pop("id")
-        file.get("vulnerabilities", [])[0].get("analysis", {}).pop("state")
+        file["vulnerabilities"][0].pop("id")
+        expected_output = (
+            "ID,RefID,Description,Status\n"
+            + "-,"
+            + file["vulnerabilities"][0]["references"][0]["id"]
+            + ","
+            + file["vulnerabilities"][0]["description"]
+            + ","
+            + file["vulnerabilities"][0]["analysis"]["state"]
+            + "\n"
+        )
+        result = vex.get_list_of_ids(file, "default")
+        self.assertEqual(result, expected_output)
 
-        expected_output = "ID,RefID,Description,Status\n" + "-,-,-,-\n"
+    def test_get_list_of_ids_default_missing_references(self):
+        file = load_file("vex.json")
+        file["vulnerabilities"][0].pop("references")
+        expected_output = (
+            "ID,RefID,Description,Status\n"
+            + file["vulnerabilities"][0]["id"]
+            + ",-,"
+            + file["vulnerabilities"][0]["description"]
+            + ","
+            + file["vulnerabilities"][0]["analysis"]["state"]
+            + "\n"
+        )
+        result = vex.get_list_of_ids(file, "default")
+        self.assertEqual(result, expected_output)
+
+    def test_get_list_of_ids_default_missing_references_id(self):
+        file = load_file("vex.json")
+        file["vulnerabilities"][0]["references"][0].pop("id")
+        expected_output = (
+            "ID,RefID,Description,Status\n"
+            + file["vulnerabilities"][0]["id"]
+            + ",-,"
+            + file["vulnerabilities"][0]["description"]
+            + ","
+            + file["vulnerabilities"][0]["analysis"]["state"]
+            + "\n"
+        )
+        result = vex.get_list_of_ids(file, "default")
+        self.assertEqual(result, expected_output)
+
+    def test_get_list_of_ids_default_missing_description(self):
+        file = load_file("vex.json")
+        file["vulnerabilities"][0].pop("description")
+        expected_output = (
+            "ID,RefID,Description,Status\n"
+            + file["vulnerabilities"][0]["id"]
+            + ","
+            + file["vulnerabilities"][0]["references"][0]["id"]
+            + ",-,"
+            + file["vulnerabilities"][0]["analysis"]["state"]
+            + "\n"
+        )
+        result = vex.get_list_of_ids(file, "default")
+        self.assertEqual(result, expected_output)
+
+    def test_get_list_of_ids_default_missing_analysis(self):
+        file = load_file("vex.json")
+        file["vulnerabilities"][0].pop("analysis")
+        expected_output = (
+            "ID,RefID,Description,Status\n"
+            + file["vulnerabilities"][0]["id"]
+            + ","
+            + file["vulnerabilities"][0]["references"][0]["id"]
+            + ","
+            + file["vulnerabilities"][0]["description"]
+            + ",-\n"
+        )
+        result = vex.get_list_of_ids(file, "default")
+        self.assertEqual(result, expected_output)
+
+    def test_get_list_of_ids_default_missing_analysis_state(self):
+        file = load_file("vex.json")
+        file["vulnerabilities"][0]["analysis"].pop("state")
+        expected_output = (
+            "ID,RefID,Description,Status\n"
+            + file["vulnerabilities"][0]["id"]
+            + ","
+            + file["vulnerabilities"][0]["references"][0]["id"]
+            + ","
+            + file["vulnerabilities"][0]["description"]
+            + ",-\n"
+        )
         result = vex.get_list_of_ids(file, "default")
         self.assertEqual(result, expected_output)
 
@@ -54,9 +134,9 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         file = load_file("vex.json")
         expected_output = (
             "ID,RefID\n"
-            + file.get("vulnerabilities", [])[0].get("id", "-")
+            + file["vulnerabilities"][0]["id"]
             + ","
-            + file.get("vulnerabilities", [])[0].get("references", [])[0].get("id", "-")
+            + file["vulnerabilities"][0]["references"][0]["id"]
             + "\n"
         )
         result = vex.get_list_of_ids(file, "lightweight")
@@ -64,26 +144,26 @@ class TestVulnerabilityFunctions(unittest.TestCase):
 
     def test_get_list_of_trimmed_vulnerabilities(self):
         file = load_file("vex.json")
-        file.get("vulnerabilities").append(
+        file["vulnerabilities"].append(
             {"id": "CVE-2020-25649", "analysis": {"state": "exploitable"}}
         )
         expected_output = file
-        expected_output.get("vulnerabilities", []).pop(1)
+        expected_output["vulnerabilities"].pop(1)
         result = vex.get_list_of_trimed_vulnerabilities(file, "not_affected")
         self.assertEqual(result, expected_output)
 
     def test_get_vulnerability_by_id(self):
         file = load_file("vex.json")
-        file.get("vulnerabilities").append(file.get("vulnerabilities")[0].copy())
-        file.get("vulnerabilities")[1]["id"] = "CVE-2020-25648"
+        file["vulnerabilities"].append(file["vulnerabilities"][0].copy())
+        file["vulnerabilities"][1]["id"] = "CVE-2020-25648"
         expected_output = file
-        expected_output.get("vulnerabilities", []).pop(1)
+        expected_output["vulnerabilities"].pop(1)
         result = vex.get_vulnerability_by_id(file, "CVE-2020-25649")
         self.assertEqual(result, expected_output)
 
     def test_get_vulnerability_by_id_missing_data(self):
         file = load_file("vex.json")
-        file.get("vulnerabilities", [])[0].pop("id")
+        file["vulnerabilities"][0].pop("id")
         expected_output = file
         result = vex.get_vulnerability_by_id(
             file, "SNYK-JAVA-COMFASTERXMLJACKSONCORE-1048302"
@@ -97,17 +177,14 @@ class TestVulnerabilityFunctions(unittest.TestCase):
 
     # Test subcommands
     def test_vex_list_command(self):
-
         result = vex.vex("list", load_file("vex.json"), "", "default")
         self.assertIn("ID,RefID,Description,Status", result)
 
     def test_vex_trim_command(self):
-
         result = vex.vex("trim", load_file("vex.json"), "not_affected", "")
         self.assertEqual(len(result["vulnerabilities"]), 1)
 
     def test_vex_search_command(self):
-
         result = vex.vex("search", load_file("vex.json"), "", "", "CVE-2020-25649")
         self.assertEqual(len(result["vulnerabilities"]), 1)
 
@@ -120,6 +197,5 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         self.assertEqual(result["vulnerabilities"], embedded_vex["vulnerabilities"])
 
     def test_vex_invalid_subcommand(self):
-
         result = vex.vex("invalid_command", load_file("vex.json"), "", "")
         self.assertEqual(result, {})

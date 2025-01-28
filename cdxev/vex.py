@@ -45,6 +45,10 @@ def get_list_of_ids(input_file: dict, scheme: str) -> str:
     if scheme == "default":
         list_str += "CVE-ID,Description,Status\n"
         for vulnerability in input_file.get("vulnerabilities", []):
+            vul_id = vulnerability.get("id", "-")
+            vul_ref_id = vulnerability.get("references", [])[0].get("id", "-")
+            vul_description = vulnerability.get("description", "-")
+            vul_state = vulnerability.get("analysis", {}).get("state", "-")
             list_str += (
                 vulID
                 + ","
@@ -58,7 +62,12 @@ def get_list_of_ids(input_file: dict, scheme: str) -> str:
     elif scheme == "lightweight":
         list_str += "CVE-ID\n"
         for vulnerability in input_file.get("vulnerabilities", []):
-            list_str += (vulnerability.get("id", "-") + ", " + vulnerability.get("references", {}).get("id", "-") + "\n")
+            list_str += (
+                vulnerability.get("id", "-")
+                + ","
+                + vulnerability.get("references", [])[0].get("id", "-")
+                + "\n"
+            )
 
     return list_str
 

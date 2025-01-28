@@ -165,7 +165,8 @@ def build_public_bom(sbom: dict, path_to_schema: t.Union[Path, None]) -> dict:
             LogMessage(
                 "metadata.component not removed",
                 "metadata.component was not removed even though the JSON schema applies to it. "
-                "Maybe you try to create an external SBOM for an internal component (the SBOM is not intended for public use)?",
+                "Maybe you try to create an external SBOM for an internal component "
+                "(the SBOM is not intended for public use)?",
             )
         )
     (

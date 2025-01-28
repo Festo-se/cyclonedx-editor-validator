@@ -17,7 +17,8 @@ build-public
     If a component containing nested components is deleted, those nested components are deleted as well.
 
     .. warning::
-        **Warning!** The ``metadata.component`` is not affected by the JSON schema. 
+        **Warning!** The ``metadata.component`` will not be removed even though the JSON schema applies to it. This is because no important information may be deleted.
+        If the schema applies to the ``metadata.component``, the SBOM is likely not intended for public use.
 
     The JSON schema must be formulated according to the Draft 7 specification.
 

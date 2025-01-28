@@ -273,7 +273,6 @@ class TestCreateExternalBom(unittest.TestCase):
         expected_component[0]["components"][0]["components"].pop(0)
         validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
         public_component = b_p_b.remove_component_tagged_internal(component, validator)
-        print(public_component[1])
         self.assertEqual(expected_component, public_component[1])
 
     def test_delete_last_nested_components(self) -> None:
@@ -285,7 +284,6 @@ class TestCreateExternalBom(unittest.TestCase):
         ]
         validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
         public_component = b_p_b.remove_component_tagged_internal(component, validator)
-        print(public_component[1])
         self.assertEqual(expected_component, public_component[1])
 
     def test_build_public_clear_component_func(self) -> None:

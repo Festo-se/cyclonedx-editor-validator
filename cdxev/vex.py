@@ -46,7 +46,9 @@ def get_list_of_ids(input_file: dict[str, Any], scheme: str) -> str:
         list_str += "ID,RefID,Description,Status\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             vul_id = vulnerability.get("id", "-")
-            vul_ref_id = vulnerability.get("references", [{"id": "-"}])[0].get("id", "-")
+            vul_ref_id = vulnerability.get("references", [{"id": "-"}])[0].get(
+                "id", "-"
+            )
             vul_description = vulnerability.get("description", "-")
             vul_state = vulnerability.get("analysis", {}).get("state", "-")
             list_str += (

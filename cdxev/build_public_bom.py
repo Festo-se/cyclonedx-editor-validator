@@ -82,11 +82,12 @@ def remove_component_tagged_internal(
 
     Returns
     -------
-    list[str]
-        A list with the bom-refs from the removed
-        components
-    list[dict]
-        A list with the new top-level component(s)
+    tuple[list[str], list[dict]]:
+        A tuple where the first element is a list containing bom-refs of
+        of all removed components. The second element is a list of the new top-level component(s).
+        If the original component has not been removed, this list contains only one element:
+        the original component with only its public nested components.
+        Otherwise the nested top-level components are saved in the list
     """
 
     list_of_removed_bom_refs = []

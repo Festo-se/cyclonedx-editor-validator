@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 def filter_component(
     present_components: list[ComponentIdentity],
-    new_components: list,
+    added_components: list,
     kept_components: list,
     dropped_components: list,
     add_to_existing: dict,
@@ -33,18 +33,18 @@ def filter_component(
     a list of filtered top level components that were not found in present_components.
     Filtered means, that the nested components are also not already present.
 
-    param present_components: a list of component identities that are already present in the sbom.
-    param new_components: a list of components that shell be compared against the list of already
+    param present_components: a list of component identities that are already present in the SBOM.
+    param new_components: a list of components that shall be compared against the list of already
     present components.
     param kept_components: list of components not present in the list of provided components,
-                           including nested components
-    param dropped_components: list of components that are already present
-    param add_to_existing: list of nested components that have to be added to present components
+                           including nested components.
+    param dropped_components: list of components that are already present.
+    param add_to_existing: list of nested components that have to be added to present_components.
 
     returns: filtered_components: list of top level components not present in present_components
     """
     filtered_components: list[dict] = []
-    for component in new_components:
+    for component in added_components:
         component_id = ComponentIdentity.create(component, allow_unsafe=True)
         # component is new
         if component_id not in present_components:
@@ -143,9 +143,9 @@ def merge_components(
         # if the component in the sbom_to_be_merged has a different
         # bom-ref than the governing_sbom, then the bom-ref will be
         # replaced through the one from the governing_sbom.
-        # while doing so, the algorithm checks, that the sbom does not
+        # While doing so, the algorithm checks, that the SBOM does not
         # already contain a different component with that ref, if so
-        # that component's bom-ref will be renamed
+        # that component's bom-ref will be renamed.
         component_id = ComponentIdentity.create(component, allow_unsafe=True)
         bom_ref_from_list = present_component_identities[component_id].get(
             "bom-ref", ""
@@ -179,7 +179,7 @@ def merge_components(
             while new_bom_ref in list_of_merged_bom_refs or bom_ref_is_not_unique:
                 n += 1
                 new_bom_ref = component.get("bom-ref", "") + "_" + str(n)
-                # The new bom-ref must not appear in either of the sboms
+                # The new bom-ref must not appear in either of the SBOMs
                 if new_bom_ref in list_of_bom_refs_to_be_added:
                     bom_ref_is_not_unique = True
                 else:

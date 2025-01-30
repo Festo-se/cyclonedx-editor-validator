@@ -242,6 +242,30 @@ class TestCreateExternalBom(unittest.TestCase):
         ]
         self.assertDictEqual(external_bom, public_sbom)
 
+    def test_no_component(self) -> None:
+        component = {}
+        expected_component = [{}]
+        validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
+        public_component = b_p_b.remove_component_tagged_internal(component, validator)
+        self.assertEqual(expected_component, public_component[1])
+
+    def test_no_nested_components(self) -> None:
+        component = {"components": []}
+        expected_component = [{}]
+        validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
+        public_component = b_p_b.remove_component_tagged_internal(component, validator)
+        self.assertEqual(expected_component, public_component[1])
+
+    def test_no_public_components(self) -> None:
+        component = {
+            "group": "com.acme.internal",
+            "components": [{"group": "com.acme.internal"}],
+        }
+        expected_component = []
+        validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
+        public_component = b_p_b.remove_component_tagged_internal(component, validator)
+        self.assertEqual(expected_component, public_component[1])
+
     def test_rearange_nested_component(self) -> None:
         sbom = get_sbom(path_to_sbom)
         component = sbom["components"][0]
@@ -285,6 +309,45 @@ class TestCreateExternalBom(unittest.TestCase):
         validator = b_p_b.create_internal_validator(path_to_documentation_schema_1)
         public_component = b_p_b.remove_component_tagged_internal(component, validator)
         self.assertEqual(expected_component, public_component[1])
+
+    def test_delete_internal_properties(self) -> None:
+        component = {
+            "name": "test",
+            "properties": [
+                {"name": "internal:stuff", "value": "should be gone"},
+                {"name": "stuff", "value": "still there"},
+            ],
+        }
+        b_p_b.remove_internal_information_from_properties(component)
+        expected = {
+            "name": "test",
+            "properties": [{"name": "stuff", "value": "still there"}],
+        }
+        self.assertEqual(component, expected)
+
+    def test_not_delete_internal_properties(self) -> None:
+        component = {
+            "name": "test",
+            "properties": [
+                {"name": "stuff:internal", "value": "still there"},
+                {"name": "stuff", "value": "still there"},
+            ],
+        }
+        expected = component.copy()
+        b_p_b.remove_internal_information_from_properties(component)
+        self.assertEqual(component, expected)
+
+    def test_empty_properties(self) -> None:
+        component = {"name": "test", "properties": []}
+        expected = component.copy()
+        b_p_b.remove_internal_information_from_properties(component)
+        self.assertEqual(component, expected)
+
+    def test_no_properties_key(self) -> None:
+        component = {"name": "test"}
+        expected = component.copy()
+        b_p_b.remove_internal_information_from_properties(component)
+        self.assertEqual(component, expected)
 
     def test_build_public_clear_component_func(self) -> None:
         component = {

@@ -333,19 +333,19 @@ class TestCreateExternalBom(unittest.TestCase):
                 {"name": "stuff", "value": "still there"},
             ],
         }
-        expected = component.copy()
+        expected = copy.deepcopy(component)
         b_p_b.remove_internal_information_from_properties(component)
         self.assertEqual(component, expected)
 
     def test_empty_properties(self) -> None:
         component = {"name": "test", "properties": []}
-        expected = component.copy()
+        expected = copy.deepcopy(component)
         b_p_b.remove_internal_information_from_properties(component)
         self.assertEqual(component, expected)
 
     def test_no_properties_key(self) -> None:
         component = {"name": "test"}
-        expected = component.copy()
+        expected = copy.deepcopy(component)
         b_p_b.remove_internal_information_from_properties(component)
         self.assertEqual(component, expected)
 

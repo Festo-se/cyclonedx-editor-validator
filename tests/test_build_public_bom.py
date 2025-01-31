@@ -148,10 +148,10 @@ class TestCreateExternalBom(unittest.TestCase):
             {"name": "the Other", "value": "something"},
             {"name": "not:internal:stuff", "value": "should be in"},
         ]
-        public_sbom["components"][2]["properties"] = []
-        public_sbom["components"][3]["properties"] = []
-        public_sbom["components"][5]["properties"] = []
-        public_sbom["components"][6]["properties"] = []
+        public_sbom["components"][2].pop("properties")
+        public_sbom["components"][3].pop("properties")
+        public_sbom["components"][5].pop("properties")
+        public_sbom["components"][6].pop("properties")
         external_bom = b_p_b.build_public_bom(sbom, path_to_example_schema_2)
         public_sbom.pop("compositions")
         external_bom.pop("compositions")
@@ -187,10 +187,10 @@ class TestCreateExternalBom(unittest.TestCase):
         public_sbom["metadata"]["component"]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(2)
-        public_sbom["components"][6]["properties"].pop(0)
-        public_sbom["components"][3]["properties"].pop(0)
-        public_sbom["components"][2]["properties"].pop(0)
-        public_sbom["components"][5]["properties"].pop(0)
+        public_sbom["components"][2].pop("properties")
+        public_sbom["components"][3].pop("properties")
+        public_sbom["components"][5].pop("properties")
+        public_sbom["components"][6].pop("properties")
         external_bom = b_p_b.build_public_bom(sbom, None)
 
         public_sbom["compositions"] = [
@@ -216,10 +216,10 @@ class TestCreateExternalBom(unittest.TestCase):
         public_sbom["metadata"]["component"]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(1)
         public_sbom["components"][1]["properties"].pop(2)
-        public_sbom["components"][6]["properties"].pop(0)
-        public_sbom["components"][3]["properties"].pop(0)
-        public_sbom["components"][2]["properties"].pop(0)
-        public_sbom["components"][5]["properties"].pop(0)
+        public_sbom["components"][2].pop("properties")
+        public_sbom["components"][3].pop("properties")
+        public_sbom["components"][5].pop("properties")
+        public_sbom["components"][6].pop("properties")
         sbom["compositions"][0]["assemblies"].append("orphaned bom-ref 1")
         sbom["compositions"][0]["assemblies"].append("orphaned bom-ref 2")
         external_bom = b_p_b.build_public_bom(sbom, None)
@@ -339,13 +339,27 @@ class TestCreateExternalBom(unittest.TestCase):
 
     def test_empty_properties(self) -> None:
         component = {"name": "test", "properties": []}
-        expected = copy.deepcopy(component)
+        expected = {"name": "test"}
         b_p_b.remove_internal_information_from_properties(component)
         self.assertEqual(component, expected)
 
     def test_no_properties_key(self) -> None:
         component = {"name": "test"}
         expected = copy.deepcopy(component)
+        b_p_b.remove_internal_information_from_properties(component)
+        self.assertEqual(component, expected)
+
+    def test_only_internal_properties(self) -> None:
+        component = {
+            "name": "test",
+            "properties": [
+                {
+                    "name": "internal:stuff",
+                    "value": "gone"
+                }
+            ],
+        }
+        expected = {"name": "test"}
         b_p_b.remove_internal_information_from_properties(component)
         self.assertEqual(component, expected)
 

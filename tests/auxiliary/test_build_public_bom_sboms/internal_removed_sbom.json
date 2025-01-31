@@ -101,7 +101,6 @@
       "group": "com.acme",
       "name": "tomcat-catalina",
       "version": "9.0.14",
-      "properties": [],
       "licenses": [
         {
           "license": {

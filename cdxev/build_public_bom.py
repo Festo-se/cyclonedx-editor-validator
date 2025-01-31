@@ -222,13 +222,21 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
         for component in components:
             clear_component(component)
             cleared_components.append(component)
-    sbom["components"] = cleared_components
+    # replace components with cleared components, if it is not an empy list
+    if cleared_components:
+        sbom["components"] = cleared_components
+    else: 
+        sbom.pop("components", None)
     for bom_ref in list_of_removed_component_bom_refs:
         dependencies = merge_dependency_for_removed_component(bom_ref, dependencies)
     remove_internal_information_from_properties(
         sbom.get("metadata", {}).get("component", {})
     )
-    sbom["dependencies"] = dependencies
+    # replace dependencies with new dependencies, if it is not  an empy list
+    if dependencies:
+        sbom["dependencies"] = dependencies
+    else:
+        sbom.pop("dependencies", None)
     for composition in sbom.get("compositions", []):
         new_assemblies = composition.get("assemblies").copy()
         for bom_ref in composition.get("assemblies"):

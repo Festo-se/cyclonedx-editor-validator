@@ -388,3 +388,24 @@ class TestCreateExternalBom(unittest.TestCase):
             b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
         expected_message = "metadata.component not removed"
         self.assertTrue(expected_message, log.output)
+
+    def test_build_public_no_metadata_(self) -> None:
+        sbom = {
+            "components":[
+                {
+                    "bom-ref": "comp1",
+                    "group": "com.acme.internal"
+                }
+            ]
+        }
+        expected = {}
+        public_sbom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
+        self.assertEqual(expected, public_sbom)
+
+    def test_build_public_no_components(self) -> None:
+        sbom = {
+            "components": []
+        }
+        expected = {}
+        public_sbom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
+        self.assertEqual(expected, public_sbom)

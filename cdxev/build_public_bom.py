@@ -38,7 +38,6 @@ def remove_internal_information_from_properties(component: dict[str, Any]) -> No
     if new_properties != []:
         component["properties"] = new_properties
     else:
-        print(new_properties)
         component.pop("properties", None)
 
 

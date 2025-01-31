@@ -189,23 +189,24 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
     cleared_components = []
     list_of_removed_component_bom_refs = []
 
-    # check if metadata.component applies to the JSON schema. If so, print a warning
-    list_of_removed_metadata_component, _ = remove_component_tagged_internal(
-        [metadata.get("component", [])], path_to_schema
-    )
-    if len(list_of_removed_metadata_component) > 0:
-        logger.warning(
-            LogMessage(
-                "metadata.component not removed",
-                "metadata.component was not removed even though the JSON schema applies to it. "
-                "Maybe you try to create an external SBOM for an internal component "
-                "(the SBOM is not intended for public use)?",
-            )
-        )
-    # if a schema is provided, the validator will check each component
-    # whether it is tagged internal by the schema or not
+    # if a schema is provided, the validator will verify the metadata.component as well
+    # as each individual component to determine if it is marked as internal according to the schema
     if path_to_schema is not None:
         validator = create_internal_validator(path_to_schema)
+
+        # check if metadata.component applies to the JSON schema. If so, print a warning
+        list_of_removed_metadata_component, _ = remove_component_tagged_internal(
+            metadata.get("component", []), validator
+        )
+        if len(list_of_removed_metadata_component) > 0:
+            logger.warning(
+                LogMessage(
+                    "metadata.component not removed",
+                    "metadata.component was not removed even though the JSON schema applies to it."
+                    " Maybe you try to create an external SBOM for an internal component "
+                    "(the SBOM is not intended for public use)?",
+                )
+            )
         for component in components:
             removed_component_bom_refs, noninternal_components = (
                 remove_component_tagged_internal(component, validator)

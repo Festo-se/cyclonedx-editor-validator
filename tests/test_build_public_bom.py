@@ -381,7 +381,7 @@ class TestCreateExternalBom(unittest.TestCase):
         self.assertDictEqual(component, expected_component)
 
     def test_build_public_metadata_warning(self) -> None:
-        sbom = get_test_sbom()
+        sbom = get_sbom(path_to_sbom)
         metadata = sbom.get("metadata", [])
         metadata["component"]["group"] = "com.acme.internal"
         with self.assertLogs() as log:

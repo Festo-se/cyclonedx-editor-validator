@@ -225,7 +225,7 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
     # replace components with cleared components, if it is not an empy list
     if cleared_components:
         sbom["components"] = cleared_components
-    else: 
+    else:
         sbom.pop("components", None)
     for bom_ref in list_of_removed_component_bom_refs:
         dependencies = merge_dependency_for_removed_component(bom_ref, dependencies)

@@ -183,7 +183,7 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
         A SBOM dictionary with internal components removed
 
     """
-    metadata = sbom.get("metadata", [])
+    metadata = sbom.get("metadata", {})
     components = sbom.get("components", [])
     dependencies = sbom.get("dependencies", [])
     cleared_components = []
@@ -196,7 +196,7 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
 
         # check if metadata.component applies to the JSON schema. If so, print a warning
         list_of_removed_metadata_component, _ = remove_component_tagged_internal(
-            metadata.get("component", []), validator
+            metadata.get("component", {}), validator
         )
         if len(list_of_removed_metadata_component) > 0:
             logger.warning(

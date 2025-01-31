@@ -98,10 +98,10 @@ def remove_component_tagged_internal(
     list_of_public_component = []
     # create copy of component without nested components inside a list
     # must be a list because the component could be internal and
-    # would then be replaced by one or multipe sub components
+    # would then be replaced by one or multiple sub components
     list_of_public_component.append(component.copy())
     list_of_public_component[0]["components"] = []
-    # loop trough nested components and remove recursivly internal tagged components
+    # loop trough nested components and remove recursively internal tagged components
     for sub_component in sub_components:
         list_of_removed_sub_bom_refs, list_of_public_sub_component = (
             remove_component_tagged_internal(sub_component, validator)
@@ -111,7 +111,7 @@ def remove_component_tagged_internal(
             list_of_public_component[0]["components"].append(new_sub_component)
         for removed_bom_ref in list_of_removed_sub_bom_refs:
             list_of_removed_bom_refs.append(removed_bom_ref)
-    # remove key if no value if there are no nested components
+    # remove key if there are no nested components
     if list_of_public_component[0].get("components", []) == []:
         list_of_public_component[0].pop("components")
     # check if component is tagged internal
@@ -186,7 +186,7 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
     list_of_removed_component_bom_refs = []
 
     # if a schema is provided, the validator will check each component
-    # wether it is tagged internal by the schema or not
+    # whether it is tagged internal by the schema or not
     if path_to_schema is not None:
         validator = create_internal_validator(path_to_schema)
         for component in components:
@@ -195,12 +195,12 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
             )
             list_of_removed_component_bom_refs.extend(removed_component_bom_refs)
             # loop trough list of removed (internal) components
-            # and remove internal properties from all (sub-) components
+            # and remove internal properties from all (sub-)components
             for noninternal_component in noninternal_components:
                 clear_component(noninternal_component)
                 cleared_components.append(noninternal_component)
     else:
-        # remove internal properties from all (sub-) components
+        # remove internal properties from all (sub-)components
         for component in components:
             clear_component(component)
             cleared_components.append(component)

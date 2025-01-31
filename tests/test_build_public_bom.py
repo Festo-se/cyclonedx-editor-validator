@@ -352,12 +352,7 @@ class TestCreateExternalBom(unittest.TestCase):
     def test_only_internal_properties(self) -> None:
         component = {
             "name": "test",
-            "properties": [
-                {
-                    "name": "internal:stuff",
-                    "value": "gone"
-                }
-            ],
+            "properties": [{"name": "internal:stuff", "value": "gone"}],
         }
         expected = {"name": "test"}
         b_p_b.remove_internal_information_from_properties(component)

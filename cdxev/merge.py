@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 def filter_component(
     present_components: list[ComponentIdentity],
-    added_components: list,
+    components_to_add: list,
     kept_components: list,
     dropped_components: list,
     add_to_existing: dict,
@@ -38,13 +38,13 @@ def filter_component(
     present components.
     param kept_components: list of components not present in the list of provided components,
                            including nested components.
-    param dropped_components: list of components that are already present.
+    param components_to_add: list of components that are already present.
     param add_to_existing: list of nested components that have to be added to present_components.
 
     returns: filtered_components: list of top level components not present in present_components
     """
     filtered_components: list[dict] = []
-    for component in added_components:
+    for component in components_to_add:
         component_id = ComponentIdentity.create(component, allow_unsafe=True)
         # component is new
         if component_id not in present_components:

@@ -33,10 +33,13 @@ def remove_internal_information_from_properties(component: dict[str, Any]) -> No
         for entry in component.get("properties", [])
         if not re.search("^internal:", entry.get("name").lower())
     ]
-    # check if the component had properties before, so that,
-    # in this case, an empty properties field is left
-    if component.get("properties", []):
+    # if the component has public properties, replace old properties list with new one
+    # otherwise delete empty key-value pair
+    if new_properties != []:
         component["properties"] = new_properties
+    else:
+        print(new_properties)
+        component.pop("properties", None)
 
 
 def clear_component(component: dict[str, Any]) -> None:

@@ -369,13 +369,13 @@ toml = ["tomli"]
 
 [[package]]
 name = "cyclonedx-python-lib"
-version = "8.5.0"
+version = "8.5.1"
 description = "Python library for CycloneDX"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "cyclonedx_python_lib-8.5.0-py3-none-any.whl", hash = "sha256:a6b6d04295cdbee27c4b8d618ba2c1c7bbd535b9666cc36b05e9d6408751a829"},
-    {file = "cyclonedx_python_lib-8.5.0.tar.gz", hash = "sha256:35f7a139042e4df17ff414fa228cec83c7e4e493bdec990847357791ca72f3a5"},
+    {file = "cyclonedx_python_lib-8.5.1-py3-none-any.whl", hash = "sha256:827541dde81dc8bb83c5f517dfa45feece0ba63d45853d5301f0405587f6aaa2"},
+    {file = "cyclonedx_python_lib-8.5.1.tar.gz", hash = "sha256:2b419c6c5e422fd937aebebde4d3776c797b69c4eac80e515243dad8ebfcddcb"},
 ]
 
 [package.dependencies]
@@ -1778,4 +1778,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.0"
-content-hash = "81ec613d30112ffdb19decc66f1f9597b927ab1d15465015b1a2f9f60d806873"
+content-hash = "5360a092620bc93fdd561317f15b1c8f7f2ffbe5865e9953a501e34130f8b9a5"

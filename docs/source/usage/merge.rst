@@ -23,7 +23,7 @@ The process runs iteratively, merging two SBOMs in each iteration. In the first 
 
 In mathematical terms: :math:`output = (((input_1 * input_2) * input_3) * input_4 ...)`
 
-The merge is per default not hierarchical for the ``components`` field of a ``component`` (`see CycloneDX documentation <https://cyclonedx.org/docs/1.6/json/#components_items_components>`). This means that components that were contained in the ``components`` of an already present component will just be added as new components under the SBOMs ``components`` sections.
+The merge is per default not hierarchical for the ``components`` field of a ``component`` (`CycloneDX documentation <https://cyclonedx.org/docs/1.6/json/#components_items_components>`_). This means that components that were contained in the ``components`` of an already present component will just be added as new components under the SBOMs ``components`` sections.
 The ``--hierarchical`` flag allows for hierarchical merges.
 
 .. image:: /img/merge_hierarchical_structure.svg

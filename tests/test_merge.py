@@ -742,27 +742,13 @@ class TestMergeComponents(unittest.TestCase):
             ),
         ]
 
+        kept_components_expected = load_sections_for_test_sbom()[
+            "test_filter_component_kept_components_expected"
+        ]
+        new_components = load_sections_for_test_sbom()[
+            "test_filter_component_new_components"
+        ]
         components["component_1"]["components"] = [components["component_1_sub_1"]]
-
-        components["component_2"]["components"] = [
-            components["component_2_sub_1"],
-            components["component_2_sub_2"],
-        ]
-        components["component_2_sub_1"]["components"] = [
-            components["component_2_sub_1_sub_1"]
-        ]
-
-        components["component_4"]["components"] = [components["component_4_sub_1"]]
-        components["component_4_sub_1"]["components"] = [
-            components["component_4_sub_1_sub_1"],
-            components["component_4_sub_1_sub_2"],
-        ]
-
-        new_components = [
-            components["component_1"],
-            components["component_2"],
-            components["component_4"],
-        ]
 
         kept_components: list[dict] = []
         dropped_components: list[dict] = []
@@ -789,16 +775,6 @@ class TestMergeComponents(unittest.TestCase):
         for key in add_to_existing_expected.keys():
             if add_to_existing_expected[key] != add_to_existing[key]:
                 add_to_existing_identical = False
-
-        kept_components_expected = [
-            components["component_2"],
-            components["component_4_sub_1_sub_1"],
-            components["component_4_sub_1"],
-            components["component_2_sub_1_sub_1"],
-            components["component_2_sub_2"],
-            components["component_1_sub_1"],
-            components["component_4"],
-        ]
 
         kept_components_identical = True
         for comp in kept_components:
@@ -835,30 +811,11 @@ class TestMergeComponents(unittest.TestCase):
             self.assertCountEqual(merged_normal, merged_nm)
 
     def test_merge_hierarchical(self) -> None:
-        components = load_sections_for_test_sbom()["hierarchical_components"]
-
-        present_components = [
-            ComponentIdentity.create(components["component_1"], allow_unsafe=True),
-            ComponentIdentity.create(components["component_3"], allow_unsafe=True),
-            ComponentIdentity.create(
-                components["component_2_sub_1"], allow_unsafe=True
-            ),
-            ComponentIdentity.create(
-                components["component_4_sub_1_sub_2"], allow_unsafe=True
-            ),
+        new_components = load_sections_for_test_sbom()[
+            "test_merge_hierarchical_new_components"
         ]
-
-        present_components = [
-            components["component_1"],
-            components["component_3"],
-            components["component_2_sub_1"],
-            components["component_4_sub_1_sub_2"],
-        ]
-
-        new_components = [
-            components["component_1"],
-            components["component_2"],
-            components["component_4"],
+        present_components = load_sections_for_test_sbom()[
+            "test_merge_hierarchical_present_components"
         ]
 
         merged_components = merge.merge_components(

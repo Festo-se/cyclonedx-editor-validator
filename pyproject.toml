@@ -36,7 +36,7 @@ cyclonedx-python-lib = "8.5.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "7.1.1"
-black = "24.10.0"
+black = "25.1.0"
 pep8-naming = "0.14.1"
 mypy = "1.14.1"
 types-python-dateutil = "2.9.0.20241206"

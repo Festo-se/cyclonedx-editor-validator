@@ -47,7 +47,7 @@ pytest-subtests = "0.14.1"
 toml = "0.10.2"
 typing-extensions = "4.12.2"
 bandit = { version = "1.8.2", extras = ["toml"] }
-isort = "5.13.2"
+isort = "6.0.0"
 pre-commit = "4.1.0"
 
 [tool.poetry.group.docs.dependencies]

@@ -35,10 +35,10 @@ def filter_component(
 
     param present_components: a list of component identities that are already present in the SBOM.
     param components_to_add: a list of components that shall be compared against the list of
-                             already present components.
+                            already present components.
     param kept_components: list of components not present in the list of provided components,
                            including nested components.
-    param components_to_add: list of components that are already present.
+    param dropped_components: list of added components that are already present.
     param add_to_existing: list of nested components that have to be added to present_components.
 
     returns: filtered_components: list of top level components not present in present_components

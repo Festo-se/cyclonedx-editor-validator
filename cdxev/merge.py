@@ -34,8 +34,8 @@ def filter_component(
     Filtered means, that the nested components are also not already present.
 
     param present_components: a list of component identities that are already present in the SBOM.
-    param new_components: a list of components that shall be compared against the list of already
-    present components.
+    param components_to_add: a list of components that shall be compared against the list of
+                             already present components.
     param kept_components: list of components not present in the list of provided components,
                            including nested components.
     param components_to_add: list of components that are already present.

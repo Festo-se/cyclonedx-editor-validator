@@ -3,7 +3,7 @@
   "specVersion": "1.5",
   "version": 2,
   "metadata": {
-    "timestamp": "2024-04-10T11:17:06+00:00",
+    "timestamp": "2024-12-17T21:30:33+00:00",
     "authors": [
       {
         "name": "automated"
@@ -33,7 +33,7 @@
           "type": "application",
           "name": "cyclonedx-editor-validator",
           "publisher": "Festo SE & Co. KG",
-          "version": "0"
+          "version": "0.0.0"
         }
       ]
     }
@@ -808,5 +808,5 @@
       ]
     }
   ],
-  "serialNumber": "urn:uuid:700a0c02-31b0-4401-a358-30c19733d028"
+  "serialNumber": "urn:uuid:a3b00100-4130-4d19-89b7-222c25ab7811"
 }

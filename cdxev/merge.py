@@ -237,7 +237,7 @@ def merge_2_sboms(
     list_of_new_vulnerabilities = sbom_to_be_merged.get("vulnerabilities", [])
 
     list_of_merged_components = merge_components(
-        original_sbom, sbom_to_be_merged, hierarchical
+        original_sbom, sbom_to_be_merged, hierarchical=hierarchical
     )
 
     merged_dependencies = merge_dependency_lists(

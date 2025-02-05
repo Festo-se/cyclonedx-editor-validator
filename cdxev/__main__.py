@@ -455,13 +455,14 @@ def create_merge_parser(
         help="Path to a folder with SBOMs to be merged.",
         type=Path,
     )
-    add_output_argument(parser)
 
     parser.add_argument(
         "--hierarchical",
         help="Flag to determine if the components should be merged hierarchical.",
         action="store_true",
     )
+    add_output_argument(parser)
+
     parser.set_defaults(cmd_handler=invoke_merge, parser=parser)
     return parser
 

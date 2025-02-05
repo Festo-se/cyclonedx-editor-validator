@@ -576,7 +576,6 @@ class TestMerge:
         # file. We don't care what the output is truly, only that it's different from the regular
         # test.
         not_expected = load_sbom(data_dir / "merge.expected_from-folder.cdx.json")
-
         assert output != not_expected
 
     def test_from_folder(

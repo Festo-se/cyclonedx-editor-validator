@@ -55,6 +55,54 @@
           }
         }
       ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "gov_comp_1",
+      "name": "gov_comp_1",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "5.0.3.96",
+      "components": [
+        {
+          "type": "library",
+          "bom-ref": "gov_comp_1_sub_1",
+          "name": "gov_comp_1_sub_1",
+          "supplier": {
+            "name": "Company Legal"
+          },
+          "group": "com.company.governing",
+          "copyright": "Company Legal 2022, all rights reserved",
+          "version": "5.0.3.96",
+          "components": [
+            {
+              "type": "library",
+              "bom-ref": "gov_comp_1_sub_1_sub_1",
+              "name": "gov_comp_1_sub_1_sub_1",
+              "supplier": {
+                "name": "Company Legal"
+              },
+              "group": "com.company.governing",
+              "copyright": "Company Legal 2022, all rights reserved",
+              "version": "5.0.3.96"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "gov_comp_2",
+      "name": "gov_comp_2",
+      "supplier": {
+        "name": "Company Legal"
+      },
+      "group": "com.company.governing",
+      "copyright": "Company Legal 2022, all rights reserved",
+      "version": "5.0.3.96"
     }
   ],
   "dependencies": [

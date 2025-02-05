@@ -8,8 +8,8 @@ import typing as t
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.auxiliary.sbomFunctions import (
     collect_affects_of_vulnerabilities,
-    extract_new_affects,
     extract_components,
+    extract_new_affects,
     get_bom_refs_from_dependencies,
     get_dependency_by_ref,
     get_identities_for_vulnerabilities,

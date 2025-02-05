@@ -455,7 +455,6 @@ def create_merge_parser(
         help="Path to a folder with SBOMs to be merged.",
         type=Path,
     )
-
     parser.add_argument(
         "--hierarchical",
         help="Flag to determine if the components should be merged hierarchical.",

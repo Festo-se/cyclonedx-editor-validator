@@ -9,6 +9,7 @@ from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.auxiliary.sbomFunctions import (
     collect_affects_of_vulnerabilities,
     extract_new_affects,
+    extract_components,
     get_bom_refs_from_dependencies,
     get_dependency_by_ref,
     get_identities_for_vulnerabilities,
@@ -20,7 +21,65 @@ from cdxev.log import LogMessage
 logger = logging.getLogger(__name__)
 
 
-def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[dict]:
+def filter_component(
+    present_components: list[ComponentIdentity],
+    components_to_add: list,
+    add_to_existing: dict,
+) -> list[dict]:
+    """
+    Function that goes through a list of components and their nested sub components
+    and determine if they are present in a provided list with component identities.
+
+    The function operates directly on the lists and dictionary provided and returns
+    a list of filtered top level components that were not found in present_components.
+    Filtered means, that the nested components are also not already present.
+
+    param present_components: a list of component identities that are already present in the SBOM.
+    param components_to_add: a list of components that shall be compared against the list of
+                            already present components.
+    param add_to_existing: list of nested components that have to be added to present_components.
+
+    returns: filtered_components: list of top level components not present in present_components
+    """
+    filtered_components: list[dict] = []
+    for component in components_to_add:
+        component_id = ComponentIdentity.create(component, allow_unsafe=True)
+        # component is new
+        if component_id not in present_components:
+            nested_components = filter_component(
+                present_components,
+                component.get("components", []),
+                add_to_existing,
+            )
+            if component.get("components", []):
+                component["components"] = nested_components
+            filtered_components.append(component)
+
+        # component already present
+        # contained components get filtered and added to the component in the main sbom
+        else:
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    f"Dropping a duplicate component ({component_id}) from the merge result.",
+                )
+            )
+            nested_components = filter_component(
+                present_components,
+                component.get("components", []),
+                add_to_existing,
+            )
+            if nested_components:
+                add_to_existing[component_id] = (
+                    add_to_existing.get(component_id, []) + nested_components
+                )
+
+    return filtered_components
+
+
+def merge_components(
+    governing_sbom: dict, sbom_to_be_merged: dict, hierarchical: bool = False
+) -> t.List[dict]:
     """
     Function that gets two lists of components and merges them unique into one.
 
@@ -39,22 +98,37 @@ def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[di
     Output:
     list_of_merged_components: List with the uniquely merged components of the submitted sboms
     """
-    list_of_merged_components: list[dict] = governing_sbom.get("components", [])
+    list_of_merged_components: t.List[dict] = governing_sbom.get("components", [])
     list_of_added_components = sbom_to_be_merged.get("components", [])
-    for component in list_of_added_components:
-        is_in_list, _ = get_corresponding_reference_to_component(
-            component, list_of_merged_components
-        )
-        if is_in_list:
-            component_id = ComponentIdentity.create(component, allow_unsafe=True)
-            logger.warning(
-                LogMessage(
-                    "Potential loss of information",
-                    f"Dropping a duplicate component ({component_id}) from the merge result.",
-                )
+
+    present_component_identities: dict[ComponentIdentity, dict] = {}
+    for component in extract_components(governing_sbom.get("components", [])):
+        present_component_identities[
+            ComponentIdentity.create(component, allow_unsafe=True)
+        ] = component
+
+    add_to_existing: dict[ComponentIdentity, dict] = {}
+    list_present_component_identities = list(present_component_identities.keys())
+    list_of_filtered_components = filter_component(
+        list_present_component_identities,
+        list_of_added_components,
+        add_to_existing,
+    )
+
+    list_of_merged_components += list_of_filtered_components
+
+    if hierarchical:
+        for key in add_to_existing.keys():
+            list_of_subcomponents = (
+                present_component_identities[key].get("components", [])
+                + add_to_existing[key]
             )
-        else:
-            list_of_merged_components.append(component)
+            present_component_identities[key]["components"] = list_of_subcomponents
+    else:
+        for key in add_to_existing.keys():
+            for new_component in add_to_existing[key]:
+                list_of_merged_components.append(new_component)
+
     return list_of_merged_components
 
 
@@ -127,6 +201,7 @@ def merge_dependency_lists(
 def merge_2_sboms(
     original_sbom: dict,
     sbom_to_be_merged: dict,
+    hierarchical: bool = False,
     vulnerability_identities: dict[str, VulnerabilityIdentity] = {},
 ) -> dict:
     """
@@ -161,7 +236,9 @@ def merge_2_sboms(
     list_of_original_vulnerabilities = original_sbom.get("vulnerabilities", [])
     list_of_new_vulnerabilities = sbom_to_be_merged.get("vulnerabilities", [])
 
-    list_of_merged_components = merge_components(original_sbom, sbom_to_be_merged)
+    list_of_merged_components = merge_components(
+        original_sbom, sbom_to_be_merged, hierarchical
+    )
 
     merged_dependencies = merge_dependency_lists(
         list_of_original_dependencies,
@@ -223,7 +300,12 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
 
     merged_sbom = sboms[0]
     for k in range(1, len(sboms)):
-        merged_sbom = merge_2_sboms(merged_sbom, sboms[k], identities)
+        merged_sbom = merge_2_sboms(
+            merged_sbom,
+            sboms[k],
+            vulnerability_identities=identities,
+            hierarchical=hierarchical,
+        )
     return merged_sbom
 
 

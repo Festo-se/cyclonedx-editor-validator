@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>merge &mdash; CycloneDX Editor Validator Tool 0.23.0 documentation</title>
+  <title>merge &mdash; CycloneDX Editor Validator Tool 0.24.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=2753bf86"></script>
+      <script src="../_static/documentation_options.js?v=a9084e48"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -107,7 +107,8 @@
 <p>Merges two or more CycloneDX input files into one. Inputs can either be specified directly as positional arguments on the command-line or using the <code class="docutils literal notranslate"><span class="pre">--from-folder</span></code> option. Files specified as arguments are merged in the order they are given, files in the folder are merged in alphabetical order (see note below).</p>
 <p>If both positional arguments and the <code class="docutils literal notranslate"><span class="pre">--from-folder</span></code> option are used, then the position arguments are merged first, followed by the files in the folder. The command will not merge the same file twice, if it is specified on the command-line and also part of the folder.</p>
 <p>When using the <code class="docutils literal notranslate"><span class="pre">--from-folder</span></code> option, the program looks for files matching either of the <a class="reference external" href="https://cyclonedx.org/specification/overview/#recognized-file-patterns">recommended CycloneDX naming schemes</a>: <code class="docutils literal notranslate"><span class="pre">bom.json</span></code> or <code class="docutils literal notranslate"><span class="pre">*.cdx.json</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">merge</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">folder</span> <span class="o">&lt;</span><span class="n">from</span><span class="o">-</span><span class="n">folder</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">merge</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">folder</span> <span class="o">&lt;</span><span class="n">from</span><span class="o">-</span><span class="n">folder</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hierarchical</span><span class="p">]</span>
+                    <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
                     <span class="p">[</span><span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -123,7 +124,11 @@
 <h2>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>--from-folder</kbd></dt>
-<dd><p>Path to a folder with sboms to be merged</p>
+<dd><p>Path to a folder with SBOMs to be merged.</p>
+</dd>
+<dt><kbd>--hierarchical</kbd></dt>
+<dd><p>Flag to determine if the components should be merged hierarchical.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </dd>
 <dt><kbd>--output, -o</kbd></dt>
 <dd><p>The path to where the output should be written. If this is a file, output is written there. If it’s a directory, output is written to a file with an auto-generated name inside that directory. If it’s not specified, output is written to stdout.</p>
@@ -135,6 +140,9 @@
 <p>Input files in the folder provided to the <code class="docutils literal notranslate"><span class="pre">--from-folder</span></code> option are sorted by name in a platform-specific way. In other words, they are merged in the same order they appear in your operating system’s file browser (e.g., Windows Explorer) when sorted by name.</p>
 <p>The process runs iteratively, merging two SBOMs in each iteration. In the first round, the second submitted SBOM is merged into the first. In the second round the third would be merged into the result of the first round and so on.</p>
 <p>In mathematical terms: <span class="math notranslate nohighlight">\(output = (((input_1 * input_2) * input_3) * input_4 ...)\)</span></p>
+<p>The merge is per default not hierarchical for the <code class="docutils literal notranslate"><span class="pre">components</span></code> field of a <code class="docutils literal notranslate"><span class="pre">component</span></code> (<a class="reference external" href="https://cyclonedx.org/docs/1.6/json/#components_items_components">CycloneDX documentation</a>). This means that components that were contained in the <code class="docutils literal notranslate"><span class="pre">components</span></code> of an already present component will just be added as new components under the SBOMs’ <code class="docutils literal notranslate"><span class="pre">components</span></code> sections.
+The <code class="docutils literal notranslate"><span class="pre">--hierarchical</span></code> flag allows for hierarchical merges. This affects only the top level components of the merged SBOM. The structured of nested components is preserved in both cases (except the removal of already present components), as shown for “component 4” in the image below.</p>
+<img alt="Merge components structure default and hierarchical." src="../_images/merge_hierarchical_structure.svg" />
 <p>A few notes on the merge algorithm:</p>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">metadata</span></code> field is always retained from the first input and never changed through a merge with the exception of the <code class="docutils literal notranslate"><span class="pre">timestamp</span></code>.</p></li>

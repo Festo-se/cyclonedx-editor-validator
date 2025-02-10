@@ -377,38 +377,6 @@ def walk_components(
     _recurse(sbom["components"], func, *args, **kwargs)
 
 
-def get_corresponding_reference_to_component(
-    component: dict, list_of_components: list
-) -> tuple[bool, str]:
-    """
-    Function that checks if a given component is contained
-    in a list of components and returns the bom-ref from
-    the corresponding component in the list.
-
-    Parameters
-    ----------
-    component: dict
-        A component dict
-    list_of_components: str
-        A list of component dicts
-
-    Returns
-    -------
-    is_in_list: bool
-        A boolean describing if the component is in the list
-    bomref_from_list:
-        The bom-ref from the corresponding component in the list
-    """
-    is_in_list = False
-    bomref_from_list = ""
-    for component_from_list in list_of_components:
-        if compare_components(component, component_from_list):
-            is_in_list = True
-            bomref_from_list = component_from_list.get("bom-ref", "")
-            break
-    return is_in_list, bomref_from_list
-
-
 # Function for the usage of the python cyclonedx model
 
 

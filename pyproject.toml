@@ -32,22 +32,22 @@ pyicu = [
 ]
 natsort = "^8.4.0"
 univers = "30.12.1"
-cyclonedx-python-lib = "8.5.0"
+cyclonedx-python-lib = "8.7.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "7.1.1"
-black = "24.10.0"
+black = "25.1.0"
 pep8-naming = "0.14.1"
-mypy = "1.14.1"
+mypy = "1.15.0"
 types-python-dateutil = "2.9.0.20241206"
 types-jsonschema = "4.23.0.20241208"
 pytest = "8.3.4"
-coverage = "7.6.10"
+coverage = "7.6.11"
 pytest-subtests = "0.14.1"
 toml = "0.10.2"
 typing-extensions = "4.12.2"
 bandit = { version = "1.8.2", extras = ["toml"] }
-isort = "5.13.2"
+isort = "6.0.0"
 pre-commit = "4.1.0"
 
 [tool.poetry.group.docs.dependencies]

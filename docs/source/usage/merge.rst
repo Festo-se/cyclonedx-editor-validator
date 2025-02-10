@@ -23,6 +23,12 @@ The process runs iteratively, merging two SBOMs in each iteration. In the first 
 
 In mathematical terms: :math:`output = (((input_1 * input_2) * input_3) * input_4 ...)`
 
+The merge is per default not hierarchical for the ``components`` field of a ``component`` (`CycloneDX documentation <https://cyclonedx.org/docs/1.6/json/#components_items_components>`_). This means that components that were contained in the ``components`` of an already present component will just be added as new components under the SBOMs' ``components`` sections.
+The ``--hierarchical`` flag allows for hierarchical merges. This affects only the top level components of the merged SBOM. The structured of nested components is preserved in both cases (except the removal of already present components), as shown for "component 4" in the image below.
+
+.. image:: /img/merge_hierarchical_structure.svg
+    :alt: Merge components structure default and hierarchical.
+
 A few notes on the merge algorithm:
 
 - The ``metadata`` field is always retained from the first input and never changed through a merge with the exception of the ``timestamp``.

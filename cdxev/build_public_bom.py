@@ -168,19 +168,19 @@ def merge_dependency_for_removed_component(
 def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) -> dict:
     """
     Removes the components with the property internal
-    from a SBOM and resolves the dependencies
+    from an SBOM and resolves the dependencies
 
     Parameters
     ----------
     sbom: dict
-        A SBOM dictionary
+        An SBOM dictionary
     path_to_schema:
         The path to json schema for defining internal components
 
     Returns
     -------
     sbom: dict
-        A SBOM dictionary with internal components removed
+        An SBOM dictionary with internal components removed
 
     """
     metadata = sbom.get("metadata", {})
@@ -194,7 +194,7 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
     if path_to_schema is not None:
         validator = create_internal_validator(path_to_schema)
 
-        # check if metadata.component applies to the JSON schema. If so, print a warning
+        # check if the JSON schema applies to metadata.component. If so, print a warning
         list_of_removed_metadata_component, _ = remove_component_tagged_internal(
             metadata.get("component", {}), validator
         )
@@ -232,7 +232,7 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
     remove_internal_information_from_properties(
         sbom.get("metadata", {}).get("component", {})
     )
-    # replace dependencies with new dependencies, if it is not  an empy list
+    # replace dependencies with new dependencies, if it is not an empy list
     if dependencies:
         sbom["dependencies"] = dependencies
     else:

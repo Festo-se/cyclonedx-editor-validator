@@ -29,7 +29,6 @@
         ]
       }
     },
-    "components": [],
     "dependencies": [
       {
         "ref": "acme-app",

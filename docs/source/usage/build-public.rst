@@ -10,7 +10,7 @@ build-public
 
     This command creates a redacted version of an SBOM fit for publication. It:
 
-    * deletes any *property* (i.e., item in the ``properties`` array of a component) whose name starts with ``internal:`` from all components.
+    * deletes any *property* (i.e., item in the ``properties`` array of a component) whose name starts with ``internal:`` from all components,
     * can optionally delete entire components matching a JSON schema provided by the user.
 
     The actions are performed in this order, meaning that *internal* properties will be taken into account when matching the JSON schema.

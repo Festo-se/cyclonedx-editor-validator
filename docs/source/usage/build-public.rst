@@ -10,8 +10,8 @@ build-public
 
     This command creates a redacted version of an SBOM fit for publication. It:
 
-    * can optionally delete entire components matching a JSON schema provided by the user, and it
     * deletes any *property* (i.e., item in the ``properties`` array of a component) whose name starts with ``internal:`` from all components.
+    * can optionally delete entire components matching a JSON schema provided by the user, and it
 
     The actions are performed in this order, meaning that *internal* properties will be taken into account when matching the JSON schema.
     If a component containing nested components is deleted, those nested components are deleted as well.
@@ -20,6 +20,7 @@ build-public
         The ``metadata.component`` will not be removed even when the JSON schema applies to it.
         This is because the ``metadata.component`` is the component the BOM describes, therefore removing it, would make the SBOM ambiguous.
         If the schema applies to the ``metadata.component``, the SBOM is likely not intended for public use.
+        However, this behavior does not affect the deletion of any property, which starts with the name ``internal:``
 
     The JSON schema must be formulated according to the Draft 7 specification.
 

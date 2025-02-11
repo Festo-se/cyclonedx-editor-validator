@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
+import logging
 import re
 import typing as t
 from pathlib import Path
@@ -9,6 +10,9 @@ from typing import Any, Sequence
 from jsonschema import Draft7Validator, FormatChecker
 
 from cdxev.auxiliary.sbomFunctions import extract_components
+from cdxev.log import LogMessage
+
+logger = logging.getLogger(__name__)
 
 
 def remove_internal_information_from_properties(component: dict[str, Any]) -> None:
@@ -164,30 +168,45 @@ def merge_dependency_for_removed_component(
 def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) -> dict:
     """
     Removes the components with the property internal
-    from a sbom and resolves the dependencies
+    from an SBOM and resolves the dependencies
 
     Parameters
     ----------
     sbom: dict
-        A sbom dictionary
+        An SBOM dictionary
     path_to_schema:
         The path to json schema for defining internal components
 
     Returns
     -------
     sbom: dict
-        A sbom dictionary with internal components removed
+        An SBOM dictionary with internal components removed
 
     """
+    metadata = sbom.get("metadata", {})
     components = sbom.get("components", [])
     dependencies = sbom.get("dependencies", [])
     cleared_components = []
     list_of_removed_component_bom_refs = []
 
-    # if a schema is provided, the validator will check each component
-    # whether it is tagged internal by the schema or not
+    # if a schema is provided, the validator will verify the metadata.component as well
+    # as each individual component to determine if it is marked as internal according to the schema
     if path_to_schema is not None:
         validator = create_internal_validator(path_to_schema)
+
+        # check if the JSON schema applies to metadata.component. If so, print a warning
+        list_of_removed_metadata_component, _ = remove_component_tagged_internal(
+            metadata.get("component", {}), validator
+        )
+        if len(list_of_removed_metadata_component) > 0:
+            logger.warning(
+                LogMessage(
+                    "metadata.component not removed",
+                    "metadata.component was not removed even though the JSON schema applies to it."
+                    " Maybe you try to create an external SBOM for an internal component "
+                    "(the SBOM is not intended for public use)?",
+                )
+            )
         for component in components:
             removed_component_bom_refs, noninternal_components = (
                 remove_component_tagged_internal(component, validator)
@@ -203,13 +222,21 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
         for component in components:
             clear_component(component)
             cleared_components.append(component)
-    sbom["components"] = cleared_components
+    # replace components with cleared components, if it is not an empy list
+    if cleared_components:
+        sbom["components"] = cleared_components
+    else:
+        sbom.pop("components", None)
     for bom_ref in list_of_removed_component_bom_refs:
         dependencies = merge_dependency_for_removed_component(bom_ref, dependencies)
     remove_internal_information_from_properties(
         sbom.get("metadata", {}).get("component", {})
     )
-    sbom["dependencies"] = dependencies
+    # replace dependencies with new dependencies, if it is not an empy list
+    if dependencies:
+        sbom["dependencies"] = dependencies
+    else:
+        sbom.pop("dependencies", None)
     for composition in sbom.get("compositions", []):
         new_assemblies = composition.get("assemblies").copy()
         for bom_ref in composition.get("assemblies"):

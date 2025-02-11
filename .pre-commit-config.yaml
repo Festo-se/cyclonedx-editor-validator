@@ -32,7 +32,7 @@ repos:
           - types-python-dateutil==2.9.0.20241206
           - typing-extensions==4.12.2
           - types-jsonschema==4.23.0.20241208
-          - cyclonedx-python-lib==8.5.1
+          - cyclonedx-python-lib==8.7.0
           - univers==30.12.1
           - charset-normalizer==3.4.0
           - natsort==8.4.0

@@ -720,7 +720,7 @@ def create_build_public_bom_parser(
     parser.add_argument(
         "--ext-ref-regex",
         metavar="<ext-ref-regex>",
-        help=("Regex pattern to remove external references"),
+        help=("regex pattern to remove matching external references"),
         default=None,
         type=str,
     )

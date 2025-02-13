@@ -25,7 +25,7 @@ list
 
     This subcommand returns a list of all vulnerability-IDs inside the input file. There are two different options:
 
-    * ``--state default`` returns: ::
+    * ``--state default`` (default) returns: ::
         CVE-ID,Description,Status
         CVE-1012-0001,some description of a vulnerability,exploitable
         CVE-1013-0002,some description of a vulnerability 2,not_affected
@@ -38,12 +38,12 @@ list
         CVE-1013-0003
 
 
-    The output can be a .txt file or a .csv file.
+    The output can be a .txt file or a .csv (default) file.
 
 Example::
 
     # Write all vulnerability-IDs to list_vex.json
-    cdxev vex list --scheme default --format csv --output list_vex.json input_file.json 
+    cdxev vex list input_file.json --scheme default --format csv --output list_vex.json
 
 
 trim
@@ -56,9 +56,9 @@ trim
 
     This subcommand returns a json file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by their state. The following states are supported:
     
+    * ``exploitable`` (default)
     * ``resolved``
     * ``resolved_with_pedigree``
-    * ``exploitable``
     * ``in_triage``
     * ``false_positive``
     * ``not_affected``
@@ -66,7 +66,7 @@ trim
 Example::
 
     # Writes all vulnerabilities with state "not_affected" to new file
-    cdxev vex trim --state not_affected --output not_affected_vex.json input_file.json
+    cdxev vex trim input_file.json --state not_affected --output not_affected_vex.json
 
 
 search
@@ -82,7 +82,7 @@ search
 Example::
 
     # Writes specific vulnerability with based on its ID to new file
-    cdxev vex search --output searched_vul.json CVE-1013-0002 input_file.json
+    cdxev vex search input_file.json --output searched_vul.json CVE-1013-0002
 
 
 extract
@@ -98,4 +98,4 @@ extract
 Example::
 
     # Writes specific vulnerability with based on its ID to new file
-    cdxev vex search --output searched_vul.json CVE-1013-0002 input_file.json 
+    cdxev vex extract input_file.json --output vex.json

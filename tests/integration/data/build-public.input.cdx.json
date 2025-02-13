@@ -18,7 +18,13 @@
       "version": "1.0.0",
       "bom-ref": "pkg:npm/test-app@1.0.0",
       "author": "Company Legal",
-      "purl": "pkg:npm/test-app@1.0.0"
+      "purl": "pkg:npm/test-app@1.0.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://internal.festo.com"
+        }
+      ]
     }
   },
   "components": [
@@ -40,6 +46,10 @@
         {
           "type": "website",
           "url": "https://www.festo.com"
+        },
+        {
+          "type": "website",
+          "url": "https://internal.festo.com"
         }
       ],
       "properties": [
@@ -89,6 +99,10 @@
             {
               "type": "website",
               "url": "https://www.universe.com"
+            },
+            {
+              "type": "website",
+              "url": "https://acme.com"
             }
           ],
           "properties": [
@@ -128,7 +142,11 @@
                 {
                   "type": "vcs",
                   "url": "https://northpole.com/rudolph.git"
-                }
+                },
+                {
+                  "type": "website",
+                  "url": "https://acme.com"
+              }
               ]
             }
           ],

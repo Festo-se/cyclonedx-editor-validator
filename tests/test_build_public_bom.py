@@ -400,3 +400,42 @@ class TestCreateExternalBom(unittest.TestCase):
         expected = {}
         public_sbom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
         self.assertEqual(expected, public_sbom)
+
+    def test_remove_external_references(self) -> None:
+        regex_pattern = r"https://internal\.acme\.com/.*"
+        component = {
+            "externalReferences": [
+                {"type": "url", "url": "https://internal.acme.com/some_internal_url"},
+                {"type": "url", "url": "https://external.acme.com/some_external_url"},
+                {"type": "url", "url": "https://another.acme.com/some_other_url"},
+            ]
+        }
+        expected = {
+            "externalReferences": [
+                {"type": "url", "url": "https://external.acme.com/some_external_url"},
+                {"type": "url", "url": "https://another.acme.com/some_other_url"},
+            ]
+        }
+        b_p_b.validate_external_references(regex_pattern, component)
+        self.assertEqual(expected, component)
+
+    def test_no_external_references(self) -> None:
+        regex_pattern = ""
+        component = {"bom-ref": "comp1"}
+        expected = {"bom-ref": "comp1"}
+        b_p_b.validate_external_references(regex_pattern, component)
+        self.assertEqual(expected, component)
+
+    def test_empty_external_references(self) -> None:
+        regex_pattern = ""
+        component = {"bom-ref": "comp1", "externalReferences": []}
+        expected = {"bom-ref": "comp1"}
+        b_p_b.validate_external_references(regex_pattern, component)
+        self.assertEqual(expected, component)
+
+    def test_no_pattern_external_references(self) -> None:
+        regex_pattern = None
+        component = {"bom-ref": "comp1", "externalReferences": []}
+        expected = {"bom-ref": "comp1"}
+        b_p_b.validate_external_references(regex_pattern, component)
+        self.assertEqual(expected, component)

@@ -1220,16 +1220,36 @@ class TestVex:
 
     @pytest.fixture(
         scope="class",
-        params=[{"input": "vex.embedded.json", "expected": "vex.json"}],
+        params=[
+            {
+                "input": "vex.embedded.json",
+                "expected": "vex.json",
+                "expected_search": "vex.expected_search.json",
+                "expected_trim": "vex.expected_trim.json",
+                "expected_list": "vex.expected_list_default.csv",
+            }
+        ],
     )
     def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
         input_path = data_dir / request.param["input"]
         expected_path = data_dir / request.param["expected"]
+        expected_search_path = data_dir / request.param["expected_search"]
+        expected_trim_path = data_dir / request.param["expected_trim"]
+        expected_list_path = data_dir / request.param["expected_list"]
         input_vex_embedded_path = input_path
+
         expected_vex = load_sbom(expected_path)
+        expected_search = load_sbom(expected_search_path)
+        expected_trim = load_sbom(expected_trim_path)
+        with expected_list_path.open() as file:
+            expected_list = file.read()
 
         return self.DataFixture(
-            input_vex_embedded_path=input_vex_embedded_path, expected_vex=expected_vex
+            input_vex_embedded_path=input_vex_embedded_path,
+            expected_vex=expected_vex,
+            expected_search=expected_search,
+            expected_list=expected_list,
+            expected_trim=expected_trim,
         )
 
     def test_extract_vex_from_sbom_from_embedded_file(
@@ -1247,3 +1267,57 @@ class TestVex:
         # Verify that output matches what is expected
         expected_output = data["expected_vex"]
         assert json.loads(actual) == expected_output
+
+    def test_search_for_vulnerability(
+        self,
+        data: DataFixture,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        argv("vex", "search", "CVE-1013-0002", str(data["input_vex_embedded_path"]))
+        exit_code, actual, _ = run_main(capsys)
+
+        # Verify that command completed successfully
+        assert exit_code == Status.OK
+
+        # Verify that output matches what is expected
+        expected_output = data["expected_search"]
+        assert json.loads(actual) == expected_output
+
+    def test_trim_vulnerabilities(
+        self,
+        data: DataFixture,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        argv(
+            "vex",
+            "trim",
+            "--state",
+            "not_affected",
+            str(data["input_vex_embedded_path"]),
+        )
+        exit_code, actual, _ = run_main(capsys)
+
+        # Verify that command completed successfully
+        assert exit_code == Status.OK
+
+        # Verify that output matches what is expected
+        expected_output = data["expected_trim"]
+        assert json.loads(actual) == expected_output
+
+    def test_list_vulnerability_ids(
+        self,
+        data: DataFixture,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        argv("vex", "list", str(data["input_vex_embedded_path"]))
+        exit_code, actual, _ = run_main(capsys)
+
+        # Verify that command completed successfully
+        assert exit_code == Status.OK
+
+        # Verify that output matches what is expected
+        expected_output = data["expected_list"]
+        assert actual == expected_output

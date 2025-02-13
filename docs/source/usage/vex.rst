@@ -8,7 +8,7 @@ vex
     :prog: cdx-ev
     :path: vex
 
-    This command provides different operation on VEX-/SBOM- Files with embedded vulnerabilities. The vex-command has following subcommands:
+    This command provides different operations on VEX-/SBOM- Files with embedded vulnerabilities. The vex-command has the following subcommands:
 
     * ``list``: returns a list of all vulnerability-IDs
     * ``trim``: returns a file with filtered vulnerabilities
@@ -54,7 +54,7 @@ trim
     :prog: cdx-ev
     :path: vex trim
 
-    This subcommand returns a json file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by the state. Following states are supported:
+    This subcommand returns a json file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by their state. The following states are supported:
     
     * ``resolved``
     * ``resolved_with_pedigree``

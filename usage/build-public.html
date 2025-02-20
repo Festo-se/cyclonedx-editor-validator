@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>build-public &mdash; CycloneDX Editor Validator Tool 0.24.0 documentation</title>
+  <title>build-public &mdash; CycloneDX Editor Validator Tool 0.25.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a9084e48"></script>
+      <script src="../_static/documentation_options.js?v=d8dd0411"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -106,11 +106,18 @@
 <h1>build-public<a class="headerlink" href="#build-public" title="Link to this heading"></a></h1>
 <p>This command creates a redacted version of an SBOM fit for publication. It:</p>
 <ul class="simple">
-<li><p>can optionally delete entire components matching a JSON schema provided by the user, and it</p></li>
-<li><p>deletes any <em>property</em> (i.e., item in the <code class="docutils literal notranslate"><span class="pre">properties</span></code> array of a component) whose name starts with <code class="docutils literal notranslate"><span class="pre">internal:</span></code> from all components.</p></li>
+<li><p>deletes any <em>property</em> (i.e., item in the <code class="docutils literal notranslate"><span class="pre">properties</span></code> array of a component) whose name starts with <code class="docutils literal notranslate"><span class="pre">internal:</span></code> from all components,</p></li>
+<li><p>can optionally delete entire components matching a JSON schema provided by the user.</p></li>
 </ul>
 <p>The actions are performed in this order, meaning that <em>internal</em> properties will be taken into account when matching the JSON schema.
 If a component containing nested components is deleted, those nested components are deleted as well.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">metadata.component</span></code> will not be removed even when the JSON schema applies to it.
+This is because the <code class="docutils literal notranslate"><span class="pre">metadata.component</span></code> is the component the BOM describes, therefore removing it, would make the SBOM ambiguous.
+If the schema applies to the <code class="docutils literal notranslate"><span class="pre">metadata.component</span></code>, the SBOM is likely not intended for public use.
+However, this behavior does not affect the deletion of any property, which starts with the name <code class="docutils literal notranslate"><span class="pre">internal:</span></code>.</p>
+</div>
 <p>The JSON schema must be formulated according to the Draft 7 specification.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">build</span><span class="o">-</span><span class="n">public</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">schema</span><span class="o">-</span><span class="n">path</span> <span class="o">&lt;</span><span class="n">schema</span> <span class="n">path</span><span class="o">&gt;</span><span class="p">]</span>
                            <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>

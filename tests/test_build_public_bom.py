@@ -379,3 +379,24 @@ class TestCreateExternalBom(unittest.TestCase):
         expected_component["components"][0]["components"][0]["properties"].pop(0)
         b_p_b.clear_component(component)
         self.assertDictEqual(component, expected_component)
+
+    def test_build_public_metadata_warning(self) -> None:
+        sbom = get_sbom(path_to_sbom)
+        metadata = sbom.get("metadata", [])
+        metadata["component"]["group"] = "com.acme.internal"
+        with self.assertLogs() as log:
+            b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
+        expected_message = "metadata.component not removed"
+        self.assertTrue(expected_message, log.output)
+
+    def test_build_public_no_metadata_(self) -> None:
+        sbom = {"components": [{"bom-ref": "comp1", "group": "com.acme.internal"}]}
+        expected = {}
+        public_sbom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
+        self.assertEqual(expected, public_sbom)
+
+    def test_build_public_no_components(self) -> None:
+        sbom = {"components": []}
+        expected = {}
+        public_sbom = b_p_b.build_public_bom(sbom, path_to_documentation_schema_1)
+        self.assertEqual(expected, public_sbom)

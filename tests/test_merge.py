@@ -1,10 +1,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import copy
 import json
 import unittest
 
 from cdxev import merge
 from cdxev.auxiliary import sbomFunctions as sbF
+from cdxev.auxiliary.identity import ComponentIdentity
 from tests.auxiliary import helper as helper
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
@@ -721,6 +723,110 @@ class TestMergeComponents(unittest.TestCase):
                 sub_sub_program_sub_program_modified, sub_sub_program_sub_sub
             )
         )
+
+    def test_filter_component(self) -> None:
+        # considered test cases:
+        # - top level component present, sub component not
+        # - top level component not present, sublevel component present
+        #   sub_sub component not present
+        # - top level not present, sub_sub present
+        components = load_sections_for_test_sbom()["hierarchical_components"]
+        present_components = [
+            ComponentIdentity.create(components["component_1"], allow_unsafe=True),
+            ComponentIdentity.create(components["component_3"], allow_unsafe=True),
+            ComponentIdentity.create(
+                components["component_2_sub_1"], allow_unsafe=True
+            ),
+            ComponentIdentity.create(
+                components["component_4_sub_1_sub_2"], allow_unsafe=True
+            ),
+        ]
+
+        kept_components_expected = load_sections_for_test_sbom()[
+            "test_filter_component_kept_components_expected"
+        ]
+        new_components = load_sections_for_test_sbom()[
+            "test_filter_component_new_components"
+        ]
+        components["component_1"]["components"] = [components["component_1_sub_1"]]
+
+        kept_components: list[dict] = []
+        dropped_components: list[dict] = []
+        add_to_existing: dict[ComponentIdentity, dict] = {}
+
+        merge.filter_component(
+            present_components,
+            new_components,
+            kept_components,
+            dropped_components,
+            add_to_existing,
+        )
+
+        add_to_existing_expected = {
+            ComponentIdentity.create(components["component_1"], allow_unsafe=True): [
+                components["component_1_sub_1"]
+            ],
+            ComponentIdentity.create(
+                components["component_2_sub_1"], allow_unsafe=True
+            ): [components["component_2_sub_1_sub_1"]],
+        }
+
+        add_to_existing_identical = True
+        for key in add_to_existing_expected.keys():
+            if add_to_existing_expected[key] != add_to_existing[key]:
+                add_to_existing_identical = False
+
+        kept_components_identical = True
+        for comp in kept_components:
+            if comp not in kept_components_expected:
+                kept_components_identical = False
+
+        self.assertTrue(len(dropped_components) == 3)
+        self.assertTrue(
+            len(add_to_existing.keys()) == len(add_to_existing_expected.keys())
+        )
+        self.assertTrue(len(kept_components) == len(kept_components_expected))
+        self.assertTrue(add_to_existing_identical)
+        self.assertTrue(kept_components_identical)
+
+    def test_individual_merge_cases(self) -> None:
+        test_cases = load_sections_for_test_sbom()["singled_out_test_cases"]
+
+        for key in test_cases.keys():
+            original = test_cases[key]["original"]
+            new = test_cases[key]["new"]
+            merged_hr = test_cases[key]["merged_hr"]
+            merged_nm = test_cases[key]["merged_normal"]
+            merged_hierarchical = merge.merge_components(
+                copy.deepcopy({"components": original}),
+                copy.deepcopy({"components": new}),
+                hierarchical=True,
+            )
+            merged_normal = merge.merge_components(
+                copy.deepcopy({"components": original}),
+                copy.deepcopy({"components": new}),
+            )
+
+            self.assertCountEqual(merged_hierarchical, merged_hr)
+            self.assertCountEqual(merged_normal, merged_nm)
+
+    def test_merge_hierarchical(self) -> None:
+        new_components = load_sections_for_test_sbom()[
+            "test_merge_hierarchical_new_components"
+        ]
+        present_components = load_sections_for_test_sbom()[
+            "test_merge_hierarchical_present_components"
+        ]
+
+        merged_components = merge.merge_components(
+            {"components": present_components},
+            {"components": new_components},
+            hierarchical=True,
+        )
+
+        expected_components = load_sections_for_test_sbom()["hierarchical_expected"]
+
+        self.assertEqual(merged_components, expected_components)
 
 
 class TestMergeCompositions(unittest.TestCase):

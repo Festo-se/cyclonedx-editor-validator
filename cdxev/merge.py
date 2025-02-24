@@ -8,8 +8,8 @@ from cdxev.auxiliary.sbomFunctions import (
     compare_time_flag_from_vulnerabilities,
     compare_vulnerabilities,
     copy_ratings,
+    extract_components,
     get_bom_refs_from_dependencies,
-    get_corresponding_reference_to_component,
     get_dependency_by_ref,
     get_ref_from_components,
 )
@@ -18,7 +18,76 @@ from cdxev.log import LogMessage
 logger = logging.getLogger(__name__)
 
 
-def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[dict]:
+def filter_component(
+    present_components: list[ComponentIdentity],
+    components_to_add: list,
+    kept_components: list,
+    dropped_components: list,
+    add_to_existing: dict,
+) -> list[dict]:
+    """
+    Function that goes through a list of components and their nested sub components
+    and determine if they are present in a provided list with component identities.
+
+    The function operates directly on the lists and dictionary provided and returns
+    a list of filtered top level components that were not found in present_components.
+    Filtered means, that the nested components are also not already present.
+
+    param present_components: a list of component identities that are already present in the SBOM.
+    param components_to_add: a list of components that shall be compared against the list of
+                            already present components.
+    param kept_components: list of components not present in the list of provided components,
+                           including nested components.
+    param dropped_components: list of added components that are already present.
+    param add_to_existing: list of nested components that have to be added to present_components.
+
+    returns: filtered_components: list of top level components not present in present_components
+    """
+    filtered_components: list[dict] = []
+    for component in components_to_add:
+        component_id = ComponentIdentity.create(component, allow_unsafe=True)
+        # component is new
+        if component_id not in present_components:
+            nested_components = filter_component(
+                present_components,
+                component.get("components", []),
+                kept_components,
+                dropped_components,
+                add_to_existing,
+            )
+            if component.get("components", []):
+                component["components"] = nested_components
+            filtered_components.append(component)
+            kept_components.append(component)
+
+        # component already present
+        # contained components get filtered and added to the component in the main sbom
+        else:
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    f"Dropping a duplicate component ({component_id}) from the merge result.",
+                )
+            )
+            dropped_components.append(component)
+            nested_components = filter_component(
+                present_components,
+                component.get("components", []),
+                kept_components,
+                dropped_components,
+                add_to_existing,
+            )
+            if nested_components:
+                add_to_existing[component_id] = (
+                    add_to_existing.get(component_id, []) + nested_components
+                )
+
+    return filtered_components
+
+
+def merge_components(
+    governing_sbom: dict, sbom_to_be_merged: dict, hierarchical: bool = False
+) -> t.List[dict]:
     """
     Function that gets two lists of components and merges them unique into one.
 
@@ -34,67 +103,93 @@ def merge_components(governing_sbom: dict, sbom_to_be_merged: dict) -> t.List[di
     Output:
     list_of_merged_components: List with the uniquely merged components of the submitted sboms
     """
-    list_of_merged_components = governing_sbom.get("components", [])
+    list_of_merged_components: t.List[dict] = governing_sbom.get("components", [])
     list_of_added_components = sbom_to_be_merged.get("components", [])
     list_of_merged_bom_refs = get_ref_from_components(list_of_merged_components)
-    for component in list_of_added_components:
-        is_in_list, bom_ref_from_list = get_corresponding_reference_to_component(
-            component, list_of_merged_components
-        )
-        if is_in_list:
-            component_id = ComponentIdentity.create(component, allow_unsafe=True)
-            logger.warning(
-                LogMessage(
-                    "Potential loss of information",
-                    f"Dropping a duplicate component ({component_id}) from the merge result.",
-                )
+
+    present_component_identities: dict[ComponentIdentity, dict] = {}
+    for component in extract_components(governing_sbom.get("components", [])):
+        present_component_identities[
+            ComponentIdentity.create(component, allow_unsafe=True)
+        ] = component
+
+    kept_components: list[dict] = []
+    dropped_components: list[dict] = []
+    add_to_existing: dict[ComponentIdentity, dict] = {}
+    list_present_component_identities = list(present_component_identities.keys())
+    list_of_filtered_components = filter_component(
+        list_present_component_identities,
+        list_of_added_components,
+        kept_components,
+        dropped_components,
+        add_to_existing,
+    )
+
+    list_of_merged_components += list_of_filtered_components
+
+    if hierarchical:
+        for key in add_to_existing.keys():
+            list_of_subcomponents = (
+                present_component_identities[key].get("components", [])
+                + add_to_existing[key]
             )
-            # if the component in the sbom_to_be_merged has a different
-            # bom-ref than the governing_sbom, then the bom-ref will be
-            # replaced through the one from the governing_sbom.
-            # while doing so, the algorithm checks, that the sbom does not
-            # already contain a different component with that ref, if so
-            # that component's bom-ref will be renamed
-            if bom_ref_from_list != component.get("bom-ref", 1):
-                counter = 0
-                new_reference = bom_ref_from_list
-                while not replace_ref_in_sbom(
-                    new_reference, component.get("bom-ref", ""), sbom_to_be_merged
-                ):
-                    counter += 1
-                    new_reference = bom_ref_from_list + "_" + str(counter)
+            present_component_identities[key]["components"] = list_of_subcomponents
+    else:
+        for key in add_to_existing.keys():
+            for new_component in add_to_existing[key]:
+                list_of_merged_components.append(new_component)
+
+    for component in dropped_components:
+        # if the component in the sbom_to_be_merged has a different
+        # bom-ref than the governing_sbom, then the bom-ref will be
+        # replaced through the one from the governing_sbom.
+        # While doing so, the algorithm checks, that the SBOM does not
+        # already contain a different component with that ref, if so
+        # that component's bom-ref will be renamed.
+        component_id = ComponentIdentity.create(component, allow_unsafe=True)
+        bom_ref_from_list = present_component_identities[component_id].get(
+            "bom-ref", ""
+        )
+        if bom_ref_from_list != component.get("bom-ref", 1):
+            counter = 0
+            new_reference = bom_ref_from_list
+            while not replace_ref_in_sbom(
+                new_reference, component.get("bom-ref", ""), sbom_to_be_merged
+            ):
+                counter += 1
+                new_reference = bom_ref_from_list + "_" + str(counter)
+
+    for component in kept_components:
+        if not (component.get("bom-ref", 1) in list_of_merged_bom_refs):
+            list_of_merged_bom_refs.append(component.get("bom-ref", ""))
         else:
-            if not (component.get("bom-ref", 1) in list_of_merged_bom_refs):
-                list_of_merged_components.append(component)
-                list_of_merged_bom_refs.append(component.get("bom-ref"))
-            else:
-                # if the bom-ref already exists in the components, add a incrementing number to
-                # the bom-ref
-                list_of_bom_refs_to_be_added = get_ref_from_components(
-                    sbom_to_be_merged.get("components", [])
-                )
-                list_of_bom_refs_to_be_added.append(
-                    sbom_to_be_merged.get("metadata", {})
-                    .get("component", {})
-                    .get("bom-ref", "")
-                )
-                bom_ref_is_not_unique = False
-                new_bom_ref = component.get("bom-ref")
-                n = 0
-                while new_bom_ref in list_of_merged_bom_refs or bom_ref_is_not_unique:
-                    n += 1
-                    new_bom_ref = component.get("bom-ref") + "_" + str(n)
-                    # The new bom-ref must not appear in either of the sboms
-                    if new_bom_ref in list_of_bom_refs_to_be_added:
-                        bom_ref_is_not_unique = True
-                    else:
-                        bom_ref_is_not_unique = False
-                replace_ref_in_sbom(
-                    new_bom_ref, component.get("bom-ref", ""), sbom_to_be_merged
-                )
-                list_of_merged_components.append(component)
-                list_of_merged_bom_refs.append(new_bom_ref)
-    return list_of_merged_components  # type:ignore [no-any-return]
+            # if the bom-ref already exists in the components, add a incrementing number to
+            # the bom-ref
+            list_of_bom_refs_to_be_added = get_ref_from_components(
+                sbom_to_be_merged.get("components", [])
+            )
+            list_of_bom_refs_to_be_added.append(
+                sbom_to_be_merged.get("metadata", {})
+                .get("component", {})
+                .get("bom-ref", "")
+            )
+            bom_ref_is_not_unique = False
+            new_bom_ref = component.get("bom-ref", "")
+            n = 0
+            while new_bom_ref in list_of_merged_bom_refs or bom_ref_is_not_unique:
+                n += 1
+                new_bom_ref = component.get("bom-ref", "") + "_" + str(n)
+                # The new bom-ref must not appear in either of the SBOMs
+                if new_bom_ref in list_of_bom_refs_to_be_added:
+                    bom_ref_is_not_unique = True
+                else:
+                    bom_ref_is_not_unique = False
+            replace_ref_in_sbom(
+                new_bom_ref, component.get("bom-ref", ""), sbom_to_be_merged
+            )
+            list_of_merged_bom_refs.append(new_bom_ref)
+
+    return list_of_merged_components
 
 
 def merge_dependency(
@@ -163,7 +258,9 @@ def merge_dependency_lists(
     return list_of_merged_dependencies
 
 
-def merge_2_sboms(original_sbom: dict, sbom_to_be_merged: dict) -> dict:
+def merge_2_sboms(
+    original_sbom: dict, sbom_to_be_merged: dict, hierarchical: bool = False
+) -> dict:
     """
     Function that merges two sboms.
 
@@ -181,7 +278,9 @@ def merge_2_sboms(original_sbom: dict, sbom_to_be_merged: dict) -> dict:
     components_of_sbom_to_be_merged.append(component_from_metadata)
     list_of_original_dependencies = original_sbom.get("dependencies", [])
     list_of_new_dependencies = sbom_to_be_merged.get("dependencies", [])
-    list_of_merged_components = merge_components(original_sbom, sbom_to_be_merged)
+    list_of_merged_components = merge_components(
+        original_sbom, sbom_to_be_merged, hierarchical=hierarchical
+    )
     merged_dependencies = merge_dependency_lists(
         list_of_original_dependencies,
         list_of_new_dependencies,
@@ -208,7 +307,7 @@ def merge_2_sboms(original_sbom: dict, sbom_to_be_merged: dict) -> dict:
     return merged_sbom
 
 
-def merge(sboms: t.Sequence[dict]) -> dict:
+def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     """
     Function that merges a list of sboms successively in to the first one and creates an JSON file.
     for the result
@@ -222,7 +321,7 @@ def merge(sboms: t.Sequence[dict]) -> dict:
     """
     merged_sbom = sboms[0]
     for k in range(1, len(sboms)):
-        merged_sbom = merge_2_sboms(merged_sbom, sboms[k])
+        merged_sbom = merge_2_sboms(merged_sbom, sboms[k], hierarchical=hierarchical)
     return merged_sbom
 
 

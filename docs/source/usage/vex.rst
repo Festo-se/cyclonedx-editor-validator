@@ -10,10 +10,10 @@ vex
 
     This command provides different operations on VEX-/SBOM- Files with embedded vulnerabilities. The vex-command has the following subcommands:
 
-    * ``list``: returns a list of all vulnerability-IDs
-    * ``trim``: returns a file with filtered vulnerabilities
-    * ``search``: returns a file with a specific vulnerability
-    * ``extract``: extract all vulnerabilities from a SBOM-file to a VEX-file
+    * ``list``: returns a list of all vulnerability-IDs.
+    * ``trim``: returns a file with filtered vulnerabilities.
+    * ``search``: returns a file with a specific vulnerability.
+    * ``extract``: extract all vulnerabilities from an SBOM-file to a VEX-file.
 
 list
 -------------
@@ -54,19 +54,13 @@ trim
     :prog: cdx-ev
     :path: vex trim
 
-    This subcommand returns a json file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by their state. The following states are supported:
-    
-    * ``exploitable`` (default)
-    * ``resolved``
-    * ``resolved_with_pedigree``
-    * ``in_triage``
-    * ``false_positive``
-    * ``not_affected``
+    This subcommand returns a json file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by any key-value pair.
+    The string must have the format ``<key>:<value>``
 
 Example::
 
     # Writes all vulnerabilities with state "not_affected" to new file
-    cdxev vex trim input_file.json --state not_affected --output not_affected_vex.json
+    cdxev vex trim input_file.json state:not_affected --output not_affected_vex.json
 
 
 search
@@ -82,7 +76,7 @@ search
 Example::
 
     # Writes specific vulnerability with based on its ID to new file
-    cdxev vex search input_file.json --output searched_vul.json CVE-1013-0002
+    cdxev vex search input_file.json CVE-1013-0002 --output searched_vul.json
 
 
 extract

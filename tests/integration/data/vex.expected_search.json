@@ -1,0 +1,31 @@
+{
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.3",
+    "version": 1,
+    "vulnerabilities": [
+        {
+            "description": "some description of a vulnerability 2",
+            "id": "CVE-1013-0002",
+            "ratings": [
+                {
+                    "score": 7.2,
+                    "severity": "high",
+                    "method": "CVSSv31",
+                    "vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H"
+                }
+            ],
+            "published": "1013-01-01T01:02Z",
+            "updated": "1013-03-02T12:24Z",
+            "affects": [{"ref": "11231231"}],
+            "analysis": {
+                "state": "not_affected",
+                "justification": "add justification here",
+                "response": [
+                    "add response here",
+                    "more than one response is possible"
+                ],
+                "detail": "the fields state, justification and response are enums, please see CycloneDX specification"
+            }
+        }
+    ]
+}

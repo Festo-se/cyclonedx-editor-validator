@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
+import re
 from typing import Any, Union
 
 
@@ -49,6 +50,24 @@ def get_list_of_ids(input_file: dict, scheme: str) -> str:
             vul_ref_id = vulnerability.get("references", [])[0].get("id", "-")
             vul_description = vulnerability.get("description", "-")
             vul_state = vulnerability.get("analysis", {}).get("state", "-")
+            ratings = vulnerability.get("ratings", [])
+            severity_string = ""
+            # write rating string
+            for rating in ratings:
+                if severity_string != "":
+                    severity_string += ","
+                severity_string += (
+                    f"{rating.get('method', '')}:"
+                    f"{rating.get('score', '')}"
+                    f"({rating.get('severity', '')})"
+                )
+            if len(ratings) == 0:
+                severity_string = "-"
+            publish_date = vulnerability.get("published", "-")
+            update_date = vulnerability.get("updated", "-")
+            vul_description = re.sub(
+                r"[\t\n\r\|]+", "", vulnerability.get("description", "-")
+            )
             list_str += (
                 vulID
                 + ","
@@ -70,6 +89,35 @@ def get_list_of_ids(input_file: dict, scheme: str) -> str:
             )
 
     return list_str
+
+
+def search_key(data: dict[str, Any], key: str, value: str) -> bool:
+    """
+    Searches a (nested) dicionary for a key-value pair.
+    Returns True if found, False if not found
+
+    Parameters
+    ----------
+    data: dict
+        A dictionary to be searched
+    key: str
+        The key to search for
+    value: str
+        The value associated with the key
+
+
+    Returns
+    -------
+    bool
+        True if found, False if not found
+    """
+    if key in data and data[key] == value:
+        return True
+    for k, v in data.items():
+        if isinstance(v, dict):
+            if search_key(v, key, value):
+                return True
+    return False
 
 
 def get_list_of_trimed_vulnerabilities(input_file: dict, state: str) -> dict:

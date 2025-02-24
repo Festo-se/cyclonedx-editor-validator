@@ -1274,7 +1274,7 @@ class TestVex:
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        argv("vex", "search", "CVE-1013-0002", str(data["input_vex_embedded_path"]))
+        argv("vex", "search", str(data["input_vex_embedded_path"]), "CVE-1013-0002")
         exit_code, actual, _ = run_main(capsys)
 
         # Verify that command completed successfully
@@ -1293,9 +1293,8 @@ class TestVex:
         argv(
             "vex",
             "trim",
-            "--state",
-            "not_affected",
             str(data["input_vex_embedded_path"]),
+            "state:not_affected",
         )
         exit_code, actual, _ = run_main(capsys)
 

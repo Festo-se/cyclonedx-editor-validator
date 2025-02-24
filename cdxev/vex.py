@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
+import re
 from typing import Any, Union
 
 
 def init_vex_header(input_file: dict[str, Any]) -> dict[str, Any]:
     """
-    Copy important keys and values from input_file to output_file
+    Copy important keys and values from input_file to output_file.
 
     Parameters
     ----------
@@ -26,7 +27,7 @@ def init_vex_header(input_file: dict[str, Any]) -> dict[str, Any]:
     return output_file
 
 
-def get_list_of_ids(input_file: dict[str, Any], scheme: str) -> str:
+def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
     """
     Get a list of vulnerability IDs.
 
@@ -42,31 +43,65 @@ def get_list_of_ids(input_file: dict[str, Any], scheme: str) -> str:
     """
 
     list_str = ""
-    if scheme == "default":
-        list_str += "ID,RefID,Description,Status\n"
+    if schema == "default":
+        list_str += "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             vul_id = vulnerability.get("id", "-")
             vul_ref_id = vulnerability.get("references", [{"id": "-"}])[0].get(
                 "id", "-"
             )
-            vul_description = vulnerability.get("description", "-")
+            # write cwe string
+            cwes = vulnerability.get("cwes", [])
+            cwe_str = ""
+            for cwe in cwes:
+                if cwe_str != "":
+                    cwe_str += ","
+                cwe_str += f"{cwe}"
+            if len(cwes) == 0:
+                cwe_str = "-"
             vul_state = vulnerability.get("analysis", {}).get("state", "-")
+            ratings = vulnerability.get("ratings", [])
+            severity_string = ""
+            # write rating string
+            for rating in ratings:
+                if severity_string != "":
+                    severity_string += ","
+                severity_string += (
+                    f"{rating.get('method', '')}:"
+                    f"{rating.get('score', '')}"
+                    f"({rating.get('severity', '')})"
+                )
+            if len(ratings) == 0:
+                severity_string = "-"
+            publish_date = vulnerability.get("published", "-")
+            update_date = vulnerability.get("updated", "-")
+            vul_description = re.sub(
+                r"[\t\n\r\|]+", "", vulnerability.get("description", "-")
+            )
             list_str += (
                 vul_id
-                + ","
+                + "|"
                 + vul_ref_id
-                + ","
-                + vul_description
-                + ","
+                + "|"
+                + cwe_str
+                + "|"
+                + severity_string
+                + "|"
                 + vul_state
+                + "|"
+                + publish_date
+                + "|"
+                + update_date
+                + "|"
+                + vul_description
                 + "\n"
             )
-    elif scheme == "lightweight":
-        list_str += "ID,RefID\n"
+    elif schema == "lightweight":
+        list_str += "ID|RefID\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             list_str += (
                 vulnerability.get("id", "-")
-                + ","
+                + "|"
                 + vulnerability.get("references", [{"id": "-"}])[0].get("id", "-")
                 + "\n"
             )
@@ -74,18 +109,47 @@ def get_list_of_ids(input_file: dict[str, Any], scheme: str) -> str:
     return list_str
 
 
+def search_key(data: dict[str, Any], key: str, value: str) -> bool:
+    """
+    Searches a (nested) dicionary for a key-value pair.
+    Returns True if found, False if not found
+
+    Parameters
+    ----------
+    data: dict
+        A dictionary to be searched
+    key: str
+        The key to search for
+    value: str
+        The value associated with the key
+
+
+    Returns
+    -------
+    bool
+        True if found, False if not found
+    """
+    if key in data and data[key] == value:
+        return True
+    for k, v in data.items():
+        if isinstance(v, dict):
+            if search_key(v, key, value):
+                return True
+    return False
+
+
 def get_list_of_trimed_vulnerabilities(
-    input_file: dict[str, Any], state: str
+    input_file: dict[str, Any], keyval: str
 ) -> dict[str, Any]:
     """
-    Get a file with vulnerabilities filtered by state
+    Get a file with vulnerabilities filtered by a key-value pair.
 
     Parameters
     ----------
     input_file: dict
         A dictionary to trim only affected vulnerabilities
-    state: str
-        The state of vulnerabilites for which the file gets filtered
+    keyval_pair: str
+        The key-value pair of vulnerabilites for which the file gets filtered
 
     Returns
     -------
@@ -94,8 +158,15 @@ def get_list_of_trimed_vulnerabilities(
     """
     trimmed_vulnerabilities = []
     output_file = {}
+    pattern = r"^(.*):(.*)$"
+    match = re.match(pattern, keyval)
+    if match:
+        key, value = match.groups()
+    else:
+        raise ValueError("keyval string does not have the format '<key>:<value>'.")
+
     for vulnerability in input_file.get("vulnerabilities", []):
-        if vulnerability.get("analysis", {}).get("state", "") == state:
+        if search_key(vulnerability, key, value):
             trimmed_vulnerabilities.append(vulnerability)
 
     output_file = init_vex_header(input_file)
@@ -119,12 +190,12 @@ def get_vulnerability_by_id(input_file: dict[str, Any], id: str) -> dict[str, An
 
 def get_vex_from_sbom(input_file: dict[str, Any]) -> dict[str, Any]:
     """
-    Extract the vulnerabilities of a SBOM file to a VEX file
+    Extract the vulnerabilities of a SBOM file to a VEX file.
 
     Parameters
     ----------
     input_file: dict
-        A SBOM dictionary from which the vulnerabilities should be extracted.
+        An SBOM dictionary from which the vulnerabilities should be extracted
 
     Returns
     -------
@@ -138,24 +209,24 @@ def get_vex_from_sbom(input_file: dict[str, Any]) -> dict[str, Any]:
 
 
 def vex(
-    sub_command: str, file: dict[str, Any], state: str, scheme: str, vul_id: str = ""
+    sub_command: str, file: dict[str, Any], keyval: str, schema: str, vul_id: str = ""
 ) -> Union[dict[str, Any], str]:
     """
-    Get different information about vulnerabilities in VEX file
+    Get different information about vulnerabilities in VEX file.
 
     Parameters
     ----------
     subcommand: string
         - "list": Get IDs of vulnerabilities in VEX file
-        - "trim": Get only affected vulnerabilities
+        - "trim": Get only vulnerabilities with searched key-value pair
         - "search <ID>": Get only vulnerability with ID
         - "extract": Get VEX file from SBOM file
     file: dict
         A VEX dictionary to search for values
-    state: string
-        A string containing the filtered state for the trim subcommand
-    scheme: string
-        A string containing the output scheme for the list subcommand
+    keyval: string
+        A string containing the filtered key-value pair for the trim subcommand
+    schema: string
+        A string containing the output schema for the list subcommand
     vul_ID: string
         A string containing the searched vulnerability-ID for the search subcommand
 
@@ -169,9 +240,9 @@ def vex(
     """
 
     if sub_command == "list":
-        return get_list_of_ids(file, scheme)
+        return get_list_of_ids(file, schema)
     elif sub_command == "trim":
-        return get_list_of_trimed_vulnerabilities(file, state)
+        return get_list_of_trimed_vulnerabilities(file, keyval)
     elif sub_command == "search":
         return get_vulnerability_by_id(file, vul_id)
     elif sub_command == "extract":

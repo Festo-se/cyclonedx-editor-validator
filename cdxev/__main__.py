@@ -504,7 +504,7 @@ def create_vex_parser(
 ) -> argparse.ArgumentParser:
     parser = subparser.add_parser(
         "vex",
-        help="Executes commands [list, search, trim, extract] on VEX/SBOM files.",
+        help="Executes commands on VEX or embedded VEX files.",
     )
 
     subparsers = parser.add_subparsers(dest="sub_command", required=True)
@@ -512,9 +512,10 @@ def create_vex_parser(
     list_parser = subparsers.add_parser(
         "list", help="Returns a list of all vulnerability IDs."
     )
+    add_input_argument(list_parser)
     list_parser.add_argument(
-        "--scheme",
-        help="Set scheme of return list.",
+        "--schema",
+        help="Set schema of return list.",
         choices=["default", "lightweight"],
         default="default",
         type=str,
@@ -529,6 +530,7 @@ def create_vex_parser(
     )
 
     search_parser = subparsers.add_parser("search", help="Get vulnerabilities by ID.")
+    add_input_argument(search_parser)
     search_parser.add_argument(
         "vul_id",
         metavar="<vul_id>",
@@ -538,30 +540,19 @@ def create_vex_parser(
 
     trim_parser = subparsers.add_parser(
         "trim",
-        help="Trims a VEX to show only the vulnerabilities according to the selected state.",
+        help="Trims a VEX to show only the vulnerabilities matching the given key-value pair.",
     )
+    add_input_argument(trim_parser)
     trim_parser.add_argument(
-        "--state",
-        help="Specifies the state to be filtered.",
-        choices=[
-            "resolved",
-            "resolved_with_pedigree",
-            "exploitable",
-            "in_triage",
-            "false_positive",
-            "not_affected",
-        ],
-        default="exploitable",
+        "keyval_pair",
+        metavar="<keyval_pair>",
+        help="Specifies the key-value pair to be filtered.",
         type=str,
     )
 
     extract_parser = subparsers.add_parser(
         "extract", help="Extract a VEX file out of SBOM file."
     )
-
-    add_input_argument(list_parser)
-    add_input_argument(trim_parser)
-    add_input_argument(search_parser)
     add_input_argument(extract_parser)
 
     add_output_argument(list_parser)
@@ -1128,21 +1119,20 @@ def invoke_validate(args: argparse.Namespace) -> int:
 def invoke_vex(args: argparse.Namespace) -> int:
     file, _ = read_sbom(args.input_file)
     vul_id = ""
-    state = ""
-    scheme = ""
+    keyval = ""
+    schema = ""
     if args.sub_command == "search":
         vul_id = args.vul_id
     if args.sub_command == "trim":
-        state = args.state
+        keyval = args.keyval_pair
     if args.sub_command == "list":
-        scheme = args.scheme
-
+        schema = args.schema
     output = vex(
         sub_command=args.sub_command,
         file=file,
         vul_id=vul_id,
-        state=state,
-        scheme=scheme,
+        keyval=keyval,
+        schema=schema,
     )
 
     if args.sub_command == "list":

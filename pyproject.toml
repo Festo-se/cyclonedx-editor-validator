@@ -32,7 +32,7 @@ pyicu = [
 ]
 natsort = "^8.4.0"
 univers = "30.12.1"
-cyclonedx-python-lib = "8.8.0"
+cyclonedx-python-lib = "9.1.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "7.1.2"

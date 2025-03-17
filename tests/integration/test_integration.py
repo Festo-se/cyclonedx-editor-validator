@@ -261,6 +261,8 @@ class TestBuildPublic:
             "build-public",
             "--schema-path",
             str(data["schema"]),
+            "--ext-ref-regex",
+            r"https://acme\.com|https://internal\.festo\.com",
             str(data["input"]),
         )
         exit_code, actual, _ = run_main(capsys, "json")

@@ -62,1116 +62,1288 @@
       ]
     }
   ],
-  "governing_program_with_vulnerabilities_updated": [
+  "vulnerabilities_ref_product_3_replaced": [
     {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "published": "2022-10-12T00:14Z",
-      "updated": "2022-11-12T00:15Z",
-      "Test Name": "This should be in the merged",
-      "ratings": [
+      "id": "Vulnerability 1",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+      },
+      "references": [
         {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 6,
-          "severity": "high",
-          "method": "New 1",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "id": "Vulnerability 1: Alias 1"
         }
       ],
       "affects": [
         {
-          "ref": "sub_program"
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "3.4",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Vulnerability 1: Alias 2",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Alias 2"
+      },
+      "references": [
+        {
+          "id": "Vulnerability 1: Alias 1"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "new",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 4",
+          "versions": [
+            {
+              "version": "3.4",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "new",
+          "versions": [
+            {
+              "version": "10",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "new",
+          "versions": [
+            {
+              "version": "11",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Vulnerability 2",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 2"
+      },
+      "affects": [
+        {
+          "ref": "product 5",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 6",
+          "versions": [
+            {
+              "version": "3.4",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Vulnerability 3",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 3"
+      },
+      "references": [
+        {
+          "id": "Vulnerability 3: Alias 3"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "product 7",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 8",
+          "versions": [
+            {
+              "version": "3.4",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Vulnerability 1",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+      },
+      "affects": [
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "12.4",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "13.4",
+              "status": "affected"
+            }
+          ]
         }
       ]
     }
   ],
-  "governing_program_with_vulnerabilities": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
+  "sbom_replace_references_1": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-10-17T19:15:49",
+      "authors": [
         {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "name": "automated"
         }
       ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
-    }
-  ],
-  "merged_governing_program_with_vul_without": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "component": {
+        "type": "application",
+        "bom-ref": "governing_program",
+        "supplier": {
+          "name": "Company Legal"
         },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
-    }
-  ],
-  "merged_governing_program_with_vul_tls_equal": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
+        "group": "com.company.governing",
+        "name": "governing_program",
+        "version": "T5.0.3.96",
+        "licenses": [
+          {
+            "license": {
+              "name": "company internal"
+            }
+          }
+        ],
+        "copyright": "Company Legal 2022, all rights reserved"
+      }
     },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
+    "components": [
+      {
+        "bom-ref": "comp 1",
+        "name": "sub_program_1",
+        "version": "T5.0.3.96"
+      },
+      {
+        "bom-ref": "comp 2",
+        "name": "sub_program_2",
+        "version": "1.0.0"
+      },
+      {
+        "bom-ref": "comp 3",
+        "name": "sub_program_3",
+        "version": "2.0.0"
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "comp 1",
+        "dependsOn": [
+          "comp 2",
+          "comp 3"
+        ]
+      },
+      {
+        "ref": "comp 2",
+        "dependsOn": [
+          "comp 3"
+        ]
+      },
+      {
+        "ref": "comp 3",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "comp 1",
+          "comp 2",
+          "comp 3"
+        ]
+      }
+    ]
+  },
+  "sbom_replace_references_2": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-10-17T19:15:49",
+      "authors": [
         {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "name": "automated"
         }
       ],
-      "affects": [
-        {
-          "ref": "gp_first_component-copy"
-        }
-      ]
+      "component": {
+        "type": "application",
+        "bom-ref": "governing_program",
+        "supplier": {
+          "name": "Company Legal"
+        },
+        "group": "com.company.governing",
+        "name": "governing_program",
+        "version": "T5.0.3.9699",
+        "licenses": [
+          {
+            "license": {
+              "name": "company internal"
+            }
+          }
+        ],
+        "copyright": "Company Legal 2022, all rights reserved"
+      }
     },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+    "components": [
+      {
+        "bom-ref": "comp 1",
+        "name": "sub_program_1",
+        "version": "T5.0.3.96"
+      },
+      {
+        "bom-ref": "2_comp 2",
+        "name": "2_sub_program_2",
+        "version": "1.0.0"
+      },
+      {
+        "bom-ref": "comp 3",
+        "name": "2_sub_program_3",
+        "version": "2.0.0"
+      },
+      {
+        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "name": "2_sub_program_3_2",
+        "version": "2.0.0"
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "comp 1",
+        "dependsOn": [
+          "2_comp 2",
+          "comp 3"
+        ]
+      },
+      {
+        "ref": "2_comp 2",
+        "dependsOn": [
+          "comp 3"
+        ]
+      },
+      {
+        "ref": "comp 3",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "complete",
+        "assemblies": [
+          "comp 1",
+          "2_comp 2",
+          "comp 3"
+        ]
+      }
+    ],
+    "vulnerabilities": [
+      {
+        "id": "Vulnerability 1",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
         },
+        "references": [
+          {
+            "id": "Vulnerability 1: Alias 1"
+          }
+        ],
+        "affects": [
+          {
+            "ref": "comp 1",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 1",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "2_comp 2",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Vulnerability 2",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+        },
+        "references": [
+          {
+            "id": "Vulnerability 1: Alias 1"
+          }
+        ],
+        "affects": [
+          {
+            "ref": "2_comp 2",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 1",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 1",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Vulnerability 3",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+        },
+        "references": [
+          {
+            "id": "Vulnerability 1: Alias 1"
+          }
+        ],
+        "affects": [
+          {
+            "ref": "comp 3",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "2_comp 2",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 3",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "sbom_replace_references_3": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-10-17T19:15:49",
+      "authors": [
         {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "name": "automated"
         }
       ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "sub_program_with_vulnerabilities_new_ratings": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "component": {
+        "type": "application",
+        "bom-ref": "governing_program",
+        "supplier": {
+          "name": "Company Legal"
         },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "New 1",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "this should be in",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
+        "group": "com.company.governing",
+        "name": "governing_program",
+        "version": "T5.0.3.9699",
+        "licenses": [
+          {
+            "license": {
+              "name": "company internal"
+            }
+          }
+        ],
+        "copyright": "Company Legal 2022, all rights reserved"
+      }
     },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
+    "components": [
+      {
+        "bom-ref": "comp 1",
+        "name": "sub_program_1",
+        "version": "T5.0.3.96"
+      },
+      {
+        "bom-ref": "comp 2",
+        "name": "2_sub_program_2",
+        "version": "1.0.0"
+      },
+      {
+        "bom-ref": "comp 3",
+        "name": "2_sub_program_3",
+        "version": "2.0.0"
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "comp 1",
+        "dependsOn": [
+          "comp 2",
+          "comp 3"
+        ]
+      },
+      {
+        "ref": "comp 2",
+        "dependsOn": [
+          "comp 3"
+        ]
+      },
+      {
+        "ref": "comp 3",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "comp 1",
+          "comp 2",
+          "comp 3"
+        ]
+      }
+    ]
+  },
+  "sbom_replace_references_4": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-10-17T19:15:49",
+      "authors": [
         {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "name": "automated"
         }
       ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
+      "component": {
+        "type": "application",
+        "bom-ref": "COORDINATES[com.company.governing/governing_program@T5.0.3.9699]",
+        "supplier": {
+          "name": "Company Legal"
+        },
+        "group": "com.company.governing",
+        "name": "governing_program",
+        "version": "T5.0.3.9699",
+        "licenses": [
+          {
+            "license": {
+              "name": "company internal"
+            }
+          }
+        ],
+        "copyright": "Company Legal 2022, all rights reserved"
+      }
     },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
+    "components": [
+      {
+        "bom-ref": "comp 1",
+        "name": "sub_program_1",
+        "version": "T5.0.3.96",
+        "group": "another"
+      },
+      {
+        "bom-ref": "COORDINATES[2_sub_program_2@1.0.0]",
+        "name": "4_sub_program_2",
+        "version": "1.0.0"
+      },
+      {
+        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "name": "4_sub_program_3",
+        "version": "2.0.0"
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "comp 1",
+        "dependsOn": [
+          "COORDINATES[2_sub_program_2@1.0.0]",
+          "COORDINATES[2_sub_program_3@2.0.0]"
+        ]
+      },
+      {
+        "ref": "COORDINATES[2_sub_program_2@1.0.0]",
+        "dependsOn": [
+          "COORDINATES[2_sub_program_3@2.0.0]"
+        ]
+      },
+      {
+        "ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "comp 1",
+          "COORDINATES[2_sub_program_2@1.0.0]",
+          "COORDINATES[2_sub_program_3@2.0.0]"
+        ]
+      }
+    ]
+  },
+  "sbom_replace_references_2_replaced": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-10-17T19:15:49",
+      "authors": [
         {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "name": "automated"
         }
       ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "sub_program_with_vulnerabilities_published": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "published": "2022-10-12T00:15Z",
-      "Test Name": "This should be in the merged",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "component": {
+        "type": "application",
+        "bom-ref": "COORDINATES[com.company.governing/governing_program@T5.0.3.9699]",
+        "supplier": {
+          "name": "Company Legal"
         },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 2,
-          "severity": "high",
-          "method": "New 1",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "this should be in",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
+        "group": "com.company.governing",
+        "name": "governing_program",
+        "version": "T5.0.3.9699",
+        "licenses": [
+          {
+            "license": {
+              "name": "company internal"
+            }
+          }
+        ],
+        "copyright": "Company Legal 2022, all rights reserved"
+      }
     },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+    "components": [
+      {
+        "bom-ref": "comp 1",
+        "name": "sub_program_1",
+        "version": "T5.0.3.96"
+      },
+      {
+        "bom-ref": "2_comp 2",
+        "name": "2_sub_program_2",
+        "version": "1.0.0"
+      },
+      {
+        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
+        "name": "2_sub_program_3",
+        "version": "2.0.0"
+      },
+      {
+        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]",
+        "name": "2_sub_program_3_2",
+        "version": "2.0.0"
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "comp 1",
+        "dependsOn": [
+          "2_comp 2",
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
+        ]
+      },
+      {
+        "ref": "2_comp 2",
+        "dependsOn": [
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
+        ]
+      },
+      {
+        "ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "complete",
+        "assemblies": [
+          "comp 1",
+          "2_comp 2",
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
+        ]
+      }
+    ],
+    "vulnerabilities": [
+      {
+        "id": "Vulnerability 1",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
         },
+        "references": [
+          {
+            "id": "Vulnerability 1: Alias 1"
+          }
+        ],
+        "affects": [
+          {
+            "ref": "comp 1",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 1",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "2_comp 2",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Vulnerability 2",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+        },
+        "references": [
+          {
+            "id": "Vulnerability 1: Alias 1"
+          }
+        ],
+        "affects": [
+          {
+            "ref": "2_comp 2",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 1",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 1",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Vulnerability 3",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+        },
+        "references": [
+          {
+            "id": "Vulnerability 1: Alias 1"
+          }
+        ],
+        "affects": [
+          {
+            "ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "2_comp 2",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "sbom_replace_references_3_replaced": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-10-17T19:15:49",
+      "authors": [
         {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "name": "automated"
         }
       ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
+      "component": {
+        "type": "application",
+        "bom-ref": "COORDINATES[com.company.governing/governing_program@T5.0.3.9699]",
+        "supplier": {
+          "name": "Company Legal"
+        },
+        "group": "com.company.governing",
+        "name": "governing_program",
+        "version": "T5.0.3.9699",
+        "licenses": [
+          {
+            "license": {
+              "name": "company internal"
+            }
+          }
+        ],
+        "copyright": "Company Legal 2022, all rights reserved"
+      }
     },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
+    "components": [
+      {
+        "bom-ref": "comp 1",
+        "name": "sub_program_1",
+        "version": "T5.0.3.96"
+      },
+      {
+        "bom-ref": "COORDINATES[2_sub_program_2@1.0.0]",
+        "name": "2_sub_program_2",
+        "version": "1.0.0"
+      },
+      {
+        "bom-ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
+        "name": "2_sub_program_3",
+        "version": "2.0.0"
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "comp 1",
+        "dependsOn": [
+          "COORDINATES[2_sub_program_2@1.0.0]",
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
+        ]
+      },
+      {
+        "ref": "COORDINATES[2_sub_program_2@1.0.0]",
+        "dependsOn": [
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
+        ]
+      },
+      {
+        "ref": "COORDINATES[2_sub_program_3@2.0.0]-1",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "comp 1",
+          "COORDINATES[2_sub_program_2@1.0.0]",
+          "COORDINATES[2_sub_program_3@2.0.0]-1"
+        ]
+      }
+    ]
+  },
+  "sbom_replace_references_4_replaced": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-10-17T19:15:49",
+      "authors": [
         {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "name": "automated"
         }
       ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "sub_program_with_vulnerabilities_several_affect_references": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "component": {
+        "type": "application",
+        "bom-ref": "COORDINATES[com.company.governing/governing_program@T5.0.3.9699]",
+        "supplier": {
+          "name": "Company Legal"
         },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_eight_component"
-        },
-        {
-          "ref": "sub_program"
-        }
-      ]
+        "group": "com.company.governing",
+        "name": "governing_program",
+        "version": "T5.0.3.9699",
+        "licenses": [
+          {
+            "license": {
+              "name": "company internal"
+            }
+          }
+        ],
+        "copyright": "Company Legal 2022, all rights reserved"
+      }
     },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
+    "components": [
+      {
+        "bom-ref": "COORDINATES[another/sub_program_1@T5.0.3.96]",
+        "name": "sub_program_1",
+        "version": "T5.0.3.96",
+        "group": "another"
+      },
+      {
+        "bom-ref": "COORDINATES[4_sub_program_2@1.0.0]",
+        "name": "4_sub_program_2",
+        "version": "1.0.0"
+      },
+      {
+        "bom-ref": "COORDINATES[4_sub_program_3@2.0.0]",
+        "name": "4_sub_program_3",
+        "version": "2.0.0"
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "COORDINATES[another/sub_program_1@T5.0.3.96]",
+        "dependsOn": [
+          "COORDINATES[4_sub_program_2@1.0.0]",
+          "COORDINATES[4_sub_program_3@2.0.0]"
+        ]
+      },
+      {
+        "ref": "COORDINATES[4_sub_program_2@1.0.0]",
+        "dependsOn": [
+          "COORDINATES[4_sub_program_3@2.0.0]"
+        ]
+      },
+      {
+        "ref": "COORDINATES[4_sub_program_3@2.0.0]",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "COORDINATES[another/sub_program_1@T5.0.3.96]",
+          "COORDINATES[4_sub_program_2@1.0.0]",
+          "COORDINATES[4_sub_program_3@2.0.0]"
+        ]
+      }
+    ]
+  },
+  "sbom_unify_references_1": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-10-17T19:15:49",
+      "authors": [
         {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "name": "automated"
         }
       ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
+      "component": {
+        "type": "application",
+        "bom-ref": "governing_program",
+        "supplier": {
+          "name": "Company Legal"
+        },
+        "group": "com.company.governing",
+        "name": "governing_program",
+        "version": "T5.0.3.96",
+        "licenses": [
+          {
+            "license": {
+              "name": "company internal"
+            }
+          }
+        ],
+        "copyright": "Company Legal 2022, all rights reserved"
+      }
     },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
+    "components": [
+      {
+        "bom-ref": "comp 1",
+        "name": "sub_program_1",
+        "version": "T5.0.3.96"
+      },
+      {
+        "bom-ref": "comp 2",
+        "name": "sub_program_2",
+        "version": "1.0.0"
+      },
+      {
+        "bom-ref": "comp 3",
+        "name": "sub_program_3",
+        "version": "2.0.0"
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "comp 1",
+        "dependsOn": [
+          "comp 2",
+          "comp 3"
+        ]
+      },
+      {
+        "ref": "comp 2",
+        "dependsOn": [
+          "comp 3"
+        ]
+      },
+      {
+        "ref": "comp 3",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "comp 1",
+          "comp 2",
+          "comp 3"
+        ]
+      }
+    ]
+  },
+  "sbom_unify_references_2": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "version": 1,
+    "metadata": {
+      "timestamp": "2022-10-17T19:15:49",
+      "authors": [
         {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+          "name": "automated"
         }
       ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "sub_program_with_vulnerabilities_updated_toOlder": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "published": "2022-10-12T00:15Z",
-      "Test Name": "This should NOT be in the merged",
-      "updated": "2022-10-12T00:10Z",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      "component": {
+        "type": "application",
+        "bom-ref": "governing_program",
+        "supplier": {
+          "name": "Company Legal"
         },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 2,
-          "severity": "high",
-          "method": "New 1",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "this should be in",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
+        "group": "com.company.governing",
+        "name": "governing_program",
+        "version": "T5.0.3.96",
+        "licenses": [
+          {
+            "license": {
+              "name": "company internal"
+            }
+          }
+        ],
+        "copyright": "Company Legal 2022, all rights reserved"
+      }
     },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+    "components": [
+      {
+        "bom-ref": "comp 1 -",
+        "name": "sub_program_1",
+        "version": "T5.0.3.96"
+      },
+      {
+        "bom-ref": "comp 2 -",
+        "name": "sub_program_2",
+        "version": "1.0.0"
+      },
+      {
+        "bom-ref": "comp 3 -",
+        "name": "sub_program_3",
+        "version": "3.0.0"
+      }
+    ],
+    "dependencies": [
+      {
+        "ref": "comp 1 -",
+        "dependsOn": [
+          "comp 2 -",
+          "comp 3 -"
+        ]
+      },
+      {
+        "ref": "comp 2 -",
+        "dependsOn": [
+          "comp 3 -"
+        ]
+      },
+      {
+        "ref": "comp 3 -",
+        "dependsOn": []
+      }
+    ],
+    "compositions": [
+      {
+        "aggregate": "incomplete",
+        "assemblies": [
+          "comp 1 -",
+          "comp 2 -",
+          "comp 3 -"
+        ]
+      }
+    ],
+    "vulnerabilities": [
+      {
+        "id": "Vulnerability 1",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
         },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        "references": [
+          {
+            "id": "Vulnerability 1: Alias 1"
+          }
+        ],
+        "affects": [
+          {
+            "ref": "comp 1 -",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 1 -",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 2 -",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Vulnerability 2",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
         },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "sub_program_with_vulnerabilities_updated": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "published": "2022-10-12T00:15Z",
-      "updated": "2022-11-12T00:14Z",
-      "Test Name": "This should NoT be in the merged",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        "references": [
+          {
+            "id": "Vulnerability 1: Alias 1"
+          }
+        ],
+        "affects": [
+          {
+            "ref": "comp 2 -",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 1 -",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 1 -",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Vulnerability 3",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
         },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 2,
-          "severity": "high",
-          "method": "New 1",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "this should be in",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "sub_program_with_vulnerabilities": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "merged_with_vulnerabilities_several_affect_references": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        },
-        {
-          "ref": "sp_eight_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "merged_new_ratings": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "New 1",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "this should be in",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "merged_published": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "published": "2022-10-12T00:15Z",
-      "Test Name": "This should be in the merged",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 2,
-          "severity": "high",
-          "method": "New 1",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "this should be in",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "merged_updated": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "published": "2022-10-12T00:14Z",
-      "updated": "2022-11-12T00:15Z",
-      "Test Name": "This should be in the merged",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 6,
-          "severity": "high",
-          "method": "New 1",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "this should be in",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "merged_governing_program_with_vul_tls_unequal": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
-  "sub_program_with_vulnerabilities_equal_mbed_tls": [
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 1",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sub_program"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 2",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_fifteenth_component"
-        }
-      ]
-    },
-    {
-      "description": "The application is vulnerable to remote SQL injection and shell upload",
-      "id": "Vul 3",
-      "ratings": [
-        {
-          "score": 9.8,
-          "severity": "critical",
-          "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
-        },
-        {
-          "score": 7.5,
-          "severity": "high",
-          "method": "CVSSv2",
-          "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "sp_first_component"
-        }
-      ]
-    }
-  ],
+        "references": [
+          {
+            "id": "Vulnerability 1: Alias 1"
+          }
+        ],
+        "affects": [
+          {
+            "ref": "comp 3 -",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 2 -",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "comp 3 -",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
   "dependencies_tls_equal": [
     {
       "ref": "sub_program",
@@ -1362,6 +1534,3625 @@
       ]
     }
   ],
+  "merge_vulnerabilities_tests": {
+    "test_get_new_affects_versions": {
+      "original_versions_list": [
+        {
+          "version": "2.4"
+        },
+        {
+          "version": "2.6"
+        },
+        {
+          "range": "vers:generic/>=2.9|<=4.1"
+        },
+        {
+          "range": "vers:generic/>=9.9|<=10.1"
+        },
+        {
+          "version": "4.0"
+        }
+      ],
+      "new_versions_list": [
+        {
+          "version": "2.4",
+          "status": "removed"
+        },
+        {
+          "version": "2.7",
+          "status": "be kept"
+        },
+        {
+          "range": "vers:generic/>=2.5|<=4.1",
+          "status": "2.6 removed"
+        },
+        {
+          "range": "vers:generic/<=10.1|>=9.9",
+          "status": "removed"
+        }
+      ]
+    },
+    "extract_new_affects": {
+      "original_affects": [
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "5.4",
+              "status": "affected"
+            },
+            {
+              "version": "5.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=9.9|<=10.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "1.4",
+              "status": "affected"
+            },
+            {
+              "version": "1.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "15.4",
+              "status": "affected"
+            },
+            {
+              "version": "15.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=19.9|<=20.1",
+              "status": "affected"
+            }
+          ]
+        }
+      ],
+      "new_affects": [
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "1.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.2",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=1.1|<=1.2",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "10.0",
+              "status": "gone"
+            },
+            {
+              "version": "3.0",
+              "status": "gone"
+            },
+            {
+              "range": "vers:generic/>=9.9|<=10.1",
+              "status": "gone"
+            }
+          ]
+        },
+        {
+          "ref": "product 2",
+          "versions": [
+            {
+              "version": "1.4",
+              "status": "affected"
+            },
+            {
+              "version": "1.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=4.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 3",
+          "versions": [
+            {
+              "version": "1.4",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "product 1",
+          "versions": [
+            {
+              "version": "2.4",
+              "status": "affected"
+            },
+            {
+              "version": "2.6",
+              "status": "affected"
+            },
+            {
+              "range": "vers:generic/>=2.9|<=5.1",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    "collect_affects_of_vulnerabilities": [
+      {
+        "id": "CVE-1021-44228",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-1021-44228"
+        },
+        "ratings": [
+          {
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&version=3.1"
+            },
+            "score": 10.0,
+            "severity": "critical",
+            "method": "CVSSv31",
+            "vector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+          }
+        ],
+        "analysis": {
+          "state": "exploitable",
+          "response": [
+            "will_not_fix",
+            "update"
+          ],
+          "detail": "Versions of Product ABC are affected by the vulnerability. Customers are advised to upgrade to the latest release."
+        },
+        "affects": [
+          {
+            "ref": "product 1",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              },
+              {
+                "version": "2.6",
+                "status": "affected"
+              },
+              {
+                "range": "vers:generic/>=2.9|<=4.1",
+                "status": "affected"
+              }
+            ]
+          },
+          {
+            "ref": "product 2",
+            "versions": [
+              {
+                "version": "3.4",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "xxx",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/xxx"
+        },
+        "ratings": [
+          {
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&version=3.1"
+            },
+            "score": 10.0,
+            "severity": "critical",
+            "method": "CVSSv31",
+            "vector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+          }
+        ],
+        "references": [
+          {
+            "id": "CVE-1021-44228"
+          }
+        ],
+        "analysis": {
+          "state": "exploitable",
+          "response": [
+            "will_not_fix",
+            "update"
+          ],
+          "detail": "Versions of Product ABC are affected by the vulnerability. Customers are advised to upgrade to the latest release."
+        },
+        "affects": [
+          {
+            "ref": "product 2",
+            "versions": [
+              {
+                "version": "2.4",
+                "status": "affected"
+              },
+              {
+                "version": "2.6",
+                "status": "affected"
+              },
+              {
+                "range": "vers:generic/>=2.9|<=4.1",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "CVE-1013-44228",
+        "source": {
+          "name": "NVD",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-1013-44228"
+        },
+        "ratings": [
+          {
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&version=3.1"
+            },
+            "score": 10.0,
+            "severity": "critical",
+            "method": "CVSSv31",
+            "vector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+          }
+        ],
+        "analysis": {
+          "state": "exploitable",
+          "response": [
+            "will_not_fix",
+            "update"
+          ],
+          "detail": "Versions of Product ABC are affected by the vulnerability. Customers are advised to upgrade to the latest release."
+        },
+        "affects": [
+          {
+            "ref": "product 2",
+            "versions": [
+              {
+                "version": "22.4",
+                "status": "affected"
+              },
+              {
+                "version": "22.6",
+                "status": "affected"
+              },
+              {
+                "range": "vers:generic/>=12.9|<=14.1",
+                "status": "affected"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "get_identities_for_vulnerabilities": [
+      {
+        "id": "ref 1",
+        "references": [
+          {
+            "id": "ref 2"
+          }
+        ]
+      },
+      {
+        "id": "ref 2",
+        "references": [
+          {
+            "id": "ref 3"
+          },
+          {
+            "id": "ref 4"
+          }
+        ]
+      },
+      {
+        "id": "ref 5",
+        "references": [
+          {
+            "id": "ref 6"
+          }
+        ]
+      }
+    ],
+    "test_identities_for_vulnerabilities": [
+      {
+        "id": "ref 1",
+        "references": [
+          {
+            "id": "ref 2"
+          }
+        ]
+      },
+      {
+        "id": "ref 2",
+        "references": [
+          {
+            "id": "ref 3"
+          },
+          {
+            "id": "ref 4"
+          }
+        ]
+      },
+      {
+        "id": "ref 5",
+        "references": [
+          {
+            "id": "ref 4"
+          }
+        ]
+      },
+      {
+        "id": "ref 3",
+        "references": [
+          {
+            "id": "ref 6"
+          }
+        ]
+      },
+      {
+        "id": "ref 7",
+        "references": [
+          {
+            "id": "ref 8"
+          }
+        ]
+      },
+      {
+        "id": "ref 7",
+        "references": [
+          {
+            "id": "ref 6"
+          }
+        ]
+      },
+      {
+        "id": "ref 8",
+        "references": [
+          {
+            "id": "ref 9"
+          },
+          {
+            "id": "ref 10"
+          }
+        ]
+      }
+    ],
+    "test_merge_vulnerabilities": {
+      "original_vulnerabilities": [
+        {
+          "id": "Vulnerability 1",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1: Alias 2",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Alias 2"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 3",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 4",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 3",
+              "versions": [
+                {
+                  "version": "10",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 3",
+              "versions": [
+                {
+                  "version": "11",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 2",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 2"
+          },
+          "affects": [
+            {
+              "ref": "product 5",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 6",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 3",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 3"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 3: Alias 3"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 7",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 8",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+          },
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "12.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "13.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "new_vulnerabilities": [
+        {
+          "id": "Vulnerability 1",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1 Alias new Vulnerability",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias new Vulnerability"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "version": "30",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1: Vulnerabilities 2",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Vulnerabilities 2"
+          },
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "12.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "13.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1 Alias 2 new Vulnerability",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias 2 new Vulnerability"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1 Alias new Vulnerability"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "3.0",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1 Alias 3 New Vulnerabilities",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 3",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 4",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 3",
+              "versions": [
+                {
+                  "version": "10",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 3",
+              "versions": [
+                {
+                  "version": "11",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "12.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "13.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product new",
+              "versions": [
+                {
+                  "version": "13.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "range": "vers:generic/>=2.3|<=2.7",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "merged_vulnerabilities": [
+        {
+          "id": "Vulnerability 1",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1: Alias 2",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Alias 2"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 3",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 4",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 3",
+              "versions": [
+                {
+                  "version": "10",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 3",
+              "versions": [
+                {
+                  "version": "11",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 2",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 2"
+          },
+          "affects": [
+            {
+              "ref": "product 5",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 6",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 3",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 3"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 3: Alias 3"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 7",
+              "versions": [
+                {
+                  "version": "2.4",
+                  "status": "affected"
+                },
+                {
+                  "version": "2.6",
+                  "status": "affected"
+                },
+                {
+                  "range": "vers:generic/>=2.9|<=4.1",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 8",
+              "versions": [
+                {
+                  "version": "3.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+          },
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "12.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "13.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1 Alias new Vulnerability",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias new Vulnerability"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "30",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1: Vulnerabilities 2",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Vulnerabilities 2"
+          },
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "version": "12.4",
+                  "status": "affected"
+                }
+              ]
+            },
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "version": "13.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1 Alias 2 new Vulnerability",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias 2 new Vulnerability"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1 Alias new Vulnerability"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 2",
+              "versions": [
+                {
+                  "range": "vers:generic/>=2.9|<=4.1|!=3.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1 Alias 3 New Vulnerabilities",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product new",
+              "versions": [
+                {
+                  "version": "13.4",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Vulnerability 1",
+          "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+          },
+          "references": [
+            {
+              "id": "Vulnerability 1: Alias 1"
+            }
+          ],
+          "affects": [
+            {
+              "ref": "product 1",
+              "versions": [
+                {
+                  "range": "vers:generic/>=2.3|<=2.7|!=2.4|!=2.6",
+                  "status": "affected"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "merge.input_1": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "version": 1,
+        "metadata": {
+          "timestamp": "2022-10-17T19:15:49",
+          "authors": [
+            {
+              "name": "automated"
+            }
+          ],
+          "component": {
+            "type": "application",
+            "bom-ref": "governing_program",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "name": "governing_program",
+            "version": "T5.0.3.96",
+            "licenses": [
+              {
+                "license": {
+                  "name": "company internal"
+                }
+              }
+            ],
+            "copyright": "Company Legal 2022, all rights reserved"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "bom-ref": "sub_program",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "name": "sub_program",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "T5.0.3.96"
+          },
+          {
+            "type": "library",
+            "bom-ref": "gp_first_component-copy",
+            "supplier": {
+              "name": "The first component Contributors"
+            },
+            "name": "gp_first_component",
+            "version": "2.24.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_1",
+            "name": "gov_comp_1",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96",
+            "components": [
+              {
+                "type": "library",
+                "bom-ref": "gov_comp_1_sub_1",
+                "name": "gov_comp_1_sub_1",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96",
+                "components": [
+                  {
+                    "type": "library",
+                    "bom-ref": "gov_comp_1_sub_1_sub_1",
+                    "name": "gov_comp_1_sub_1_sub_1",
+                    "supplier": {
+                      "name": "Company Legal"
+                    },
+                    "group": "com.company.governing",
+                    "copyright": "Company Legal 2022, all rights reserved",
+                    "version": "5.0.3.96"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_2",
+            "name": "gov_comp_2",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96"
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_fifteenth_component",
+            "name": "gov_comp_3",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96"
+          }
+        ],
+        "dependencies": [
+          {
+            "ref": "governing_program",
+            "dependsOn": [
+              "sub_program",
+              "gp_first_component-copy"
+            ]
+          },
+          {
+            "ref": "sub_program",
+            "dependsOn": []
+          },
+          {
+            "ref": "gp_first_component-copy",
+            "dependsOn": []
+          }
+        ],
+        "compositions": [
+          {
+            "aggregate": "incomplete",
+            "assemblies": [
+              "sub_program",
+              "gp_first_component-copy"
+            ]
+          }
+        ],
+        "vulnerabilities": [
+          {
+            "id": "Vulnerability 1",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1: Alias 2",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Alias 2"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 3",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 4",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 3",
+                "versions": [
+                  {
+                    "version": "10",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 3",
+                "versions": [
+                  {
+                    "version": "11",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 2",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 2"
+            },
+            "affects": [
+              {
+                "ref": "product 5",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 6",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 3",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 3"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 3: Alias 3"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 7",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 8",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+            },
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "12.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "13.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "merge.input_2": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "version": 1,
+        "metadata": {
+          "timestamp": "2022-10-17T19:59:12",
+          "authors": [
+            {
+              "name": "automated"
+            }
+          ],
+          "component": {
+            "type": "library",
+            "bom-ref": "sub_program",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "name": "sub_program",
+            "version": "T5.0.3.96",
+            "licenses": [
+              {
+                "license": {
+                  "name": "company internal"
+                }
+              }
+            ],
+            "copyright": "Company Legal 2022, all rights reserved"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "bom-ref": "sp_first_component",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "name": "sp_first_component",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "e84ec5567d56d2dcf963ed2e454c106d9a9f323b"
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_second_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_second_component",
+            "version": "5.16.1.0",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name OS-01264"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_fifteenth_component",
+            "supplier": {
+              "name": "The first component Contributors"
+            },
+            "name": "gp_first_component",
+            "version": "3.1.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_fourth_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_fourth_component",
+            "version": "5.16.1.0",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name OS-01267"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_fifth_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_fifth_component",
+            "version": "3.42.6",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name IP-00443"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_sixth_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_sixth_component",
+            "version": "5.14.0",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name FS-00766"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_seventh_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_seventh_component",
+            "version": "1.02h",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name MODB-00197"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_eight_component",
+            "supplier": {
+              "name": "some electronics"
+            },
+            "name": "sp_eight_component",
+            "version": "1.14.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-3-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              },
+              {
+                "license": {
+                  "id": "IJG"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST SLA0044"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST Proprietary"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_ninth_component",
+            "supplier": {
+              "name": "some electronics"
+            },
+            "name": "sp_ninth_component",
+            "version": "1.8.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-3-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              },
+              {
+                "license": {
+                  "id": "IJG"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST SLA0044"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST Proprietary"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_tenth_component",
+            "supplier": {
+              "name": "some electronics"
+            },
+            "name": "sp_tenth_component",
+            "version": "1.4.0-1",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-3-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              },
+              {
+                "license": {
+                  "id": "IJG"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST SLA0044"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST Proprietary"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_eleventh_component",
+            "supplier": {
+              "name": "some stuff"
+            },
+            "name": "sp_eleventh_component",
+            "version": "6.15.2",
+            "licenses": [
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_twelfth_component",
+            "supplier": {
+              "name": " a supplier"
+            },
+            "name": "sp_twelfth_component",
+            "version": "1.12",
+            "licenses": [
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-3-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "GPL-2.0-or-later"
+                }
+              },
+              {
+                "license": {
+                  "id": "GPL-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-4-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "ISC"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-1-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "Zlib"
+                }
+              },
+              {
+                "license": {
+                  "id": "OFL-1.1"
+                }
+              },
+              {
+                "license": {
+                  "name": "MCD-ST Liberty SW License Agreement V2"
+                }
+              },
+              {
+                "license": {
+                  "name": "PJRC.COM"
+                }
+              },
+              {
+                "license": {
+                  "id": "LGPL-3.0-only"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_thirteenth_component",
+            "supplier": {
+              "name": " another supplier"
+            },
+            "name": "sp_thirteenth_component",
+            "version": "3.8.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_fourteenth_component",
+            "supplier": {
+              "name": "leg"
+            },
+            "name": "GNU Tools for Arm Embedded Processors",
+            "version": "9-2019-q4-major",
+            "copyright": "Arm Limited"
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_sixteenth_component",
+            "supplier": {
+              "name": "Free Software Foundation, Inc."
+            },
+            "name": "sp_sixteenth_component",
+            "version": "9.2.1",
+            "licenses": [
+              {
+                "license": {
+                  "id": "GPL-3.0-only"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_seventeenth_component",
+            "supplier": {
+              "name": "some website"
+            },
+            "name": "sp_seventeenth_component",
+            "version": "3.1.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "GPL-3.0-only"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_1",
+            "name": "gov_comp_1",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96",
+            "components": [
+              {
+                "type": "library",
+                "bom-ref": "gov_comp_1_sub_1",
+                "name": "gov_comp_1_sub_1",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96",
+                "components": [
+                  {
+                    "type": "library",
+                    "bom-ref": "gov_comp_1_sub_1_sub_2",
+                    "name": "gov_comp_1_sub_1_sub_2",
+                    "supplier": {
+                      "name": "Company Legal"
+                    },
+                    "group": "com.company.governing",
+                    "copyright": "Company Legal 2022, all rights reserved",
+                    "version": "5.0.3.96"
+                  }
+                ]
+              },
+              {
+                "type": "library",
+                "bom-ref": "gov_comp_1_sub_2",
+                "name": "gov_comp_1_sub_2",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96"
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "merged_comp_1",
+            "name": "merged_comp_1",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96",
+            "components": [
+              {
+                "type": "library",
+                "bom-ref": "merged_comp_1_sub_1",
+                "name": "merged_comp_1_sub_1",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96"
+              },
+              {
+                "type": "library",
+                "bom-ref": "merged_comp_1_sub_2",
+                "name": "merged_comp_1_sub_2",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96"
+              },
+              {
+                "type": "library",
+                "bom-ref": "merged_comp_1_sub_3",
+                "name": "merged_comp_1_sub_3",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96"
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_2",
+            "name": "gov_comp_2",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96",
+            "components": [
+              {
+                "type": "library",
+                "bom-ref": "gov_comp_2_sub_1",
+                "name": "gov_comp_2_sub_1",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96"
+              },
+              {
+                "type": "library",
+                "bom-ref": "gov_comp_2_sub_2",
+                "name": "gov_comp_2_sub_2",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96",
+                "components": [
+                  {
+                    "type": "library",
+                    "bom-ref": "This should disappear",
+                    "name": "gov_comp_1",
+                    "supplier": {
+                      "name": "Company Legal"
+                    },
+                    "group": "com.company.governing",
+                    "copyright": "Company Legal 2022, all rights reserved",
+                    "version": "5.0.3.96",
+                    "components": [
+                      {
+                        "type": "library",
+                        "bom-ref": "Should not disappear!",
+                        "name": "some deep sub component",
+                        "supplier": {
+                          "name": "Company Legal"
+                        },
+                        "group": "com.company.governing",
+                        "copyright": "Company Legal 2022, all rights reserved",
+                        "version": "5.0.3.96"
+                      },
+                      {
+                        "type": "library",
+                        "bom-ref": "gov_comp_1_sub_1_sub_1",
+                        "name": "gov_comp_1_sub_1_sub_1",
+                        "supplier": {
+                          "name": "Company Legal"
+                        },
+                        "group": "com.company.governing",
+                        "copyright": "Company Legal 2022, all rights reserved",
+                        "version": "5.0.3.96"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "library",
+                "bom-ref": "gov_comp_2_sub_3",
+                "name": "gov_comp_2_sub_3",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96"
+              }
+            ]
+          }
+        ],
+        "dependencies": [
+          {
+            "ref": "sub_program",
+            "dependsOn": [
+              "sp_first_component",
+              "sp_second_component",
+              "sp_fourth_component",
+              "sp_fifth_component",
+              "sp_sixth_component",
+              "sp_seventh_component",
+              "sp_eight_component",
+              "sp_ninth_component",
+              "sp_tenth_component",
+              "sp_eleventh_component",
+              "sp_twelfth_component",
+              "sp_thirteenth_component",
+              "sp_fourteenth_component",
+              "sp_fifteenth_component"
+            ]
+          },
+          {
+            "ref": "sp_first_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_second_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_fourth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_fifth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_sixth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_seventh_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_eight_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_ninth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_tenth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_eleventh_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_twelfth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_thirteenth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_fourteenth_component",
+            "dependsOn": [
+              "sp_sixteenth_component",
+              "sp_seventeenth_component"
+            ]
+          },
+          {
+            "ref": "sp_sixteenth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_seventeenth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_fifteenth_component",
+            "dependsOn": []
+          }
+        ],
+        "compositions": [
+          {
+            "aggregate": "complete",
+            "assemblies": [
+              "sp_first_component",
+              "sp_second_component",
+              "sp_fourth_component"
+            ]
+          },
+          {
+            "aggregate": "incomplete",
+            "assemblies": [
+              "sp_fifth_component",
+              "sp_sixth_component",
+              "sp_seventh_component",
+              "sp_eight_component",
+              "sp_ninth_component",
+              "sp_tenth_component",
+              "sp_eleventh_component",
+              "sp_twelfth_component",
+              "sp_thirteenth_component",
+              "sp_fourteenth_component",
+              "sp_sixteenth_component",
+              "sp_seventeenth_component",
+              "sp_fifteenth_component"
+            ]
+          }
+        ],
+        "vulnerabilities": [
+          {
+            "id": "Vulnerability 1",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1 Alias new Vulnerability",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias new Vulnerability"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "30",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1: Vulnerabilities 2",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Vulnerabilities 2"
+            },
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "12.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "13.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1 Alias 2 new Vulnerability",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias 2 new Vulnerability"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1 Alias new Vulnerability"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "3.0",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1 Alias 3 New Vulnerabilities",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 3",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 4",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 3",
+                "versions": [
+                  {
+                    "version": "10",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 3",
+                "versions": [
+                  {
+                    "version": "11",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "12.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "13.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "sp_fifteenth_component",
+                "versions": [
+                  {
+                    "version": "13.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "range": "vers:generic/>=2.3|<=2.7",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "test_merge_replace_ref_goal": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "version": 1,
+        "metadata": {
+          "timestamp": "2022-10-17T19:15:49",
+          "authors": [
+            {
+              "name": "automated"
+            }
+          ],
+          "component": {
+            "type": "application",
+            "bom-ref": "governing_program",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "name": "governing_program",
+            "version": "T5.0.3.96",
+            "licenses": [
+              {
+                "license": {
+                  "name": "company internal"
+                }
+              }
+            ],
+            "copyright": "Company Legal 2022, all rights reserved"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "bom-ref": "sub_program",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "name": "sub_program",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "T5.0.3.96"
+          },
+          {
+            "type": "library",
+            "bom-ref": "gp_first_component-copy",
+            "supplier": {
+              "name": "The first component Contributors"
+            },
+            "name": "gp_first_component",
+            "version": "2.24.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_1",
+            "name": "gov_comp_1",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96",
+            "components": [
+              {
+                "type": "library",
+                "bom-ref": "gov_comp_1_sub_1",
+                "name": "gov_comp_1_sub_1",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96",
+                "components": [
+                  {
+                    "type": "library",
+                    "bom-ref": "gov_comp_1_sub_1_sub_1",
+                    "name": "gov_comp_1_sub_1_sub_1",
+                    "supplier": {
+                      "name": "Company Legal"
+                    },
+                    "group": "com.company.governing",
+                    "copyright": "Company Legal 2022, all rights reserved",
+                    "version": "5.0.3.96"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_2",
+            "name": "gov_comp_2",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96"
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_fifteenth_component",
+            "name": "gov_comp_3",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96"
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_first_component",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "name": "sp_first_component",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "e84ec5567d56d2dcf963ed2e454c106d9a9f323b"
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_second_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_second_component",
+            "version": "5.16.1.0",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name OS-01264"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "COORDINATES[gp_first_component@3.1.0]",
+            "supplier": {
+              "name": "The first component Contributors"
+            },
+            "name": "gp_first_component",
+            "version": "3.1.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_fourth_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_fourth_component",
+            "version": "5.16.1.0",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name OS-01267"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_fifth_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_fifth_component",
+            "version": "3.42.6",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name IP-00443"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_sixth_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_sixth_component",
+            "version": "5.14.0",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name FS-00766"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_seventh_component",
+            "supplier": {
+              "name": "some name Microcontroller GmbH"
+            },
+            "name": "sp_seventh_component",
+            "version": "1.02h",
+            "licenses": [
+              {
+                "license": {
+                  "name": "some name MODB-00197"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_eight_component",
+            "supplier": {
+              "name": "some electronics"
+            },
+            "name": "sp_eight_component",
+            "version": "1.14.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-3-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              },
+              {
+                "license": {
+                  "id": "IJG"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST SLA0044"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST Proprietary"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_ninth_component",
+            "supplier": {
+              "name": "some electronics"
+            },
+            "name": "sp_ninth_component",
+            "version": "1.8.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-3-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              },
+              {
+                "license": {
+                  "id": "IJG"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST SLA0044"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST Proprietary"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_tenth_component",
+            "supplier": {
+              "name": "some electronics"
+            },
+            "name": "sp_tenth_component",
+            "version": "1.4.0-1",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-3-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              },
+              {
+                "license": {
+                  "id": "IJG"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST SLA0044"
+                }
+              },
+              {
+                "license": {
+                  "name": "ST Proprietary"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_eleventh_component",
+            "supplier": {
+              "name": "some stuff"
+            },
+            "name": "sp_eleventh_component",
+            "version": "6.15.2",
+            "licenses": [
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_twelfth_component",
+            "supplier": {
+              "name": " a supplier"
+            },
+            "name": "sp_twelfth_component",
+            "version": "1.12",
+            "licenses": [
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-3-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "GPL-2.0-or-later"
+                }
+              },
+              {
+                "license": {
+                  "id": "GPL-2.0"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-4-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "ISC"
+                }
+              },
+              {
+                "license": {
+                  "id": "BSD-1-Clause"
+                }
+              },
+              {
+                "license": {
+                  "id": "Zlib"
+                }
+              },
+              {
+                "license": {
+                  "id": "OFL-1.1"
+                }
+              },
+              {
+                "license": {
+                  "name": "MCD-ST Liberty SW License Agreement V2"
+                }
+              },
+              {
+                "license": {
+                  "name": "PJRC.COM"
+                }
+              },
+              {
+                "license": {
+                  "id": "LGPL-3.0-only"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_thirteenth_component",
+            "supplier": {
+              "name": " another supplier"
+            },
+            "name": "sp_thirteenth_component",
+            "version": "3.8.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "MIT"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_fourteenth_component",
+            "supplier": {
+              "name": "leg"
+            },
+            "name": "GNU Tools for Arm Embedded Processors",
+            "version": "9-2019-q4-major",
+            "copyright": "Arm Limited"
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_sixteenth_component",
+            "supplier": {
+              "name": "Free Software Foundation, Inc."
+            },
+            "name": "sp_sixteenth_component",
+            "version": "9.2.1",
+            "licenses": [
+              {
+                "license": {
+                  "id": "GPL-3.0-only"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "sp_seventeenth_component",
+            "supplier": {
+              "name": "some website"
+            },
+            "name": "sp_seventeenth_component",
+            "version": "3.1.0",
+            "licenses": [
+              {
+                "license": {
+                  "id": "GPL-3.0-only"
+                }
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "merged_comp_1",
+            "name": "merged_comp_1",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96",
+            "components": [
+              {
+                "type": "library",
+                "bom-ref": "merged_comp_1_sub_1",
+                "name": "merged_comp_1_sub_1",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96"
+              },
+              {
+                "type": "library",
+                "bom-ref": "merged_comp_1_sub_2",
+                "name": "merged_comp_1_sub_2",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96"
+              },
+              {
+                "type": "library",
+                "bom-ref": "merged_comp_1_sub_3",
+                "name": "merged_comp_1_sub_3",
+                "supplier": {
+                  "name": "Company Legal"
+                },
+                "group": "com.company.governing",
+                "copyright": "Company Legal 2022, all rights reserved",
+                "version": "5.0.3.96"
+              }
+            ]
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_1_sub_1_sub_2",
+            "name": "gov_comp_1_sub_1_sub_2",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96"
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_1_sub_2",
+            "name": "gov_comp_1_sub_2",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96"
+          },
+          {
+            "type": "library",
+            "bom-ref": "Should not disappear!",
+            "name": "some deep sub component",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96"
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_2_sub_1",
+            "name": "gov_comp_2_sub_1",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96"
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_2_sub_2",
+            "name": "gov_comp_2_sub_2",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96",
+            "components": []
+          },
+          {
+            "type": "library",
+            "bom-ref": "gov_comp_2_sub_3",
+            "name": "gov_comp_2_sub_3",
+            "supplier": {
+              "name": "Company Legal"
+            },
+            "group": "com.company.governing",
+            "copyright": "Company Legal 2022, all rights reserved",
+            "version": "5.0.3.96"
+          }
+        ],
+        "dependencies": [
+          {
+            "ref": "sub_program",
+            "dependsOn": [
+              "sp_first_component",
+              "sp_second_component",
+              "sp_fourth_component",
+              "sp_fifth_component",
+              "sp_sixth_component",
+              "sp_seventh_component",
+              "sp_eight_component",
+              "sp_ninth_component",
+              "sp_tenth_component",
+              "sp_eleventh_component",
+              "sp_twelfth_component",
+              "sp_thirteenth_component",
+              "sp_fourteenth_component",
+              "COORDINATES[gp_first_component@3.1.0]"
+            ]
+          },
+          {
+            "ref": "sp_first_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_second_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_fourth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_fifth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_sixth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_seventh_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_eight_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_ninth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_tenth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_eleventh_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_twelfth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_thirteenth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_fourteenth_component",
+            "dependsOn": [
+              "sp_sixteenth_component",
+              "sp_seventeenth_component"
+            ]
+          },
+          {
+            "ref": "sp_sixteenth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "sp_seventeenth_component",
+            "dependsOn": []
+          },
+          {
+            "ref": "COORDINATES[gp_first_component@3.1.0]",
+            "dependsOn": []
+          },
+          {
+            "ref": "governing_program",
+            "dependsOn": [
+              "sub_program",
+              "gp_first_component-copy"
+            ]
+          },
+          {
+            "ref": "gp_first_component-copy",
+            "dependsOn": []
+          }
+        ],
+        "compositions": [
+          {
+            "aggregate": "incomplete",
+            "assemblies": [
+              "sub_program",
+              "gp_first_component-copy",
+              "sp_fifth_component",
+              "sp_sixth_component",
+              "sp_seventh_component",
+              "sp_eight_component",
+              "sp_ninth_component",
+              "sp_tenth_component",
+              "sp_eleventh_component",
+              "sp_twelfth_component",
+              "sp_thirteenth_component",
+              "sp_fourteenth_component",
+              "sp_sixteenth_component",
+              "sp_seventeenth_component",
+              "COORDINATES[gp_first_component@3.1.0]"
+            ]
+          },
+          {
+            "aggregate": "complete",
+            "assemblies": [
+              "sp_first_component",
+              "sp_second_component",
+              "sp_fourth_component"
+            ]
+          }
+        ],
+        "vulnerabilities": [
+          {
+            "id": "Vulnerability 1",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1: Alias 2",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Alias 2"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 3",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 4",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 3",
+                "versions": [
+                  {
+                    "version": "10",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 3",
+                "versions": [
+                  {
+                    "version": "11",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 2",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 2"
+            },
+            "affects": [
+              {
+                "ref": "product 5",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 6",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 3",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 3"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 3: Alias 3"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 7",
+                "versions": [
+                  {
+                    "version": "2.4",
+                    "status": "affected"
+                  },
+                  {
+                    "version": "2.6",
+                    "status": "affected"
+                  },
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 8",
+                "versions": [
+                  {
+                    "version": "3.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+            },
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "12.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "13.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1 Alias new Vulnerability",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias new Vulnerability"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "30",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1: Vulnerabilities 2",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1: Vulnerabilities 2"
+            },
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "version": "12.4",
+                    "status": "affected"
+                  }
+                ]
+              },
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "version": "13.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1 Alias 2 new Vulnerability",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1 Alias 2 new Vulnerability"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1 Alias new Vulnerability"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 2",
+                "versions": [
+                  {
+                    "range": "vers:generic/>=2.9|<=4.1|!=3.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1 Alias 3 New Vulnerabilities",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1 New Vulnerabilities"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "COORDINATES[gp_first_component@3.1.0]",
+                "versions": [
+                  {
+                    "version": "13.4",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "Vulnerability 1",
+            "source": {
+              "name": "NVD",
+              "url": "https://nvd.nist.gov/vuln/detail/Vulnerability 1"
+            },
+            "references": [
+              {
+                "id": "Vulnerability 1: Alias 1"
+              }
+            ],
+            "affects": [
+              {
+                "ref": "product 1",
+                "versions": [
+                  {
+                    "range": "vers:generic/>=2.3|<=2.7|!=2.4|!=2.6",
+                    "status": "affected"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
   "hierarchical_components": {
     "component_1": {
       "name": "component_1",
@@ -1725,144 +5516,6 @@
               "name": "component_4_sub_1_sub_2",
               "version": "1.0.0",
               "bom-ref": "component_4_sub_1_sub_2",
-              "components": [],
-              "type": "library",
-              "supplier": {
-                "name": "Company Legal"
-              },
-              "group": "com.company.governing",
-              "copyright": "Company Legal 2022, all rights reserved"
-            }
-          ],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    }
-  ],
-  "test_filter_component_kept_components_expected": [
-    {
-      "name": "component_2",
-      "version": "1.0.0",
-      "bom-ref": "component_2",
-      "components": [
-        {
-          "name": "component_2_sub_2",
-          "version": "1.0.0",
-          "bom-ref": "component_2_sub_2",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4_sub_1_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_4_sub_1_sub_1",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_4_sub_1",
-      "components": [
-        {
-          "name": "component_4_sub_1_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1_sub_1",
-          "components": [],
-          "type": "library",
-          "supplier": {
-            "name": "Company Legal"
-          },
-          "group": "com.company.governing",
-          "copyright": "Company Legal 2022, all rights reserved"
-        }
-      ],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_2_sub_1_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_2_sub_1_sub_1",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_2_sub_2",
-      "version": "1.0.0",
-      "bom-ref": "component_2_sub_2",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_1_sub_1",
-      "version": "1.0.0",
-      "bom-ref": "component_1_sub_1",
-      "components": [],
-      "type": "library",
-      "supplier": {
-        "name": "Company Legal"
-      },
-      "group": "com.company.governing",
-      "copyright": "Company Legal 2022, all rights reserved"
-    },
-    {
-      "name": "component_4",
-      "version": "1.0.0",
-      "bom-ref": "component_4",
-      "components": [
-        {
-          "name": "component_4_sub_1",
-          "version": "1.0.0",
-          "bom-ref": "component_4_sub_1",
-          "components": [
-            {
-              "name": "component_4_sub_1_sub_1",
-              "version": "1.0.0",
-              "bom-ref": "component_4_sub_1_sub_1",
               "components": [],
               "type": "library",
               "supplier": {

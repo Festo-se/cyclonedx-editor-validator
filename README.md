@@ -25,7 +25,7 @@ The tool is built with automation in mind, i.e. usage within CI/CD. We try to be
 | [merge-vex](https://festo-se.github.io/cyclonedx-editor-validator/usage/merge-vex.html) | *[Deprecated]* Merges the *vex* information in two or more CycloneDX documents into one. |
 | [set](https://festo-se.github.io/cyclonedx-editor-validator/usage/set.html) | Sets properties on specified components to specified values. If a component in an SBOM is missing a particular property or the property is present but has a wrong value, this command can be used to modify just the affected properties without changing the rest of the SBOM. |
 | [validate](https://festo-se.github.io/cyclonedx-editor-validator/usage/validate.html) | Validate the SBOM against a built-in or user-provided JSON schema. |
-| [vex](https://festo-se.github.io/cyclonedx-editor-validator/usage/vex.html) | Apply different sub-commands on VEX- or embedded VEX-files. |
+| [vex](https://festo-se.github.io/cyclonedx-editor-validator/usage/vex.html) | Apply different operations on VEX-files. |
 
 ## Installation and usage
 

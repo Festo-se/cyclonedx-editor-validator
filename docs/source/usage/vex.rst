@@ -54,7 +54,7 @@ trim
     :prog: cdx-ev
     :path: vex trim
 
-    This subcommand returns a json file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by any key-value pair.
+    This subcommand returns a JSON file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by any key-value pair.
     The string must have the format ``<key>:<value>``
 
 Example::

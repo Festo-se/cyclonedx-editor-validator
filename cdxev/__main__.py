@@ -549,9 +549,17 @@ def create_vex_parser(
     )
     add_input_argument(trim_parser)
     trim_parser.add_argument(
-        "keyval_pair",
-        metavar="<keyval_pair>",
-        help="Specifies the key-value pair to be filtered.",
+        "key",
+        metavar="<key>",
+        help=("Specifies the key by which the filtering should be done.",),
+        type=str,
+    )
+    trim_parser.add_argument(
+        "value",
+        metavar="<value>",
+        help=(
+            "Specifies the value of the provided key that should be used for filtering."
+        ),
         type=str,
     )
 
@@ -1205,19 +1213,22 @@ def invoke_validate(args: argparse.Namespace) -> int:
 def invoke_vex(args: argparse.Namespace) -> int:
     file, _ = read_sbom(args.input_file)
     vul_id = ""
-    keyval = ""
+    key = ""
+    value = ""
     schema = ""
     if args.sub_command == "search":
         vul_id = args.vul_id
     if args.sub_command == "trim":
-        keyval = args.keyval_pair
+        key = args.key
+        value = args.value
     if args.sub_command == "list":
         schema = args.schema
     output = vex(
         sub_command=args.sub_command,
         file=file,
         vul_id=vul_id,
-        keyval=keyval,
+        key=key,
+        value=value,
         schema=schema,
     )
 

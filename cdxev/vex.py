@@ -94,7 +94,7 @@ def get_list_of_ids(input_file: dict, scheme: str) -> str:
 def search_key(data: dict[str, Any], key: str, value: str) -> bool:
     """
     Searches a (nested) dicionary for a key-value pair.
-    Returns True if found, False if not found
+    Returns True if found, False if not found.
 
     Parameters
     ----------

@@ -170,18 +170,13 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         )
         expected_output = copy.deepcopy(file)
         expected_output["vulnerabilities"].pop(1)
-        result = vex.get_list_of_trimed_vulnerabilities(file, "state:not_affected")
+        result = vex.get_list_of_trimed_vulnerabilities(file, "state", "not_affected")
         self.assertEqual(result, expected_output)
-
-    def test_get_list_of_trimmed_vulnerabilities_no_keyval_pair(self):
-        file = load_file("vex.json")
-        with self.assertRaises(ValueError):
-            vex.get_list_of_trimed_vulnerabilities(file, "")
 
     def test_get_list_of_trimmed_vulnerabilities_not_found_keyval_pair(self):
         file = load_file("vex.json")
         expected_output = []
-        result = vex.get_list_of_trimed_vulnerabilities(file, "test:test")
+        result = vex.get_list_of_trimed_vulnerabilities(file, "test", "test")
         self.assertEqual(result.get("vulnerabilities"), expected_output)
 
     def test_get_vulnerability_by_id(self):
@@ -209,17 +204,17 @@ class TestVulnerabilityFunctions(unittest.TestCase):
 
     # Test subcommands
     def test_vex_list_command(self):
-        result = vex.vex("list", load_file("vex.json"), "", "default")
+        result = vex.vex("list", load_file("vex.json"), "", "", "default")
         self.assertIn(
             "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description", result
         )
 
     def test_vex_trim_command(self):
-        result = vex.vex("trim", load_file("vex.json"), "state:not_affected", "")
+        result = vex.vex("trim", load_file("vex.json"), "state", "not_affected", "")
         self.assertEqual(len(result["vulnerabilities"]), 1)
 
     def test_vex_search_command(self):
-        result = vex.vex("search", load_file("vex.json"), "", "", "CVE-2020-25649")
+        result = vex.vex("search", load_file("vex.json"), "", "", "", "CVE-2020-25649")
         self.assertEqual(len(result["vulnerabilities"]), 1)
 
     def test_vex_extract_command(self):
@@ -227,9 +222,9 @@ class TestVulnerabilityFunctions(unittest.TestCase):
             path_to_test_folder + "embedded_vex.json", "r", encoding="utf-8-sig"
         ) as my_file:
             embedded_vex = json.load(my_file)
-        result = vex.vex("extract", embedded_vex, "", "", "")
+        result = vex.vex("extract", embedded_vex, "", "", "", "")
         self.assertEqual(result["vulnerabilities"], embedded_vex["vulnerabilities"])
 
     def test_vex_invalid_subcommand(self):
-        result = vex.vex("invalid_command", load_file("vex.json"), "", "")
+        result = vex.vex("invalid_command", load_file("vex.json"), "", "", "")
         self.assertEqual(result, {})

@@ -1328,7 +1328,8 @@ class TestVex:
             "vex",
             "trim",
             str(data["input_vex_embedded_path"]),
-            "state:not_affected",
+            "state",
+            "not_affected",
         )
         exit_code, actual, _ = run_main(capsys)
 

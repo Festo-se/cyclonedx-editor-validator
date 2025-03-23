@@ -139,7 +139,7 @@ def search_key(data: dict[str, Any], key: str, value: str) -> bool:
 
 
 def get_list_of_trimed_vulnerabilities(
-    input_file: dict[str, Any], keyval: str
+    input_file: dict[str, Any], key: str, value: str
 ) -> dict[str, Any]:
     """
     Get a file with vulnerabilities filtered by a key-value pair.
@@ -158,12 +158,6 @@ def get_list_of_trimed_vulnerabilities(
     """
     trimmed_vulnerabilities = []
     output_file = {}
-    pattern = r"^(.*):(.*)$"
-    match = re.match(pattern, keyval)
-    if match:
-        key, value = match.groups()
-    else:
-        raise ValueError("keyval string does not have the format '<key>:<value>'.")
 
     for vulnerability in input_file.get("vulnerabilities", []):
         if search_key(vulnerability, key, value):
@@ -209,7 +203,12 @@ def get_vex_from_sbom(input_file: dict[str, Any]) -> dict[str, Any]:
 
 
 def vex(
-    sub_command: str, file: dict[str, Any], keyval: str, schema: str, vul_id: str = ""
+    sub_command: str,
+    file: dict[str, Any],
+    key: str,
+    value: str,
+    schema: str,
+    vul_id: str = "",
 ) -> Union[dict[str, Any], str]:
     """
     Get different information about vulnerabilities in VEX file.
@@ -242,7 +241,7 @@ def vex(
     if sub_command == "list":
         return get_list_of_ids(file, schema)
     elif sub_command == "trim":
-        return get_list_of_trimed_vulnerabilities(file, keyval)
+        return get_list_of_trimed_vulnerabilities(file, key, value)
     elif sub_command == "search":
         return get_vulnerability_by_id(file, vul_id)
     elif sub_command == "extract":

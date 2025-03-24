@@ -2,7 +2,12 @@
 
 import unittest
 
-from cdxev.auxiliary.identity import ComponentIdentity, Key, KeyType
+from cdxev.auxiliary.identity import (
+    ComponentIdentity,
+    Key,
+    KeyType,
+    VulnerabilityIdentity,
+)
 
 
 class IdentityTestCase(unittest.TestCase):
@@ -206,3 +211,59 @@ class IdentityTestCase(unittest.TestCase):
         self.assertTrue(purl_key in component_id)
         self.assertTrue(coordinates_key in component_id)
         self.assertFalse(swid_key in component_id)
+
+
+class TestVulnerabilityIdentity(unittest.TestCase):
+    def test_vulnerability_identity_class(self) -> None:
+        identity = VulnerabilityIdentity("id", ["ref 1", "ref 2"])
+        self.assertEqual(identity.__str__(), "id_|_ref 1_|_ref 2")
+        self.assertEqual(identity.aliases, ["ref 1", "ref 2"])
+        self.assertTrue(identity.id_is_in("id"))
+        self.assertTrue(identity.one_of_ids_is_in(["ll", "ref 2", ".l"]))
+        self.assertFalse(identity.id_is_in("id 2"))
+        self.assertFalse(identity.one_of_ids_is_in(["ll", "ref 22", ".l"]))
+        self.assertEqual(
+            identity,
+            VulnerabilityIdentity.from_vulnerability(
+                {
+                    "id": "id",
+                    "references": [{"id": "ref 1"}, {"id": "ref 2"}],
+                },
+            ),
+        )
+        self.assertEqual(
+            VulnerabilityIdentity.from_string("id_|_ref 1_|_ref 2_|_ref 3"),
+            VulnerabilityIdentity("id", ["id", "ref 1", "ref 2", "ref 3"]),
+        )
+        self.assertTrue(
+            VulnerabilityIdentity.from_string("id_|_ref 1_|_ref 2_|_ref 3")
+            == VulnerabilityIdentity("id", ["id", "ref 1", "ref 2", "ref 3"])
+        )
+        self.assertTrue(
+            VulnerabilityIdentity.from_string("id_|_ref 1_|_ref 2_|_ref 3")
+            == VulnerabilityIdentity("", ["id", "ref 1", "ref 2", "ref 3"])
+        )
+        self.assertTrue(
+            VulnerabilityIdentity.from_string("id2_|_ref 11_|_ref 22_|_ref 3")
+            == VulnerabilityIdentity("", ["id", "ref 1", "ref 2", "ref 3"])
+        )
+
+    def test_get_ids_from_vulnerability(self) -> None:
+        vulnerability = {
+            "id": "CVE-2021-39182",
+            "references": [
+                {"id": "CVE-2021-39182"},
+                {"id": "GHSA-35m5-8cvj-8783"},
+                {"id": "SNYK-PYTHON-ENROCRYPT-1912876"},
+            ],
+        }
+
+        ids = VulnerabilityIdentity.get_ids_from_vulnerability(vulnerability)
+        self.assertEqual(
+            ids,
+            [
+                "CVE-2021-39182",
+                "GHSA-35m5-8cvj-8783",
+                "SNYK-PYTHON-ENROCRYPT-1912876",
+            ],
+        )

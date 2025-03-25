@@ -551,7 +551,7 @@ def create_vex_parser(
     trim_parser.add_argument(
         "key",
         metavar="<key>",
-        help=("Specifies the key by which the filtering should be done.",),
+        help=("Specifies the key by which the filtering should be done."),
         type=str,
     )
     trim_parser.add_argument(

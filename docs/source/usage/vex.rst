@@ -55,12 +55,11 @@ trim
     :path: vex trim
 
     This subcommand returns a JSON file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by any key-value pair.
-    The string must have the format ``<key>:<value>``
 
 Example::
 
     # Writes all vulnerabilities with state "not_affected" to new file
-    cdxev vex trim input_file.json state:not_affected --output not_affected_vex.json
+    cdxev vex trim input_file.json key=state value=not_affected --output not_affected_vex.json
 
 
 search

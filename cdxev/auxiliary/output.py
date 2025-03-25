@@ -135,10 +135,12 @@ def write_list(
 ) -> None:
 
     def create_list_file_filename(sbom: dict) -> str:
+        file_name = generate_filename(sbom)
+        file_name = file_name.replace(".json", "").replace(".cdx", "")
         if format == "txt":
-            return "list_file_" + generate_filename(sbom) + ".txt"
+            return "list_file_" + file_name + ".txt"
         elif format == "csv":
-            return "list_file_" + generate_filename(sbom) + ".csv"
+            return "list_file_" + file_name + ".csv"
         else:
             raise AppError(
                 "Format not supported.",

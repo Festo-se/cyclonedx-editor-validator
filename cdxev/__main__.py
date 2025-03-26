@@ -549,13 +549,13 @@ def create_vex_parser(
     )
     add_input_argument(trim_parser)
     trim_parser.add_argument(
-        "key",
+        "--key",
         metavar="<key>",
         help=("Specifies the key by which the filtering should be done."),
         type=str,
     )
     trim_parser.add_argument(
-        "value",
+        "--value",
         metavar="<value>",
         help=(
             "Specifies the value of the provided key that should be used for filtering."
@@ -1140,6 +1140,13 @@ def invoke_vex(args: argparse.Namespace) -> int:
     if args.sub_command == "trim":
         key = args.key
         value = args.value
+        if args.key is None:
+            usage_error("--key is required.", args.parser)
+        elif args.value is None:
+            usage_error(
+                "--value is required.",
+                args.parser,
+            )
     if args.sub_command == "list":
         schema = args.schema
     output = vex(

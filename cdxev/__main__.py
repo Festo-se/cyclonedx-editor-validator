@@ -209,7 +209,11 @@ def add_output_argument(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def add_input_argument(parser: argparse.ArgumentParser) -> None:
+def add_input_argument(
+    parser: argparse.ArgumentParser,
+    nargs: str = "",
+    help: str = "Path to the SBOM file.",
+) -> None:
     """Helper function to create uniform input options for all commands."""
     parser.add_argument(
         "input_file",
@@ -393,14 +397,8 @@ def create_amend_parser(
         description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Path to the SBOM file.",
-        type=Path,
-        default=None,
-        nargs="?",
-    )
+    add_input_argument(parser, nargs="?")
+
     parser.add_argument(
         "--operation",
         help=(
@@ -443,12 +441,10 @@ def create_merge_parser(
     subparsers: argparse._SubParsersAction,
 ) -> argparse.ArgumentParser:
     parser = subparsers.add_parser("merge", help="Merges two or more SBOMs into one.")
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Paths to SBOM files to merge. You must specify at least two paths.",
+    add_input_argument(
+        parser,
         nargs="*",
-        type=Path,
+        help="Paths to SBOM files to merge. You must specify at least two paths.",
     )
     parser.add_argument(
         "--from-folder",
@@ -658,12 +654,7 @@ def create_validation_parser(
     parser = subparsers.add_parser(
         "validate", help="Validates an SBOM against a given specification."
     )
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Path to the SBOM file to validate.",
-        type=Path,
-    )
+    add_input_argument(parser)
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -738,12 +729,7 @@ def create_set_parser(
             "(--from-file <file> | <target> --key <key> --value <value>) <input>"
         ),
     )
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Path to the input SBOM file.",
-        type=Path,
-    )
+    add_input_argument(parser)
     add_output_argument(parser)
 
     parser.add_argument(

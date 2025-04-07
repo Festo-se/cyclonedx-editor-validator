@@ -304,7 +304,7 @@ def _map_out_components(sbom: dict) -> dict[Key, list[dict]]:
 
 
 def _get_protected(update_set: dict) -> t.Union[t.Literal[False], set]:
-    global _PROTECTED
+    global _PROTECTED  # noqa: F824
     intersection = _PROTECTED & update_set.keys()
     if intersection:
         return intersection

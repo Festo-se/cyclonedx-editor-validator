@@ -45,7 +45,38 @@ def remove_internal_information_from_properties(component: dict[str, Any]) -> No
         component.pop("properties", None)
 
 
-def clear_component(component: dict[str, Any]) -> None:
+def validate_external_references(regex: t.Union[str, None], component: dict) -> None:
+    """
+    Checks the external references of a component and
+    removes any that match the regex pattern.
+    The function operates directly on the given component.
+
+    Parameters
+    ----------
+    regex: str
+        The regex pattern
+    component: dict
+        A component dictionary
+
+    Returns
+    -------
+    None
+    """
+    references = component.get("externalReferences", [])
+    if regex is not None:
+        new_references = [ref for ref in references if not re.match(regex, ref["url"])]
+        if new_references != []:
+            component["externalReferences"] = new_references
+        else:
+            component.pop("externalReferences", None)
+    else:
+        if not references:
+            component.pop("externalReferences", None)
+
+
+def clear_component(
+    component: dict[str, Any], ext_ref_regex: t.Union[str, None] = None
+) -> None:
     """
     Removes all internal information of the component
     and applies the same process to all sub-components
@@ -62,11 +93,13 @@ def clear_component(component: dict[str, Any]) -> None:
     None
     """
     remove_internal_information_from_properties(component)
+    validate_external_references(ext_ref_regex, component)
     # The 'extract_components' function processes any nested components recursively,
     # ensuring that all levels of sub-components are handled.
     sub_components = extract_components(component.get("components", []))
     for sub_component in sub_components:
         remove_internal_information_from_properties(sub_component)
+        validate_external_references(ext_ref_regex, sub_component)
 
 
 def remove_component_tagged_internal(
@@ -165,7 +198,11 @@ def merge_dependency_for_removed_component(
     return new_dependencies
 
 
-def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) -> dict:
+def build_public_bom(
+    sbom: dict[str, Any],
+    path_to_schema: t.Union[Path, None],
+    ext_ref_regex: t.Union[str, None] = None,
+) -> dict:
     """
     Removes the components with the property internal
     from an SBOM and resolves the dependencies
@@ -215,12 +252,12 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
             # loop trough list of removed (internal) components
             # and remove internal properties from all (sub-)components
             for noninternal_component in noninternal_components:
-                clear_component(noninternal_component)
+                clear_component(noninternal_component, ext_ref_regex)
                 cleared_components.append(noninternal_component)
     else:
         # remove internal properties from all (sub-)components
         for component in components:
-            clear_component(component)
+            clear_component(component, ext_ref_regex)
             cleared_components.append(component)
     # replace components with cleared components, if it is not an empy list
     if cleared_components:
@@ -229,8 +266,12 @@ def build_public_bom(sbom: dict[str, Any], path_to_schema: t.Union[Path, None]) 
         sbom.pop("components", None)
     for bom_ref in list_of_removed_component_bom_refs:
         dependencies = merge_dependency_for_removed_component(bom_ref, dependencies)
+    # check metadata.component
     remove_internal_information_from_properties(
         sbom.get("metadata", {}).get("component", {})
+    )
+    validate_external_references(
+        ext_ref_regex, sbom.get("metadata", {}).get("component", {})
     )
     # replace dependencies with new dependencies, if it is not an empy list
     if dependencies:

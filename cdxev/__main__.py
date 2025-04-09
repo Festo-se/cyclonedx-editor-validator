@@ -23,7 +23,7 @@ import cdxev.set
 from cdxev import pkg
 from cdxev.amend.operations import Operation
 from cdxev.auxiliary.identity import Key, KeyType
-from cdxev.auxiliary.IO_processing import (
+from cdxev.auxiliary.io_processing import (
     add_input_argument,
     add_output_argument,
     write_list,

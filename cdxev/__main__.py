@@ -23,7 +23,12 @@ import cdxev.set
 from cdxev import pkg
 from cdxev.amend.operations import Operation
 from cdxev.auxiliary.identity import Key, KeyType
-from cdxev.auxiliary.output import write_list, write_sbom
+from cdxev.auxiliary.IO_processing import (
+    add_input_argument,
+    add_output_argument,
+    write_list,
+    write_sbom,
+)
 from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
 from cdxev.initialize_sbom import initialize_sbom
@@ -191,36 +196,6 @@ def create_parser() -> argparse.ArgumentParser:
     create_list_command_parser(subparsers)
 
     return parser
-
-
-def add_output_argument(parser: argparse.ArgumentParser) -> None:
-    """Helper function to create uniform output options for all commands."""
-    parser.add_argument(
-        "--output",
-        "-o",
-        metavar="<file>",
-        help=(
-            "The path to where the output should be written. If this is a file, output is "
-            "written there. If it's a directory, output is written to a file with an "
-            "auto-generated name inside that directory. If it's not specified, output is written "
-            "to stdout."
-        ),
-        type=Path,
-    )
-
-
-def add_input_argument(
-    parser: argparse.ArgumentParser,
-    nargs: str = "",
-    help: str = "Path to the SBOM file.",
-) -> None:
-    """Helper function to create uniform input options for all commands."""
-    parser.add_argument(
-        "input_file",
-        metavar="<input_file>",
-        help=("The path to the input (SBOM or VEX) file."),
-        type=Path,
-    )
 
 
 @dataclass

@@ -23,7 +23,12 @@ import cdxev.set
 from cdxev import pkg
 from cdxev.amend.operations import Operation
 from cdxev.auxiliary.identity import Key, KeyType
-from cdxev.auxiliary.output import write_list, write_sbom
+from cdxev.auxiliary.io_processing import (
+    add_input_argument,
+    add_output_argument,
+    write_list,
+    write_sbom,
+)
 from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
 from cdxev.initialize_sbom import initialize_sbom
@@ -32,6 +37,7 @@ from cdxev.log import configure_logging
 from cdxev.merge import merge
 from cdxev.merge_vex import merge_vex
 from cdxev.validator import validate_sbom
+from cdxev.vex import vex
 
 logger: logging.Logger
 
@@ -182,6 +188,7 @@ def create_parser() -> argparse.ArgumentParser:
     create_amend_parser(subparsers)
     create_merge_parser(subparsers)
     create_merge_vex_parser(subparsers)
+    create_vex_parser(subparsers)
     create_validation_parser(subparsers)
     create_set_parser(subparsers)
     create_build_public_bom_parser(subparsers)
@@ -189,22 +196,6 @@ def create_parser() -> argparse.ArgumentParser:
     create_list_command_parser(subparsers)
 
     return parser
-
-
-def add_output_argument(parser: argparse.ArgumentParser) -> None:
-    """Helper function to create uniform output options for all commands."""
-    parser.add_argument(
-        "--output",
-        "-o",
-        metavar="<file>",
-        help=(
-            "The path to where the output should be written. If this is a file, output is "
-            "written there. If it's a directory, output is written to a file with an "
-            "auto-generated name inside that directory. If it's not specified, output is written "
-            "to stdout."
-        ),
-        type=Path,
-    )
 
 
 @dataclass
@@ -381,14 +372,8 @@ def create_amend_parser(
         description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Path to the SBOM file.",
-        type=Path,
-        default=None,
-        nargs="?",
-    )
+    add_input_argument(parser, nargs="?")
+
     parser.add_argument(
         "--operation",
         help=(
@@ -431,12 +416,10 @@ def create_merge_parser(
     subparsers: argparse._SubParsersAction,
 ) -> argparse.ArgumentParser:
     parser = subparsers.add_parser("merge", help="Merges two or more SBOMs into one.")
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Paths to SBOM files to merge. You must specify at least two paths.",
+    add_input_argument(
+        parser,
         nargs="*",
-        type=Path,
+        help="Paths to SBOM files to merge. You must specify at least two paths.",
     )
     parser.add_argument(
         "--from-folder",
@@ -492,18 +475,87 @@ def create_merge_vex_parser(
 
 
 # noinspection PyUnresolvedReferences,PyProtectedMember
+def create_vex_parser(
+    subparser: argparse._SubParsersAction,
+) -> argparse.ArgumentParser:
+    parser = subparser.add_parser(
+        "vex",
+        help="Executes commands on VEX or embedded VEX files.",
+    )
+
+    subparsers = parser.add_subparsers(dest="sub_command", required=True)
+
+    list_parser = subparsers.add_parser(
+        "list", help="Returns a list of all vulnerability IDs."
+    )
+    add_input_argument(list_parser)
+    list_parser.add_argument(
+        "--schema",
+        help="Set schema of return list.",
+        choices=["default", "lightweight"],
+        default="default",
+        type=str,
+    )
+
+    list_parser.add_argument(
+        "--format",
+        help="Set format of return file.",
+        choices=["txt", "csv"],
+        default="csv",
+        type=str,
+    )
+
+    search_parser = subparsers.add_parser("search", help="Get vulnerabilities by ID.")
+    add_input_argument(search_parser)
+    search_parser.add_argument(
+        "vul_id",
+        metavar="<vul_id>",
+        help="The ID of the vulnerability to search for.",
+        type=str,
+    )
+
+    trim_parser = subparsers.add_parser(
+        "trim",
+        help="Trims a VEX to show only the vulnerabilities matching the given key-value pair.",
+    )
+    add_input_argument(trim_parser)
+    trim_parser.add_argument(
+        "--key",
+        metavar="<key>",
+        help=("Specifies the key by which the filtering should be done."),
+        type=str,
+    )
+    trim_parser.add_argument(
+        "--value",
+        metavar="<value>",
+        help=(
+            "Specifies the value of the provided key that should be used for filtering."
+        ),
+        type=str,
+    )
+
+    extract_parser = subparsers.add_parser(
+        "extract", help="Extract a VEX file out of SBOM file."
+    )
+    add_input_argument(extract_parser)
+
+    add_output_argument(list_parser)
+    add_output_argument(trim_parser)
+    add_output_argument(search_parser)
+    add_output_argument(extract_parser)
+
+    parser.set_defaults(cmd_handler=invoke_vex, parser=parser)
+    return parser
+
+
+# noinspection PyUnresolvedReferences,PyProtectedMember
 def create_validation_parser(
     subparsers: argparse._SubParsersAction,
 ) -> argparse.ArgumentParser:
     parser = subparsers.add_parser(
         "validate", help="Validates an SBOM against a given specification."
     )
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Path to the SBOM file to validate.",
-        type=Path,
-    )
+    add_input_argument(parser)
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -578,12 +630,7 @@ def create_set_parser(
             "(--from-file <file> | <target> --key <key> --value <value>) <input>"
         ),
     )
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Path to the input SBOM file.",
-        type=Path,
-    )
+    add_input_argument(parser)
     add_output_argument(parser)
 
     parser.add_argument(
@@ -1041,6 +1088,44 @@ def invoke_validate(args: argparse.Namespace) -> int:
         == Status.OK
         else Status.VALIDATION_ERROR
     )
+
+
+def invoke_vex(args: argparse.Namespace) -> int:
+    file, _ = read_sbom(args.input)
+    vul_id = ""
+    key = ""
+    value = ""
+    schema = ""
+    if args.sub_command == "search":
+        vul_id = args.vul_id
+    if args.sub_command == "trim":
+        key = args.key
+        value = args.value
+        if args.key is None:
+            usage_error("--key is required.", args.parser)
+        elif args.value is None:
+            usage_error(
+                "--value is required.",
+                args.parser,
+            )
+    if args.sub_command == "list":
+        schema = args.schema
+    output = vex(
+        sub_command=args.sub_command,
+        file=file,
+        vul_id=vul_id,
+        key=key,
+        value=value,
+        schema=schema,
+    )
+
+    if args.sub_command == "list":
+        write_list(str(output), args.output, file, format=args.format)
+    else:
+        if isinstance(output, dict):
+            write_sbom(output, args.output, update_metadata=False)
+
+    return Status.OK
 
 
 def invoke_build_public_bom(args: argparse.Namespace) -> int:

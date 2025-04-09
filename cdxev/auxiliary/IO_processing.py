@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import argparse
 import json
 import logging
 import sys
@@ -135,10 +136,12 @@ def write_list(
 ) -> None:
 
     def create_list_file_filename(sbom: dict) -> str:
+        file_name = generate_filename(sbom)
+        file_name = file_name.replace(".json", "").replace(".cdx", "")
         if format == "txt":
-            return "list_file_" + generate_filename(sbom) + ".txt"
+            return "list_file_" + file_name + ".txt"
         elif format == "csv":
-            return "list_file_" + generate_filename(sbom) + ".csv"
+            return "list_file_" + file_name + ".csv"
         else:
             raise AppError(
                 "Format not supported.",
@@ -155,3 +158,33 @@ def write_list(
         )
         file = destination.open("w")
     file.write(list_file)
+
+
+def add_output_argument(parser: argparse.ArgumentParser) -> None:
+    """Helper function to create uniform output options for all commands."""
+    parser.add_argument(
+        "--output",
+        "-o",
+        metavar="<file>",
+        help=(
+            "The path to where the output should be written. If this is a file, output is "
+            "written there. If it's a directory, output is written to a file with an "
+            "auto-generated name inside that directory. If it's not specified, output is written "
+            "to stdout."
+        ),
+        type=Path,
+    )
+
+
+def add_input_argument(
+    parser: argparse.ArgumentParser,
+    nargs: str = "",
+    help: str = "Path to the SBOM file.",
+) -> None:
+    """Helper function to create uniform input options for all commands."""
+    if nargs:
+        parser.add_argument(
+            "input", metavar="<input>", help=help, type=Path, nargs=nargs
+        )
+    else:
+        parser.add_argument("input", metavar="<input>", help=help, type=Path)

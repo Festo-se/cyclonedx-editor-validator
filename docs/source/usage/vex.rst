@@ -8,12 +8,12 @@ vex
     :prog: cdx-ev
     :path: vex
 
-    This command provides different operations on VEX-/SBOM- Files with embedded vulnerabilities. The vex-command has the following subcommands:
+    This command provides different operations on VEX/SBOM Files with embedded vulnerabilities. The vex-command has the following subcommands:
 
     * ``list``: returns a list of all vulnerability-IDs.
     * ``trim``: returns a file with filtered vulnerabilities.
     * ``search``: returns a file with a specific vulnerability.
-    * ``extract``: extract all vulnerabilities from an SBOM-file to a VEX-file.
+    * ``extract``: extract all vulnerabilities from an SBOMfile to a VEXfile.
 
 list
 -------------
@@ -26,12 +26,14 @@ list
     This subcommand returns a list of all vulnerability-IDs inside the input file. There are two different options:
 
     * ``--state default`` (default) returns: ::
+
         CVE-ID,Description,Status
         CVE-1012-0001,some description of a vulnerability,exploitable
         CVE-1013-0002,some description of a vulnerability 2,not_affected
         CVE-1013-0003,some description of a vulnerability 3,exploitable
 
     * ``--state lightweight`` returns: ::
+
         CVE-ID
         CVE-1012-0001
         CVE-1013-0002
@@ -86,7 +88,7 @@ extract
     :prog: cdx-ev
     :path: vex extract
 
-    This subcommand extracts all vulnerabilities from a SBOM-file and returns it as a VEX-file in .json format
+    This subcommand extracts all vulnerabilities from a SBOMfile and returns it as a VEXfile in .json format
 
 Example::
 

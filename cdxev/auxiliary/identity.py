@@ -128,9 +128,26 @@ class ComponentIdentity:
         return self._keys.__iter__()
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, ComponentIdentity) and any(
-            k in self._keys for k in other._keys
-        )
+        def get_keys_of_type(keys: t.Tuple[Key], key_type: KeyType) -> t.Set[Key]:
+            return {k for k in keys if k.type == key_type}
+
+        if not isinstance(other, ComponentIdentity):
+            return False
+
+        # Ensure PURLs are not different
+        self_purls = get_keys_of_type(self._keys, KeyType.PURL)
+        other_purls = get_keys_of_type(other._keys, KeyType.PURL)
+        if self_purls and other_purls and self_purls != other_purls:
+            return False
+
+        # Ensure CPEs are not different
+        self_cpes = get_keys_of_type(self._keys, KeyType.CPE)
+        other_cpes = get_keys_of_type(other._keys, KeyType.CPE)
+        if self_cpes and other_cpes and self_cpes != other_cpes:
+            return False
+
+        # Compare any for matching keys
+        return any(k in self._keys for k in other._keys)
 
     def __str__(self) -> str:
         return str(self._keys[0]) if len(self) > 0 else ""

@@ -248,9 +248,6 @@ def walk_components(
 
 
 def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
-
-    # TODO reintroduce the components mapped to refs to add refs of already existing components
-    # Probably just do the unifying also in here.... its half of the job
     assigned_bom_refs: dict[ComponentIdentity, str] = {}
 
     if list_of_sboms:
@@ -260,21 +257,22 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
         )
 
         for k in range(1, len(list_of_sboms)):
-            secondary_sbom = list_of_sboms[k]
+            subsequent_sbom = list_of_sboms[k]
             new_components = get_ref_components_mapping(
-                secondary_sbom.get("components", [])
-                + [secondary_sbom.get("metadata", {}).get("component", {})]
+                subsequent_sbom.get("components", [])
+                + [subsequent_sbom.get("metadata", {}).get("component", {})]
             )
 
             for reference in new_components.keys():
-                # reference exists in primary sbom
-                # component is not identical to the one in primary sbom
-                # the component did not receive a new bom-ref already
-
                 if (
-                    reference in retained_components.keys()
-                    and retained_components[reference] != new_components[reference]
+                    reference
+                    in retained_components.keys()  # reference exists in primary SBOM
+                    and retained_components[reference]
+                    != new_components[
+                        reference
+                    ]  # component is not identical to the one in primary SBOM
                     and new_components[reference] not in assigned_bom_refs.keys()
+                    # the component did not receive a new bom-ref already
                 ):
                     new_bom_ref = str(new_components[reference])
                     index = 1
@@ -285,7 +283,7 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
                         new_bom_ref = str(new_components[reference]) + "-" + str(index)
                         index += 1
 
-                    replace_bom_ref_in_sbom(secondary_sbom, reference, new_bom_ref)
+                    replace_bom_ref_in_sbom(subsequent_sbom, reference, new_bom_ref)
                     retained_components[new_bom_ref] = new_components[reference]
 
                     assigned_bom_refs[new_components[reference]] = new_bom_ref
@@ -293,7 +291,7 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
                 elif new_components[reference] in assigned_bom_refs.keys():
 
                     replace_bom_ref_in_sbom(
-                        secondary_sbom,
+                        subsequent_sbom,
                         reference,
                         assigned_bom_refs[new_components[reference]],
                     )
@@ -304,6 +302,13 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
 
 
 def unify_bom_refs(list_of_sboms: Sequence[dict]) -> None:
+    """
+    Function to unify the bom-refs of several SBOMs,
+    so that identical components in the different SBOMs.
+    have the same reference.
+
+    :param list_of_sboms: list of SBOM dictionaries.
+    """
     for n in range(len(list_of_sboms)):
         primary_sbom = list_of_sboms[n]
         primary_components = extract_components(

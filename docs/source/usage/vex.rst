@@ -88,7 +88,7 @@ extract
     :prog: cdx-ev
     :path: vex extract
 
-    This subcommand extracts all vulnerabilities from a SBOMfile and returns it as a VEXfile in JSON format.
+    This subcommand extracts all vulnerabilities from an SBOMfile and returns it as a VEXfile in JSON format.
 
 Example::
 

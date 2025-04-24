@@ -40,7 +40,7 @@ list
         CVE-1013-0003
 
 
-    The output can be a .txt file or a .csv (default) file.
+    The output can be a text file or a CSV (default) file.
 
 Example::
 
@@ -72,7 +72,7 @@ search
     :prog: cdx-ev
     :path: vex search
 
-    This subcommand searches a file for a specific vulnerability based on its ID. The command returns a .json file.
+    This subcommand searches a file for a specific vulnerability based on its ID. The command returns a JSON file.
 
 Example::
 
@@ -88,7 +88,7 @@ extract
     :prog: cdx-ev
     :path: vex extract
 
-    This subcommand extracts all vulnerabilities from a SBOMfile and returns it as a VEXfile in .json format
+    This subcommand extracts all vulnerabilities from a SBOMfile and returns it as a VEXfile in JSON format.
 
 Example::
 

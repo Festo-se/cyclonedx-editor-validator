@@ -1212,15 +1212,14 @@ def invoke_validate(args: argparse.Namespace) -> int:
 
 def invoke_vex(args: argparse.Namespace) -> int:
     file, _ = read_sbom(args.input_file)
-    vul_id = ""
-    key = ""
-    value = ""
-    schema = ""
+
+    if args.sub_command == "extract":
+        output = vex(sub_command=args.sub_command, file=file)
+
     if args.sub_command == "search":
-        vul_id = args.vul_id
+        output = vex(sub_command=args.sub_command, file=file, vul_id=args.vul_id)
+
     if args.sub_command == "trim":
-        key = args.key
-        value = args.value
         if args.key is None:
             usage_error("--key is required.", args.parser)
         elif args.value is None:
@@ -1228,16 +1227,12 @@ def invoke_vex(args: argparse.Namespace) -> int:
                 "--value is required.",
                 args.parser,
             )
+        output = vex(
+            sub_command=args.sub_command, file=file, key=args.key, value=args.value
+        )
+
     if args.sub_command == "list":
-        schema = args.schema
-    output = vex(
-        sub_command=args.sub_command,
-        file=file,
-        vul_id=vul_id,
-        key=key,
-        value=value,
-        schema=schema,
-    )
+        output = vex(sub_command=args.sub_command, file=file, schema=args.schema)
 
     if args.sub_command == "list":
         write_list(str(output), args.output, file, format=args.format)

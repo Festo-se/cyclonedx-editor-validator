@@ -9,9 +9,17 @@ from enum import Enum
 
 @functools.total_ordering
 class KeyType(Enum):
-    CPE = 1
-    PURL = 2
-    SWID = 3
+    """
+    Known types of component keys.
+
+    There are two kinds of keys: safe and unsafe ones. "Safe" in this case means that a key should
+    always uniquely identify a component. Unsafe keys might occur on different components which
+    simply share the same name or version number.
+    """
+
+    PURL = 1
+    SWID = 2
+    CPE = 3
     COORDINATES = 4
 
     def __lt__(self, other: "KeyType") -> bool:
@@ -128,26 +136,18 @@ class ComponentIdentity:
         return self._keys.__iter__()
 
     def __eq__(self, other: object) -> bool:
-        def get_keys_of_type(keys: t.Tuple[Key], key_type: KeyType) -> t.Set[Key]:
-            return {k for k in keys if k.type == key_type}
-
         if not isinstance(other, ComponentIdentity):
             return False
 
-        # Ensure PURLs are not different
-        self_purls = get_keys_of_type(self._keys, KeyType.PURL)
-        other_purls = get_keys_of_type(other._keys, KeyType.PURL)
-        if self_purls and other_purls and self_purls != other_purls:
-            return False
+        for key_type in KeyType:
+            try:
+                own_key = next(k for k in self._keys if k.type == key_type)
+                other_key = next(k for k in other._keys if k.type == key_type)
+                return own_key == other_key
+            except StopIteration:
+                continue
 
-        # Ensure CPEs are not different
-        self_cpes = get_keys_of_type(self._keys, KeyType.CPE)
-        other_cpes = get_keys_of_type(other._keys, KeyType.CPE)
-        if self_cpes and other_cpes and self_cpes != other_cpes:
-            return False
-
-        # Compare any for matching keys
-        return any(k in self._keys for k in other._keys)
+        return False
 
     def __str__(self) -> str:
         return str(self._keys[0]) if len(self) > 0 else ""

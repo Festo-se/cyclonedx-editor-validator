@@ -205,9 +205,9 @@ def get_vex_from_sbom(input_file: dict[str, Any]) -> dict[str, Any]:
 def vex(
     sub_command: str,
     file: dict[str, Any],
-    key: str,
-    value: str,
-    schema: str,
+    key: str = "",
+    value: str = "",
+    schema: str = "",
     vul_id: str = "",
 ) -> Union[dict[str, Any], str]:
     """
@@ -226,7 +226,7 @@ def vex(
         A string containing the filtered key-value pair for the trim subcommand
     schema: string
         A string containing the output schema for the list subcommand
-    vul_ID: string
+    vul_id: string
         A string containing the searched vulnerability-ID for the search subcommand
 
     Returns

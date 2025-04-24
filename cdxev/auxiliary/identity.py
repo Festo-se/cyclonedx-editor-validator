@@ -83,17 +83,24 @@ class SWID(dict):
     """
     SWIDs are a complex construct which can contain a lot of information.
 
-    Fortunately, a single property of an SWID is both mandatory and unique: the tagId.
+    This class employs a naive approach to SWID equality. Two SWIDs are considered
+    to refer to the same component iff the required fields tagId and name are identical
+    and the version field is the same or not present on both objects.
     """
 
     def __str__(self) -> str:
         return "tagId: " + str(self["tagId"])
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, SWID) and self["tagId"] == other["tagId"]
+        return (
+            isinstance(other, SWID)
+            and (self["tagId"] == other["tagId"])
+            and (self["name"] == other["name"])
+            and (self.get("version", True) == other.get("version", True))
+        )
 
     def __hash__(self) -> int:  # type: ignore[override]
-        return self["tagId"].__hash__()  # type: ignore
+        return (self["tagId"], self["name"], self.get("version", True)).__hash__()
 
 
 @dataclass(init=True, frozen=True, eq=True)

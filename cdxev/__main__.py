@@ -1172,7 +1172,7 @@ def invoke_validate(args: argparse.Namespace) -> int:
 
 
 def invoke_vex(args: argparse.Namespace) -> int:
-    file, _ = read_sbom(args.input_file)
+    file, _ = read_sbom(args.input)
 
     if args.sub_command == "extract":
         output = vex(sub_command=args.sub_command, file=file)

@@ -214,7 +214,7 @@ def add_input_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "input_file",
         metavar="<input_file>",
-        help=("The path to the input file (SBOM or VEX file)."),
+        help=("The path to the input (SBOM or VEX) file."),
         type=Path,
     )
 

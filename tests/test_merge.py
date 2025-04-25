@@ -699,6 +699,37 @@ class TestReplaceBomRefs(unittest.TestCase):
             merge.replace_ref_in_sbom("gp_first_component-copy", "sub_program", sbom)
         )
 
+    def test_identical_metadata_bomrefs(self) -> None:
+        metacomp1 = {
+            "bom-ref": "app",
+            "type": "application",
+            "name": "foo",
+        }
+        metacomp2 = {
+            "bom-ref": "app",
+            "type": "application",
+            "name": "bar",
+        }
+        sbom_template = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "components": [],
+            "dependencies": [],
+        }
+
+        sbom1 = sbom_template.copy()
+        sbom1["metadata"] = {"component": metacomp1}
+        sbom2 = sbom_template.copy()
+        sbom2["metadata"] = {"component": metacomp2}
+
+        result = merge.merge([sbom1, sbom2])
+
+        self.assertNotEqual(
+            result["metadata"]["component"]["bom-ref"],
+            result["components"][0]["bom-ref"],
+        )
+
 
 class TestMergeComponents(unittest.TestCase):
     def test_merge_components(self) -> None:

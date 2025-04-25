@@ -3,6 +3,7 @@
 import copy
 import json
 import unittest
+from itertools import chain, combinations
 
 from cdxev import merge
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
@@ -640,6 +641,100 @@ class TestMergeVulnerabilities(unittest.TestCase):
         )
 
         self.assertEqual(actual_merged["vulnerabilities"], merged_vulnerabilities)
+
+
+class TestMergeSimilarComponents(unittest.TestCase):
+    def setUp(self):
+        self.component = {
+            "type": "library",
+            "name": "Library A",
+            "version": "1.0.0",
+            "purl": "pkg:npm/libA@1.0.0",
+            "cpe": "cpe:2.3:a:example:libraryA:1.0.0:*:*:*:*:*:*:*",
+            "swid": {
+                "tagId": "library_A_1.0.0",
+                "name": "Library A",
+                "version": "1.0.0",
+            },
+        }
+        self.sbom1 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "metadata": {
+                "component": {
+                    "type": "application",
+                    "name": "foo",
+                    "version": "1.0.0",
+                }
+            },
+            "components": [copy.deepcopy(self.component)],
+            "dependencies": [],
+        }
+        self.sbom2 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "metadata": {
+                "component": {
+                    "bom-ref": "bar",
+                    "type": "application",
+                    "name": "bar",
+                    "version": "1.0.0",
+                }
+            },
+            "components": [self.component],
+            "dependencies": [],
+        }
+
+    # TODO: Throughout this test case the expectations might need to be adjusted.
+    # Tests currently assume the following algorithm:
+    # - Keys are prioritized in this order: PURL > SWID > CPE > name/group/version
+    # - Comparison goes through keys in above order and stops as soon as both components
+    #   have a key of the same type. The components are considered identical, when those
+    #   two keys match.
+
+    def test_identical_components_are_dropped(self) -> None:
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 2)
+        self.assertEqual(result["components"][1], self.sbom2["metadata"]["component"])
+
+    def test_comps_with_different_purl_considered_different(self) -> None:
+        self.component["purl"] = "pkg:npm/newpurl"
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 3)
+        self.assertEqual(result["components"][1], self.component)
+
+    def test_comps_with_different_swid_considered_identical(self) -> None:
+        self.component["swid"] = {"tagId": "newtag", "name": "new name"}
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 2)
+
+    def test_comps_with_different_cpe_considered_identical(self) -> None:
+        self.component["cpe"] = "cpe:2.3:a:example:newcpe:1.0.0:*:*:*:*:*:*:*"
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 2)
+
+    def test_comps_with_different_name_considered_identical(self) -> None:
+        self.component["name"] = "new name"
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 2)
+
+    def test_comps_with_subset_of_keys_considered_identical(self) -> None:
+        # A set of tests where all possible combinations of PURL, SWID, and CPE are deleted
+        # before the merge.
+        # Name/version are always left behind.
+        original_component = copy.deepcopy(self.component)
+        identifiers = ["cpe", "purl", "swid"]
+        for test_case in chain.from_iterable(
+            combinations(identifiers, r + 1) for r in range(len(identifiers))
+        ):
+            with self.subTest(missing_keys=test_case):
+                self.sbom2["components"][0] = copy.deepcopy(original_component)
+                for identifier in test_case:
+                    del self.sbom2["components"][0][identifier]
+                result = merge.merge([self.sbom1, self.sbom2])
+                self.assertEqual(len(result["components"]), 2)
 
 
 if __name__ == "__main__":

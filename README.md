@@ -1,6 +1,7 @@
 
 [![build and test](https://github.com/Festo-se/cyclonedx-editor-validator/actions/workflows/main.yml/badge.svg)](https://github.com/Festo-se/cyclonedx-editor-validator/actions/workflows/main.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Festo-se/cyclonedx-editor-validator/badge)](https://scorecard.dev/viewer/?uri=github.com/Festo-se/cyclonedx-editor-validator)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10485/badge)](https://www.bestpractices.dev/projects/10485)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)

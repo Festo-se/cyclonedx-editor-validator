@@ -10,9 +10,9 @@ build-public
 
     This command creates a redacted version of an SBOM fit for publication. It:
 
-    * deletes any *property* (i.e., item in the ``properties`` array of a component) whose name starts with ``internal:`` from all components,
-    * deletes any ``externalReferences`` that are marked as internal by the regex pattern specified by the user,
-    * can optionally delete entire components matching a JSON schema provided by the user.
+    * Can optionally delete entire components matching a JSON schema provided by the user.
+    * Deletes any *property* (i.e., item in the ``properties`` array of a component) whose name starts with ``internal:`` from all components.
+    * Deletes any ``externalReferences`` that are marked as internal by the regex pattern specified by the user, if provided.
 
     The actions are performed in this order, meaning that *internal* properties and external references will be taken into account when matching the JSON schema.
     If a component containing nested components is deleted, those nested components are deleted as well.

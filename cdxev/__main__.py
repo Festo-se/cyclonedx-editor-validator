@@ -858,7 +858,7 @@ def invoke_amend(args: argparse.Namespace) -> int:
 
 
 def invoke_merge(args: argparse.Namespace) -> int:
-    global logger
+    global logger  # noqa: F824
 
     inputs = args.input
 

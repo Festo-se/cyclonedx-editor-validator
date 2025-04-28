@@ -384,14 +384,14 @@ toml = ["tomli ; python_full_version <= \"3.11.0a6\""]
 
 [[package]]
 name = "cyclonedx-python-lib"
-version = "9.1.0"
+version = "10.0.0"
 description = "Python library for CycloneDX"
 optional = false
-python-versions = "<4.0,>=3.8"
+python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "cyclonedx_python_lib-9.1.0-py3-none-any.whl", hash = "sha256:55693fca8edaecc3363b24af14e82cc6e659eb1e8353e58b587c42652ce0fb52"},
-    {file = "cyclonedx_python_lib-9.1.0.tar.gz", hash = "sha256:86935f2c88a7b47a529b93c724dbd3e903bc573f6f8bd977628a7ca1b5dadea1"},
+    {file = "cyclonedx_python_lib-10.0.0-py3-none-any.whl", hash = "sha256:30eb0d7774b0a0448b3480d11e40591d2798b4b44d15707c15e6ca06bf9f4246"},
+    {file = "cyclonedx_python_lib-10.0.0.tar.gz", hash = "sha256:d0b3deb90659faf3acc909e487af216199c1a0ee976e1601ea13649bd6a070db"},
 ]
 
 [package.dependencies]
@@ -1085,13 +1085,13 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyicu"
-version = "2.15.1"
+version = "2.15.2"
 description = "Python extension wrapping the ICU C++ API"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "pyicu-2.15.1.tar.gz", hash = "sha256:a9e6c3056668e3c75568da7172a7b0eb24727eb2892e8528b370faa122522f02"},
+    {file = "pyicu-2.15.2.tar.gz", hash = "sha256:561e77eedff17cec6839f26211f7a5ce3c071b776e8a0ec9d1207f46cbce598f"},
 ]
 
 [[package]]
@@ -1866,4 +1866,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10.0"
-content-hash = "9aa8c1a092029ac77b1ed661dfdfb4c3f54171aebe74fb6eb5aea211954f95da"
+content-hash = "8fa9013e0b94feff65784dbecf393e05c4a8a33f878ed9e2fff435bc5fbb9172"

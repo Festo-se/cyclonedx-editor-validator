@@ -803,6 +803,13 @@ def create_build_public_bom_parser(
         default=None,
         type=Path,
     )
+    parser.add_argument(
+        "--ext-ref-regex",
+        metavar="<ext-ref-regex>",
+        help=("Regex pattern to remove matching external references."),
+        default=None,
+        type=str,
+    )
     add_output_argument(parser)
     parser.set_defaults(cmd_handler=invoke_build_public_bom, parser=parser)
     return parser
@@ -1164,7 +1171,7 @@ def invoke_vex(args: argparse.Namespace) -> int:
 
 def invoke_build_public_bom(args: argparse.Namespace) -> int:
     sbom, _ = read_sbom(args.input)
-    output = build_public_bom(sbom, args.schema_path)
+    output = build_public_bom(sbom, args.schema_path, args.ext_ref_regex)
     write_sbom(output, args.output)
     return Status.OK
 

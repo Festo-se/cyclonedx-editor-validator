@@ -5,7 +5,7 @@ import re
 from typing import Any, Union
 
 
-def init_vex_header(input_file: dict) -> dict:
+def init_vex_header(input_file: dict[str, Any]) -> dict[str, Any]:
     """
     Copy important keys and values from input_file to output_file.
 
@@ -27,7 +27,7 @@ def init_vex_header(input_file: dict) -> dict:
     return output_file
 
 
-def get_list_of_ids(input_file: dict, scheme: str) -> str:
+def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
     """
     Get a list of vulnerability IDs.
 
@@ -43,12 +43,22 @@ def get_list_of_ids(input_file: dict, scheme: str) -> str:
     """
 
     list_str = ""
-    if scheme == "default":
-        list_str += "CVE-ID,Description,Status\n"
+    if schema == "default":
+        list_str += "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             vul_id = vulnerability.get("id", "-")
-            vul_ref_id = vulnerability.get("references", [])[0].get("id", "-")
-            vul_description = vulnerability.get("description", "-")
+            vul_ref_id = vulnerability.get("references", [{"id": "-"}])[0].get(
+                "id", "-"
+            )
+            # write cwe string
+            cwes = vulnerability.get("cwes", [])
+            cwe_str = ""
+            for cwe in cwes:
+                if cwe_str != "":
+                    cwe_str += ","
+                cwe_str += f"{cwe}"
+            if len(cwes) == 0:
+                cwe_str = "-"
             vul_state = vulnerability.get("analysis", {}).get("state", "-")
             ratings = vulnerability.get("ratings", [])
             severity_string = ""
@@ -69,22 +79,30 @@ def get_list_of_ids(input_file: dict, scheme: str) -> str:
                 r"[\t\n\r\|]+", "", vulnerability.get("description", "-")
             )
             list_str += (
-                vulID
-                + ","
-                + vulRefID
-                + ","
-                + vulDescription
-                + ","
-                + vulState
+                vul_id
+                + "|"
+                + vul_ref_id
+                + "|"
+                + cwe_str
+                + "|"
+                + severity_string
+                + "|"
+                + vul_state
+                + "|"
+                + publish_date
+                + "|"
+                + update_date
+                + "|"
+                + vul_description
                 + "\n"
             )
-    elif scheme == "lightweight":
-        list_str += "CVE-ID\n"
+    elif schema == "lightweight":
+        list_str += "ID|RefID\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             list_str += (
                 vulnerability.get("id", "-")
-                + ","
-                + vulnerability.get("references", [])[0].get("id", "-")
+                + "|"
+                + vulnerability.get("references", [{"id": "-"}])[0].get("id", "-")
                 + "\n"
             )
 
@@ -120,7 +138,9 @@ def search_key(data: dict[str, Any], key: str, value: str) -> bool:
     return False
 
 
-def get_list_of_trimed_vulnerabilities(input_file: dict, state: str) -> dict:
+def get_list_of_trimed_vulnerabilities(
+    input_file: dict[str, Any], key: str, value: str
+) -> dict[str, Any]:
     """
     Get a file with vulnerabilities filtered by a key-value pair.
 
@@ -140,7 +160,7 @@ def get_list_of_trimed_vulnerabilities(input_file: dict, state: str) -> dict:
     output_file = {}
 
     for vulnerability in input_file.get("vulnerabilities", []):
-        if vulnerability.get("analysis", []).get("state", []) == state:
+        if search_key(vulnerability, key, value):
             trimmed_vulnerabilities.append(vulnerability)
 
     output_file = init_vex_header(input_file)
@@ -148,12 +168,14 @@ def get_list_of_trimed_vulnerabilities(input_file: dict, state: str) -> dict:
     return output_file
 
 
-def get_vulnerability_by_id(input_file: dict, id: str) -> dict:
-    searched_vulnerability = []
+def get_vulnerability_by_id(input_file: dict[str, Any], id: str) -> dict[str, Any]:
+    found_vulnerabilities = []
     output_file = {}
     for vulnerability in input_file.get("vulnerabilities", []):
-        if vulnerability.get("id", "-") == id or vulnerability.get("references", {}).get("id", "") == id:
-            searched_vulnerability.append(vulnerability)
+        if vulnerability.get("id", "-") == id or any(
+            vul.get("id", "") == id for vul in vulnerability.get("references", [])
+        ):
+            found_vulnerabilities.append(vulnerability)
 
     output_file = init_vex_header(input_file)
     output_file["vulnerabilities"] = found_vulnerabilities
@@ -181,7 +203,12 @@ def get_vex_from_sbom(input_file: dict[str, Any]) -> dict[str, Any]:
 
 
 def vex(
-    sub_command: str, file: dict, state: str, scheme: str, vul_id: str = ""
+    sub_command: str,
+    file: dict[str, Any],
+    key: str = "",
+    value: str = "",
+    schema: str = "",
+    vul_id: str = "",
 ) -> Union[dict[str, Any], str]:
     """
     Get different information about vulnerabilities in VEX file.

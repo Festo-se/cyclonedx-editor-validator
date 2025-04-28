@@ -7,6 +7,7 @@ vex
     :func: create_parser
     :prog: cdx-ev
     :path: vex
+    :nosubcommands:
 
     This command provides different operations on VEX/SBOM Files with embedded vulnerabilities. The vex-command has the following subcommands:
 

@@ -14,7 +14,7 @@ vex
     * ``list``: returns a list of all vulnerability-IDs.
     * ``trim``: returns a file with filtered vulnerabilities.
     * ``search``: returns a file with a specific vulnerability.
-    * ``extract``: extract all vulnerabilities from an SBOM file to a VEXfile.
+    * ``extract``: extract all vulnerabilities from an SBOM file to a VEX file.
 
 list
 -------------
@@ -89,7 +89,7 @@ extract
     :prog: cdx-ev
     :path: vex extract
 
-    This subcommand extracts all vulnerabilities from an SBOM file and returns it as a VEXfile in JSON format.
+    This subcommand extracts all vulnerabilities from an SBOM file and returns it as a VEX file in JSON format.
 
 Example::
 

@@ -1158,8 +1158,9 @@ def invoke_vex(args: argparse.Namespace) -> int:
         )
 
     if args.sub_command == "list":
-        write_list(str(output), args.output, file, format=args.format)
         output = vex(sub_command=args.sub_command, file=file, schema=args.schema)
+        write_list(str(output), args.output, file, format=args.format)
+
     else:
         if isinstance(output, dict):
             write_sbom(output, args.output, update_metadata=False)

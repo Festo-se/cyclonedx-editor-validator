@@ -823,11 +823,8 @@ def create_build_public_bom_parser(
             "and resolves the dependencies."
         ),
     )
-    parser.add_argument(
-        "input",
-        help="Path to a SBOM file.",
-        type=Path,
-    )
+    add_input_argument(parser)
+
     parser.add_argument(
         "--schema-path",
         metavar="<schema path>",

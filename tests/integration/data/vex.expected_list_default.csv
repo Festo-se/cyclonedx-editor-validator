@@ -1,0 +1,15 @@
+ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description
+CVE-1012-0001|-|-|CVSSv31:9.8(critical),CVSSv2:7.5(high)|exploitable|1012-01-01T01:01Z|1012-02-04T12:24Z|some description of a vulnerability
+CVE-1013-0002|-|-|CVSSv31:7.2(high)|not_affected|1013-01-01T01:02Z|1013-03-02T12:24Z|some description of a vulnerability 2
+CVE-1013-0003|-|-|CVSSv31:7.2(high)|exploitable|1013-01-01T01:02Z|1013-03-02T12:24Z|some description of a vulnerability 3
+CVE-1013-0004|-|-|CVSSv31:7.2(high)|exploitable|1013-01-01T01:02Z|1013-03-02T12:24Z|some description of a vulnerability 4
+CVE-1013-0005|-|-|CVSSv31:9.8(critical)|not_affected|1013-01-01T01:03Z|1013-03-03T12:24Z|some description of a vulnerability 5
+CVE-1013-0006|-|-|CVSSv31:7.2(high)|not_affected|1013-01-01T01:03Z|1013-03-04T12:24Z|some description of a vulnerability 5
+CVE-1012-0007|-|-|CVSSv31:9.8(critical),CVSSv2:7.5(high)|exploitable|1012-01-01T01:04Z|1013-03-05T12:24Z|some description of a vulnerability 6
+CVE-1013-0008|-|-|CVSSv31:7.2(high)|not_affected|1013-01-01T01:05Z|1013-03-07T12:24Z|some description of a vulnerability 7
+CVE-1013-0009|-|-|CVSSv31:7.2(high)|not_affected|1013-01-01T01:05Z|1013-03-07T12:24Z|some description of a vulnerability 8
+CVE-1013-0010|-|-|CVSSv31:7.2(high)|not_affected|1013-01-01T01:06Z|1013-03-08T12:24Z|some description of a vulnerability 9
+CVE-1013-0011|-|-|CVSSv31:7.2(high)|not_affected|1013-01-01T01:06Z|1013-03-09T12:24Z|some description of a vulnerability 10
+CVE-1012-0012|-|-|CVSSv31:9.8(critical),CVSSv2:7.5(high)|exploitable|1012-01-01T01:07Z|1013-03-10T12:24Z|some description of a vulnerability 11
+CVE-1012-0013|-|-|CVSSv31:5.3(medium),CVSSv2:5.0(medium)|not_affected|1012-01-01T01:08Z|1013-03-12T12:24Z|some description of a vulnerability 12
+CVE-1012-0014|-|-|CVSSv31:5.3(medium),CVSSv2:5.0(medium)|exploitable|1012-01-01T01:07Z|1013-03-12T12:24Z|some description of a vulnerability 13

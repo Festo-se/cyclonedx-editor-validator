@@ -5,7 +5,6 @@ import unittest
 from pathlib import Path
 
 import cdxev.vex as vex
-import cdxev.vex as vex
 
 path_to_test_folder = "tests/auxiliary/test_vex/"
 
@@ -19,26 +18,58 @@ def load_file(file_path: Path) -> dict:
 class TestVulnerabilityFunctions(unittest.TestCase):
 
     def test_init_vex_header(self):
-        expected_output = {"bomFormat": "CycloneDX", "specVersion": "1.3", "version": 1}
+        expected_output = {"bomFormat": "CycloneDX", "specVersion": "1.4", "version": 1}
 
-        with open(
-            path_to_test_folder + "bom.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            sbom = json.load(my_file)
-        result = vex.init_vex_header(sbom)
+        file = load_file("embedded_vex.json")
+        result = vex.init_vex_header(file)
 
         self.assertEqual(result, expected_output)
 
+    def helper_list_output(self) -> str:
+        file = load_file("vex.json")
+        expected_cwe = ""
+        for cwe in file["vulnerabilities"][0].get("cwes", []):
+            if expected_cwe != "":
+                expected_cwe += ","
+            expected_cwe += f"{cwe}"
+
+        expected_severity = ""
+        for rating in file["vulnerabilities"][0].get("ratings", []):
+            if expected_severity != "":
+                expected_severity += ","
+            expected_severity += (
+                f"{rating.get('method', '')}:"
+                f"{rating.get('score', '')}"
+                f"({rating.get('severity', '')})"
+            )
+        description = re.sub(
+            r"[\t\n\r\|]+", "", file["vulnerabilities"][0]["description"]
+        )
+        expected_output = (
+            "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description\n"
+            + file["vulnerabilities"][0]["id"]
+            + "|"
+            + file["vulnerabilities"][0]["references"][0]["id"]
+            + "|"
+            + expected_cwe
+            + "|"
+            + expected_severity
+            + "|"
+            + file["vulnerabilities"][0]["analysis"]["state"]
+            + "|"
+            + file["vulnerabilities"][0].get("published", "-")
+            + "|"
+            + file["vulnerabilities"][0].get("updated", "-")
+            + "|"
+            + description
+            + "\n"
+        )
+        return expected_output
+
     def test_get_list_of_ids_default(self):
-        with open(
-            path_to_test_folder + "list_default.csv", "r", encoding="utf-8-sig"
-        ) as my_file:
-            expected_output = my_file.read()
-        with open(
-            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-        result = vex.get_list_of_ids(vex_file, "default")
+        file = load_file("vex.json")
+        result = vex.get_list_of_ids(file, "default")
+        expected_output = self.helper_list_output()
         self.assertEqual(result, expected_output)
 
     def test_get_list_of_ids_default_missing_id(self):
@@ -98,30 +129,15 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         self.assertEqual(result, expected_output)
 
     def test_get_list_of_ids_lightweight(self):
-        with open(
-            path_to_test_folder + "list_lightweight.csv", "r", encoding="utf-8-sig"
-        ) as my_file:
-            expected_output = my_file.read()
-
-        with open(
-            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-        result = vex.get_list_of_ids(vex_file, "lightweight")
-        self.assertEqual(result, expected_output)
-
-    def test_get_list_of_ids_lightweight_missing_data(self):
-        with open(
-            path_to_test_folder + "list_lightweight_missing_data.csv",
-            "r",
-            encoding="utf-8-sig",
-        ) as my_file:
-            expected_output = my_file.read()
-        with open(
-            path_to_test_folder + "vex_missing_data.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-        result = vex.get_list_of_ids(vex_file, "lightweight")
+        file = load_file("vex.json")
+        expected_output = (
+            "ID|RefID\n"
+            + file["vulnerabilities"][0]["id"]
+            + "|"
+            + file["vulnerabilities"][0]["references"][0]["id"]
+            + "\n"
+        )
+        result = vex.get_list_of_ids(file, "lightweight")
         self.assertEqual(result, expected_output)
 
     def test_search_key(self):
@@ -148,16 +164,13 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         self.assertEqual(result, False)
 
     def test_get_list_of_trimmed_vulnerabilities(self):
-        with open(
-            path_to_test_folder + "trimmed_vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            expected_output = json.load(my_file)
-
-        with open(
-            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-        result = vex.get_list_of_trimed_vulnerabilities(vex_file, "not_affected")
+        file = load_file("vex.json")
+        file["vulnerabilities"].append(
+            {"id": "CVE-2020-25649", "analysis": {"state": "exploitable"}}
+        )
+        expected_output = copy.deepcopy(file)
+        expected_output["vulnerabilities"].pop(1)
+        result = vex.get_list_of_trimed_vulnerabilities(file, "state", "not_affected")
         self.assertEqual(result, expected_output)
 
     def test_get_list_of_trimmed_vulnerabilities_not_found_keyval_pair(self):
@@ -167,16 +180,12 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         self.assertEqual(result.get("vulnerabilities"), expected_output)
 
     def test_get_vulnerability_by_id(self):
-        with open(
-            path_to_test_folder + "searched_vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            expected_output = json.load(my_file)
-
-        with open(
-            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-        result = vex.get_vulnerability_by_id(vex_file, "CVE-1013-0002")
+        file = load_file("vex.json")
+        file["vulnerabilities"].append(file["vulnerabilities"][0].copy())
+        file["vulnerabilities"][1]["id"] = "CVE-2020-25648"
+        expected_output = copy.deepcopy(file)
+        expected_output["vulnerabilities"].pop(1)
+        result = vex.get_vulnerability_by_id(file, "CVE-2020-25649")
         self.assertEqual(result, expected_output)
 
     def test_get_vulnerability_by_id_missing_data(self):
@@ -189,42 +198,23 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         self.assertEqual(result, expected_output)
 
     def test_get_vex_from_sbom(self):
-        with open(
-            path_to_test_folder + "embedded_vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            embedded_vex = json.load(my_file)
-
-        with open(
-            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-
-        result = vex.get_vex_from_sbom(embedded_vex)
-        self.assertEqual(result, vex_file)
+        file = load_file("embedded_vex.json")
+        result = vex.get_vex_from_sbom(file)
+        self.assertEqual(result, load_file("vex.json"))
 
     # Test subcommands
     def test_vex_list_command(self):
-        with open(
-            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-        result = vex.vex("list", vex_file, "", "default")
-        self.assertIn("ID,RefID,Description,Status", result)
+        result = vex.vex("list", load_file("vex.json"), "", "", "default")
+        self.assertIn(
+            "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description", result
+        )
 
     def test_vex_trim_command(self):
-        with open(
-            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-        result = vex.vex("trim", vex_file, "not_affected", "")
-        self.assertEqual(len(result["vulnerabilities"]), 8)
+        result = vex.vex("trim", load_file("vex.json"), "state", "not_affected", "")
+        self.assertEqual(len(result["vulnerabilities"]), 1)
 
     def test_vex_search_command(self):
-        with open(
-            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-        result = vex.vex("search", vex_file, "", "", "CVE-1013-0002")
+        result = vex.vex("search", load_file("vex.json"), "", "", "", "CVE-2020-25649")
         self.assertEqual(len(result["vulnerabilities"]), 1)
 
     def test_vex_extract_command(self):
@@ -236,9 +226,5 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         self.assertEqual(result["vulnerabilities"], embedded_vex["vulnerabilities"])
 
     def test_vex_invalid_subcommand(self):
-        with open(
-            path_to_test_folder + "vex.json", "r", encoding="utf-8-sig"
-        ) as my_file:
-            vex_file = json.load(my_file)
-        result = vex.vex("invalid_command", vex_file, "", "")
+        result = vex.vex("invalid_command", load_file("vex.json"), "", "", "")
         self.assertEqual(result, {})

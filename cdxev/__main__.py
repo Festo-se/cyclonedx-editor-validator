@@ -827,7 +827,6 @@ def create_list_command_parser(
             "Currently supported are the listing of license information and component information."
         ),
     )
-    add_input_argument(parser)
 
     parser.add_argument(
         "operation",
@@ -837,6 +836,8 @@ def create_list_command_parser(
         default=None,
         type=str,
     )
+
+    add_input_argument(parser)
 
     parser.add_argument(
         "--format",

@@ -825,7 +825,7 @@ def create_list_command_parser(
         help=(
             "Lists specific contents of the SBOM."
             "Currently supported are the listing of license information and component information."
-        )
+        ),
     )
     add_input_argument(parser)
 

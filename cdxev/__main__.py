@@ -825,12 +825,10 @@ def create_list_command_parser(
         help=(
             "Lists specific contents of the SBOM."
             "Currently supported are the listing of license information and component information."
-        ),
-        usage=(
-            "cdx-ev list [-h] [--format {txt,csv}] "
-            "[--output <file>] <operation> {licenses, components} input"
-        ),
+        )
     )
+    add_input_argument(parser)
+
     parser.add_argument(
         "operation",
         metavar="<operation>",
@@ -839,11 +837,7 @@ def create_list_command_parser(
         default=None,
         type=str,
     )
-    parser.add_argument(
-        "input",
-        help="Path to an SBOM file.",
-        type=Path,
-    )
+
     parser.add_argument(
         "--format",
         help="The output format of the data, the default is csv.",

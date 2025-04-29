@@ -181,7 +181,6 @@ def create_parser() -> argparse.ArgumentParser:
     )
     create_amend_parser(subparsers)
     create_merge_parser(subparsers)
-    create_merge_vex_parser(subparsers)
     create_vex_parser(subparsers)
     create_validation_parser(subparsers)
     create_set_parser(subparsers)
@@ -463,42 +462,6 @@ def create_merge_parser(
     add_output_argument(parser)
 
     parser.set_defaults(cmd_handler=invoke_merge, parser=parser)
-    return parser
-
-
-# noinspection PyUnresolvedReferences,PyProtectedMember
-def create_merge_vex_parser(
-    subparsers: argparse._SubParsersAction,
-) -> argparse.ArgumentParser:
-    parser = subparsers.add_parser(
-        "merge-vex",
-        help=(
-            "[Deprecated] - This command will be removed in a future version."
-            "Note: The `merge-vex` command will be superseded by a new `vex` command."
-            "Merges a VEX file into an SBOM."
-        ),
-    )
-    parser.add_argument(
-        "sbom_file",
-        metavar="<sbom_file>",
-        help=(
-            "Path to SBOM file to merge."
-            "The first file is assumed to be the SBOM, the second the vex file"
-        ),
-        type=Path,
-    )
-    parser.add_argument(
-        "vex_file",
-        metavar="<vex_file>",
-        help=(
-            "Path to VEX file to merge."
-            "The first file is assumed to be the SBOM, the second the vex file"
-        ),
-        type=Path,
-    )
-    add_output_argument(parser)
-
-    parser.set_defaults(cmd_handler=invoke_merge_vex, parser=parser)
     return parser
 
 

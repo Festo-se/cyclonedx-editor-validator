@@ -209,7 +209,7 @@ class TestAmend:
     def test_help_operation(
         self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]
     ):
-        argv("amend", "--help-operation", "add-license-text")
+        argv("amend", "any.cdx.json", "--help-operation", "add-license-text")
         exit_code, stdout, _ = run_main(capsys=capsys)
 
         assert exit_code == Status.OK

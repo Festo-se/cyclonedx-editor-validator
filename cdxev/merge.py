@@ -352,7 +352,7 @@ def merge_compositions(
     return
 
 
-def merge_vulnerabilities(
+def merge_vulnerabilities_old(
     list_of_original_vulnerabilities_input: list[dict],
     list_of_new_vulnerabilities_input: list[dict],
     vulnerability_identities: dict[str, VulnerabilityIdentity],
@@ -455,7 +455,7 @@ def merge_vulnerabilities(
     return list_of_merged_vulnerabilities
 
 
-def merge_vulnerabilities_2(
+def merge_vulnerabilities(
     list_of_original_vulnerabilities_input: list[dict],
     list_of_new_vulnerabilities_input: list[dict],
     vulnerability_identities: dict[str, VulnerabilityIdentity],

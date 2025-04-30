@@ -372,7 +372,7 @@ def create_amend_parser(
         description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    add_input_argument(parser, nargs="?")
+    add_input_argument(parser)
 
     parser.add_argument(
         "--operation",

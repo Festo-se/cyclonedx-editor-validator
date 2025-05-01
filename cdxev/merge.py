@@ -15,6 +15,7 @@ from cdxev.auxiliary.sbomFunctions import (
     get_identities_for_vulnerabilities,
     make_bom_refs_unique,
     unify_bom_refs,
+    merge_affects_versions,
 )
 from cdxev.log import LogMessage
 
@@ -352,109 +353,6 @@ def merge_compositions(
     return
 
 
-def merge_vulnerabilities_old(
-    list_of_original_vulnerabilities_input: list[dict],
-    list_of_new_vulnerabilities_input: list[dict],
-    vulnerability_identities: dict[str, VulnerabilityIdentity],
-) -> list[dict]:
-    """
-    Merges the vulnerabilities of two SBOMs.
-
-    The vulnerabilities in list_of_original_vulnerabilities are
-    kept unchanged.
-    If a vulnerability in list_of_new_vulnerabilities is not yet present,
-    it will be added.
-    If the vulnerability already exists, its "affects" field is compared entries
-    already present in a Vulnerability in list_of_original_vulnerabilities will be removed.
-    In case of version ranges, for an already present version a != constrained is appended.
-
-    version ranged can not be compared with each other, here exists a risk of information loss.
-
-    Parameters
-    ----------
-    list_of_original_vulnerabilities : Sequence[dict]
-        The list of Vulnerabilities of the sbom in which should be merged
-    list_of_new_vulnerabilities: Sequence[dict]
-        The list of Vulnerabilities of the new sbom that will be merged in the other
-
-    Returns
-    -------
-    Sequence[dict]
-        List with the merged Vulnerabilities
-    """
-    # Create copies in case both inputs are the same object
-    # what would cause a crash
-    list_of_original_vulnerabilities = copy.deepcopy(
-        list_of_original_vulnerabilities_input
-    )
-    list_of_new_vulnerabilities = copy.deepcopy(list_of_new_vulnerabilities_input)
-
-    # replace old bom-refs with the bom refs of the merged sbom
-    list_of_merged_vulnerabilities = copy.deepcopy(
-        list_of_original_vulnerabilities_input
-    )
-    collected_affects = collect_affects_of_vulnerabilities(
-        list_of_merged_vulnerabilities, vulnerability_identities
-    )
-
-    for new_vulnerability in list_of_new_vulnerabilities:
-        is_in = False
-        id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
-        id_object_new_vulnerability = vulnerability_identities[id_str_new_vulnerability]
-
-        # The loop is over the original vulnerabilities and not the merged ones to avoid
-        # data losses in the case of duplicate entries in new_vulnerabilities
-        # both of those will be kept since the comparison used dose not take fields like
-        # "analysis" or the "status" of "affects" into consideration.
-        # A cleanup of such duplicates might be performed in a dedicated function to be implemented
-        # in the tool.
-        for original_vulnerability in list_of_original_vulnerabilities:
-            id_str_original_vulnerability = json.dumps(
-                original_vulnerability, sort_keys=True
-            )
-            id_object_original_vulnerability = vulnerability_identities[
-                id_str_original_vulnerability
-            ]
-            if id_object_new_vulnerability == id_object_original_vulnerability:
-                is_in = True
-                # Check affects: 3 cases
-                # 1. complete disjunct => two different vulnerability objects, keep both
-                # 2. new affects are a subset of the original vulnerabilities => drop with warning
-                # 3. the affects have overlap => drop all already present affect objects and throw
-                #    a warning
-                #    keep the "cleaned" vulnerability object
-
-                # TODO: This comparison takes only individual affect objects into account
-                # a holistic approach might be worth future consideration
-                # e.g. a vulnerability with the versions "<2.0.0" and "">=2.0.0|<=3.0.0"
-                # is equal to one with the entry "<=3.0.0" but for this the ranges must be checked
-                # as a whole
-
-                new_affects = extract_new_affects(
-                    collected_affects[id_object_original_vulnerability.string()],
-                    new_vulnerability.get("affects", []),
-                    original_vulnerability.get("id", ""),
-                )
-
-                if new_affects:
-                    new_vulnerability["affects"] = new_affects
-                    list_of_merged_vulnerabilities.append(new_vulnerability)
-                    logger.warning(
-                        LogMessage(
-                            "Potential loss of information",
-                            (
-                                "Dropping a duplicate affects entries "
-                                f'in vulnerability ({original_vulnerability.get("id", "")})'
-                            ),
-                        )
-                    )
-                break
-        if not is_in:
-            list_of_merged_vulnerabilities.append(new_vulnerability)
-
-    return list_of_merged_vulnerabilities
-
-
 def merge_vulnerabilities(
     list_of_original_vulnerabilities_input: list[dict],
     list_of_new_vulnerabilities_input: list[dict],
@@ -492,22 +390,50 @@ def merge_vulnerabilities(
     )
     list_of_new_vulnerabilities = copy.deepcopy(list_of_new_vulnerabilities_input)
 
-    # replace old bom-refs with the bom refs of the merged sbom
-    list_of_merged_vulnerabilities = copy.deepcopy(
-        list_of_original_vulnerabilities_input
-    )
     collected_affects = collect_affects_of_vulnerabilities(
-        list_of_merged_vulnerabilities, vulnerability_identities
+        list_of_original_vulnerabilities, vulnerability_identities
     )
 
+    # add all original vulnerabilities without "merge conflict" to merged vulnerabilities
+    # this could be avoided by iterating over merged vulnerabilities,
+    # but since those are changed during
+    # the loop it would be necessary to recalculate
+    # the vulnerability identities after every change.
+    list_of_merged_vulnerabilities = []
+    for original_vulnerability in list_of_original_vulnerabilities:
+        is_in = False
+        same_affects_state = False
+        id_str_original_vulnerability = json.dumps(
+            original_vulnerability, sort_keys=True
+        )
+        id_object_original_vulnerability = vulnerability_identities[
+            id_str_original_vulnerability
+        ]
+        for new_vulnerability in list_of_new_vulnerabilities:
+            id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
+            id_object_new_vulnerability = vulnerability_identities[
+                id_str_new_vulnerability
+            ]
+            if id_object_new_vulnerability == id_object_original_vulnerability:
+                is_in = True
+                if original_vulnerability.get("analysis", {}).get(
+                    "state", ""
+                ) == new_vulnerability.get("analysis", {}).get("state", "_"):
+                    same_affects_state = True
+
+        if not is_in or not same_affects_state:
+            list_of_merged_vulnerabilities.append(original_vulnerability)
+
+        # go over new vulnerabilities to resolve "merge conflicts"
     for new_vulnerability in list_of_new_vulnerabilities:
         is_in = False
-        has_same_analysis_state = False
-        id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
+        same_affects_state = False
+
         # since vulnerabilities can be assigned different identifier (cve, snyk ...)
         # all provided vulnerabilities are analysed during intitialization and a registry with
         # the respective references is created, the vulnerabilities are then mapped according to
         # this registry
+        id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
         id_object_new_vulnerability = vulnerability_identities[id_str_new_vulnerability]
 
         # The loop is over the original vulnerabilities and not the merged ones to avoid
@@ -519,16 +445,15 @@ def merge_vulnerabilities(
             id_object_original_vulnerability = vulnerability_identities[
                 id_str_original_vulnerability
             ]
-
             # objects describe the same vulnerability
             if id_object_new_vulnerability == id_object_original_vulnerability:
                 is_in = True
-
                 # compare the analysis.state
                 if original_vulnerability.get("analysis", {}).get(
                     "state", ""
-                ) == original_vulnerability.get("analysis", {}).get("state", "_"):
-                    has_same_analysis_state = True
+                ) == new_vulnerability.get("analysis", {}).get("state", "_"):
+                    same_affects_state = True
+
                     # Check affects: 3 cases
                     # 1. complete disjunct => two different vulnerability objects, merge
                     # 2. new affects are a subset of the original vulnerabilities => ignore
@@ -546,14 +471,19 @@ def merge_vulnerabilities(
                         original_vulnerability.get("id", ""),
                         keep_version_overlap=True,
                     )
-                    original_affects = original_vulnerability.get("affects", [])
-                    original_affects.append(new_affects)
+                    merged_vulnerability = copy.deepcopy(original_vulnerability)
+                    merged_affects = merged_vulnerability.get("affects", [])
+                    merge_affects_versions(merged_affects, new_affects)
                     # if vulnerability did not contain affects object
-                    original_vulnerability["affects"] = original_affects
 
-        # if no vulnerability object for the vulnerabiolity with the same analysis state exists
+                    merged_vulnerability["affects"] = merged_affects
+
+                    merge_responses(merged_vulnerability, new_vulnerability)
+                    list_of_merged_vulnerabilities.append(merged_vulnerability)
+
+        # if no vulnerability object for the vulnerability with the same analysis state exists
         # create a new one
-        if is_in and not has_same_analysis_state:
+        if is_in and not same_affects_state:
             # Check affects: 3 cases
             # 1. complete disjunct => two different vulnerability objects, add new vuln object
             # 2. new affects are a subset of the original vulnerabilities => drop
@@ -565,18 +495,28 @@ def merge_vulnerabilities(
             # e.g. a vulnerability with the versions "<2.0.0" and "">=2.0.0|<=3.0.0"
             # is equal to one with the entry "<=3.0.0" but for this the ranges must be checked
             # as a whole
-
             new_affects = extract_new_affects(
                 collected_affects[id_object_original_vulnerability.string()],
                 new_vulnerability.get("affects", []),
                 original_vulnerability.get("id", ""),
+                different_analysis=True,
             )
-
+            # make no changes on the objects themselfs to avoid key errors +
+            # when using their id strings
+            merged_vulnerability = copy.deepcopy(new_vulnerability)
             if new_affects:
-                new_vulnerability["affects"] = new_affects
-                list_of_merged_vulnerabilities.append(new_vulnerability)
+                merged_vulnerability["affects"] = new_affects
+                list_of_merged_vulnerabilities.append(merged_vulnerability)
 
+            # If vulnerability is not yet present
         if not is_in:
             list_of_merged_vulnerabilities.append(new_vulnerability)
 
     return list_of_merged_vulnerabilities
+
+
+def merge_responses(original_vulnerability: dict, new_vulnerability: dict) -> None:
+    original_response = original_vulnerability.get("analysis", {}).get("response", [])
+    for response in new_vulnerability.get("analysis", {}).get("response", []):
+        if response not in original_response:
+            original_response.append(response)

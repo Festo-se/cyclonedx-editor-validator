@@ -545,6 +545,7 @@ def get_new_affects_versions(
     vuln_id: str,
     ref: str,
     keep_version_overlap: bool = False,
+    different_analysis: bool = False,
 ) -> list[dict]:
     kept_versions: list[dict] = []
     for new_version in new_versions_list:
@@ -552,7 +553,6 @@ def get_new_affects_versions(
         new_version_copy = deepcopy(new_version)
         for original_version in original_versions_list:
             result = compare_affects_versions_object(original_version, new_version)
-
             if result == -1 and not keep_version_overlap:
                 new_range = (
                     new_version_copy.get("range", "")
@@ -566,14 +566,24 @@ def get_new_affects_versions(
                     LogMessage(
                         "Potential duplicate retained",
                         (
-                            f"Inconclusive version comparison, keeping entry ({ref}) "
+                            f"Inconclusive version comparison, "
+                            f"keeping entry ({ref}) version {new_version} "
                             f"in vulnerability {vuln_id}."
                         ),
                     )
                 )
-
             if result in [1, 2]:
                 is_in = True
+                if different_analysis:
+                    logger.warning(
+                        LogMessage(
+                            "Dropped duplicate with different analysis",
+                            (
+                                f"Dropped entry ({ref}) version {new_version} "
+                                f"in vulnerability {vuln_id}."
+                            ),
+                        )
+                    )
         if not is_in:
             kept_versions.append(new_version_copy)
     return kept_versions
@@ -584,6 +594,7 @@ def extract_new_affects(
     new_affects_list: list[dict],
     vuln_id: str,
     keep_version_overlap: bool = False,
+    different_analysis: bool = False,
 ) -> list[dict]:
     kept_affects: list[dict] = []
     collected_original_affects = join_affect_versions_with_same_references(
@@ -604,6 +615,7 @@ def extract_new_affects(
                 vuln_id,
                 new_affect.get("ref", ""),
                 keep_version_overlap,
+                different_analysis,
             )
 
             if kept_affect_versions:
@@ -735,3 +747,18 @@ def extract_cyclonedx_components(
             extracted_components.append(component)
             extracted_components += extract_cyclonedx_components(component.components)
     return extracted_components
+
+
+def merge_affects_versions(
+    original_affects: list[dict], new_affects: list[dict]
+) -> None:
+    for affect in new_affects:
+        ref_is_in = False
+        for original_affect in original_affects:
+            if original_affect.get("ref", "") == affect.get("ref", "_"):
+                ref_is_in = True
+                original_affect_versions = original_affect.get("versions", [])
+                for version in affect.get("versions", []):
+                    original_affect_versions.append(version)
+        if not ref_is_in:
+            original_affects.append(affect)

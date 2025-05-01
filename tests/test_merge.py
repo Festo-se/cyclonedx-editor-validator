@@ -2,10 +2,12 @@
 
 import copy
 import unittest
+import json
 
 from cdxev import merge
-from cdxev.auxiliary.identity import ComponentIdentity
+from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from tests.auxiliary import helper as helper
+
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
 
@@ -289,46 +291,167 @@ class TestMergeCompositions(unittest.TestCase):
 
 
 class TestMergeVulnerabilities(unittest.TestCase):
-    def test_merge_vulnerabilities(self) -> None:
-        vulnerabilities = helper.load_sections_for_test_sbom()[
-            "merge_vulnerabilities_tests"
-        ]["test_merge_vulnerabilities"]
-        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
-        new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
-        merged_vulnerabilities = vulnerabilities["merged_vulnerabilities"]
+    basic_vulnerability = {
+        "id": "CVE-2021-44228",
+        "source": {
+            "name": "NVD",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-44228",
+        },
+        "ratings": [
+            {
+                "source": {
+                    "name": "NVD",
+                    "url": "https:",
+                },
+                "score": 10.0,
+                "severity": "critical",
+                "method": "CVSSv31",
+                "vector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+            }
+        ],
+        "analysis": {
+            "state": "exploitable",
+            "response": ["will_not_fix", "update"],
+            "detail": "Versions of Products ABC and JKL are affected by the vulnerability.",
+        },
+        "affects": [
+            {
+                "ref": "Product 1",
+                "versions": [
+                    {"version": "2.4", "status": "affected"},
+                    {"version": "2.6", "status": "affected"},
+                    {"range": "vers:generic/>=2.9|<=4.1", "status": "affected"},
+                ],
+            },
+            {
+                "ref": "Product 2",
+                "versions": [
+                    {"range": "vers:generic/>=4.5|<=5.0", "status": "affected"}
+                ],
+            },
+        ],
+    }
 
-        identities = merge.get_identities_for_vulnerabilities(
-            original_vulnerabilities + new_vulnerabilities
+    def calculate_merged_vulnerabilities(
+        self, vulnerability_1: dict, vulnerability_2: dict
+    ) -> list[dict]:
+        vulnerability_identities = {
+            json.dumps(
+                vulnerability_1, sort_keys=True
+            ): VulnerabilityIdentity.from_vulnerability(vulnerability_1),
+            json.dumps(
+                vulnerability_2, sort_keys=True
+            ): VulnerabilityIdentity.from_vulnerability(vulnerability_2),
+        }
+        return merge.merge_vulnerabilities(
+            [vulnerability_1], [vulnerability_2], vulnerability_identities
         )
 
-        actual_merged = merge.merge_vulnerabilities(
-            original_vulnerabilities, new_vulnerabilities, identities
+    # Same Product affected
+    def test_2_different_vulnerabilities(self) -> None:
+        # test 2 different vulnerabilities
+        vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_2 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_2["id"] = "something else"
+        merged_vulnerabilities = self.calculate_merged_vulnerabilities(
+            vulnerability_1, vulnerability_2
         )
-        self.assertEqual(merged_vulnerabilities, actual_merged)
+        self.assertEqual(merged_vulnerabilities, [vulnerability_1, vulnerability_2])
 
-    def test_merge_same_vulnerabilities(self) -> None:
-        vulnerabilities = helper.load_sections_for_test_sbom()[
-            "merge_vulnerabilities_tests"
-        ]["test_merge_vulnerabilities"]
-        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
-        new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
+    def test_test_same_vulnerabilities_different_analysis_and_affects(self) -> None:
+        # test same vulnerabilities different analysis and affects
+        vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_3 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_3["analysis"]["state"] = "false_positive"
+        vulnerability_3["affects"] = [
+            {
+                "ref": "Product 1",
+                "versions": [{"version": "10", "status": "unaffected"}],
+            }
+        ]
+        merged_vulnerabilities = self.calculate_merged_vulnerabilities(
+            vulnerability_1, vulnerability_3
+        )
+        self.assertEqual(merged_vulnerabilities, [vulnerability_1, vulnerability_3])
 
-        identities_1 = merge.get_identities_for_vulnerabilities(
-            original_vulnerabilities
+    def test_test_same_vulnerabilities_different_analysis_and_same_affects(
+        self,
+    ) -> None:
+        # test same vulnerabilities different analysis and same affects
+        vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_4 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_4["analysis"]["state"] = "false_positive"
+        vulnerability_4["affects"] = [
+            {
+                "ref": "Product 1",
+                "versions": [
+                    {"version": "2.4", "status": "unaffected"},
+                    {"version": "2.6", "status": "unaffected"},
+                ],
+            }
+        ]
+        merged_vulnerabilities = self.calculate_merged_vulnerabilities(
+            vulnerability_1, vulnerability_4
+        )
+        self.assertEqual(merged_vulnerabilities, [vulnerability_1])
+
+    def test_test_same_vulnerabilities_different_analysis_and_overlapping_affects(
+        self,
+    ) -> None:
+        # test same vulnerabilities different analysis and overlapping affects
+        vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_5 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_5["analysis"]["state"] = "false_positive"
+        vulnerability_5["affects"] = [
+            {
+                "ref": "Product 1",
+                "versions": [
+                    {"version": "3.0", "status": "unaffected"},
+                    {"range": "vers:generic/<2.6", "status": "unaffected"},
+                ],
+            }
+        ]
+        vulnerability_5_merged = copy.deepcopy(vulnerability_5)
+        merged_vulnerabilities = self.calculate_merged_vulnerabilities(
+            vulnerability_1, vulnerability_5
+        )
+        vulnerability_5_merged["affects"] = [
+            {
+                "ref": "Product 1",
+                "versions": [
+                    {"range": "vers:generic/<2.6|!=2.4", "status": "unaffected"}
+                ],
+            }
+        ]
+        # drops one and removes the other from the range
+        self.assertEqual(
+            merged_vulnerabilities, [vulnerability_1, vulnerability_5_merged]
         )
 
-        identities_2 = merge.get_identities_for_vulnerabilities(new_vulnerabilities)
-
-        actual_merged = merge.merge_vulnerabilities(
-            original_vulnerabilities, original_vulnerabilities, identities_1
+    def test_test_same_vulnerabilities_same_analysis_and_other_affects(self) -> None:
+        # Merge of the same vulnerability with other affects
+        vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_6 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_6["affects"] = [
+            {
+                "ref": "Product 1",
+                "versions": [
+                    {"version": "10.0", "status": "affected"},
+                    {"range": "vers:generic/>20", "status": "affected"},
+                ],
+            }
+        ]
+        merged_vulnerabilities = self.calculate_merged_vulnerabilities(
+            vulnerability_1, vulnerability_6
         )
-
-        actual_merged_2 = merge.merge_vulnerabilities(
-            new_vulnerabilities, new_vulnerabilities, identities_2
+        vulnerability_1_merged = copy.deepcopy(vulnerability_1)
+        vulnerability_1_merged["affects"][0]["versions"].append(
+            vulnerability_6["affects"][0]["versions"][0]
         )
-
-        self.assertEqual(original_vulnerabilities, actual_merged)
-        self.assertEqual(new_vulnerabilities, actual_merged_2)
+        vulnerability_1_merged["affects"][0]["versions"].append(
+            vulnerability_6["affects"][0]["versions"][1]
+        )
+        self.assertEqual(merged_vulnerabilities, [vulnerability_1_merged])
 
     def test_merge_only_one_vulnerabilities(self) -> None:
         vulnerabilities = helper.load_sections_for_test_sbom()[

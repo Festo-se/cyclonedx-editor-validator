@@ -14,8 +14,8 @@ from cdxev.auxiliary.sbomFunctions import (
     get_dependency_by_ref,
     get_identities_for_vulnerabilities,
     make_bom_refs_unique,
-    unify_bom_refs,
     merge_affects_versions,
+    unify_bom_refs,
 )
 from cdxev.log import LogMessage
 

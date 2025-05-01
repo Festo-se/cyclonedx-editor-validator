@@ -504,6 +504,22 @@ class TestMergeVulnerabilities(unittest.TestCase):
         # drops one and removes the other from the range
         self.assertEqual(merged_vulnerabilities, [vulnerability_merged])
 
+    def test_merge_vulnerabilities(self) -> None:
+        vulnerabilities = helper.load_sections_for_test_sbom()[
+            "merge_vulnerabilities_tests"
+        ]["test_merge_vulnerabilities"]
+        original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
+        new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
+        merged_vulnerabilities = vulnerabilities["merged_vulnerabilities"]
+
+        identities = merge.get_identities_for_vulnerabilities(
+            original_vulnerabilities + new_vulnerabilities
+        )
+        actual_merged = merge.merge_vulnerabilities(
+            original_vulnerabilities, new_vulnerabilities, identities
+        )
+        self.assertEqual(merged_vulnerabilities, actual_merged)
+
     def test_merge_only_one_vulnerabilities(self) -> None:
         vulnerabilities = helper.load_sections_for_test_sbom()[
             "merge_vulnerabilities_tests"

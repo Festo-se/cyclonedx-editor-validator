@@ -357,7 +357,7 @@ class TestMergeVulnerabilities(unittest.TestCase):
         )
         self.assertEqual(merged_vulnerabilities, [vulnerability_1, vulnerability_2])
 
-    def test_test_same_vulnerabilities_different_analysis_and_affects(self) -> None:
+    def test_same_vulnerabilities_different_analysis_and_affects(self) -> None:
         # test same vulnerabilities different analysis and affects
         vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
         vulnerability_3 = copy.deepcopy(self.basic_vulnerability)
@@ -368,12 +368,14 @@ class TestMergeVulnerabilities(unittest.TestCase):
                 "versions": [{"version": "10", "status": "unaffected"}],
             }
         ]
+
         merged_vulnerabilities = self.calculate_merged_vulnerabilities(
             vulnerability_1, vulnerability_3
         )
+
         self.assertEqual(merged_vulnerabilities, [vulnerability_1, vulnerability_3])
 
-    def test_test_same_vulnerabilities_different_analysis_and_same_affects(
+    def test_same_vulnerabilities_different_analysis_and_same_affects(
         self,
     ) -> None:
         # test same vulnerabilities different analysis and same affects
@@ -389,12 +391,13 @@ class TestMergeVulnerabilities(unittest.TestCase):
                 ],
             }
         ]
+
         merged_vulnerabilities = self.calculate_merged_vulnerabilities(
             vulnerability_1, vulnerability_4
         )
         self.assertEqual(merged_vulnerabilities, [vulnerability_1])
 
-    def test_test_same_vulnerabilities_different_analysis_and_overlapping_affects(
+    def test_same_vulnerabilities_different_analysis_and_overlapping_affects(
         self,
     ) -> None:
         # test same vulnerabilities different analysis and overlapping affects
@@ -411,6 +414,7 @@ class TestMergeVulnerabilities(unittest.TestCase):
             }
         ]
         vulnerability_5_merged = copy.deepcopy(vulnerability_5)
+
         merged_vulnerabilities = self.calculate_merged_vulnerabilities(
             vulnerability_1, vulnerability_5
         )
@@ -427,7 +431,7 @@ class TestMergeVulnerabilities(unittest.TestCase):
             merged_vulnerabilities, [vulnerability_1, vulnerability_5_merged]
         )
 
-    def test_test_same_vulnerabilities_same_analysis_and_other_affects(self) -> None:
+    def test_same_vulnerabilities_same_analysis_and_other_affects(self) -> None:
         # Merge of the same vulnerability with other affects
         vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
         vulnerability_6 = copy.deepcopy(self.basic_vulnerability)
@@ -451,6 +455,54 @@ class TestMergeVulnerabilities(unittest.TestCase):
             vulnerability_6["affects"][0]["versions"][1]
         )
         self.assertEqual(merged_vulnerabilities, [vulnerability_1_merged])
+
+    def test_same_vulnerability(self) -> None:
+        # Merge of the same vulnerability with other affects
+        vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_2 = copy.deepcopy(self.basic_vulnerability)
+
+        merged_vulnerabilities = self.calculate_merged_vulnerabilities(
+            vulnerability_1, vulnerability_2
+        )
+        self.assertEqual(merged_vulnerabilities, [vulnerability_1])
+
+    def test_merge_responses_same_vulnerability(self) -> None:
+        # Merge of the same vulnerability with other affects
+        vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_2 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_merged = copy.deepcopy(vulnerability_1)
+
+        vulnerability_2["analysis"]["response"].append("another")
+        merged_vulnerabilities = self.calculate_merged_vulnerabilities(
+            vulnerability_1, vulnerability_2
+        )
+        vulnerability_merged["analysis"]["response"].append("another")
+
+        self.assertEqual(merged_vulnerabilities, [vulnerability_merged])
+
+    def test_new_product(
+        self,
+    ) -> None:
+        # test same vulnerabilities different analysis and overlapping affects
+        vulnerability_1 = copy.deepcopy(self.basic_vulnerability)
+        vulnerability_2 = copy.deepcopy(self.basic_vulnerability)
+        new_affects = {
+            "ref": "Product 3",
+            "versions": [
+                {"version": "3.0", "status": "unaffected"},
+                {"range": "vers:generic/<2.6", "status": "unaffected"},
+            ],
+        }
+        vulnerability_2["affects"] = [new_affects]
+
+        vulnerability_merged = copy.deepcopy(vulnerability_1)
+
+        merged_vulnerabilities = self.calculate_merged_vulnerabilities(
+            vulnerability_1, vulnerability_2
+        )
+        vulnerability_merged["affects"].append(new_affects)
+        # drops one and removes the other from the range
+        self.assertEqual(merged_vulnerabilities, [vulnerability_merged])
 
     def test_merge_only_one_vulnerabilities(self) -> None:
         vulnerabilities = helper.load_sections_for_test_sbom()[

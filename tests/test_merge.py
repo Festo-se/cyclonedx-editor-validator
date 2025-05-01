@@ -1,13 +1,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import copy
-import unittest
 import json
+import unittest
 
 from cdxev import merge
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from tests.auxiliary import helper as helper
-
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
 

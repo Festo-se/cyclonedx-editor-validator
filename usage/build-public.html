@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>build-public &mdash; CycloneDX Editor Validator Tool 0.25.5 documentation</title>
+  <title>build-public &mdash; CycloneDX Editor Validator Tool 0.26.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=80d49aaf"></script>
+      <script src="../_static/documentation_options.js?v=4aa2dafa"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -65,6 +65,7 @@
 <li class="toctree-l2"><a class="reference internal" href="merge-vex.html">merge-vex</a></li>
 <li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
 <li class="toctree-l2"><a class="reference internal" href="validate.html">validate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vex.html">vex</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#exit-codes">Exit codes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#output">Output</a></li>
 </ul>
@@ -107,9 +108,10 @@
 <p>This command creates a redacted version of an SBOM fit for publication. It:</p>
 <ul class="simple">
 <li><p>deletes any <em>property</em> (i.e., item in the <code class="docutils literal notranslate"><span class="pre">properties</span></code> array of a component) whose name starts with <code class="docutils literal notranslate"><span class="pre">internal:</span></code> from all components,</p></li>
+<li><p>deletes any <code class="docutils literal notranslate"><span class="pre">externalReferences</span></code> that are marked as internal by the regex pattern specified by the user, if provided,</p></li>
 <li><p>can optionally delete entire components matching a JSON schema provided by the user.</p></li>
 </ul>
-<p>The actions are performed in this order, meaning that <em>internal</em> properties will be taken into account when matching the JSON schema.
+<p>For the deletion of entire components <em>internal</em> properties and external references will be taken into account when matching the JSON schema.
 If a component containing nested components is deleted, those nested components are deleted as well.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -120,7 +122,7 @@ However, this behavior does not affect the deletion of any property, which start
 </div>
 <p>The JSON schema must be formulated according to the Draft 7 specification.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">build</span><span class="o">-</span><span class="n">public</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">schema</span><span class="o">-</span><span class="n">path</span> <span class="o">&lt;</span><span class="n">schema</span> <span class="n">path</span><span class="o">&gt;</span><span class="p">]</span>
-                           <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
+                           <span class="p">[</span><span class="o">--</span><span class="n">ext</span><span class="o">-</span><span class="n">ref</span><span class="o">-</span><span class="n">regex</span> <span class="o">&lt;</span><span class="n">ext</span><span class="o">-</span><span class="n">ref</span><span class="o">-</span><span class="n">regex</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
                            <span class="nb">input</span>
 </pre></div>
 </div>
@@ -137,6 +139,9 @@ However, this behavior does not affect the deletion of any property, which start
 <dl class="option-list">
 <dt><kbd>--schema-path</kbd></dt>
 <dd><p>Path to a json schema, defining when the information in an SBOM is considered internal</p>
+</dd>
+<dt><kbd>--ext-ref-regex</kbd></dt>
+<dd><p>Regex pattern to remove matching external references.</p>
 </dd>
 <dt><kbd>--output, -o</kbd></dt>
 <dd><p>The path to where the output should be written. If this is a file, output is written there. If it’s a directory, output is written to a file with an auto-generated name inside that directory. If it’s not specified, output is written to stdout.</p>

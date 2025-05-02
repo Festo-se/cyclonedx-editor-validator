@@ -51,7 +51,7 @@ Please consider the following rules for commands, options and arguments:
 +----------------------------+--------------------------------+-------------------------------------------+
 | Option value               | <kebab-case> [#f1]_            | `cdx-ev --issues-file <file>`             |
 +----------------------------+--------------------------------+-------------------------------------------+
-| Positional argument        | <snake-case>                   | `cdx-ev merge-vex <sbom_file> <vex_file>` |
+| Positional argument        | <snake_case>                   | `cdx-ev merge-vex <sbom_file> <vex_file>` |
 +----------------------------+--------------------------------+-------------------------------------------+
 | Optional position argument | [<kebab-case>]                 | No good examples, yet.                    |
 +----------------------------+--------------------------------+-------------------------------------------+

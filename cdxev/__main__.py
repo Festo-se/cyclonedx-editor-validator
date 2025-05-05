@@ -372,7 +372,7 @@ def create_amend_parser(
         description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    add_input_argument(parser)
+    add_input_argument(parser, nargs="?")
 
     parser.add_argument(
         "--operation",
@@ -627,7 +627,7 @@ def create_set_parser(
         ),
         usage=(
             "cdx-ev set [-h] [--output <file>] [--force] "
-            "(--from-file <file> | <target> --key <key> --value <value>) <input>"
+            "(--from-file <file> | <target> --key <key> --value <value>) input"
         ),
     )
     add_input_argument(parser)

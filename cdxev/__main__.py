@@ -23,7 +23,12 @@ import cdxev.set
 from cdxev import pkg
 from cdxev.amend.operations import Operation
 from cdxev.auxiliary.identity import Key, KeyType
-from cdxev.auxiliary.output import write_list, write_sbom
+from cdxev.auxiliary.io_processing import (
+    add_input_argument,
+    add_output_argument,
+    write_list,
+    write_sbom,
+)
 from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
 from cdxev.initialize_sbom import initialize_sbom
@@ -191,32 +196,6 @@ def create_parser() -> argparse.ArgumentParser:
     create_list_command_parser(subparsers)
 
     return parser
-
-
-def add_output_argument(parser: argparse.ArgumentParser) -> None:
-    """Helper function to create uniform output options for all commands."""
-    parser.add_argument(
-        "--output",
-        "-o",
-        metavar="<file>",
-        help=(
-            "The path to where the output should be written. If this is a file, output is "
-            "written there. If it's a directory, output is written to a file with an "
-            "auto-generated name inside that directory. If it's not specified, output is written "
-            "to stdout."
-        ),
-        type=Path,
-    )
-
-
-def add_input_argument(parser: argparse.ArgumentParser) -> None:
-    """Helper function to create uniform input options for all commands."""
-    parser.add_argument(
-        "input_file",
-        metavar="<input_file>",
-        help=("The path to the input (SBOM or VEX) file."),
-        type=Path,
-    )
 
 
 @dataclass
@@ -393,14 +372,8 @@ def create_amend_parser(
         description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Path to the SBOM file.",
-        type=Path,
-        default=None,
-        nargs="?",
-    )
+    add_input_argument(parser, nargs="?")
+
     parser.add_argument(
         "--operation",
         help=(
@@ -443,12 +416,10 @@ def create_merge_parser(
     subparsers: argparse._SubParsersAction,
 ) -> argparse.ArgumentParser:
     parser = subparsers.add_parser("merge", help="Merges two or more SBOMs into one.")
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Paths to SBOM files to merge. You must specify at least two paths.",
+    add_input_argument(
+        parser,
         nargs="*",
-        type=Path,
+        help="Paths to SBOM files to merge. You must specify at least two paths.",
     )
     parser.add_argument(
         "--from-folder",
@@ -584,12 +555,7 @@ def create_validation_parser(
     parser = subparsers.add_parser(
         "validate", help="Validates an SBOM against a given specification."
     )
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Path to the SBOM file to validate.",
-        type=Path,
-    )
+    add_input_argument(parser)
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -664,12 +630,7 @@ def create_set_parser(
             "(--from-file <file> | <target> --key <key> --value <value>) <input>"
         ),
     )
-    parser.add_argument(
-        "input",
-        metavar="<input>",
-        help="Path to the input SBOM file.",
-        type=Path,
-    )
+    add_input_argument(parser)
     add_output_argument(parser)
 
     parser.add_argument(
@@ -788,11 +749,8 @@ def create_build_public_bom_parser(
             "and resolves the dependencies."
         ),
     )
-    parser.add_argument(
-        "input",
-        help="Path to a SBOM file.",
-        type=Path,
-    )
+    add_input_argument(parser)
+
     parser.add_argument(
         "--schema-path",
         metavar="<schema path>",
@@ -868,11 +826,8 @@ def create_list_command_parser(
             "Lists specific contents of the SBOM."
             "Currently supported are the listing of license information and component information."
         ),
-        usage=(
-            "cdx-ev list [-h] [--format {txt,csv}] "
-            "[--output <file>] <operation> {licenses, components} input"
-        ),
     )
+
     parser.add_argument(
         "operation",
         metavar="<operation>",
@@ -881,11 +836,9 @@ def create_list_command_parser(
         default=None,
         type=str,
     )
-    parser.add_argument(
-        "input",
-        help="Path to an SBOM file.",
-        type=Path,
-    )
+
+    add_input_argument(parser)
+
     parser.add_argument(
         "--format",
         help="The output format of the data, the default is csv.",
@@ -1137,7 +1090,7 @@ def invoke_validate(args: argparse.Namespace) -> int:
 
 
 def invoke_vex(args: argparse.Namespace) -> int:
-    file, _ = read_sbom(args.input_file)
+    file, _ = read_sbom(args.input)
 
     if args.sub_command == "extract":
         output = vex(sub_command=args.sub_command, file=file)
@@ -1160,7 +1113,6 @@ def invoke_vex(args: argparse.Namespace) -> int:
     if args.sub_command == "list":
         output = vex(sub_command=args.sub_command, file=file, schema=args.schema)
         write_list(str(output), args.output, file, format=args.format)
-
     else:
         if isinstance(output, dict):
             write_sbom(output, args.output, update_metadata=False)

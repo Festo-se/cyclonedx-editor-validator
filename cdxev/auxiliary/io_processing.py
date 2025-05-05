@@ -183,6 +183,8 @@ def add_input_argument(
 ) -> None:
     """Helper function to create uniform input options for all commands."""
     if nargs:
-        parser.add_argument("input", metavar="input", help=help, type=Path, nargs=nargs)
+        parser.add_argument(
+            "input", metavar="<input>", help=help, type=Path, nargs=nargs
+        )
     else:
-        parser.add_argument("input", metavar="input", help=help, type=Path)
+        parser.add_argument("input", metavar="<input>", help=help, type=Path)

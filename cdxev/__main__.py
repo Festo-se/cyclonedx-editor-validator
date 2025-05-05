@@ -627,7 +627,7 @@ def create_set_parser(
         ),
         usage=(
             "cdx-ev set [-h] [--output <file>] [--force] "
-            "(--from-file <file> | <target> --key <key> --value <value>) input"
+            "(--from-file <file> | <target> --key <key> --value <value>) <input>"
         ),
     )
     add_input_argument(parser)

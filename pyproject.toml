@@ -84,7 +84,7 @@ module = [
     "cdxev.__main__",
     "cdxev.validator.helper",
     "cdxev.validator.validate",
-    "cdxev.auxiliary.output",
+    "cdxev.auxiliary.io_processing",
     "cdxev.auxiliary.sbomFunctions",
     "cdxev.auxiliary.filename_gen",
     "cdxev.auxiliary.identity",

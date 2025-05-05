@@ -12,7 +12,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-import cdxev.auxiliary.output as out
+import cdxev.auxiliary.io_processing as out
 from cdxev import pkg
 
 

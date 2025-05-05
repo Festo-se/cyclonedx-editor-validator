@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import json
 import typing as t
 
 
@@ -92,3 +93,75 @@ def search_entry(haystack: dict, key: t.Any, value: t.Any) -> t.Optional[dict]:
         return None
 
     return _recurse(haystack)
+
+
+# Import functions for json files used in test_merge and test_sbom_functions
+path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
+
+
+def get_ratings_dict() -> dict:
+    with open(
+        path_to_folder_with_test_sboms + "ratings_lists_for_tests.json",
+        "r",
+        encoding="utf-8-sig",
+    ) as my_file:
+        return json.load(my_file)
+
+
+def get_dictionary_with_stuff() -> dict:
+    with open(
+        path_to_folder_with_test_sboms + "sections_for_test_sbom.json",
+        "r",
+        encoding="utf-8-sig",
+    ) as my_file:
+        return json.load(my_file)
+
+
+def load_governing_program() -> dict:
+    with open(
+        path_to_folder_with_test_sboms + "governing_program.json",
+        "r",
+        encoding="utf-8-sig",
+    ) as my_file:
+        sbom = json.load(my_file)
+    return sbom
+
+
+def load_sections_for_test_sbom() -> dict:
+    with open(
+        path_to_folder_with_test_sboms + "sections_for_test_sbom.json",
+        "r",
+        encoding="utf-8-sig",
+    ) as my_file:
+        sbom = json.load(my_file)
+    return sbom
+
+
+def load_governing_program_merged_sub_program() -> dict:
+    with open(
+        path_to_folder_with_test_sboms + "merged_sbom.json",
+        "r",
+        encoding="utf-8-sig",
+    ) as my_file:
+        sbom = json.load(my_file)
+    return sbom
+
+
+def load_sub_program() -> dict:
+    with open(
+        path_to_folder_with_test_sboms + "sub_program.json",
+        "r",
+        encoding="utf-8-sig",
+    ) as my_file:
+        sbom = json.load(my_file)
+    return sbom
+
+
+def load_additional_sbom_dict() -> dict:
+    with open(
+        path_to_folder_with_test_sboms + "additional_sboms.json",
+        "r",
+        encoding="utf-8-sig",
+    ) as my_file:
+        sbom = json.load(my_file)
+    return sbom

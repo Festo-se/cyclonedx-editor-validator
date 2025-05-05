@@ -77,7 +77,6 @@ strict = true
 [[tool.mypy.overrides]]
 module = [
     "cdxev.merge",
-    "cdxev.merge_vex",
     "cdxev.set",
     "cdxev.amend.operations",
     "cdxev.amend.license",

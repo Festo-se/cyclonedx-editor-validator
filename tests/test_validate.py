@@ -358,7 +358,7 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(search_for_word_issues("additional", issues), True)
 
     def test_components_licenses_is_empty(self) -> None:
-        for spec_version in ["1.6"]:
+        for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["components"][0]["licenses"] = []

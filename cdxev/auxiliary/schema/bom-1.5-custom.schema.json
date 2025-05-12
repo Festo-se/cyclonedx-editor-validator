@@ -1298,10 +1298,29 @@
               "description": "The timestamp indicating when the current license expires (if applicable)."
             }
           },
-          "required": [
-            "licenseTypes",
-            "licensor",
-            "licensee"
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "licenseTypes": {
+                    "contains": {
+                      "const": "appliance"
+                    }
+                  }
+                },
+                "required": [
+                  "licenseTypes"
+                ]
+              },
+              "then": {},
+              "else": {
+                "required": [
+                  "licenseTypes",
+                  "licensor",
+                  "licensee"
+                ]
+              }
+            }
           ]
         },
         "properties": {

@@ -357,6 +357,14 @@ class TestValidateComponents(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("additional", issues), True)
 
+    def test_components_licenses_is_empty(self) -> None:
+        for spec_version in ["1.6"]:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0]["licenses"] = []
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("empty", issues), True)
+
     def test_components_license_name_without_text(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
@@ -1102,6 +1110,39 @@ class TestInternalMetaData(unittest.TestCase):
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
+
+    def test_component_metadata_empty_license(self) -> None:
+        sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-02-17T10:14:58Z",
+                "authors": [{"name": "automated"}],
+                "component": {
+                    "type": "application",
+                    "bom-ref": "acme-app",
+                    "group": "com.festo.internal",
+                    "licenses": [],
+                    "supplier": {"name": "acme"},
+                    "name": "Acme_Application",
+                    "version": "9.1.1",
+                    "hashes": [
+                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
+                    ],
+                    "properties": [
+                        {"name": "internal:component:status", "value": "internal"}
+                    ],
+                },
+            },
+            "compositions": [],
+            "dependencies": [],
+        }
+        for spec_version in list_of_spec_versions:
+            sbom["specVersion"] = spec_version
+            issues = validate_test(sbom)
+            self.assertEqual(search_for_word_issues("empty", issues), True)
 
     def test_internal_component_metadata_supplier_copyright_no_issue(self) -> None:
         sbom = {

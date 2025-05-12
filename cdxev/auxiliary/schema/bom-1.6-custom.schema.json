@@ -1325,18 +1325,43 @@
             ]
           },
           {
-            "anyOf": [
-              {
-                "required": [
-                  "licenses"
-                ]
+            "if": {
+              "properties": {
+                "type": {
+                  "enum": [
+                    "application",
+                    "container",
+                    "framework",
+                    "library",
+                    "platform",
+                    "operating-system",
+                    "device-driver",
+                    "firmware",
+                    "file",
+                    "machine-learning-model",
+                    "data",
+                    "cryptographic-asset"
+                  ]
+                }
               },
-              {
-                "required": [
-                  "copyright"
-                ]
-              }
-            ]
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "anyOf": [
+                {
+                  "required": [
+                    "licenses"
+                  ]
+                },
+                {
+                  "required": [
+                    "copyright"
+                  ]
+                }
+              ]
+            }
           },
           {
             "anyOf": [

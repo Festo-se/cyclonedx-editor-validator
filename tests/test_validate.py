@@ -637,6 +637,26 @@ class TestValidateLicensing(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("licensee", issues), True)
 
+    def test_licensetype_appliance_no_licensor_or_licensee(self) -> None:
+        for spec_version in list_of_spec_versions_containing_licensing:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0]["licenses"] = [
+                {
+                    "license": {
+                        "name": "some_name",
+                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
+                        "text": {"content": "some text"},
+                        "licensing": {
+                            "licenseTypes": ["appliance"],
+                            "expiration": "2023-04-13T20:20:39+00:00",
+                        },
+                    }
+                }
+            ]
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
     def test_no_license_types(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()

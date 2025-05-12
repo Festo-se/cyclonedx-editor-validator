@@ -392,6 +392,15 @@ class TestValidateComponents(unittest.TestCase):
                 search_for_word_issues("not a valid SPDX ID", issues), True
             )
 
+    def test_components_no_license_or_copyright_for_device(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["components"][0]["type"] = "device"
+            sbom["components"][0].pop("licenses")
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
     def test_components_component_copyright(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()

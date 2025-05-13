@@ -335,7 +335,8 @@
           "items": {
             "$ref": "#/definitions/licenseChoice"
           },
-          "title": "Component License(s)"
+          "title": "Component License(s)",
+          "minItems": 1
         },
         "properties": {
           "type": "array",
@@ -614,6 +615,7 @@
           "items": {
             "$ref": "#/definitions/licenseChoice"
           },
+          "minItems": 1,
           "title": "Component License(s)"
         },
         "copyright": {

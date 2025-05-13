@@ -304,7 +304,7 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
 def unify_bom_refs(list_of_sboms: Sequence[dict]) -> None:
     """
     Function to unify the bom-refs of several SBOMs,
-    so that identical components in the different SBOMs.
+    so that identical components in the different SBOMs
     have the same reference.
 
     :param list_of_sboms: list of SBOM dictionaries.

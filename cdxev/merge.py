@@ -374,14 +374,14 @@ def merge_vulnerabilities(
     Parameters
     ----------
     list_of_original_vulnerabilities : Sequence[dict]
-        The list of Vulnerabilities of the sbom in which should be merged
+        The list of vulnerabilities of the sbom in which should be merged
     list_of_new_vulnerabilities: Sequence[dict]
-        The list of Vulnerabilities of the new sbom that will be merged in the other
+        The list of vulnerabilities of the new sbom that will be merged in the other
 
     Returns
     -------
     Sequence[dict]
-        List with the merged Vulnerabilities
+        List with the merged vulnerabilities
     """
     # Create copies in case both inputs are the same object
     # what would cause a crash

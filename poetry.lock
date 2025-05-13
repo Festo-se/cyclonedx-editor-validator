@@ -1007,15 +1007,15 @@ files = [
 
 [[package]]
 name = "pep8-naming"
-version = "0.15.0"
+version = "0.15.1"
 description = "Check PEP-8 naming conventions, plugin for flake8"
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 markers = "sys_platform == \"darwin\" or sys_platform == \"linux\" or sys_platform != \"darwin\" and sys_platform != \"linux\""
 files = [
-    {file = "pep8_naming-0.15.0-py3-none-any.whl", hash = "sha256:2ce36937ff0421d871a634f4a0c2af06f994fe22c9055ea9813ca72d562754da"},
-    {file = "pep8_naming-0.15.0.tar.gz", hash = "sha256:a637ee5144f7585c800b1fc6eeb996fa35a2ef0f2690880a9e1b29cb9f6e8359"},
+    {file = "pep8_naming-0.15.1-py3-none-any.whl", hash = "sha256:eb63925e7fd9e028c7f7ee7b1e413ec03d1ee5de0e627012102ee0222c273c86"},
+    {file = "pep8_naming-0.15.1.tar.gz", hash = "sha256:f6f4a499aba2deeda93c1f26ccc02f3da32b035c8b2db9696b730ef2c9639d29"},
 ]
 
 [package.dependencies]
@@ -1953,4 +1953,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10.0"
-content-hash = "5d9164fec684340bb6e7e654dabc9955235b8937d14d7e7b0c7c413dbd38f4e0"
+content-hash = "1fc7b85f30b0b0d7ed0b28a9af2092c2e9c108218577b2b64eab76b7594e2824"

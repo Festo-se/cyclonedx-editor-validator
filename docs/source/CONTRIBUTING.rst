@@ -45,13 +45,13 @@ Please consider the following rules for commands, options and arguments:
 +----------------------------+--------------------------------+-------------------------------------------+
 | Argument type              | Style                          | Examples                                  |
 +============================+================================+===========================================+
-| Subcommand                 | kebab-case [#f1]_              | `cdx-ev merge-vex`                        |
+| Subcommand                 | kebab-case [#f1]_              | `cdx-ev init-sbom`                        |
 +----------------------------+--------------------------------+-------------------------------------------+
 | Option                     | kebab-case                     | `cdx-ev --issues-file`                    |
 +----------------------------+--------------------------------+-------------------------------------------+
 | Option value               | <kebab-case> [#f1]_            | `cdx-ev --issues-file <file>`             |
 +----------------------------+--------------------------------+-------------------------------------------+
-| Positional argument        | <snake-case>                   | `cdx-ev merge-vex <sbom_file> <vex_file>` |
+| Positional argument        | <snake_case>                   | `cdx-ev merge-vex <sbom_file> <vex_file>` |
 +----------------------------+--------------------------------+-------------------------------------------+
 | Optional position argument | [<kebab-case>]                 | No good examples, yet.                    |
 +----------------------------+--------------------------------+-------------------------------------------+

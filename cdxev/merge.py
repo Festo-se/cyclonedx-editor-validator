@@ -84,7 +84,7 @@ def merge_components(
     """
     Function that gets two lists of components and merges them unique into one.
     Before use, it must be ensured, that the bom-refs are unique and unified
-    across al SBOMs.
+    across all SBOMs.
 
     The bom-refs of the sbom_to_be_merged will be replaced by the ones from the
     one it will be merged into (governing_sbom), if they contain the same component.
@@ -205,7 +205,7 @@ def merge_2_sboms(
     vulnerability_identities: dict[str, VulnerabilityIdentity] = {},
 ) -> dict:
     """
-    Function that merges two sboms.
+    Function that merges two SBOMs.
 
     Input
     original_sbom: sbom

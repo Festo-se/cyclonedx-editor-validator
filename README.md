@@ -1,6 +1,7 @@
 
 [![build and test](https://github.com/Festo-se/cyclonedx-editor-validator/actions/workflows/main.yml/badge.svg)](https://github.com/Festo-se/cyclonedx-editor-validator/actions/workflows/main.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Festo-se/cyclonedx-editor-validator/badge)](https://scorecard.dev/viewer/?uri=github.com/Festo-se/cyclonedx-editor-validator)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10485/badge)](https://www.bestpractices.dev/projects/10485)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
@@ -25,6 +26,7 @@ The tool is built with automation in mind, i.e. usage within CI/CD. We try to be
 | [merge-vex](https://festo-se.github.io/cyclonedx-editor-validator/usage/merge-vex.html) | *[Deprecated]* Merges the *vex* information in two or more CycloneDX documents into one. |
 | [set](https://festo-se.github.io/cyclonedx-editor-validator/usage/set.html) | Sets properties on specified components to specified values. If a component in an SBOM is missing a particular property or the property is present but has a wrong value, this command can be used to modify just the affected properties without changing the rest of the SBOM. |
 | [validate](https://festo-se.github.io/cyclonedx-editor-validator/usage/validate.html) | Validate the SBOM against a built-in or user-provided JSON schema. |
+| [vex](https://festo-se.github.io/cyclonedx-editor-validator/usage/vex.html) | Apply different operations on VEX-files. |
 
 ## Installation and usage
 

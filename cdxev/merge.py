@@ -365,18 +365,18 @@ def merge_vulnerabilities(
     kept unchanged.
     If a vulnerability in list_of_new_vulnerabilities is not yet present,
     it will be added.
-    If the vulnerability already exists, its "affects" field is compared entries
-    already present in a Vulnerability in list_of_original_vulnerabilities will be removed.
+    If the vulnerability already exists, its "affects" field is compared.
+    Entries already present in a vulnerability in list_of_original_vulnerabilities will be removed.
     In case of version ranges, for an already present version a != constrained is appended.
 
-    version ranged can not be compared with each other, here exists a risk of information loss.
+    version ranges can not be compared with each other, here exists a risk of information loss.
 
     Parameters
     ----------
     list_of_original_vulnerabilities : Sequence[dict]
-        The list of vulnerabilities of the sbom in which should be merged
+        The list of vulnerabilities of the SBOM in which should be merged
     list_of_new_vulnerabilities: Sequence[dict]
-        The list of vulnerabilities of the new sbom that will be merged in the other
+        The list of vulnerabilities of the new SBOM that will be merged in the other
 
     Returns
     -------

@@ -38,5 +38,4 @@ A few notes on the merge algorithm:
 - Uniqueness of *bom-refs* will be ensured.
 - The command is able to merge inputs containing only VEX information in the form of a ``vulnerabilities``. To ensure a sensible result, it should be ensured that bom-refs in the affects field reference components of the same SBOM.
 - Vulnerabilities, like components, are merged into the result in the order they **first** appear in the inputs.
-- The vex whose ``analysis`` information should be preserved must be merged first.
-- If a merged vulnerability contains additional entries in the ``affects`` field, those will be added as a new vulnerability object (duplicates are possible if version ranges are used), already present ``affects`` entries are dropped without consideration of the ``analysis`` field.
+- If a merged vulnerability contains additional entries in the ``affects`` field, those will be added to the original vulnerability object (duplicates are possible if version ranges are used).

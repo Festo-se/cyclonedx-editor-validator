@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>list &mdash; CycloneDX Editor Validator Tool 0.26.0 documentation</title>
+  <title>list &mdash; CycloneDX Editor Validator Tool 0.27.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4aa2dafa"></script>
+      <script src="../_static/documentation_options.js?v=3b7790a3"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -61,7 +61,6 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
-<li class="toctree-l2"><a class="reference internal" href="merge-vex.html">merge-vex</a></li>
 <li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
 <li class="toctree-l2"><a class="reference internal" href="validate.html">validate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vex.html">vex</a></li>
@@ -110,7 +109,8 @@
 <li><p>of the components in the SBOM using the <code class="docutils literal notranslate"><span class="pre">components</span></code> operation.</p></li>
 </ul>
 <p>The information can be displayed as a text file or in csv format.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">list</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">format</span> <span class="p">{</span><span class="n">txt</span><span class="p">,</span><span class="n">csv</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">operation</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">licenses</span><span class="p">,</span> <span class="n">components</span><span class="p">}</span> <span class="nb">input</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">list</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">format</span> <span class="p">{</span><span class="n">txt</span><span class="p">,</span><span class="n">csv</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
+                   <span class="o">&lt;</span><span class="n">operation</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <section id="create_parser-positional-arguments">
@@ -120,8 +120,8 @@
 <dd><p>Possible choices: licenses, components</p>
 <p>The list operation that shall be performed.</p>
 </dd>
-<dt><kbd>input</kbd></dt>
-<dd><p>Path to an SBOM file.</p>
+<dt><kbd>&lt;input&gt;</kbd></dt>
+<dd><p>Path to the SBOM file.</p>
 </dd>
 </dl>
 </section>

@@ -32,7 +32,10 @@ The ``--hierarchical`` flag allows for hierarchical merges. This affects only th
 A few notes on the merge algorithm:
 
 - The ``metadata`` field is always retained from the first input and never changed through a merge with the exception of the ``timestamp``.
+- The command merges the contents of the fields ``components``, ``dependencies``, ``compositions`` and ``vulnerabilities``.
 - Components are merged into the result in the order they **first** appear in the inputs. If any subsequent input specifies the same component (sameness in this case being defined as having identical identifying attributes such as ``name``, ``version``, ``purl``, etc.), the later instance of the component will be dropped with a warning. **This command cannot be used to merge information inside components.**
 - The resulting dependency graph will reflect all dependencies from all inputs. Dependencies from later inputs are always added to the result, even if the component is dropped as a duplicate as described above.
 - Uniqueness of *bom-refs* will be ensured.
-- If the inputs contain VEX information in the form of a ``vulnerabilities`` field, this will be merged as well. For details see section on the ``merge-vex`` command.
+- The command is able to merge inputs containing only VEX information in the form of a ``vulnerabilities``. To ensure a sensible result, it should be ensured that bom-refs in the affects field reference components of the same SBOM.
+- Vulnerabilities, like components, are merged into the result in the order they **first** appear in the inputs.
+- If a merged vulnerability contains additional entries in the ``affects`` field, those will be added to the original vulnerability object (duplicates are possible if version ranges are used).

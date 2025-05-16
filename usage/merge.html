@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>merge &mdash; CycloneDX Editor Validator Tool 0.26.0 documentation</title>
+  <title>merge &mdash; CycloneDX Editor Validator Tool 0.27.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,14 +15,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4aa2dafa"></script>
+      <script src="../_static/documentation_options.js?v=3b7790a3"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="merge-vex" href="merge-vex.html" />
+    <link rel="next" title="set" href="set.html" />
     <link rel="prev" title="list" href="list.html" /> 
 </head>
 
@@ -62,7 +62,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#details">Details</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="merge-vex.html">merge-vex</a></li>
 <li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
 <li class="toctree-l2"><a class="reference internal" href="validate.html">validate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vex.html">vex</a></li>
@@ -147,10 +146,13 @@ The <code class="docutils literal notranslate"><span class="pre">--hierarchical<
 <p>A few notes on the merge algorithm:</p>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">metadata</span></code> field is always retained from the first input and never changed through a merge with the exception of the <code class="docutils literal notranslate"><span class="pre">timestamp</span></code>.</p></li>
+<li><p>The command merges the contents of the fields <code class="docutils literal notranslate"><span class="pre">components</span></code>, <code class="docutils literal notranslate"><span class="pre">dependencies</span></code>, <code class="docutils literal notranslate"><span class="pre">compositions</span></code> and <code class="docutils literal notranslate"><span class="pre">vulnerabilities</span></code>.</p></li>
 <li><p>Components are merged into the result in the order they <strong>first</strong> appear in the inputs. If any subsequent input specifies the same component (sameness in this case being defined as having identical identifying attributes such as <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">version</span></code>, <code class="docutils literal notranslate"><span class="pre">purl</span></code>, etc.), the later instance of the component will be dropped with a warning. <strong>This command cannot be used to merge information inside components.</strong></p></li>
 <li><p>The resulting dependency graph will reflect all dependencies from all inputs. Dependencies from later inputs are always added to the result, even if the component is dropped as a duplicate as described above.</p></li>
 <li><p>Uniqueness of <em>bom-refs</em> will be ensured.</p></li>
-<li><p>If the inputs contain VEX information in the form of a <code class="docutils literal notranslate"><span class="pre">vulnerabilities</span></code> field, this will be merged as well. For details see section on the <code class="docutils literal notranslate"><span class="pre">merge-vex</span></code> command.</p></li>
+<li><p>The command is able to merge inputs containing only VEX information in the form of a <code class="docutils literal notranslate"><span class="pre">vulnerabilities</span></code>. To ensure a sensible result, it should be ensured that bom-refs in the affects field reference components of the same SBOM.</p></li>
+<li><p>Vulnerabilities, like components, are merged into the result in the order they <strong>first</strong> appear in the inputs.</p></li>
+<li><p>If a merged vulnerability contains additional entries in the <code class="docutils literal notranslate"><span class="pre">affects</span></code> field, those will be added to the original vulnerability object (duplicates are possible if version ranges are used).</p></li>
 </ul>
 </section>
 </section>
@@ -160,7 +162,7 @@ The <code class="docutils literal notranslate"><span class="pre">--hierarchical<
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="list.html" class="btn btn-neutral float-left" title="list" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="merge-vex.html" class="btn btn-neutral float-right" title="merge-vex" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="set.html" class="btn btn-neutral float-right" title="set" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

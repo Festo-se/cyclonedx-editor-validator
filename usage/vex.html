@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>vex &mdash; CycloneDX Editor Validator Tool 0.26.0 documentation</title>
+  <title>vex &mdash; CycloneDX Editor Validator Tool 0.27.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4aa2dafa"></script>
+      <script src="../_static/documentation_options.js?v=3b7790a3"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -56,7 +56,6 @@
 <li class="toctree-l2"><a class="reference internal" href="init-sbom.html">init-sbom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="list.html">list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
-<li class="toctree-l2"><a class="reference internal" href="merge-vex.html">merge-vex</a></li>
 <li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
 <li class="toctree-l2"><a class="reference internal" href="validate.html">validate</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">vex</a><ul>
@@ -164,14 +163,14 @@
 <p>The output can be a text file or a CSV (default) file.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="nb">list</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">schema</span> <span class="p">{</span><span class="n">default</span><span class="p">,</span><span class="n">lightweight</span><span class="p">}]</span>
                        <span class="p">[</span><span class="o">--</span><span class="nb">format</span> <span class="p">{</span><span class="n">txt</span><span class="p">,</span><span class="n">csv</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
-                       <span class="o">&lt;</span><span class="n">input_file</span><span class="o">&gt;</span>
+                       <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <section id="create_parser-positional-arguments">
 <h3>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
-<dt><kbd>&lt;input_file&gt;</kbd></dt>
-<dd><p>The path to the input (SBOM or VEX) file.</p>
+<dt><kbd>&lt;input&gt;</kbd></dt>
+<dd><p>Path to the SBOM file.</p>
 </dd>
 </dl>
 </section>
@@ -203,14 +202,14 @@
 <h2>trim<a class="headerlink" href="#trim" title="Link to this heading"></a></h2>
 <p>This subcommand returns a JSON file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by any key-value pair.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">trim</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">key</span> <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">value</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
-                       <span class="o">&lt;</span><span class="n">input_file</span><span class="o">&gt;</span>
+                       <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <section id="create_parser-positional-arguments">
 <h3>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
-<dt><kbd>&lt;input_file&gt;</kbd></dt>
-<dd><p>The path to the input (SBOM or VEX) file.</p>
+<dt><kbd>&lt;input&gt;</kbd></dt>
+<dd><p>Path to the SBOM file.</p>
 </dd>
 </dl>
 </section>
@@ -237,14 +236,14 @@
 <section id="search">
 <h2>search<a class="headerlink" href="#search" title="Link to this heading"></a></h2>
 <p>This subcommand searches a file for a specific vulnerability based on its ID. The command returns a JSON file.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">search</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">input_file</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">vul_id</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">search</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">vul_id</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <section id="create_parser-positional-arguments">
 <h3>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
-<dt><kbd>&lt;input_file&gt;</kbd></dt>
-<dd><p>The path to the input (SBOM or VEX) file.</p>
+<dt><kbd>&lt;input&gt;</kbd></dt>
+<dd><p>Path to the SBOM file.</p>
 </dd>
 <dt><kbd>&lt;vul_id&gt;</kbd></dt>
 <dd><p>The ID of the vulnerability to search for.</p>
@@ -268,14 +267,14 @@
 <section id="extract">
 <h2>extract<a class="headerlink" href="#extract" title="Link to this heading"></a></h2>
 <p>This subcommand extracts all vulnerabilities from an SBOM file and returns it as a VEX file in JSON format.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">extract</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">input_file</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">extract</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <section id="create_parser-positional-arguments">
 <h3>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
-<dt><kbd>&lt;input_file&gt;</kbd></dt>
-<dd><p>The path to the input (SBOM or VEX) file.</p>
+<dt><kbd>&lt;input&gt;</kbd></dt>
+<dd><p>Path to the SBOM file.</p>
 </dd>
 </dl>
 </section>

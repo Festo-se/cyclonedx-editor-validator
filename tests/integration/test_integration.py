@@ -537,6 +537,24 @@ class TestMerge:
 
         assert "Dropping a duplicate component" in warnings
 
+    def test_merge_of_vex(
+        self,
+        argv: Callable[..., None],
+        data_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+
+        input_1 = data_dir / "merge.vex.input_1.cdx.json"
+        input_2 = data_dir / "merge.vex.input_2.cdx.json"
+
+        argv("merge", str(input_1), str(input_2))
+        exit_code, actual, _ = run_main(capsys=capsys, parse_output="json")
+
+        assert exit_code == Status.OK
+
+        expected = load_sbom(data_dir / "merge.vex.expected.cdx.json")
+        assert expected == actual
+
     def test_order(
         self,
         argv: Callable[..., None],

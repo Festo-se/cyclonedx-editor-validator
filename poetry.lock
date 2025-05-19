@@ -1817,15 +1817,15 @@ files = [
 
 [[package]]
 name = "types-jsonschema"
-version = "4.23.0.20241208"
+version = "4.23.0.20250516"
 description = "Typing stubs for jsonschema"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["dev"]
 markers = "sys_platform == \"darwin\" or sys_platform == \"linux\" or sys_platform != \"darwin\" and sys_platform != \"linux\""
 files = [
-    {file = "types_jsonschema-4.23.0.20241208-py3-none-any.whl", hash = "sha256:87934bd9231c99d8eff94cacfc06ba668f7973577a9bd9e1f9de957c5737313e"},
-    {file = "types_jsonschema-4.23.0.20241208.tar.gz", hash = "sha256:e8b15ad01f290ecf6aea53f93fbdf7d4730e4600313e89e8a7f95622f7e87b7c"},
+    {file = "types_jsonschema-4.23.0.20250516-py3-none-any.whl", hash = "sha256:e7d0dd7db7e59e63c26e3230e26ffc64c4704cc5170dc21270b366a35ead1618"},
+    {file = "types_jsonschema-4.23.0.20250516.tar.gz", hash = "sha256:9ace09d9d35c4390a7251ccd7d833b92ccc189d24d1b347f26212afce361117e"},
 ]
 
 [package.dependencies]
@@ -1953,4 +1953,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10.0"
-content-hash = "537ed740012d4be169a96db2b65d9bfcf0af85da3996c20861b49f37aa018752"
+content-hash = "cf9c69065fb90218f76688bb3019e79e66fd316a8cada44bd36be6f1e1a9ff75"

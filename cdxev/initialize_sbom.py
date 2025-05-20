@@ -22,6 +22,7 @@ def initialize_sbom(
     version: Union[str, None],
     supplier: Union[str, None],
     authors: Union[str, None],
+    email: Union[str, None] = None,
 ) -> dict[str, Any]:
     """
     Creates an initial SBOM draft to work with, containing the most basic fields.
@@ -48,11 +49,15 @@ def initialize_sbom(
         "the underlying claims to copyright ownership in a published work."
     )
 
-    metadata_authors = OrganizationalContact(
-        name=authors,
-        phone="The phone number of the contact.",
-        email="The email address of the contact.",
-    )
+    if email is None:
+        metadata_authors = OrganizationalContact(
+            name=authors,
+        )
+    else:
+        metadata_authors = OrganizationalContact(
+            name=authors,
+            email=email,
+        )
 
     component_supplier = OrganizationalEntity(name=supplier)
 

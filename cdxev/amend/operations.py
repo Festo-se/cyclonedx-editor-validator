@@ -209,7 +209,7 @@ class Compositions(Operation):
 
 @default
 class DefaultAuthor(Operation):
-    """Sets author of the metadata component to ``automated``, if missing."""
+    """Sets author of the SBOM in metadata to ``automated``, if missing."""
 
     def handle_metadata(self, metadata: dict) -> None:
         authors = metadata.setdefault("authors", [])

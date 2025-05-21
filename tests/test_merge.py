@@ -98,7 +98,6 @@ class TestMergeSboms(unittest.TestCase):
         expected = sections["expected"]
 
         actual = merge.merge([sbom_1, sbom_2])
-        print(actual)
         self.assertEqual(actual, expected)
 
 

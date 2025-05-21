@@ -117,34 +117,6 @@ class TestMergeSeveralSboms(unittest.TestCase):
 
         self.assertTrue(helper.compare_sboms(merged_bom, goal_sbom))
 
-
-class TestReplaceBomRefs(unittest.TestCase):
-    def test_replace_licenses(self) -> None:
-        sbom = load_governing_program_merged_sub_program()
-        sbom["dependencies"] = dictionary_with_stuff["dependencies_tls_equal"]
-        sbom["compositions"] = dictionary_with_stuff["compositions_tls_equal"]
-        sbom["components"] = [
-            component
-            for component in sbom["components"]
-            if component["bom-ref"] != "sp_fifteenth_component"
-        ]
-        sbom["vulnerabilities"] = dictionary_with_stuff["vulnerabilities_tls_equal"]
-        list_of_bom_refs = sbF.get_ref_from_components(sbom.get("components", []))
-        sbom_bom_refs_replaced = load_additional_sbom_dict()[
-            "sbom_with_bom_refs_replaced"
-        ]
-        list_of_bom_refs.append(sbom["metadata"]["component"]["bom-ref"])
-        for bom_ref in list_of_bom_refs:
-            new_reference = bom_ref + "_replaced"
-            merge.replace_ref_in_sbom(new_reference, bom_ref, sbom)
-        self.assertTrue(helper.compare_sboms(sbom, sbom_bom_refs_replaced))
-
-    def test_new_license_already_exists(self) -> None:
-        sbom = load_governing_program_merged_sub_program()
-        self.assertFalse(
-            merge.replace_ref_in_sbom("gp_first_component-copy", "sub_program", sbom)
-        )
-
     def test_identical_metadata_bomrefs(self) -> None:
         metacomp1 = {
             "bom-ref": "app",

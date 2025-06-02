@@ -450,8 +450,11 @@ def compare_version_range(first_range: str, second_range: str) -> bool:
     if first_range == second_range:
         return True
 
-    first_range_object = VersionRange.from_string(second_range)
-    second_range_object = VersionRange.from_string(first_range)
+    try:
+        first_range_object = VersionRange.from_string(second_range)
+        second_range_object = VersionRange.from_string(first_range)
+    except:
+        return False
 
     if first_range_object == second_range_object:
         return True
@@ -528,8 +531,8 @@ def compare_affects_versions_object(
         and second_affects_object.get("range", None) is not None
     ):  # TODO extend to support >= and <= for version ranges when supported
         if compare_version_range(
-            first_affects_object.get("range", None),
-            second_affects_object.get("range", None),
+            first_affects_object.get("range", "1"),
+            second_affects_object.get("range", "2"),
         ):
             return 1
         # If the version ranges are not identical, no further conclusions can be drawn

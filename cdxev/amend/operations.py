@@ -312,7 +312,7 @@ class LicenseNameToId(Operation):
 
     license_map: dict[str, str] = {}
 
-    def prepare(self, sbom: dict) -> None:  # type: ignore
+    def prepare(self, sbom: dict) -> None:
         license_mapping_file = (
             importlib.resources.files(__spec__.parent) / "license_name_spdx_id_map.json"  # type: ignore[arg-type]  # noqa: E501
         )

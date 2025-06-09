@@ -400,15 +400,15 @@ toml = ["tomli ; python_full_version <= \"3.11.0a6\""]
 
 [[package]]
 name = "cyclonedx-python-lib"
-version = "10.0.1"
+version = "10.1.0"
 description = "Python library for CycloneDX"
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 markers = "sys_platform == \"darwin\" or sys_platform == \"linux\" or sys_platform != \"darwin\" and sys_platform != \"linux\""
 files = [
-    {file = "cyclonedx_python_lib-10.0.1-py3-none-any.whl", hash = "sha256:790a5d53b116f62f91740b07b234019bb477f155984d6bf0bd6d91cd4d4b5441"},
-    {file = "cyclonedx_python_lib-10.0.1.tar.gz", hash = "sha256:6c7a8c27a28279d22d92d4e0982e59beed3076a1aa4928a27830b0eaa2ca4f29"},
+    {file = "cyclonedx_python_lib-10.1.0-py3-none-any.whl", hash = "sha256:8f76c7d9fad4494eb7f1511f6758c8d2ed0a10723d0da3cc50089c85cf2f2d62"},
+    {file = "cyclonedx_python_lib-10.1.0.tar.gz", hash = "sha256:ab2ce2204b8e3c71e0c7263a6f156feeee68cfe5ea6d7d679bce711d0ec63d3d"},
 ]
 
 [package.dependencies]
@@ -1957,4 +1957,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10.0"
-content-hash = "a48eea0eb066ea91812c231d33ac16ba56c71d9e7db97b5e7d2c2555300c54a2"
+content-hash = "a68fbadeb8e7672042c54ccbdf7ea38d6333505f16095b49b067de6abce1ff09"

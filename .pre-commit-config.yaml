@@ -30,7 +30,7 @@ repos:
         # https://github.com/pre-commit/mirrors-mypy/blob/main/README.md
         additional_dependencies:
           - types-python-dateutil==2.9.0.20250516
-          - typing-extensions==4.13.2
+          - typing-extensions==4.14.0
           - types-jsonschema==4.24.0.20250528
           - cyclonedx-python-lib==10.2.0
           - univers==30.12.1

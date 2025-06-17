@@ -453,7 +453,7 @@ def compare_version_range(first_range: str, second_range: str) -> bool:
     try:
         first_range_object = VersionRange.from_string(second_range)
         second_range_object = VersionRange.from_string(first_range)
-    except:
+    except ValueError:
         return False
 
     if first_range_object == second_range_object:

@@ -140,7 +140,7 @@ def write_license_dict_to_csv(info_dict: dict[str, Any]) -> str:
     string += ","
     string += '"' + license_str + '"'
 
-    return string
+    return str(string)
 
 
 def write_license_information_to_txt(

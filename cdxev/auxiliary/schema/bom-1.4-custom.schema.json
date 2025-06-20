@@ -193,6 +193,7 @@
         "licenses": {
           "type": "array",
           "title": "BOM License(s)",
+          "minItems": 1,
           "additionalItems": false,
           "items": {
             "$ref": "#/definitions/licenseChoice"
@@ -465,6 +466,7 @@
           "items": {
             "$ref": "#/definitions/licenseChoice"
           },
+          "minItems": 1,
           "title": "Component License(s)"
         },
         "copyright": {

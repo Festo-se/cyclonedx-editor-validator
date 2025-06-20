@@ -165,6 +165,7 @@
         },
         "licenses": {
           "type": "array",
+          "minItems": 1,
           "title": "BOM License(s)",
           "items": {
             "$ref": "#/definitions/licenseChoice"
@@ -420,6 +421,7 @@
         },
         "licenses": {
           "type": "array",
+          "minItems": 1,
           "items": {
             "$ref": "#/definitions/licenseChoice"
           },

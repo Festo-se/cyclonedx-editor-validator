@@ -848,13 +848,40 @@
           },
           {
             "if": {
-              "properties": {
-                "author": {
-                  "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+              "allOf": [
+                {
+                  "properties": {
+                    "author": {
+                      "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                    }
+                  },
+                  "required": [
+                    "author"
+                  ]
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "application",
+                        "container",
+                        "framework",
+                        "library",
+                        "platform",
+                        "operating-system",
+                        "device-driver",
+                        "firmware",
+                        "file",
+                        "machine-learning-model",
+                        "data",
+                        "cryptographic-asset"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
                 }
-              },
-              "required": [
-                "author"
               ]
             },
             "then": {

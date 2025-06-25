@@ -22,6 +22,7 @@ def initialize_sbom(
     version: Union[str, None],
     supplier: Union[str, None],
     authors: Union[str, None],
+    email: Union[str, None] = None,
 ) -> dict[str, Any]:
     """
     Creates an initial SBOM draft to work with, containing the most basic fields.
@@ -48,11 +49,15 @@ def initialize_sbom(
         "the underlying claims to copyright ownership in a published work."
     )
 
-    metadata_authors = OrganizationalContact(
-        name=authors,
-        phone="The phone number of the contact.",
-        email="The email address of the contact.",
-    )
+    if email is None:
+        metadata_authors = OrganizationalContact(
+            name=authors,
+        )
+    else:
+        metadata_authors = OrganizationalContact(
+            name=authors,
+            email=email,
+        )
 
     component_supplier = OrganizationalEntity(name=supplier)
 
@@ -93,8 +98,12 @@ def initialize_sbom(
     )
 
     my_json_outputter = JsonV1Dot6(sbom)
+
     serialized_json: dict[str, Any] = json.loads(
         my_json_outputter.output_as_string(indent=4)
     )
+
+    # Not yet supported by the model
+    serialized_json["compositions"] = [{"aggregate": "unknown", "assemblies": []}]
 
     return serialized_json

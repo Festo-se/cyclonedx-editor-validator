@@ -294,6 +294,8 @@ class TestInitSbom:
             "supplier",
             "--version",
             "1.1.1",
+            "--email",
+            "test@test.com",
         )
         exit_code, actual, _ = run_main(capsys, "json")
 

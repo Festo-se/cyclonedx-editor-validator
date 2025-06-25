@@ -35,7 +35,7 @@ For detailed installation and usage guides, please refer to our [official docume
 
 ## Contributing
 
-See our [contribution guidelines](https://festo-se.github.io/cyclonedx-editor-validator/CONTRIBUTING/).
+See our [contribution guidelines](https://festo-se.github.io/cyclonedx-editor-validator/CONTRIBUTING).
 
 ## License
 

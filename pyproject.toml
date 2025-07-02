@@ -31,7 +31,7 @@ pyicu = [
     { version = "^2.13.1", platform = "linux" },
 ]
 natsort = "^8.4.0"
-univers = "30.12.1"
+univers = "31.0.0"
 cyclonedx-python-lib = "10.2.0"
 
 [tool.poetry.group.dev.dependencies]

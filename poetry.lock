@@ -1914,15 +1914,15 @@ files = [
 
 [[package]]
 name = "univers"
-version = "30.12.1"
+version = "31.0.0"
 description = "A mostly universal library to parse and compare software package versions and version ranges. A companion to Package URLs."
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 markers = "sys_platform == \"darwin\" or sys_platform == \"linux\" or sys_platform != \"darwin\" and sys_platform != \"linux\""
 files = [
-    {file = "univers-30.12.1-py3-none-any.whl", hash = "sha256:2fb9b8d281fd524c6437e1b5aa58d2660b213fcad92e489bdce06ae2608e35a2"},
-    {file = "univers-30.12.1.tar.gz", hash = "sha256:c21b943372079ee2b96e45c9f123eb3283b77119e6d32c4a04fc4149f7902056"},
+    {file = "univers-31.0.0-py3-none-any.whl", hash = "sha256:4ec8eea8a6d24b6348ec7189eb66c95f069a418206c209b3cd69a203656e1edc"},
+    {file = "univers-31.0.0.tar.gz", hash = "sha256:06a3f9b1e50e86465005d8bb0a56940dab2bee1f00ed8462760212a501d54751"},
 ]
 
 [package.dependencies]
@@ -2008,4 +2008,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10.0"
-content-hash = "4d6e64cc7700aade2762194eb5cccdb055f17f931caf59f4f1f71760160cbc1b"
+content-hash = "1fa2e9a2d814bec093edb6953c11fe52f85350b5e8f3e93341506e35ff50a08a"

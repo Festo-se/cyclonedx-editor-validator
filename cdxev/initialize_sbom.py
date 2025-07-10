@@ -13,7 +13,7 @@ from cyclonedx.model.contact import OrganizationalContact, OrganizationalEntity
 from cyclonedx.model.dependency import Dependency
 from cyclonedx.model.tool import Tool
 from cyclonedx.output.json import JsonV1Dot6
-from email_validator import (  # type: ignore[import-not-found]
+from email_validator import (
     EmailNotValidError,
     validate_email,
 )

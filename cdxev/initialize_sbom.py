@@ -13,6 +13,7 @@ from cyclonedx.model.contact import OrganizationalContact, OrganizationalEntity
 from cyclonedx.model.dependency import Dependency
 from cyclonedx.model.tool import Tool
 from cyclonedx.output.json import JsonV1Dot6
+from email_validator import validate_email, EmailNotValidError  # type: ignore[import-not-found]
 
 from cdxev import pkg
 
@@ -54,6 +55,11 @@ def initialize_sbom(
             name=authors,
         )
     else:
+        try:
+            validate_email(email, check_deliverability=False)
+        except EmailNotValidError:
+            raise ValueError("Provided email is invalid.")
+
         metadata_authors = OrganizationalContact(
             name=authors,
             email=email,

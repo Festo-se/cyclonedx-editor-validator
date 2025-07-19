@@ -31,7 +31,7 @@ repos:
         additional_dependencies:
           - types-python-dateutil==2.9.0.20250708
           - typing-extensions==4.14.0
-          - types-jsonschema==4.24.0.20250528
+          - types-jsonschema==4.24.0.20250708
           - cyclonedx-python-lib==10.4.1
           - univers==31.0.0
           - charset-normalizer==3.4.2

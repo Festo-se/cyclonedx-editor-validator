@@ -406,15 +406,15 @@ toml = ["tomli ; python_full_version <= \"3.11.0a6\""]
 
 [[package]]
 name = "cyclonedx-python-lib"
-version = "10.4.1"
+version = "10.5.0"
 description = "Python library for CycloneDX"
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 markers = "sys_platform == \"darwin\" or sys_platform == \"linux\" or sys_platform != \"darwin\" and sys_platform != \"linux\""
 files = [
-    {file = "cyclonedx_python_lib-10.4.1-py3-none-any.whl", hash = "sha256:1073d5855cdab02b7367f037c47cb46f4c82cadbc745e063edbb9160290efda2"},
-    {file = "cyclonedx_python_lib-10.4.1.tar.gz", hash = "sha256:ee017dee867ffb9b449b955161fd235a7c6245e87a5169998e10a0ce61292efb"},
+    {file = "cyclonedx_python_lib-10.5.0-py3-none-any.whl", hash = "sha256:e9531555b751a5cb940b334e510141813f37e774929562d2679dbc4868b56d02"},
+    {file = "cyclonedx_python_lib-10.5.0.tar.gz", hash = "sha256:49b8bdeb4c7aeea66e3c83739523ba88a3440fed5fe2c57ac942a9e335cf410a"},
 ]
 
 [package.dependencies]
@@ -425,8 +425,8 @@ sortedcontainers = ">=2.4.0,<3.0.0"
 typing_extensions = {version = ">=4.6,<5.0", markers = "python_version < \"3.13\""}
 
 [package.extras]
-json-validation = ["jsonschema[format] (>=4.18,<5.0)", "referencing (>=0.28.4)"]
-validation = ["jsonschema[format] (>=4.18,<5.0)", "lxml (>=4,<7)", "referencing (>=0.28.4)"]
+json-validation = ["jsonschema[format-nongpl] (>=4.25,<5.0)", "referencing (>=0.28.4)"]
+validation = ["jsonschema[format-nongpl] (>=4.25,<5.0)", "lxml (>=4,<7)", "referencing (>=0.28.4)"]
 xml-validation = ["lxml (>=4,<7)"]
 
 [[package]]
@@ -2009,4 +2009,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10.0"
-content-hash = "3ac2bf0fbe112d2fb99c8cf9342a1a2ff6694626a3d611b165dea236828bf139"
+content-hash = "bc12baf8185e8c2827a3488ab854d9812d59be15719775ece73d39c84758ed6e"

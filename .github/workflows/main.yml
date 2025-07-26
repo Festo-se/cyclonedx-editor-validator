@@ -19,15 +19,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install and configure uv
+    - name: Checkout repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
       with:
         enable-cache: true
+    - name: Install dependencies
+      run: uv sync --all-extras --frozen
     - name: Build package
-      run: |
-        uv install
+      run: uv build
 
   tests:
     needs: build

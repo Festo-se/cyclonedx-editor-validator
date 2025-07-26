@@ -18,7 +18,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
       - name: Install dependencies
-        run: uv install --extra docs
+        run: uv sync --extra docs
       - name: Test build of documentation
         run: uv run sphinx-build -a -E docs/source/ docs/build/
 
@@ -36,7 +36,7 @@ jobs:
         with:
           enable-cache: true
       - name: Install dependencies for development
-        run: uv install --extra dev
+        run: uv sync --extra dev
       - name: Run black
         run: uv run black cdxev tests --check
       - name: Run isort
@@ -61,7 +61,7 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
     - name: Install package
-      run: uv install
+      run: uv sync --all-extras --frozen
     - name: Run pytest
       run: uv run coverage run -m pytest --junitxml=reports/unittest.xml
     - name: Check coverage

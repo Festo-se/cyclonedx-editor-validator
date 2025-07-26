@@ -56,7 +56,7 @@ def test_version_from_pyproject(
 ):
     toml_file = Path(__file__).parents[2] / "pyproject.toml"
     toml_content = toml.load(toml_file)
-    expected_version = toml_content.get("tool", {}).get("poetry", {}).get("version")
+    expected_version = toml_content.get("project", {}).get("version")
 
     argv("--version")
     with pytest.raises(SystemExit) as e:

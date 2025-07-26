@@ -13,7 +13,7 @@ license = "GPL-3.0-or-later"
 dependencies = [
     "python-dateutil==2.9.0.post0",
     "jsonschema[format]==4.24.0",
-    "docstring-parser>=0.16,<0.17",
+    "docstring-parser>=0.16,<0.18",
     "charset-normalizer>=3.3.2,<4",
     "pyicu>=2.13.1,<3 ; sys_platform == 'darwin'",
     "pyicu>=2.13.1,<3 ; sys_platform == 'linux'",
@@ -31,40 +31,34 @@ Changelog = "https://github.com/Festo-se/cyclonedx-editor-validator/releases"
 [project.scripts]
 cdx-ev = "cdxev.__main__:main"
 
-[tool.poetry.dependencies]
-python = "^3.10.0"
-python-dateutil = "2.9.0.post0"
-jsonschema = { version = "4.24.0", extras = ["format"] }
-docstring-parser = ">=0.16,<0.18"
-charset-normalizer = "^3.3.2"
-pyicu = [
-    { version = "^2.13.1", platform = "darwin" },
-    { version = "^2.13.1", platform = "linux" },
+[dependency-groups]
+dev = [
+    "flake8==7.3.0",
+    "black==25.1.0",
+    "pep8-naming==0.15.1",
+    "mypy==1.17.0",
+    "types-python-dateutil==2.9.0.20250708",
+    "types-jsonschema==4.24.0.20250528",
+    "pytest==8.4.1",
+    "coverage==7.10.1",
+    "pytest-subtests==0.14.2",
+    "toml==0.10.2",
+    "typing-extensions==4.14.0",
+    "bandit[toml]==1.8.6",
+    "isort==6.0.1",
+    "pre-commit==4.2.0",
 ]
-natsort = "^8.4.0"
-univers = "31.0.0"
-cyclonedx-python-lib = "10.4.1"
+docs = [
+    "sphinx-argparse==0.5.2",
+    "sphinx-rtd-theme==3.0.2",
+    "sphinx==8.1.3",
+]
 
-[tool.poetry.group.dev.dependencies]
-flake8 = "7.3.0"
-black = "25.1.0"
-pep8-naming = "0.15.1"
-mypy = "1.17.0"
-types-python-dateutil = "2.9.0.20250708"
-types-jsonschema = "4.24.0.20250528"
-pytest = "8.4.1"
-coverage = "7.10.1"
-pytest-subtests = "0.14.2"
-toml = "0.10.2"
-typing-extensions = "4.14.0"
-bandit = { version = "1.8.6", extras = ["toml"] }
-isort = "6.0.1"
-pre-commit = "4.2.0"
-
-[tool.poetry.group.docs.dependencies]
-sphinx-argparse = "0.5.2"
-sphinx-rtd-theme = "3.0.2"
-sphinx = "8.1.3"
+[tool.uv]
+default-groups = [
+    "dev",
+    "docs",
+]
 
 [build-system]
 requires = ["hatchling"]

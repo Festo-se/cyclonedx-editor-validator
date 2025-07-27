@@ -274,11 +274,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/3c/38/bbe2e63902847cf79036ecc75550d0698af31c91c7575352eb25190d0fb3/coverage-7.9.2-py3-none-any.whl", hash = "sha256:e425cd5b00f6fc0ed7cdbd766c70be8baab4b7839e4d4fe5fac48581dd968ea4", size = 204005, upload-time = "2025-07-03T10:54:13.491Z" },
 ]
 
-[package.optional-dependencies]
-toml = [
-    { name = "tomli", marker = "python_full_version <= '3.11'" },
-]
-
 [[package]]
 name = "cyclonedx-editor-validator"
 version = "0.0.0"
@@ -298,7 +293,7 @@ dependencies = [
 dev = [
     { name = "bandit", extra = ["toml"] },
     { name = "black" },
-    { name = "coverage", extra = ["toml"] },
+    { name = "coverage" },
     { name = "flake8" },
     { name = "isort" },
     { name = "mypy" },
@@ -334,7 +329,7 @@ requires-dist = [
 dev = [
     { name = "bandit", extras = ["toml"], specifier = "==1.8.6" },
     { name = "black", specifier = "==25.1.0" },
-    { name = "coverage", extras = ["toml"], specifier = "==7.9.2" },
+    { name = "coverage", specifier = "==7.9.2" },
     { name = "flake8", specifier = "==7.3.0" },
     { name = "isort", specifier = "==6.0.1" },
     { name = "mypy", specifier = "==1.17.0" },

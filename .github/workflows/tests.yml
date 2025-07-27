@@ -46,7 +46,7 @@ jobs:
       - name: Run mypy
         run: uv run mypy --install-types --non-interactive --config-file=pyproject.toml
       - name: Run bandit
-        run: uv tool run bandit -c pyproject.toml -r cdxev
+        run: uv run bandit -c pyproject.toml -r cdxev
 
   pytest:
     runs-on: ubuntu-latest

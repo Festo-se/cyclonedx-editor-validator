@@ -44,7 +44,7 @@ jobs:
       - name: Run flake8
         run: uv tool run flake8 cdxev tests
       - name: Run mypy
-        run: uv tool run mypy --install-types --non-interactive --config-file=pyproject.toml
+        run: uv run mypy --install-types --non-interactive --config-file=pyproject.toml
       - name: Run bandit
         run: uv tool run bandit -c pyproject.toml -r cdxev
 

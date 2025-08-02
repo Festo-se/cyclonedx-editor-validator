@@ -36,7 +36,7 @@ repos:
           - univers==31.0.0
           - charset-normalizer==3.4.2
           - natsort==8.4.0
-          - docstring-parser==0.16
+          - docstring-parser==0.17.0
         files: "^cdxev/.*\\.py$"
         args: ["--config-file", "pyproject.toml"]
   - repo: https://github.com/PyCQA/bandit

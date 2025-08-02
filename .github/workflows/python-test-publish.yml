@@ -6,11 +6,11 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Upload Python Package
+name: Pre-release Python Package
 
 on:
   release:
-    types: [released]
+    types: [prereleased]
 
 permissions:
   contents: read
@@ -38,20 +38,10 @@ jobs:
           uv sync --no-dev --frozen
       - name: Build package
         run: |
+          uv version --dry-run
           uv build
-      - name: Build HTML
-        run: uv run sphinx-build -a -E docs/source/ docs/build
-      - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - name: Publish package distributions to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          name: html-docs
-          path: docs/build
-      - name: Deploy pages
-        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/build
-      - name: Publish package on PyPI
-        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
-        with:
-          password: ${{ secrets.API_TOKEN_PYPI }}
+          repository-url: https://test.pypi.org/legacy/
+          password: ${{ secrets.API_TOKEN_TEST_PYPI }}

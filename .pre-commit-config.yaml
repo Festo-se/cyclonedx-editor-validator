@@ -4,7 +4,7 @@ default_language_version:
   python: python3.11
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
@@ -45,3 +45,8 @@ repos:
       - id: bandit
         args: ["-c", "pyproject.toml"]
         additional_dependencies: ["bandit[toml]"]
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.8.3
+    hooks:
+      - id: uv-lock

@@ -76,7 +76,7 @@ class IdentityTestCase(unittest.TestCase):
         component_id = ComponentIdentity.create(component, True)
 
         # This id shouldn't have an SWID.
-        expected_key_types = (KeyType.CPE, KeyType.PURL, KeyType.COORDINATES)
+        expected_key_types = (KeyType.PURL, KeyType.CPE, KeyType.COORDINATES)
         actual_key_types = [k.type for k in component_id]
         self.assertSequenceEqual(actual_key_types, expected_key_types)
 
@@ -95,7 +95,7 @@ class IdentityTestCase(unittest.TestCase):
         component_id = ComponentIdentity.create(component, False)
 
         # This id shouldn't have an SWID.
-        expected_key_types = (KeyType.CPE, KeyType.PURL)
+        expected_key_types = (KeyType.PURL, KeyType.CPE)
         actual_key_types = [k.type for k in component_id]
         self.assertSequenceEqual(actual_key_types, expected_key_types)
 
@@ -156,20 +156,20 @@ class IdentityTestCase(unittest.TestCase):
             "purl": self.sample_purl,
             "swid": self.sample_swid,
         }
+        other_swid = dict(self.sample_swid)
+        other_swid["tagId"] = "new id"
 
         component_with_cpe = dict(component_base)
-        del component_with_cpe["name"]
-        del component_with_cpe["purl"]
-        del component_with_cpe["swid"]
+        component_with_cpe["name"] = "other name"
 
         component_with_purl = dict(component_base)
-        del component_with_purl["name"]
-        del component_with_purl["cpe"]
-        del component_with_purl["swid"]
+        component_with_purl["name"] = "other name"
+        component_with_purl["cpe"] = "other cpe"
+        component_with_purl["swid"] = other_swid
 
         component_with_swid = dict(component_base)
-        del component_with_swid["name"]
-        del component_with_swid["cpe"]
+        component_with_swid["name"] = "other name"
+        component_with_swid["cpe"] = "other cpe"
         del component_with_swid["purl"]
 
         component_with_coords = dict(component_base)
@@ -187,6 +187,47 @@ class IdentityTestCase(unittest.TestCase):
         self.assertEqual(id_base, id_purl)
         self.assertEqual(id_base, id_swid)
         self.assertEqual(id_base, id_coords)
+
+    def test_id_inequality(self) -> None:
+        component_base = {
+            "type": "library",
+            "bom-ref": "first bom-ref",
+            "author": "Company Unit",
+            "name": self.sample_coordinates["name"],
+            "group": self.sample_coordinates["group"],
+            "version": self.sample_coordinates["version"],
+            "cpe": self.sample_cpe,
+            "purl": self.sample_purl,
+            "swid": self.sample_swid,
+        }
+        other_swid = dict(self.sample_swid)
+        other_swid["version"] = "3.141"
+
+        component_with_cpe = dict(component_base)
+        component_with_cpe["swid"] = other_swid
+        del component_with_cpe["purl"]
+
+        component_with_purl = dict(component_base)
+        component_with_purl["purl"] = "other purl"
+
+        component_with_swid = dict(component_base)
+        component_with_swid["purl"] = "other purl"
+
+        component_with_coords = dict(component_base)
+        component_with_coords["cpe"] = "other cpe"
+        del component_with_coords["purl"]
+        del component_with_coords["swid"]
+
+        id_base = ComponentIdentity.create(component_base, True)
+        id_cpe = ComponentIdentity.create(component_with_cpe, True)
+        id_purl = ComponentIdentity.create(component_with_purl, True)
+        id_swid = ComponentIdentity.create(component_with_swid, True)
+        id_coords = ComponentIdentity.create(component_with_coords, True)
+
+        self.assertNotEqual(id_base, id_cpe)
+        self.assertNotEqual(id_base, id_purl)
+        self.assertNotEqual(id_base, id_swid)
+        self.assertNotEqual(id_base, id_coords)
 
     def test_key_in_id(self) -> None:
         component = {

@@ -6645,5 +6645,54 @@
         }
       ]
     }
+  },
+  "test_merge_metadata_component": {
+    "sbom_1": {
+      "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+      "bomFormat": "CycloneDX",
+      "specVersion": "1.6",
+      "metadata": {
+        "component": {
+          "bom-ref": "app",
+          "type": "application",
+          "name": "Acme Application",
+          "version": "1.0.0"
+        }
+      }
+    },
+    "sbom_2": {
+      "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+      "bomFormat": "CycloneDX",
+      "specVersion": "1.6",
+      "metadata": {
+        "component": {
+          "bom-ref": "second",
+          "type": "application",
+          "name": "Second app",
+          "version": "1.0.0"
+        }
+      }
+    },
+    "expected": {
+      "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+      "bomFormat": "CycloneDX",
+      "specVersion": "1.6",
+      "metadata": {
+        "component": {
+          "bom-ref": "app",
+          "type": "application",
+          "name": "Acme Application",
+          "version": "1.0.0"
+        }
+      },
+      "components": [
+        {
+          "bom-ref": "second",
+          "type": "application",
+          "name": "Second app",
+          "version": "1.0.0"
+        }
+      ]
+    }
   }
 }

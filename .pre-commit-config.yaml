@@ -34,7 +34,7 @@ repos:
           - types-jsonschema==4.24.0.20250528
           - cyclonedx-python-lib==10.4.1
           - univers==31.0.0
-          - charset-normalizer==3.4.2
+          - charset-normalizer==3.4.3
           - natsort==8.4.0
           - docstring-parser==0.17.0
         files: "^cdxev/.*\\.py$"

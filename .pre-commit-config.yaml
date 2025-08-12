@@ -4,7 +4,7 @@ default_language_version:
   python: python3.11
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
@@ -29,14 +29,14 @@ repos:
         # List type stub dependencies explicitly, as --install-types should be avoided as per
         # https://github.com/pre-commit/mirrors-mypy/blob/main/README.md
         additional_dependencies:
-          - types-python-dateutil==2.9.0.20250516
-          - typing-extensions==4.14.0
+          - types-python-dateutil==2.9.0.20250809
+          - typing-extensions==4.14.1
           - types-jsonschema==4.24.0.20250528
-          - cyclonedx-python-lib==10.2.0
+          - cyclonedx-python-lib==10.4.1
           - univers==31.0.0
-          - charset-normalizer==3.4.2
+          - charset-normalizer==3.4.3
           - natsort==8.4.0
-          - docstring-parser==0.16
+          - docstring-parser==0.17.0
         files: "^cdxev/.*\\.py$"
         args: ["--config-file", "pyproject.toml"]
   - repo: https://github.com/PyCQA/bandit
@@ -45,3 +45,8 @@ repos:
       - id: bandit
         args: ["-c", "pyproject.toml"]
         additional_dependencies: ["bandit[toml]"]
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.8.3
+    hooks:
+      - id: uv-lock

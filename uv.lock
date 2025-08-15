@@ -339,7 +339,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "charset-normalizer", specifier = ">=3.3.2,<4" },
-    { name = "cyclonedx-python-lib", specifier = "==10.4.1" },
+    { name = "cyclonedx-python-lib", specifier = "==11.0.0" },
     { name = "docstring-parser", specifier = ">=0.16,<0.18" },
     { name = "jsonschema", extras = ["format"], specifier = "==4.25.0" },
     { name = "natsort", specifier = ">=8.4.0,<9" },
@@ -374,7 +374,7 @@ docs = [
 
 [[package]]
 name = "cyclonedx-python-lib"
-version = "10.4.1"
+version = "11.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "license-expression" },
@@ -383,9 +383,9 @@ dependencies = [
     { name = "sortedcontainers" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/60/6d/350b5f894c3f37c13adb884baf8b492a46fbb573934545a02514ec286850/cyclonedx_python_lib-10.4.1.tar.gz", hash = "sha256:ee017dee867ffb9b449b955161fd235a7c6245e87a5169998e10a0ce61292efb", size = 1040510, upload-time = "2025-07-08T16:28:18.274Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/86/62/c279a8470746be835c0860152737b61b9b7237df59b6c5c009a8d2ae6e40/cyclonedx_python_lib-11.0.0.tar.gz", hash = "sha256:d51d456c01cfc42378a2282ef35858fc809162ef13d8cce2af6c4d16f788217e", size = 1041433, upload-time = "2025-07-21T10:53:49.353Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/85/25/d7c1d834d41c53e8a3e413e1ccc1bbba57a6eac7a5db59f01a563584a777/cyclonedx_python_lib-10.4.1-py3-none-any.whl", hash = "sha256:1073d5855cdab02b7367f037c47cb46f4c82cadbc745e063edbb9160290efda2", size = 381522, upload-time = "2025-07-08T16:28:16.748Z" },
+    { url = "https://files.pythonhosted.org/packages/41/59/b9887a55047a11eda49fa4f643ada302b8d757520810972ed5544f6a251b/cyclonedx_python_lib-11.0.0-py3-none-any.whl", hash = "sha256:4bcaebf381daf63c8a9badc7a7132704ed461b6822c4cc513beeb28ff95d7858", size = 381983, upload-time = "2025-07-21T10:53:47.443Z" },
 ]
 
 [[package]]

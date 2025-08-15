@@ -94,7 +94,6 @@ def validate_sbom(
                 )
         v = validator_cls(
             schema=sbom_schema,
-            # remove mypy exclusion, if https://github.com/python/typeshed/pull/12484 is merged
             registry=registry,
             format_checker=FormatChecker(),
         )

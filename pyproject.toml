@@ -38,7 +38,7 @@ dev = [
     "pep8-naming==0.15.1",
     "mypy==1.17.1",
     "types-python-dateutil==2.9.0.20250809",
-    "types-jsonschema==4.24.0.20250528",
+    "types-jsonschema==4.25.0.20250809",
     "pytest==8.4.1",
     "coverage==7.10.3",
     "pytest-subtests==0.14.2",

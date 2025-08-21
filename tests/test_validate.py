@@ -243,6 +243,28 @@ class TestValidateMetadata(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertTrue(search_for_word_issues("CycloneDX", issues))
 
+    def test_metadata_component_licensetype_appliance_no_licensor_or_licensee(
+        self,
+    ) -> None:
+        for spec_version in list_of_spec_versions_containing_licensing:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["metadata"]["component"]["licenses"] = [
+                {
+                    "license": {
+                        "name": "some_name",
+                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
+                        "text": {"content": "some text"},
+                        "licensing": {
+                            "licenseTypes": ["appliance"],
+                            "expiration": "2023-04-13T20:20:39+00:00",
+                        },
+                    }
+                }
+            ]
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
 
 class TestValidateComponents(unittest.TestCase):
     def test_components_empty(self) -> None:

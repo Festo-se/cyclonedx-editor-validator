@@ -774,6 +774,11 @@ def create_init_sbom_parser(
         metavar="<supplier-sbom>",
         help=("The person who created the SBOM."),
     )
+    submitted_values.add_argument(
+        "--email",
+        metavar="<email-author>",
+        help=("Email of the person who created the SBOM."),
+    )
     add_output_argument(parser)
     parser.set_defaults(cmd_handler=invoke_init_sbom, parser=parser)
     return parser
@@ -1081,12 +1086,17 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
 
 
 def invoke_init_sbom(args: argparse.Namespace) -> int:
-    sbom = initialize_sbom(
-        software_name=args.name,
-        authors=args.authors,
-        supplier=args.supplier,
-        version=args.version,
-    )
+    try:
+        sbom = initialize_sbom(
+            software_name=args.name,
+            authors=args.authors,
+            supplier=args.supplier,
+            version=args.version,
+            email=args.email,
+        )
+    except ValueError as exc:
+        print(f"Error: {exc}")
+        return Status.USAGE_ERROR
     write_sbom(sbom, args.output, update_metadata=False)
     return Status.OK
 

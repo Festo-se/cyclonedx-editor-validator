@@ -1086,13 +1086,17 @@ def invoke_build_public_bom(args: argparse.Namespace) -> int:
 
 
 def invoke_init_sbom(args: argparse.Namespace) -> int:
-    sbom = initialize_sbom(
-        software_name=args.name,
-        authors=args.authors,
-        supplier=args.supplier,
-        version=args.version,
-        email=args.email,
-    )
+    try:
+        sbom = initialize_sbom(
+            software_name=args.name,
+            authors=args.authors,
+            supplier=args.supplier,
+            version=args.version,
+            email=args.email,
+        )
+    except ValueError as exc:
+        print(f"Error: {exc}")
+        return Status.USAGE_ERROR
     write_sbom(sbom, args.output, update_metadata=False)
     return Status.OK
 

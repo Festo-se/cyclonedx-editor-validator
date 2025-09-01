@@ -7,9 +7,7 @@
   "metadata": {
     "authors": [
       {
-        "name": "The person who created the SBOM.",
-        "phone": "The phone number of the contact.",
-        "email": "The email address of the contact."
+        "name": "The person who created the SBOM."
       }
     ],
     "component": {
@@ -41,5 +39,11 @@
   "version": 1,
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
-  "specVersion": "1.6"
+  "specVersion": "1.6",
+  "compositions": [
+    {
+      "aggregate": "unknown",
+      "assemblies": []
+    }
+  ]
 }

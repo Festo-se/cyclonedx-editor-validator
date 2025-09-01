@@ -101,3 +101,29 @@ class TestInitializeSbom(unittest.TestCase):
         self.assertEqual(
             sbom["metadata"]["authors"][0]["name"], "The person who created the SBOM."
         )
+
+    def test_email_arguments_given(self) -> None:
+        sbom = initialize_sbom(
+            software_name=None,
+            authors=None,
+            supplier=None,
+            version=None,
+            email="test@test.com",
+        )
+        self.assertEqual(sbom["metadata"]["authors"][0]["email"], "test@test.com")
+
+    def test_email_arguments_not_given(self) -> None:
+        sbom = initialize_sbom(
+            software_name=None, authors=None, supplier=None, version=None
+        )
+        self.assertEqual(sbom["metadata"]["authors"][0].get("email", None), None)
+
+    def test_invalid_email(self) -> None:
+        with self.assertRaises(ValueError):
+            initialize_sbom(
+                software_name=None,
+                authors=None,
+                supplier=None,
+                version=None,
+                email="notValidMail.com",
+            )

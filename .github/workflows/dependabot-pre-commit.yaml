@@ -7,8 +7,6 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     if: github.actor == 'dependabot[bot]'
     steps:
       - name: Dependabot metadata

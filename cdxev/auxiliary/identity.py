@@ -9,9 +9,17 @@ from enum import Enum
 
 @functools.total_ordering
 class KeyType(Enum):
-    CPE = 1
-    PURL = 2
-    SWID = 3
+    """
+    Known types of component keys.
+
+    There are two kinds of keys: safe and unsafe ones. "Safe" in this case means that a key should
+    always uniquely identify a component. Unsafe keys might occur on different components which
+    simply share the same name or version number.
+    """
+
+    PURL = 1
+    SWID = 2
+    CPE = 3
     COORDINATES = 4
 
     def __lt__(self, other: "KeyType") -> bool:
@@ -75,17 +83,24 @@ class SWID(dict):
     """
     SWIDs are a complex construct which can contain a lot of information.
 
-    Fortunately, a single property of an SWID is both mandatory and unique: the tagId.
+    This class employs a naive approach to SWID equality. Two SWIDs are considered
+    to refer to the same component iff the required fields tagId and name are identical
+    and the version field is the same or not present on both objects.
     """
 
     def __str__(self) -> str:
         return "tagId: " + str(self["tagId"])
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, SWID) and self["tagId"] == other["tagId"]
+        return (
+            isinstance(other, SWID)
+            and (self["tagId"] == other["tagId"])
+            and (self["name"] == other["name"])
+            and (self.get("version", True) == other.get("version", True))
+        )
 
     def __hash__(self) -> int:  # type: ignore[override]
-        return self["tagId"].__hash__()  # type: ignore
+        return (self["tagId"], self["name"], self.get("version", True)).__hash__()
 
 
 @dataclass(init=True, frozen=True, eq=True)
@@ -128,9 +143,18 @@ class ComponentIdentity:
         return self._keys.__iter__()
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, ComponentIdentity) and any(
-            k in self._keys for k in other._keys
-        )
+        if not isinstance(other, ComponentIdentity):
+            return False
+
+        for key_type in KeyType:
+            try:
+                own_key = next(k for k in self._keys if k.type == key_type)
+                other_key = next(k for k in other._keys if k.type == key_type)
+                return own_key == other_key
+            except StopIteration:
+                continue
+
+        return False
 
     def __str__(self) -> str:
         return str(self._keys[0]) if len(self) > 0 else ""

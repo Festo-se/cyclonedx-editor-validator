@@ -1035,11 +1035,13 @@
                     "type"
                   ]
                 },
-                                  {
-    "not": {
-      "required": ["licenses"]
-    }
-  }
+                {
+                  "not": {
+                    "required": [
+                      "licenses"
+                    ]
+                  }
+                }
               ]
             },
             "then": {

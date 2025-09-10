@@ -164,9 +164,6 @@ class TestValidateMetadata(unittest.TestCase):
             sbom["metadata"]["component"].pop("copyright")
             sbom["metadata"]["component"]["author"] = "festo"
             sbom["metadata"]["component"]["supplier"] = {"name": "Acme"}
-            sbom["metadata"]["component"]["licenses"] = (
-                [{"license": {"id": "Apache-1.0"}}],
-            )
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("copyright", issues), True)
 
@@ -188,10 +185,7 @@ class TestValidateMetadata(unittest.TestCase):
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("supplier")
             sbom["metadata"]["component"]["author"] = "festo"
-            sbom["metadata"]["component"]["copyright"] = "something"
-            sbom["metadata"]["component"]["licenses"] = [
-                {"license": {"id": "Apache-1.0"}}
-            ]
+            sbom["metadata"]["component"]["copyright"] = "something" 
             issues = validate_test(sbom)
             self.assertEqual(
                 search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
@@ -262,6 +256,31 @@ class TestValidateMetadata(unittest.TestCase):
                     }
                 }
             ]
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"])
+
+    def test_metadata_component_supplier_author_festo_no_copyright_with_licenses(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["metadata"]["component"] = {
+                "type": "application",
+                "bom-ref": "acme-app",
+                "group": "com.festo.internal",
+                "supplier": {
+                    "name": "Festo SE & Co. KG"
+                },
+                "author": "Festo",
+                "name": "Acme_Application",
+                "version": "9.1.1",
+                "licenses": [{"license": {"id": "Apache-2.0"}}],
+                "hashes": [
+                    {
+                        "alg": "MD5",
+                        "content": "ec7781220ec7781220ec778122012345"
+                    }
+                ]
+            }
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
 

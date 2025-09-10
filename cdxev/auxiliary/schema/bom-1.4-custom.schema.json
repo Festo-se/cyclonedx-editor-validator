@@ -881,7 +881,12 @@
                   "required": [
                     "type"
                   ]
-                }
+                },
+                                  {
+    "not": {
+      "required": ["licenses"]
+    }
+  }
               ]
             },
             "then": {

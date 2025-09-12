@@ -881,6 +881,13 @@
                   "required": [
                     "type"
                   ]
+                },
+                {
+                  "not": {
+                    "required": [
+                      "licenses"
+                    ]
+                  }
                 }
               ]
             },

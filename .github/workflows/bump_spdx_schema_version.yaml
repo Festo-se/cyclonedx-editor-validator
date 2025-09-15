@@ -25,12 +25,17 @@ jobs:
         run: |
           curl -sSL https://cyclonedx.org/schema/spdx.schema.json -o remote_spdx.schema.json
           remote_version=$(jq -r '."$comment"' remote_spdx.schema.json)
+          echo "remove version is: $remote_version"
           local_version=$(jq -r '."$comment"' cdxev/auxiliary/schema/spdx.schema.json)
+          echo "local version is: $local_version"
           # Simple version compare; adjust logic as needed
           # Remove "v" prefix
           remote_version_norm=${remote_version#v}
+          echo "remote version normalized is: $remote_version_norm"
           local_version_norm=${local_version#v}
+          echo "local version normalized is: $local_version_norm"
           higher_version=$(printf "%s\n%s\n" "$remote_norm" "$local_norm" | sort -V | tail -n1)
+          echo "higher version is: $higher_version"
 
           if [ "$higher_version" = "$remote_version_norm" ] && [ "$remote_version_norm" != "$local_version_norm" ]; then
             echo "working on it"

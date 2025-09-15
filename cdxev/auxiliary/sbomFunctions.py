@@ -11,8 +11,8 @@ from typing import Any, Callable, Optional, Sequence
 
 from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component
-from univers.version_range import VersionRange  # type: ignore[import-untyped]
-from univers.versions import nuget  # type: ignore[import-untyped]
+from univers import nuget
+from univers.version_range import VersionRange
 
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.error import AppError
@@ -451,8 +451,8 @@ def compare_version_range(first_range: str, second_range: str) -> bool:
         return True
 
     try:
-        first_range_object = VersionRange.from_string(second_range)
-        second_range_object = VersionRange.from_string(first_range)
+        first_range_object = VersionRange.from_string(second_range)  # type:ignore
+        second_range_object = VersionRange.from_string(first_range)  # type:ignore
     except ValueError:
         return False
 
@@ -464,7 +464,7 @@ def compare_version_range(first_range: str, second_range: str) -> bool:
 
 def version_is_in_version_range(version: str, version_range: str) -> bool:
 
-    range_object = VersionRange.from_string(version_range)
+    range_object = VersionRange.from_string(version_range)  # type:ignore
     version_class = range_object.version_class
     try:
         if version_class.is_valid(version):

@@ -30,9 +30,9 @@ jobs:
           # Remove "v" prefix
           remote_version_norm=${remote_version#v}
           local_version_norm=${local_version#v}
-          higher=$(printf "%s\n%s\n" "$remote_norm" "$local_norm" | sort -V | tail -n1)
+          higher_version=$(printf "%s\n%s\n" "$remote_norm" "$local_norm" | sort -V | tail -n1)
 
-          if [ "$higher" = "$remote_norm" ] && [ "$remote_norm" != "$local_norm" ]; then
+          if [ "$higher_version" = "$remote_version_norm" ] && [ "$remote_version_norm" != "$local_version_norm" ]; then
             sed -i "s/\"\\$comment\": *\"[^\"]*\"/\"\\$comment\": \"$remote_version\"/" cdxev/auxiliary/schema/spdx.schema.json
             git config --local user.email "github-actions[bot]@users.noreply.github.com"
             git config --local user.name "github-actions[bot]"

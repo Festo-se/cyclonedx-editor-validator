@@ -9,9 +9,9 @@ from functools import total_ordering
 from re import fullmatch
 from typing import Any, Callable, Optional, Sequence
 
-from univers import nuget
 from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component
+from univers import nuget
 from univers.version_range import VersionRange
 
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity

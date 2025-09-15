@@ -9,7 +9,7 @@ from functools import total_ordering
 from re import fullmatch
 from typing import Any, Callable, Optional, Sequence
 
-import univers.nuget
+from univers import nuget
 from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component
 from univers.version_range import VersionRange
@@ -471,7 +471,7 @@ def version_is_in_version_range(version: str, version_range: str) -> bool:
             return version_class(version) in range_object
         else:
             return False
-    except univers.nuget.InvalidNuGetVersion:
+    except nuget.InvalidNuGetVersion:
         return False
 
 

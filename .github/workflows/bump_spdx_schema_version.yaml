@@ -1,0 +1,56 @@
+name: Check & Bump SPDX Schema Version
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"  # run at 03:00 on Mondays
+
+jobs:
+  check-spdx-schema-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.COMMIT_KEY }}
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          # Check out HEAD of source branch. Without this option, the merge commit would be checked out.
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Fetch and bump remote spdx.schema.json
+        id: check_version
+        run: |
+          curl -sSL https://cyclonedx.org/schema/spdx.schema.json -o remote_spdx.schema.json
+          remote_version=$(jq -r '."$comment"' remote_spdx.schema.json)
+          echo "remote_version=$remote_version" >> $GITHUB_OUTPUT
+          local_version=$(jq -r '."$comment"' cdxev/auxiliary/schema/spdx.schema.json)
+          echo "local version is: $local_version"
+          # Simple version compare; adjust logic as needed
+          # Remove "v" prefix
+          remote_version_norm=${remote_version#v}
+          echo "remote version normalized is: $remote_version_norm"
+          local_version_norm=${local_version#v}
+          echo "local version normalized is: $local_version_norm"
+          # Replace hyphen with dot to make semantic components comparable
+          remote_sanitized=${remote_version_norm//-/\.}
+          local_sanitized=${local_version_norm//-/\.}
+          higher_version=$(printf "%s\n%s\n" "$remote_sanitized" "$local_sanitized" | sort -V | tail -n1)
+          echo "higher version is: $higher_version"
+
+          if [ "$higher_version" = "$remote_sanitized" ] && [ "$remote_sanitized" != "$local_sanitized" ]; then
+            echo "update_list=true" >> $GITHUB_OUTPUT
+            mv remote_spdx.schema.json cdxev/auxiliary/schema/spdx.schema.json
+          else
+            echo "update_list=false" >> $GITHUB_OUTPUT
+          fi
+  
+      - name: Create Pull Request if schema was updated
+        if: steps.check_version.outputs.update_list == 'true'
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          commit-message: "chore: bump SPDX schema to ${{ steps.check_version.outputs.remote_version }}"
+          branch: bump-spdx-schema-version-${{ steps.update_schema.outputs.remote_version }}
+          title: "chore: bump SPDX schema version to ${{ steps.check_version.outputs.remote_version }}"
+          body: |
+            This PR updates the `spdx.schema.json` to the latest version `${{ steps.check_version.outputs.remote_version }}`

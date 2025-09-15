@@ -348,7 +348,7 @@ requires-dist = [
     { name = "pyicu", marker = "sys_platform == 'darwin'", specifier = ">=2.13.1,<3" },
     { name = "pyicu", marker = "sys_platform == 'linux'", specifier = ">=2.13.1,<3" },
     { name = "python-dateutil", specifier = "==2.9.0.post0" },
-    { name = "univers", specifier = "==31.0.0" },
+    { name = "univers", specifier = "==31.1.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -1454,7 +1454,7 @@ wheels = [
 
 [[package]]
 name = "univers"
-version = "31.0.0"
+version = "31.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -1462,9 +1462,9 @@ dependencies = [
     { name = "semantic-version" },
     { name = "semver" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/33/a0/9d80562732a303333c927b5e5b631511a8c012bc577c45dd54ef0b266a15/univers-31.0.0.tar.gz", hash = "sha256:06a3f9b1e50e86465005d8bb0a56940dab2bee1f00ed8462760212a501d54751", size = 274081, upload-time = "2025-06-24T20:36:04.455Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/78/83/7304856c01eadc320147818aa8b53338955d636db66e2bfdddea8941b527/univers-31.1.0.tar.gz", hash = "sha256:5c617edd03657f02ddaa84db0b66a11134aa604fe04b06e7c828483f089c9da6", size = 294626, upload-time = "2025-09-11T13:31:02.265Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/99/d3/7561fd63da9271e2960e57e9bd20f2c4b8601fb7693b19173cc22446c9e4/univers-31.0.0-py3-none-any.whl", hash = "sha256:4ec8eea8a6d24b6348ec7189eb66c95f069a418206c209b3cd69a203656e1edc", size = 95202, upload-time = "2025-06-24T20:36:02.733Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/f1/80d9c7c72511c3b792b6bd637334e9ae76ddd2a6e5188876c265bc44aefc/univers-31.1.0-py3-none-any.whl", hash = "sha256:e299829882b058d9355e244609739b7c78ab72da5c786bf7f681ffc9db523665", size = 96759, upload-time = "2025-09-11T13:31:00.928Z" },
 ]
 
 [[package]]

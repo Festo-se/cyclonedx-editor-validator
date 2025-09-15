@@ -6,8 +6,8 @@ import sys
 import typing as t
 from dataclasses import dataclass, field, fields
 
-import univers.version_range  # type:ignore[import-untyped]
-import univers.versions  # type:ignore[import-untyped]
+import univers.version_range
+import univers.versions
 
 from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
 from cdxev.auxiliary.sbomFunctions import walk_components
@@ -164,7 +164,9 @@ class UpdateIdentity(ComponentIdentity):
     ) -> "Key":
         coordinates: Coordinates
         if version_range is not None:
-            vers = univers.version_range.VersionRange.from_string(version_range)
+            vers = univers.version_range.VersionRange.from_string(
+                version_range
+            )  # type:ignore
             coordinates = CoordinatesWithVersionRange(name, group, None, vers)
         else:
             coordinates = Coordinates(name, group, version)

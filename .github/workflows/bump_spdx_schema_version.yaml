@@ -44,12 +44,6 @@ jobs:
           if [ "$higher_version" = "$remote_sanitized" ] && [ "$remote_sanitized" != "$local_sanitized" ]; then
             echo "update_list = true" >> $GITHUB_OUTPUT
             mv remote_spdx.schema.json cdxev/auxiliary/schema/spdx.schema.json
-            git config --local user.email "github-actions[bot]@users.noreply.github.com"
-            git config --local user.name "github-actions[bot]"
-            git remote set-url origin "git@github.com:${{ github.repository }}.git"
-            git add cdxev/auxiliary/schema/spdx.schema.json
-            git commit -m "chore: bump SPDX schema version to $remote_version"
-            git push
           else
             echo "update_list=false" >> $GITHUB_OUTPUT
           fi

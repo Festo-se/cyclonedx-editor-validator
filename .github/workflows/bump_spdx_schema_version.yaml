@@ -22,10 +22,11 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Fetch and bump remote spdx.schema.json
+        id: check_version
         run: |
           curl -sSL https://cyclonedx.org/schema/spdx.schema.json -o remote_spdx.schema.json
           remote_version=$(jq -r '."$comment"' remote_spdx.schema.json)
-          echo "remove version is: $remote_version"
+          echo "remote_version=$remote_version" >> $GITHUB_OUTPUT
           local_version=$(jq -r '."$comment"' cdxev/auxiliary/schema/spdx.schema.json)
           echo "local version is: $local_version"
           # Simple version compare; adjust logic as needed
@@ -41,7 +42,7 @@ jobs:
           echo "higher version is: $higher_version"
 
           if [ "$higher_version" = "$remote_sanitized" ] && [ "$remote_sanitized" != "$local_sanitized" ]; then
-            echo "working on it"
+            echo "update_list = true" >> $GITHUB_OUTPUT
             mv remote_spdx.schema.json cdxev/auxiliary/schema/spdx.schema.json
             git config --local user.email "github-actions[bot]@users.noreply.github.com"
             git config --local user.name "github-actions[bot]"
@@ -49,4 +50,16 @@ jobs:
             git add cdxev/auxiliary/schema/spdx.schema.json
             git commit -m "chore: bump SPDX schema version to $remote_version"
             git push
+          else
+            echo "update_list=false" >> $GITHUB_OUTPUT
           fi
+  
+      - name: Create Pull Request if schema was updated
+        if: steps.check_version.outputs.need_update == 'true'
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          commit-message: "chore: bump SPDX schema to ${{ steps.check_version.outputs.remote_version }}"
+          branch: bump-spdx-schema-version-${{ steps.update_schema.outputs.remote_version }}
+          title: "chore: bump SPDX schema version to ${{ steps.check_version.outputs.remote_version }}"
+          body: |
+            This PR updates the `spdx.schema.json` to the latest version `$ { { steps.check_version.outputs.remote_version } }`

@@ -1,0 +1,43 @@
+name: Check & Bump SPDX Schema Version
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"  # run at 03:00 on Mondays
+  pull_request:          #      
+    branches:
+      - main
+
+jobs:
+  check-spdx-schema-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.COMMIT_KEY }}
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          # Check out HEAD of source branch. Without this option, the merge commit would be checked out.
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Fetch and bump remote spdx.schema.json
+        run: |
+          curl -sSL https://cyclonedx.org/schema/spdx.schema.json -o remote_spdx.schema.json
+          remote_version=$(jq -r '."$comment"' remote_spdx.schema.json)
+          local_version=$(jq -r '."$comment"' cdxev/auxiliary/schema/spdx.schema.json)
+          # Simple version compare; adjust logic as needed
+          # Remove "v" prefix
+          remote_version_norm=${remote_version#v}
+          local_version_norm=${local_version#v}
+          higher=$(printf "%s\n%s\n" "$remote_norm" "$local_norm" | sort -V | tail -n1)
+
+          if [ "$higher" = "$remote_norm" ] && [ "$remote_norm" != "$local_norm" ]; then
+            sed -i "s/\"\\$comment\": *\"[^\"]*\"/\"\\$comment\": \"$remote_version\"/" cdxev/auxiliary/schema/spdx.schema.json
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git remote set-url origin "git@github.com:${{ github.repository }}.git"
+            git add cdxev/auxiliary/schema/spdx.schema.json
+            git commit -m "chore: bump SPDX schema version to $remote_version"
+            git push
+          fi

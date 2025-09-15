@@ -34,10 +34,13 @@ jobs:
           echo "remote version normalized is: $remote_version_norm"
           local_version_norm=${local_version#v}
           echo "local version normalized is: $local_version_norm"
-          higher_version=$(printf "%s\n%s\n" "$remote_norm" "$local_norm" | sort -V | tail -n1)
+          # Replace hyphen with dot to make semantic components comparable
+          remote_sanitized=${remote_version_norm//-/\.}
+          local_sanitized=${local_version_norm//-/\.}
+          higher_version=$(printf "%s\n%s\n" "$remote_sanitized" "$local_sanitized" | sort -V | tail -n1)
           echo "higher version is: $higher_version"
 
-          if [ "$higher_version" = "$remote_version_norm" ] && [ "$remote_version_norm" != "$local_version_norm" ]; then
+          if [ "$higher_version" = "$remote_sanitized" ] && [ "$remote_sanitized" != "$local_sanitized" ]; then
             echo "working on it"
             sed -i "s/\"\\$comment\": *\"[^\"]*\"/\"\\$comment\": \"$remote_version\"/" cdxev/auxiliary/schema/spdx.schema.json
             git config --local user.email "github-actions[bot]@users.noreply.github.com"

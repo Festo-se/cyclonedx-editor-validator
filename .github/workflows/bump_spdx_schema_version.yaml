@@ -42,7 +42,7 @@ jobs:
           echo "higher version is: $higher_version"
 
           if [ "$higher_version" = "$remote_sanitized" ] && [ "$remote_sanitized" != "$local_sanitized" ]; then
-            echo "update_list = true" >> $GITHUB_OUTPUT
+            echo "update_list=true" >> $GITHUB_OUTPUT
             mv remote_spdx.schema.json cdxev/auxiliary/schema/spdx.schema.json
           else
             echo "update_list=false" >> $GITHUB_OUTPUT

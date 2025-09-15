@@ -53,4 +53,4 @@ jobs:
           branch: bump-spdx-schema-version-${{ steps.update_schema.outputs.remote_version }}
           title: "chore: bump SPDX schema version to ${{ steps.check_version.outputs.remote_version }}"
           body: |
-            This PR updates the `spdx.schema.json` to the latest version `$ { { steps.check_version.outputs.remote_version } }`
+            This PR updates the `spdx.schema.json` to the latest version `${{ steps.check_version.outputs.remote_version }}`

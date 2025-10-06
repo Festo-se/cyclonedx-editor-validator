@@ -46,7 +46,7 @@ dev = [
     "toml==0.10.2",
     "typing-extensions==4.15.0",
     "bandit[toml]==1.8.6",
-    "isort==6.0.1",
+    "isort==6.1.0",
     "pre-commit==4.3.0",
 ]
 docs = [

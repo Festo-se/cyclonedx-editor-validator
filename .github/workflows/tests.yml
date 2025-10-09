@@ -6,7 +6,8 @@ name: tests
 on:
   workflow_call:
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   test_pages:

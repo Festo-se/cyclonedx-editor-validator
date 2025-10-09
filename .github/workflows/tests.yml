@@ -6,6 +6,8 @@ name: tests
 on:
   workflow_call:
 
+permissions: read-all
+
 jobs:
   test_pages:
     runs-on: ubuntu-latest

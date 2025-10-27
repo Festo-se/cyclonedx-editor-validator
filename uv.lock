@@ -380,7 +380,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "charset-normalizer", specifier = ">=3.3.2,<4" },
-    { name = "cyclonedx-python-lib", specifier = "==11.2.0" },
+    { name = "cyclonedx-python-lib", specifier = "==11.4.0" },
     { name = "docstring-parser", specifier = ">=0.16,<0.18" },
     { name = "email-validator", specifier = ">=2.2.0,<3.0.0" },
     { name = "jsonschema", extras = ["format"], specifier = "==4.25.1" },
@@ -416,7 +416,7 @@ docs = [
 
 [[package]]
 name = "cyclonedx-python-lib"
-version = "11.2.0"
+version = "11.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "license-expression" },
@@ -425,9 +425,9 @@ dependencies = [
     { name = "sortedcontainers" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/55/1b/fb7a788c836bb30d9a47c9236034092be128bdf50c9ad4546007512b3a68/cyclonedx_python_lib-11.2.0.tar.gz", hash = "sha256:f27a66f6c4cea6862ff828e597e4785082757d18afd8c3f8f5af0939a719a171", size = 1043380, upload-time = "2025-10-15T13:44:57.844Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/58/e4/e923543e0d7729a02be1bf686cf1b2f4047a8df6493ffba5f43968790838/cyclonedx_python_lib-11.4.0.tar.gz", hash = "sha256:1de90231a600340cc6a7bacb35fbe97c75241b39788beaa33a0f49bf4afd4e6c", size = 1403403, upload-time = "2025-10-23T14:28:45.45Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/f0/72b7ab69b1b74cb4279296e32ae32be3d03ec078acc14f4ecf502e4aa3d9/cyclonedx_python_lib-11.2.0-py3-none-any.whl", hash = "sha256:94842258700a54000b23331b0aeabb8578d5fadf0f9abd80af33715bb01b36b1", size = 382953, upload-time = "2025-10-15T13:44:54.864Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/1e/8f90b773582013e5c324256bfc464dd7b998a4e2b075dc6d953bc49f5f60/cyclonedx_python_lib-11.4.0-py3-none-any.whl", hash = "sha256:98a2b05da0f203379bd169b8d369075db7b3b5d5c812c05c1b5ebe40ad0305bc", size = 499679, upload-time = "2025-10-23T14:28:43.541Z" },
 ]
 
 [[package]]

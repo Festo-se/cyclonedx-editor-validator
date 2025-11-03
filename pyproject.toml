@@ -19,7 +19,7 @@ dependencies = [
     "pyicu>=2.13.1,<3 ; sys_platform == 'linux'",
     "natsort>=8.4.0,<9",
     "univers==31.1.0",
-    "cyclonedx-python-lib==11.4.0",
+    "cyclonedx-python-lib==11.5.0",
     "email-validator (>=2.2.0,<3.0.0)",
 ]
 

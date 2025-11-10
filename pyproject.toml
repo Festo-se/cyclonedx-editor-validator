@@ -47,7 +47,7 @@ dev = [
     "typing-extensions==4.15.0",
     "bandit[toml]==1.8.6",
     "isort==7.0.0",
-    "pre-commit==4.3.0",
+    "pre-commit==4.4.0",
 ]
 docs = [
     "sphinx-argparse==0.5.2",

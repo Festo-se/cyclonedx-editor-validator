@@ -42,7 +42,6 @@ dev = [
     "types-jsonschema==4.25.1.20251009",
     "pytest==9.0.0",
     "coverage==7.11.3",
-    "pytest-subtests==0.15.0",
     "toml==0.10.2",
     "typing-extensions==4.15.0",
     "bandit[toml]==1.8.6",

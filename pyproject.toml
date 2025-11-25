@@ -35,7 +35,7 @@ cdx-ev = "cdxev.__main__:main"
 [dependency-groups]
 dev = [
     "flake8==7.3.0",
-    "black==25.9.0",
+    "black==25.11.0",
     "pep8-naming==0.15.1",
     "mypy==1.18.2",
     "types-python-dateutil==2.9.0.20251115",

@@ -109,6 +109,9 @@ source = ["cdxev"]
 [tool.coverage.report]
 omit = ["*__init__.py*"]
 
+[tool.bandit]
+exclude_dirs = ["tests"]
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -168,6 +171,3 @@ max-line-length=99
 
 [tool.ruff.lint.mccabe]
 max-complexity = 20
-
-[tool.ruff.lint.flake8-bandit]
-exclude_dirs = ["tests"]

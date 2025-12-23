@@ -41,6 +41,7 @@ dev = [
     "coverage==7.13.1",
     "toml==0.10.2",
     "typing-extensions==4.15.0",
+    "bandit[toml]==1.9.2",
     "pre-commit==4.5.1",
     "ruff==0.14.10",
 ]
@@ -152,8 +153,8 @@ target-version = "py310"
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and pycodestyle (`E`) codes by default.
 # Additionally adds isort (`I`), pep8-naming (`N`), and enables
-# pycodestyle warnings (`W`), McCabe complexity (`C901`) and bandit (`S`).
-select = ["E", "F", "I", "N", "W", "C901", "S"]
+# pycodestyle warnings (`W`) and McCabe complexity (`C901`).
+select = ["E", "F", "I", "N", "W", "C901"]
 ignore = ["E203", "E722"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.

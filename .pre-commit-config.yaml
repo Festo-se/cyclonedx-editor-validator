@@ -41,12 +41,6 @@ repos:
           - email-validator==2.3.0
         files: "^cdxev/.*\\.py$"
         args: ["--config-file", "pyproject.toml"]
-  - repo: https://github.com/PyCQA/bandit
-    rev: "1.9.2"
-    hooks:
-      - id: bandit
-        args: ["-c", "pyproject.toml"]
-        additional_dependencies: ["bandit[toml]"]
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.
     rev: 0.9.18

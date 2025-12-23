@@ -12,15 +12,13 @@ from uuid import uuid4
 from cdxev import pkg
 from cdxev.auxiliary.filename_gen import generate_filename
 from cdxev.auxiliary.identity import ComponentIdentity
-from cdxev.auxiliary.sbomFunctions import CycloneDXVersion, SpecVersion
+from cdxev.auxiliary.sbom_functions import CycloneDXVersion, SpecVersion
 from cdxev.error import AppError
 
 logger = logging.getLogger(__name__)
 
 
-def write_sbom(
-    sbom: dict, destination: t.Optional[Path], update_metadata: bool = True
-) -> None:
+def write_sbom(sbom: dict, destination: t.Optional[Path], update_metadata: bool = True) -> None:
     """
     Writes a JSON SBOM to a file.
 
@@ -51,9 +49,7 @@ def write_sbom(
     json.dump(sbom, file, indent=4)
 
 
-def create_destination_path(
-    destination: Path, sbom: dict, generate_filename: t.Callable
-) -> Path:
+def create_destination_path(destination: Path, sbom: dict, generate_filename: t.Callable) -> Path:
     # Destination has been specified but might be a file, directory or non-existent.
     if destination.exists() and destination.is_dir():
         filename = generate_filename(sbom)
@@ -110,10 +106,7 @@ def update_tools(sbom: dict) -> None:
         # the tool crash. Therefore, bandit error B101 is silenced.
         assert isinstance(tools, list)  # nosec
 
-    if any(
-        ComponentIdentity.create(tool, allow_unsafe=True) == this_tool_id
-        for tool in tools
-    ):
+    if any(ComponentIdentity.create(tool, allow_unsafe=True) == this_tool_id for tool in tools):
         return
 
     tools.append(this_tool)
@@ -134,7 +127,6 @@ def update_version(sbom: dict) -> None:
 def write_list(
     list_file: str, destination: t.Optional[Path], sbom: dict, format: str = "txt"
 ) -> None:
-
     def create_list_file_filename(sbom: dict) -> str:
         file_name = generate_filename(sbom)
         file_name = file_name.replace(".json", "").replace(".cdx", "")
@@ -153,9 +145,7 @@ def write_list(
         # No output file specified.
         file = sys.stdout
     else:
-        destination = create_destination_path(
-            destination, sbom, create_list_file_filename
-        )
+        destination = create_destination_path(destination, sbom, create_list_file_filename)
         file = destination.open("w")
     file.write(list_file)
 
@@ -183,8 +173,6 @@ def add_input_argument(
 ) -> None:
     """Helper function to create uniform input options for all commands."""
     if nargs:
-        parser.add_argument(
-            "input", metavar="<input>", help=help, type=Path, nargs=nargs
-        )
+        parser.add_argument("input", metavar="<input>", help=help, type=Path, nargs=nargs)
     else:
         parser.add_argument("input", metavar="<input>", help=help, type=Path)

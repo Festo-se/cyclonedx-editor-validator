@@ -10,7 +10,7 @@ import univers.version_range
 import univers.versions
 
 from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
-from cdxev.auxiliary.sbomFunctions import walk_components
+from cdxev.auxiliary.sbom_functions import walk_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 
@@ -54,9 +54,7 @@ class CoordinatesWithVersionRange(Coordinates):
     def __eq__(self, other: object) -> bool:
         if t.TYPE_CHECKING:
             # univers guarantees that version_class is not None
-            assert (
-                self.version_range.version_class is not None
-            )  # nosec - only for type checker
+            assert self.version_range.version_class is not None  # nosec - only for type checker
 
         if isinstance(other, CoordinatesWithVersionRange):
             for field_ in fields(self):
@@ -73,10 +71,7 @@ class CoordinatesWithVersionRange(Coordinates):
 
             if other.version is not None:
                 try:
-                    if (
-                        self.version_range.version_class(other.version)
-                        in self.version_range
-                    ):
+                    if self.version_range.version_class(other.version) in self.version_range:
                         return True
                 except univers.versions.InvalidVersion:
                     possible_versions = []
@@ -111,9 +106,7 @@ class CoordinatesWithVersionRange(Coordinates):
 
     def __str__(self) -> str:
         group_str = (f"{self.group}/") if self.group is not None else ""
-        version_str = (
-            (f"@{self.version_range}") if self.version_range is not None else ""
-        )
+        version_str = (f"@{self.version_range}") if self.version_range is not None else ""
         return group_str + self.name + version_str
 
 
@@ -135,15 +128,14 @@ class UpdateIdentity(ComponentIdentity):
         super().__init__(*keys)
 
     def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, ComponentIdentity) or isinstance(other, UpdateIdentity)
-        ) and any(k in self._keys for k in other._keys)
+        return (isinstance(other, ComponentIdentity) or isinstance(other, UpdateIdentity)) and any(
+            k in self._keys for k in other._keys
+        )
 
     @classmethod
     def create(
         cls, component: t.Mapping[str, t.Any], allow_unsafe: bool = False
     ) -> "t.Union[UpdateIdentity, ComponentIdentity]":
-
         if "version-range" in component:
             coordinates = cls.from_coordinates(
                 name=component["name"],
@@ -164,9 +156,7 @@ class UpdateIdentity(ComponentIdentity):
     ) -> "Key":
         coordinates: Coordinates
         if version_range is not None:
-            vers = univers.version_range.VersionRange.from_string(
-                version_range
-            )  # type:ignore
+            vers = univers.version_range.VersionRange.from_string(version_range)  # type:ignore
             coordinates = CoordinatesWithVersionRange(name, group, None, vers)
         else:
             coordinates = Coordinates(name, group, version)
@@ -241,9 +231,7 @@ def _should_remap(property: str) -> bool:
     return property in _PROTECTED and property not in _IDENTIFIERS
 
 
-def _update_id(
-    old: ComponentIdentity, new: ComponentIdentity, map: dict[Key, list[dict]]
-) -> None:
+def _update_id(old: ComponentIdentity, new: ComponentIdentity, map: dict[Key, list[dict]]) -> None:
     instance_list = None
     for key in old:
         instance_list = map.pop(key)
@@ -306,7 +294,7 @@ def _map_out_components(sbom: dict) -> dict[Key, list[dict]]:
 
 
 def _get_protected(update_set: dict) -> t.Union[t.Literal[False], set]:
-    global _PROTECTED  # noqa: F824
+    global _PROTECTED
     intersection = _PROTECTED & update_set.keys()
     if intersection:
         return intersection
@@ -316,16 +304,12 @@ def _get_protected(update_set: dict) -> t.Union[t.Literal[False], set]:
 
 def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -> None:
     if len(updates) == 0:
-        logger.debug(
-            "No updates to perform. This is probably wrong but what do I know."
-        )
+        logger.debug("No updates to perform. This is probably wrong but what do I know.")
         return
 
     for upd in updates:
         if "id" not in upd:
-            raise AppError(
-                "Invalid set file", "An update object is missing the 'id' property."
-            )
+            raise AppError("Invalid set file", "An update object is missing the 'id' property.")
         if "version" in upd["id"] and "version-range" in upd["id"]:
             raise AppError(
                 "Invalid set file",
@@ -343,9 +327,7 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
         upd["id"] = component_id
 
         if len(component_id) == 0:
-            raise AppError(
-                "Invalid set file", "An update object has an empty 'id' property."
-            )
+            raise AppError("Invalid set file", "An update object has an empty 'id' property.")
         if len(component_id) > 1:
             raise AppError(
                 "Invalid set file",

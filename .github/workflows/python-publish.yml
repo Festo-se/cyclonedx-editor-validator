@@ -65,7 +65,6 @@ jobs:
       - name: Build HTML
         run: |
           uv version ${{ github.ref_name }}
-          uv build
           uv run sphinx-build -a -E docs/source/ docs/build
       - name: Upload artifacts
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0

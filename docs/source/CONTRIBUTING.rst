@@ -34,7 +34,7 @@ Prerequisites
 * Make sure to use the latest code by performing a :code:`git pull`.
 * For a major change it is recommended that you get in touch with us by :ref:`creating an issue <contributing:create issues>` to discuss changes prior to dedicating time and resources. This process allows us to better coordinate our efforts and prevent duplication of work.
 * Commit your changes using a descriptive commit message that follows our :ref:`commit message format <contributing:commit message format>`. The same applies for titles of PRs. This is required as we generate our release notes from these messages.
-* Otherwise, feel free to directly [submit a pull request](#submitting-pull-requests).
+* Otherwise, feel free to directly :ref:`submit a pull request <contributing:submitting-pull-requests>`.
 
 ----------------------------------------
 Write new commands, options or arguments

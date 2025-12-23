@@ -91,9 +91,7 @@ def read_sbom(sbom_file: Path, file_type: Optional[str] = None) -> Tuple[dict, s
     known_loaders = {"json": load_json, "xml": load_xml}
 
     if file_type not in known_loaders:
-        raise InputFileError(
-            f'Failed to guess file type from extension ".{file_type}".'
-        )
+        raise InputFileError(f'Failed to guess file type from extension ".{file_type}".')
 
     sbom = known_loaders[file_type](sbom_file)
     return sbom, file_type
@@ -116,9 +114,7 @@ def load_xml(path: Path) -> dict:
     )
 
 
-def usage_error(
-    message: str, parser: Optional[argparse.ArgumentParser] = None
-) -> NoReturn:
+def usage_error(message: str, parser: Optional[argparse.ArgumentParser] = None) -> NoReturn:
     if parser is not None:
         parser.print_usage(file=sys.stderr)
 
@@ -170,9 +166,7 @@ def create_parser() -> argparse.ArgumentParser:
         ),
         action="store_true",
     )
-    group.add_argument(
-        "--version", action="version", version=pkg.VERSION, help="Print version."
-    )
+    group.add_argument("--version", action="version", version=pkg.VERSION, help="Print version.")
     group.add_argument("--help", "-h", action="help", help="Print this help message.")
 
     subparsers = parser.add_subparsers(
@@ -312,7 +306,7 @@ def reflow_paragraphs(text: str, indent: int = 8) -> str:
                 """
                 while len(lines) > 0:
                     item = lines.pop(0)
-                    while len(lines) > 0 and not lines[0][0] in "*-+":
+                    while len(lines) > 0 and lines[0][0] not in "*-+":
                         item += lines.pop(0)
                     yield item
 
@@ -394,9 +388,7 @@ def create_amend_parser(
         group_parser = parser.add_argument_group(f"Options for '{group}'")
         for opt in args:
             name = opt["name"]
-            group_parser.add_argument(
-                name, **{k: v for k, v in opt.items() if k != "name"}
-            )
+            group_parser.add_argument(name, **{k: v for k, v in opt.items() if k != "name"})
 
     add_output_argument(parser)
 
@@ -447,9 +439,7 @@ def create_vex_parser(
 
     subparsers = parser.add_subparsers(dest="sub_command", required=True)
 
-    list_parser = subparsers.add_parser(
-        "list", help="Returns a list of all vulnerability IDs."
-    )
+    list_parser = subparsers.add_parser("list", help="Returns a list of all vulnerability IDs.")
     add_input_argument(list_parser)
     list_parser.add_argument(
         "--schema",
@@ -490,15 +480,11 @@ def create_vex_parser(
     trim_parser.add_argument(
         "--value",
         metavar="<value>",
-        help=(
-            "Specifies the value of the provided key that should be used for filtering."
-        ),
+        help=("Specifies the value of the provided key that should be used for filtering."),
         type=str,
     )
 
-    extract_parser = subparsers.add_parser(
-        "extract", help="Extract a VEX file out of SBOM file."
-    )
+    extract_parser = subparsers.add_parser("extract", help="Extract a VEX file out of SBOM file.")
     add_input_argument(extract_parser)
 
     add_output_argument(list_parser)
@@ -607,8 +593,7 @@ def create_set_parser(
         "--key",
         metavar="<key>",
         help=(
-            "Name of the component field to set or update. "
-            "May not be combined with --from-file."
+            "Name of the component field to set or update. May not be combined with --from-file."
         ),
     )
     parser.add_argument(
@@ -864,7 +849,7 @@ def invoke_amend(args: argparse.Namespace) -> int:
 
 
 def invoke_merge(args: argparse.Namespace) -> int:
-    global logger  # noqa: F824
+    global logger
 
     inputs = args.input
 
@@ -892,9 +877,7 @@ def invoke_merge(args: argparse.Namespace) -> int:
         inputs += folder_inputs
 
     if len(inputs) < 2:
-        usage_error(
-            f"Not enough inputs. Must be at least 2, you have provided {len(inputs)}."
-        )
+        usage_error(f"Not enough inputs. Must be at least 2, you have provided {len(inputs)}.")
 
     inputs = [sbom for (sbom, _) in (read_sbom(input) for input in inputs)]
     output = merge(inputs, hierarchical=args.hierarchical)
@@ -919,9 +902,7 @@ def invoke_set(args: argparse.Namespace) -> int:
                 args.parser,
             )
         elif args.key is None:
-            usage_error(
-                "--key is required, unless the --from-file option is used.", args.parser
-            )
+            usage_error("--key is required, unless the --from-file option is used.", args.parser)
         elif args.value is None:
             usage_error(
                 "--value is required, unless the --from-file option is used.",
@@ -1037,9 +1018,7 @@ def invoke_validate(args: argparse.Namespace) -> int:
             report_format=args.report_format,
             report_path=args.report_path,
             schema_type=args.schema_type,
-            filename_regex=(
-                None if args.no_filename_validation else args.filename_pattern
-            ),
+            filename_regex=(None if args.no_filename_validation else args.filename_pattern),
             schema_path=args.schema_path,
         )
         == Status.OK
@@ -1064,9 +1043,7 @@ def invoke_vex(args: argparse.Namespace) -> int:
                 "--value is required.",
                 args.parser,
             )
-        output = vex(
-            sub_command=args.sub_command, file=file, key=args.key, value=args.value
-        )
+        output = vex(sub_command=args.sub_command, file=file, key=args.key, value=args.value)
 
     if args.sub_command == "list":
         output = vex(sub_command=args.sub_command, file=file, schema=args.schema)

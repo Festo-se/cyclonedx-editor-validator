@@ -3,7 +3,7 @@
 import logging
 import typing as t
 
-from cdxev.auxiliary.sbomFunctions import walk_components
+from cdxev.auxiliary.sbom_functions import walk_components
 
 from .operations import Operation
 
@@ -66,7 +66,5 @@ def _metadata(operations: list[Operation], sbom: dict) -> None:
 
 def _do_amend(component: dict, operations: list[Operation]) -> None:
     for operation in operations:
-        logger.debug(
-            "Processing component %s", (component.get("bom-ref", "<no bom-ref>"))
-        )
+        logger.debug("Processing component %s", (component.get("bom-ref", "<no bom-ref>")))
         operation.handle_component(component)

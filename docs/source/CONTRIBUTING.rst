@@ -72,11 +72,11 @@ The following things are to consider before submitting a pull request.
 
 3. Please ensure that types are correct according to `mypy <mypy_url>`_.
 
-4. All submitted code should conform to `PEP8 <pep8_url>`_ and `black <black_url>`_.
+4. All submitted code should conform to `PEP8 <pep8_url>`_ and `ruff <ruff_url>`_.
 
 5. The code should be python 3.10 compliant.
 
-.. _black_url: https://black.readthedocs.io/en/stable/index.html
+.. _ruff_url: https://docs.astral.sh/ruff/
 .. _pep8_url: https://www.python.org/dev/peps/pep-0008/
 .. _mypy_url: https://www.mypy-lang.org/
 
@@ -126,4 +126,4 @@ Examples
 
 :code:`feat: add 'amend' option`
 
-:code:`refactor: apply black`
+:code:`refactor: apply ruff`

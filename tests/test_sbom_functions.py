@@ -3,7 +3,7 @@ import unittest
 from copy import deepcopy
 from typing import Sequence
 
-from cdxev.auxiliary import sbomFunctions as sbF
+from cdxev.auxiliary import sbom_functions as sbf
 from cdxev.auxiliary.identity import ComponentIdentity
 from tests.auxiliary.helper import load_sections_for_test_sbom, load_sub_program
 
@@ -60,7 +60,7 @@ class TestComponentFunctions(unittest.TestCase):
                 ],
             },
         ]
-        components = sbF.extract_components(example_list)
+        components = sbf.extract_components(example_list)
         list_of_references = []
         for comp in components:
             list_of_references.append(comp["bom-ref"])
@@ -148,8 +148,8 @@ class TestComponentFunctions(unittest.TestCase):
             },
         ]
         sbom_dict = {"components": example_list}
-        sbom = sbF.deserialize(sbom_dict)
-        components = sbF.extract_cyclonedx_components(sbom.components)
+        sbom = sbf.deserialize(sbom_dict)
+        components = sbf.extract_cyclonedx_components(sbom.components)
         bom_refs = []
         for component in components:
             bom_refs.append(component.bom_ref.value)
@@ -175,15 +175,13 @@ class TestComponentFunctions(unittest.TestCase):
 
     def test_get_component_by_ref(self) -> None:
         sbom = load_sub_program()
-        self.assertEqual(
-            sbF.get_component_by_ref("not existing ref", sbom["components"]), {}
-        )
+        self.assertEqual(sbf.get_component_by_ref("not existing ref", sbom["components"]), {})
 
 
 class TestCompareComponents(unittest.TestCase):
     def test_equal(self) -> None:
         self.assertTrue(
-            sbF.compare_components(
+            sbf.compare_components(
                 {
                     "name": "Name1",
                     "version": "1.0",
@@ -203,7 +201,7 @@ class TestCompareComponents(unittest.TestCase):
             )
         )
         self.assertTrue(
-            sbF.compare_components(
+            sbf.compare_components(
                 {
                     "name": "Name1",
                     "version": "1.0",
@@ -223,7 +221,7 @@ class TestCompareComponents(unittest.TestCase):
             )
         )
         self.assertTrue(
-            sbF.compare_components(
+            sbf.compare_components(
                 {
                     "name": "Name1",
                     "version": "1.0",
@@ -241,13 +239,13 @@ class TestCompareComponents(unittest.TestCase):
             )
         )
         self.assertTrue(
-            sbF.compare_components(
+            sbf.compare_components(
                 {"name": "Name1", "version": "1.0", "group": "group1", "swid": "swid1"},
                 {"name": "Name2", "version": "2.0", "group": "group2", "swid": "swid1"},
             )
         )
         self.assertTrue(
-            sbF.compare_components(
+            sbf.compare_components(
                 {"name": "Name1", "version": "1.0", "group": "group1", "purl": "purl1"},
                 {
                     "name": "Name1",
@@ -259,7 +257,7 @@ class TestCompareComponents(unittest.TestCase):
             )
         )
         self.assertTrue(
-            sbF.compare_components(
+            sbf.compare_components(
                 {
                     "name": "Name1",
                     "version": "1.0",
@@ -279,7 +277,7 @@ class TestCompareComponents(unittest.TestCase):
             )
         )
         self.assertTrue(
-            sbF.compare_components(
+            sbf.compare_components(
                 {
                     "name": "Name2",
                     "version": "1.0",
@@ -294,7 +292,7 @@ class TestCompareComponents(unittest.TestCase):
 
     def test_unequal(self) -> None:
         self.assertFalse(
-            sbF.compare_components(
+            sbf.compare_components(
                 {
                     "name": "Name1",
                     "version": "1.0",
@@ -314,7 +312,7 @@ class TestCompareComponents(unittest.TestCase):
             )
         )
         self.assertFalse(
-            sbF.compare_components(
+            sbf.compare_components(
                 {
                     "name": "Name1",
                     "version": "1.0",
@@ -334,7 +332,7 @@ class TestCompareComponents(unittest.TestCase):
             )
         )
         self.assertFalse(
-            sbF.compare_components(
+            sbf.compare_components(
                 {
                     "name": "Name1",
                     "version": "1.0",
@@ -354,7 +352,7 @@ class TestCompareComponents(unittest.TestCase):
             )
         )
         self.assertFalse(
-            sbF.compare_components(
+            sbf.compare_components(
                 {
                     "name": "Name1",
                     "version": "2.0",
@@ -366,7 +364,7 @@ class TestCompareComponents(unittest.TestCase):
             )
         )
         self.assertFalse(
-            sbF.compare_components(
+            sbf.compare_components(
                 {"name": "Name1", "version": "1.0", "group": "group1"},
                 {"name": "Name1", "version": "1.0", "group": "group2"},
             )
@@ -391,10 +389,10 @@ class TestReplaceBomRefs(unittest.TestCase):
         component_list: list[dict] = [component, component_2, {}]
         component_list_copy = deepcopy(component_list)
 
-        sbF.replace_ref_in_components(component_list, "...", new_reference)
+        sbf.replace_ref_in_components(component_list, "...", new_reference)
         self.assertEqual(component_list, component_list_copy)
 
-        sbF.replace_ref_in_components(
+        sbf.replace_ref_in_components(
             [component, component_2, component_3], reference, new_reference
         )
         self.assertEqual(component["bom-ref"], new_reference)
@@ -413,15 +411,13 @@ class TestReplaceBomRefs(unittest.TestCase):
         reference = "sp_second_component"
         new_reference = "new"
 
-        sbF.replace_ref_in_dependencies(dependencies, "...", new_reference)
+        sbf.replace_ref_in_dependencies(dependencies, "...", new_reference)
         self.assertEqual(dependencies, dependencies_copy)
 
-        sbF.replace_ref_in_dependencies(dependencies, reference, new_reference)
+        sbf.replace_ref_in_dependencies(dependencies, reference, new_reference)
         self.assertEqual(dependencies[0]["ref"], new_reference)
         self.assertEqual(dependencies[1]["ref"], "sp_fourth_component")
-        self.assertEqual(
-            dependencies[1]["dependsOn"], [new_reference, new_reference, "other"]
-        )
+        self.assertEqual(dependencies[1]["dependsOn"], [new_reference, new_reference, "other"])
 
     def test_replace_ref_in_compositions(self) -> None:
         compositions = [
@@ -447,14 +443,14 @@ class TestReplaceBomRefs(unittest.TestCase):
         reference = "sp_second_component"
         new_reference = "new"
 
-        sbF.replace_ref_in_compositions(compositions, "...", new_reference)
+        sbf.replace_ref_in_compositions(compositions, "...", new_reference)
         self.assertEqual(compositions, compositions_copy)
 
         compositions_copy[0]["assemblies"][1] = new_reference  # type:ignore
         compositions_copy[1]["assemblies"][2] = new_reference  # type:ignore
         compositions_copy[1]["assemblies"][3] = new_reference  # type:ignore
 
-        sbF.replace_ref_in_compositions(compositions, reference, new_reference)
+        sbf.replace_ref_in_compositions(compositions, reference, new_reference)
         self.assertEqual(compositions, compositions_copy)
 
     def test_replace_ref_in_vulnerabilities(self) -> None:
@@ -466,7 +462,7 @@ class TestReplaceBomRefs(unittest.TestCase):
         ]
         reference = "product 3"
         new_reference = "new"
-        sbF.replace_ref_in_vulnerabilities(vulnerabilities, reference, new_reference)
+        sbf.replace_ref_in_vulnerabilities(vulnerabilities, reference, new_reference)
         self.assertEqual(vulnerabilities, vulnerabilities_replaced)
 
     def test_get_ref_components_mapping(self) -> None:
@@ -475,7 +471,7 @@ class TestReplaceBomRefs(unittest.TestCase):
             {"name": "comp 3", "version": "1.0.0", "bom-ref": "com-2"},
             {"name": "comp 3", "version": "1.0.0", "bom-ref": "com-3"},
         ]
-        ref_mapping = sbF.get_ref_components_mapping(components)
+        ref_mapping = sbf.get_ref_components_mapping(components)
         self.assertEqual(
             ref_mapping,
             {
@@ -491,18 +487,12 @@ class TestReplaceBomRefs(unittest.TestCase):
         sbom_3 = load_sections_for_test_sbom()["sbom_replace_references_3"]
         sbom_4 = load_sections_for_test_sbom()["sbom_replace_references_4"]
 
-        sbom_2_replaced = load_sections_for_test_sbom()[
-            "sbom_replace_references_2_replaced"
-        ]
-        sbom_3_replaced = load_sections_for_test_sbom()[
-            "sbom_replace_references_3_replaced"
-        ]
-        sbom_4_replaced = load_sections_for_test_sbom()[
-            "sbom_replace_references_4_replaced"
-        ]
+        sbom_2_replaced = load_sections_for_test_sbom()["sbom_replace_references_2_replaced"]
+        sbom_3_replaced = load_sections_for_test_sbom()["sbom_replace_references_3_replaced"]
+        sbom_4_replaced = load_sections_for_test_sbom()["sbom_replace_references_4_replaced"]
 
         sbom_1_copy = deepcopy(sbom_1)
-        sbF.make_bom_refs_unique([sbom_1, sbom_2, sbom_3, sbom_4])
+        sbf.make_bom_refs_unique([sbom_1, sbom_2, sbom_3, sbom_4])
 
         self.assertEqual(sbom_1, sbom_1_copy)
         self.assertEqual(sbom_2_replaced, sbom_2)
@@ -538,70 +528,48 @@ class TestReplaceBomRefs(unittest.TestCase):
                 },
             ]
         }
-        sbF.make_bom_refs_unique([components_1, components_2])
+        sbf.make_bom_refs_unique([components_1, components_2])
 
-        self.assertEqual(
-            components_2["components"][0]["bom-ref"], "COORDINATES[comp 1@2.0.0]-3"
-        )
+        self.assertEqual(components_2["components"][0]["bom-ref"], "COORDINATES[comp 1@2.0.0]-3")
 
     def test_unify_bom_refs(self) -> None:
         sbom_1 = load_sections_for_test_sbom()["sbom_unify_references_1"]
         sbom_2 = load_sections_for_test_sbom()["sbom_unify_references_2"]
         sbom_3 = deepcopy(sbom_1)
         sbom_3["vulnerabilities"] = deepcopy(sbom_2["vulnerabilities"])
-        sbF.replace_ref_in_vulnerabilities(
-            sbom_3["vulnerabilities"], "comp 3 -", "comp 3"
-        )
-        sbF.replace_ref_in_vulnerabilities(
-            sbom_3["vulnerabilities"], "comp 2 -", "comp 2"
-        )
-        sbF.replace_ref_in_vulnerabilities(
-            sbom_3["vulnerabilities"], "comp 1 -", "comp 1"
-        )
+        sbf.replace_ref_in_vulnerabilities(sbom_3["vulnerabilities"], "comp 3 -", "comp 3")
+        sbf.replace_ref_in_vulnerabilities(sbom_3["vulnerabilities"], "comp 2 -", "comp 2")
+        sbf.replace_ref_in_vulnerabilities(sbom_3["vulnerabilities"], "comp 1 -", "comp 1")
         sbom_3["components"][2] = deepcopy(sbom_2["components"][2])
         sbom_3["components"][2]["bom-ref"] = "comp 3"
 
         sbom_3_expected = deepcopy(sbom_1)
         sbom_3_expected["components"][2] = deepcopy(sbom_2["components"][2])
         sbom_3_expected["vulnerabilities"] = deepcopy(sbom_2["vulnerabilities"])
-        sbF.replace_ref_in_components(
-            sbom_3_expected["components"], "comp 3", "comp 3 -"
-        )
-        sbF.replace_ref_in_compositions(
-            sbom_3_expected["compositions"], "comp 3", "comp 3 -"
-        )
-        sbF.replace_ref_in_dependencies(
-            sbom_3_expected["dependencies"], "comp 3", "comp 3 -"
-        )
+        sbf.replace_ref_in_components(sbom_3_expected["components"], "comp 3", "comp 3 -")
+        sbf.replace_ref_in_compositions(sbom_3_expected["compositions"], "comp 3", "comp 3 -")
+        sbf.replace_ref_in_dependencies(sbom_3_expected["dependencies"], "comp 3", "comp 3 -")
 
-        sbF.replace_ref_in_vulnerabilities(
+        sbf.replace_ref_in_vulnerabilities(
             sbom_3_expected["vulnerabilities"], "comp 1 -", "comp 1"
         )
 
-        sbF.replace_ref_in_vulnerabilities(
+        sbf.replace_ref_in_vulnerabilities(
             sbom_3_expected["vulnerabilities"], "comp 2 -", "comp 2"
         )
 
         sbom_2_expected = deepcopy(sbom_1)
-        sbom_2_expected["vulnerabilities"] = deepcopy(
-            sbom_3_expected["vulnerabilities"]
-        )
+        sbom_2_expected["vulnerabilities"] = deepcopy(sbom_3_expected["vulnerabilities"])
 
         sbom_2_expected["components"][2] = deepcopy(sbom_2["components"][2])
-        sbF.replace_ref_in_components(
-            sbom_2_expected["components"], "comp 3", "comp 3 -"
-        )
-        sbF.replace_ref_in_compositions(
-            sbom_2_expected["compositions"], "comp 3", "comp 3 -"
-        )
-        sbF.replace_ref_in_dependencies(
-            sbom_2_expected["dependencies"], "comp 3", "comp 3 -"
-        )
-        sbF.replace_ref_in_vulnerabilities(
+        sbf.replace_ref_in_components(sbom_2_expected["components"], "comp 3", "comp 3 -")
+        sbf.replace_ref_in_compositions(sbom_2_expected["compositions"], "comp 3", "comp 3 -")
+        sbf.replace_ref_in_dependencies(sbom_2_expected["dependencies"], "comp 3", "comp 3 -")
+        sbf.replace_ref_in_vulnerabilities(
             sbom_2_expected["vulnerabilities"], "comp 3", "comp 3 -"
         )
 
-        sbF.unify_bom_refs([sbom_1, sbom_2, sbom_3])
+        sbf.unify_bom_refs([sbom_1, sbom_2, sbom_3])
 
         self.assertEqual(sbom_1, sbom_1)
         self.assertEqual(sbom_2, sbom_2_expected)
@@ -611,66 +579,60 @@ class TestReplaceBomRefs(unittest.TestCase):
 class TestVulnerabilities(unittest.TestCase):
     def test_compare_version_range(self) -> None:
         self.assertTrue(
-            sbF.compare_version_range(
+            sbf.compare_version_range(
                 "vers:tomee/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0",
                 "vers:tomee/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0",
             )
         )
 
         self.assertFalse(
-            sbF.compare_version_range(
+            sbf.compare_version_range(
                 "vers:pypi/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0",
                 "vers:pypi/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2",
             )
         )
 
         self.assertFalse(
-            sbF.compare_version_range(
+            sbf.compare_version_range(
                 "No v range",
                 "1",
             )
         )
 
         self.assertTrue(
-            sbF.compare_version_range(
+            sbf.compare_version_range(
                 "vers:pypi/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0",
                 "vers:pypi/>=1.0.0-beta1|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0|<=1.7.5|>=7.0.0",
             )
         )
 
     def test_version_is_in_version_range(self) -> None:
-        self.assertTrue(sbF.version_is_in_version_range("8.0.0", "vers:cargo/<9.0.14"))
-        self.assertFalse(
-            sbF.version_is_in_version_range("10.0.0", "vers:cargo/<9.0.14")
-        )
+        self.assertTrue(sbf.version_is_in_version_range("8.0.0", "vers:cargo/<9.0.14"))
+        self.assertFalse(sbf.version_is_in_version_range("10.0.0", "vers:cargo/<9.0.14"))
 
     def test_compare_affects_version_object(self) -> None:
         self.assertEqual(
-            sbF.compare_affects_versions_object(
+            sbf.compare_affects_versions_object(
                 {"range": "vers:cargo/>9.0.14"}, {"range": "vers:cargo/<9.0.14"}
             ),
             3,
         )
         self.assertEqual(
-            sbF.compare_affects_versions_object(
-                {
-                    "range": "vers:pypi/>=1.0.0|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0"
-                },
-                {
-                    "range": "vers:pypi/>=1.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0|<=1.7.5|>=7.0.0"
-                },
+            sbf.compare_affects_versions_object(
+                {"range": "vers:pypi/>=1.0.0|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0"},
+                {"range": "vers:pypi/>=1.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0|<=1.7.5|>=7.0.0"},
             ),
             1,
         )
         self.assertEqual(
-            sbF.compare_affects_versions_object(
+            sbf.compare_affects_versions_object(
                 {"version": "9.0.14", "range": "vers:cargo/<9.0.14"},
                 {"version": "9.0.0", "range": "vers:cargo/<9.0.14"},
             ),
             0,
         )
         self.assertEqual(
-            sbF.compare_affects_versions_object(
+            sbf.compare_affects_versions_object(
                 {"version": "8.0.0", "range": "vers:cargo/<9.0.14"},
                 {"version": "8.0.0", "range": "vers:cargo/>9.0.14"},
             ),
@@ -678,21 +640,21 @@ class TestVulnerabilities(unittest.TestCase):
         )
 
         self.assertEqual(
-            sbF.compare_affects_versions_object(
+            sbf.compare_affects_versions_object(
                 {"range": "vers:cargo/<9.0.14"}, {"version": "8.0.0"}
             ),
             2,
         )
 
         self.assertEqual(
-            sbF.compare_affects_versions_object(
+            sbf.compare_affects_versions_object(
                 {"version": "8.0.0"}, {"range": "vers:cargo/<9.0.14"}
             ),
             -1,
         )
 
         self.assertEqual(
-            sbF.compare_affects_versions_object(
+            sbf.compare_affects_versions_object(
                 {"range": "vers:cargo/<9.0.14"},
                 {"version": "8.0.0", "range": "vers:cargo/<9.0.14"},
             ),
@@ -700,7 +662,7 @@ class TestVulnerabilities(unittest.TestCase):
         )
 
         self.assertEqual(
-            sbF.compare_affects_versions_object(
+            sbf.compare_affects_versions_object(
                 {"version": "8.0.0", "range": "vers:cargo/<9.0.14"},
                 {"range": "vers:cargo/<9.0.14"},
             ),
@@ -711,7 +673,7 @@ class TestVulnerabilities(unittest.TestCase):
         lists = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
             "test_get_new_affects_versions"
         ]
-        kept_versions = sbF.get_new_affects_versions(
+        kept_versions = sbf.get_new_affects_versions(
             lists["original_versions_list"],
             lists["new_versions_list"],
             "vuln_id",
@@ -733,7 +695,7 @@ class TestVulnerabilities(unittest.TestCase):
         lists = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
             "extract_new_affects"
         ]["original_affects"]
-        joined_lists = sbF.join_affect_versions_with_same_references(lists)
+        joined_lists = sbf.join_affect_versions_with_same_references(lists)
 
         self.assertEqual(joined_lists["product 2"], lists[2]["versions"])
         self.assertEqual(
@@ -742,10 +704,8 @@ class TestVulnerabilities(unittest.TestCase):
         )
 
     def test_extract_new_affects(self) -> None:
-        lists = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
-            "extract_new_affects"
-        ]
-        kept_affects = sbF.extract_new_affects(
+        lists = load_sections_for_test_sbom()["merge_vulnerabilities_tests"]["extract_new_affects"]
+        kept_affects = sbf.extract_new_affects(
             lists["original_affects"], lists["new_affects"], "vuln_id"
         )
 
@@ -766,9 +726,7 @@ class TestVulnerabilities(unittest.TestCase):
                 },
                 {
                     "ref": "product 1",
-                    "versions": [
-                        {"range": "vers:generic/>=2.9|<=5.1", "status": "affected"}
-                    ],
+                    "versions": [{"range": "vers:generic/>=2.9|<=5.1", "status": "affected"}],
                 },
             ],
         )
@@ -778,7 +736,7 @@ class TestVulnerabilities(unittest.TestCase):
         ]
         original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
 
-        actual_merged = sbF.extract_new_affects(
+        actual_merged = sbf.extract_new_affects(
             original_vulnerabilities[2]["affects"],
             original_vulnerabilities[2]["affects"],
             "vuln_id",
@@ -790,7 +748,7 @@ class TestVulnerabilities(unittest.TestCase):
         vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
             "get_identities_for_vulnerabilities"
         ]
-        identities = sbF.get_identities_for_vulnerabilities(vulnerabilities)
+        identities = sbf.get_identities_for_vulnerabilities(vulnerabilities)
         self.assertEqual(len(identities.keys()), 3)
         self.assertEqual(
             identities[json.dumps(vulnerabilities[0], sort_keys=True)],
@@ -798,14 +756,14 @@ class TestVulnerabilities(unittest.TestCase):
         )
         self.assertEqual(
             identities[json.dumps(vulnerabilities[2], sort_keys=True)].aliases,
-            sbF.VulnerabilityIdentity.get_ids_from_vulnerability(vulnerabilities[2]),
+            sbf.VulnerabilityIdentity.get_ids_from_vulnerability(vulnerabilities[2]),
         )
 
     def test_identities_for_vulnerabilities(self) -> None:
         vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
             "test_identities_for_vulnerabilities"
         ]
-        identities = sbF.get_identities_for_vulnerabilities(vulnerabilities)
+        identities = sbf.get_identities_for_vulnerabilities(vulnerabilities)
         self.assertEqual(
             set(identities[json.dumps(vulnerabilities[0], sort_keys=True)].aliases),
             set(
@@ -828,8 +786,8 @@ class TestVulnerabilities(unittest.TestCase):
         lists = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
             "collect_affects_of_vulnerabilities"
         ]
-        identities = sbF.get_identities_for_vulnerabilities(lists)
-        collected = sbF.collect_affects_of_vulnerabilities(lists, identities)
+        identities = sbf.get_identities_for_vulnerabilities(lists)
+        collected = sbf.collect_affects_of_vulnerabilities(lists, identities)
 
         vuln_id = identities[json.dumps(lists[0], sort_keys=True)].string()
         self.assertEqual(

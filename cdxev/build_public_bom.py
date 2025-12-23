@@ -9,7 +9,7 @@ from typing import Any, Sequence
 
 from jsonschema import Draft7Validator, FormatChecker
 
-from cdxev.auxiliary.sbomFunctions import extract_components
+from cdxev.auxiliary.sbom_functions import extract_components
 from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
@@ -74,9 +74,7 @@ def validate_external_references(regex: t.Union[str, None], component: dict) -> 
             component.pop("externalReferences", None)
 
 
-def clear_component(
-    component: dict[str, Any], ext_ref_regex: t.Union[str, None] = None
-) -> None:
+def clear_component(component: dict[str, Any], ext_ref_regex: t.Union[str, None] = None) -> None:
     """
     Removes all internal information of the component
     and applies the same process to all sub-components
@@ -245,8 +243,8 @@ def build_public_bom(
                 )
             )
         for component in components:
-            removed_component_bom_refs, noninternal_components = (
-                remove_component_tagged_internal(component, validator)
+            removed_component_bom_refs, noninternal_components = remove_component_tagged_internal(
+                component, validator
             )
             list_of_removed_component_bom_refs.extend(removed_component_bom_refs)
             # loop trough list of removed (internal) components
@@ -267,12 +265,8 @@ def build_public_bom(
     for bom_ref in list_of_removed_component_bom_refs:
         dependencies = merge_dependency_for_removed_component(bom_ref, dependencies)
     # check metadata.component
-    remove_internal_information_from_properties(
-        sbom.get("metadata", {}).get("component", {})
-    )
-    validate_external_references(
-        ext_ref_regex, sbom.get("metadata", {}).get("component", {})
-    )
+    remove_internal_information_from_properties(sbom.get("metadata", {}).get("component", {}))
+    validate_external_references(ext_ref_regex, sbom.get("metadata", {}).get("component", {}))
     # replace dependencies with new dependencies, if it is not an empy list
     if dependencies:
         sbom["dependencies"] = dependencies
@@ -290,8 +284,6 @@ def build_public_bom(
 def create_internal_validator(path_to_schema: Path) -> Draft7Validator:
     with path_to_schema.open() as schema_f:
         schema_internal = json.load(schema_f)
-    validator_for_being_internal = Draft7Validator(
-        schema_internal, format_checker=FormatChecker()
-    )
+    validator_for_being_internal = Draft7Validator(schema_internal, format_checker=FormatChecker())
     validator_for_being_internal.check_schema(schema_internal)
     return validator_for_being_internal

@@ -2,11 +2,10 @@ import json
 import unittest
 
 import cdxev.list_command as lc
-from cdxev.auxiliary.sbomFunctions import deserialize
+from cdxev.auxiliary.sbom_functions import deserialize
 
 path_to_sbom = (
-    "tests/auxiliary/test_list_command_sboms/"
-    "Acme_Application_9.1.1_20220217T101458.cdx.json"
+    "tests/auxiliary/test_list_command_sboms/Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
 
@@ -32,9 +31,7 @@ class TestListCommand(unittest.TestCase):
         license_file = lc.list_license_information(deserialized_sbom)
         components = sbom.get("components", [])
         list_file_licenses = license_file[
-            license_file.find(
-                "This product includes material developed by third parties:\n\n"
-            )
+            license_file.find("This product includes material developed by third parties:\n\n")
             + len("This product includes material developed by third parties:\n")
             + 1 :
         ]
@@ -76,7 +73,7 @@ class TestListCommand(unittest.TestCase):
             found = False
             for component_entry in component_txt_list:
                 attribute_text = component_entry.replace("\n", "")
-                if not component.get("name", "") in attribute_text:
+                if component.get("name", "") not in attribute_text:
                     continue
 
                 if not (
@@ -99,7 +96,6 @@ class TestListCommand(unittest.TestCase):
         for component in components:
             found = False
             for license_entry in license_txt_list:
-
                 if component.get("name", "") not in license_entry:
                     continue
 
@@ -128,7 +124,6 @@ class TestListCommand(unittest.TestCase):
         for component in components:
             found = False
             for license_entry in license_txt_list:
-
                 if component.get("name", "") not in license_entry:
                     continue
 

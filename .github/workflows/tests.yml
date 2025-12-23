@@ -44,6 +44,8 @@ jobs:
         run: uv run ruff check cdxev tests
       - name: Run mypy
         run: uv run mypy --install-types --non-interactive --config-file=pyproject.toml
+      - name: Run bandit
+        run: uv run bandit -c pyproject.toml -r cdxev
 
   pytest:
     runs-on: ubuntu-latest

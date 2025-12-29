@@ -237,7 +237,7 @@ class TestValidateMetadata(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertTrue(search_for_word_issues("CycloneDX", issues))
 
-    def test_metadata_component_licensetype_appliance_no_licensor_or_licensee(
+    def test_metadata_component_licensetype_appliance_no_licensor(
         self,
     ) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -682,7 +682,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["other"],
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -703,7 +702,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "text": {"content": "some text"},
                         "licensing": {
                             "licenseTypes": ["other"],
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -712,28 +710,7 @@ class TestValidateLicensing(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("licensor", issues), True)
 
-    def test_no_licensee(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensor": {"individual": {"name": "Something"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("licensee", issues), True)
-
-    def test_licensetype_appliance_no_licensor_or_licensee(self) -> None:
+    def test_licensetype_appliance_no_licensor(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -765,7 +742,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "text": {"content": "some text"},
                         "licensing": {
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -802,7 +778,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["other"],
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -824,7 +799,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["something"],
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -833,7 +807,7 @@ class TestValidateLicensing(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("something", issues), True)
 
-    def test_licensing_neither_organization_nor_individual(self) -> None:
+    def test_licensing_licensor_empty(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -846,7 +820,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["other"],
                             "licensor": {},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -869,7 +842,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["other"],
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                             "additional_field": "",
                         },

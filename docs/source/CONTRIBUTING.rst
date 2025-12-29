@@ -169,6 +169,8 @@ Development in corporate contexts may require special environment variables, suc
 - `UV_PYTHON_BIN_DIR`: Specifies the directory to place links to installed, managed Python executables.
 - `UV_PYTHON_CACHE_DIR`: Specifies the directory for caching the archives of managed Python installations before installation.
 - `UV_CACHE_DIR`: Specifies the directory for caching instead of the default cache directory.
+- `UV_TOOL_BIN_DIR`: Specifies the "bin" directory for installing tool executables.
+- `UV_TOOL_DIR`: Specifies the directory where uv stores managed tools.
 
 Example export (assuming git bash):
 
@@ -179,6 +181,8 @@ Example export (assuming git bash):
     export UV_PYTHON_BIN_DIR=C:/corp/uv/bin
     export UV_PYTHON_CACHE_DIR=C:/corp/uv/cache
     export UV_CACHE_DIR=C:/corp/uv/cache
+    export UV_TOOL_BIN_DIR=C:/corp/uv/tools/bin
+    export UV_TOOL_DIR=C:/corp/uv/tools
 
 You can also maintain a `.bashrc` file that is sourced by your shell as needed.
 

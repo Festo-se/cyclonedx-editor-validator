@@ -106,26 +106,17 @@ def compare_components(first_component: dict, second_component: dict) -> bool:
     """
     is_equal = False
     if first_component.get("purl", "") and second_component.get("purl", ""):
-        if (
-            first_component.get("purl", "1").lower()
-            == second_component.get("purl", "2").lower()
-        ):
+        if first_component.get("purl", "1").lower() == second_component.get("purl", "2").lower():
             is_equal = True
         else:
             return False
     if first_component.get("cpe", "") and second_component.get("cpe", ""):
-        if (
-            first_component.get("cpe", "1").lower()
-            == second_component.get("cpe", "2").lower()
-        ):
+        if first_component.get("cpe", "1").lower() == second_component.get("cpe", "2").lower():
             is_equal = True
         else:
             return False
     if first_component.get("swid", "") and second_component.get("swid", ""):
-        if (
-            first_component.get("swid", "1").lower()
-            == second_component.get("swid", "2").lower()
-        ):
+        if first_component.get("swid", "1").lower() == second_component.get("swid", "2").lower():
             is_equal = True
         else:
             return False
@@ -265,8 +256,7 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
 
             for reference in new_components.keys():
                 if (
-                    reference
-                    in retained_components.keys()  # reference exists in primary SBOM
+                    reference in retained_components.keys()  # reference exists in primary SBOM
                     and retained_components[reference]
                     != new_components[
                         reference
@@ -289,7 +279,6 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
                     assigned_bom_refs[new_components[reference]] = new_bom_ref
 
                 elif new_components[reference] in assigned_bom_refs.keys():
-
                     replace_bom_ref_in_sbom(
                         subsequent_sbom,
                         reference,
@@ -327,22 +316,14 @@ def unify_bom_refs(list_of_sboms: Sequence[dict]) -> None:
                         new_component, allow_unsafe=True
                     ) == ComponentIdentity.create(
                         primary_component, allow_unsafe=True
-                    ) and new_component.get(
-                        "bom-ref", ""
-                    ) != primary_component.get(
-                        "bom-ref", ""
-                    ):
+                    ) and new_component.get("bom-ref", "") != primary_component.get("bom-ref", ""):
                         reference = new_component.get("bom-ref", "")
                         new_reference = primary_component.get("bom-ref", "")
 
-                        replace_bom_ref_in_sbom(
-                            secondary_sbom, reference, new_reference
-                        )
+                        replace_bom_ref_in_sbom(secondary_sbom, reference, new_reference)
 
 
-def replace_ref_in_components(
-    components: list[dict], reference: str, new_reference: str
-) -> None:
+def replace_ref_in_components(components: list[dict], reference: str, new_reference: str) -> None:
     for component in components:
         if component.get("bom-ref", "") == reference:
             component["bom-ref"] = new_reference
@@ -358,8 +339,7 @@ def replace_ref_in_dependencies(
             dependson = dependency.get("dependsOn", [])
             if reference in dependson:
                 new_dependson = [
-                    new_reference if entry == reference else entry
-                    for entry in dependson
+                    new_reference if entry == reference else entry for entry in dependson
                 ]
                 dependency["dependsOn"] = new_dependson
 
@@ -422,9 +402,7 @@ def collect_affects_of_vulnerabilities(
     if list_of_original_vulnerabilities:
         for n in range(len(list_of_original_vulnerabilities)):
             # use json string of vulnerability in case the vulnerability does not contain any id
-            id = identities[
-                json.dumps(list_of_original_vulnerabilities[n], sort_keys=True)
-            ]
+            id = identities[json.dumps(list_of_original_vulnerabilities[n], sort_keys=True)]
             affects = deepcopy(list_of_original_vulnerabilities[n].get("affects", []))
             if id.string() not in collected_affects.keys():
                 for k in range(n + 1, len(list_of_original_vulnerabilities)):
@@ -433,9 +411,7 @@ def collect_affects_of_vulnerabilities(
                     ]
 
                     if id == new_id:
-                        affects += list_of_original_vulnerabilities[k].get(
-                            "affects", []
-                        )
+                        affects += list_of_original_vulnerabilities[k].get("affects", [])
 
                 collected_affects[id.string()] = affects
     return collected_affects
@@ -463,7 +439,6 @@ def compare_version_range(first_range: str, second_range: str) -> bool:
 
 
 def version_is_in_version_range(version: str, version_range: str) -> bool:
-
     range_object = VersionRange.from_string(version_range)  # type:ignore
     version_class = range_object.version_class
     try:
@@ -493,9 +468,7 @@ def compare_affects_versions_object(
         first_affects_object.get("version", None) is not None
         and second_affects_object.get("version", None) is not None
     ):
-        if first_affects_object.get("version", None) == second_affects_object.get(
-            "version", None
-        ):
+        if first_affects_object.get("version", None) == second_affects_object.get("version", None):
             return 1
         else:
             return 0
@@ -504,7 +477,6 @@ def compare_affects_versions_object(
         first_affects_object.get("range", None) is not None
         and second_affects_object.get("version", None) is not None
     ):
-
         if version_is_in_version_range(
             second_affects_object.get("version", ""),
             first_affects_object.get("range", ""),
@@ -517,7 +489,6 @@ def compare_affects_versions_object(
         first_affects_object.get("version", None) is not None
         and second_affects_object.get("range", None) is not None
     ):
-
         if version_is_in_version_range(
             first_affects_object.get("version", ""),
             second_affects_object.get("range", ""),
@@ -558,9 +529,7 @@ def get_new_affects_versions(
             result = compare_affects_versions_object(original_version, new_version)
             if result == -1 and not keep_version_overlap:
                 new_range = (
-                    new_version_copy.get("range", "")
-                    + "|!="
-                    + original_version.get("version", "")
+                    new_version_copy.get("range", "") + "|!=" + original_version.get("version", "")
                 )
                 new_version_copy["range"] = new_range
 
@@ -600,9 +569,7 @@ def extract_new_affects(
     different_analysis: bool = False,
 ) -> list[dict]:
     kept_affects: list[dict] = []
-    collected_original_affects = join_affect_versions_with_same_references(
-        original_affects_list
-    )
+    collected_original_affects = join_affect_versions_with_same_references(original_affects_list)
 
     for new_affect in new_affects_list:
         new_versions = new_affect.get("versions", [])
@@ -632,12 +599,8 @@ def extract_new_affects(
     return kept_affects
 
 
-def compare_vulnerability_ids(
-    first_vulnerability: dict, second_vulnerability: dict
-) -> int:
-    ids_first_vulnerability = VulnerabilityIdentity.get_ids_from_vulnerability(
-        first_vulnerability
-    )
+def compare_vulnerability_ids(first_vulnerability: dict, second_vulnerability: dict) -> int:
+    ids_first_vulnerability = VulnerabilityIdentity.get_ids_from_vulnerability(first_vulnerability)
     ids_second_vulnerability = VulnerabilityIdentity.get_ids_from_vulnerability(
         second_vulnerability
     )
@@ -693,10 +656,8 @@ def get_identities_for_vulnerabilities(
                 while len_aliases != new_len_aliases:
                     len_aliases = len(aliases)
                     for vulnerability_object in list_of_vulnerabilities:
-                        vulnerability_aliases = (
-                            VulnerabilityIdentity.get_ids_from_vulnerability(
-                                vulnerability_object
-                            )
+                        vulnerability_aliases = VulnerabilityIdentity.get_ids_from_vulnerability(
+                            vulnerability_object
                         )
 
                         # check if one of the vulnerability identifiers
@@ -714,9 +675,7 @@ def get_identities_for_vulnerabilities(
 
                     new_len_aliases = len(aliases)
 
-                identities[vulnerability_string] = VulnerabilityIdentity(
-                    aliases[0], aliases
-                )
+                identities[vulnerability_string] = VulnerabilityIdentity(aliases[0], aliases)
 
     return identities
 
@@ -726,9 +685,7 @@ def get_identities_for_vulnerabilities(
 
 def deserialize(sbom: dict) -> Bom:
     if sbom.get("compositions", {}):
-        sbom.pop(
-            "compositions"
-        )  # compositions need to be removed till the model supports those
+        sbom.pop("compositions")  # compositions need to be removed till the model supports those
     deserialized_bom = Bom.from_json(data=sbom)  # type:ignore[attr-defined]
     if isinstance(deserialized_bom, Bom):
         return deserialized_bom
@@ -752,9 +709,7 @@ def extract_cyclonedx_components(
     return extracted_components
 
 
-def merge_affects_versions(
-    original_affects: list[dict], new_affects: list[dict]
-) -> None:
+def merge_affects_versions(original_affects: list[dict], new_affects: list[dict]) -> None:
     for affect in new_affects:
         ref_is_in = False
         for original_affect in original_affects:

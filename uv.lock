@@ -343,7 +343,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "bandit", extras = ["toml"], specifier = "==1.9.2" },
-    { name = "coverage", specifier = "==7.13.0" },
+    { name = "coverage", specifier = "==7.13.1" },
     { name = "mypy", specifier = "==1.19.1" },
     { name = "pre-commit", specifier = "==4.5.1" },
     { name = "pytest", specifier = "==9.0.2" },

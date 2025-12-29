@@ -455,7 +455,7 @@ class TestValidateComponents(unittest.TestCase):
             ]
             issues = validate_test(sbom)
             self.assertEqual(
-                search_for_word_issues("not a valid SPDX ID", issues), True
+                search_for_word_issues("'some_id' is not a valid SPDX ID", issues), True
             )
 
     def test_components_no_license_or_copyright_for_device(self) -> None:

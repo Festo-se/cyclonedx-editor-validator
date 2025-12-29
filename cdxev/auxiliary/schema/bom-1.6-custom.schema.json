@@ -1957,8 +1957,7 @@
               "else": {
                 "required": [
                   "licenseTypes",
-                  "licensor",
-                  "licensee"
+                  "licensor"
                 ]
               }
             }

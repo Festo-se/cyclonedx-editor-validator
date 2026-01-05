@@ -61,7 +61,7 @@ def main() -> t.Union[int, t.Any]:
         # Run the handler for the selected command.
         return args.cmd_handler(args)
     except AppError as ex:
-        logger.error(ex.details, exc_info=True)
+        logger.exception(ex.details)
         return Status.APP_ERROR
 
 
@@ -869,10 +869,10 @@ def invoke_merge(args: argparse.Namespace) -> int:
         folder_inputs = os_sorted(p for p in folder_inputs if p not in args.input)
 
         if len(folder_inputs) == 0:
-            logger.warning(f"No additional SBOMs found in folder: {args.from_folder}")
+            logger.warning("No additional SBOMs found in folder: %s", args.from_folder)
 
         for input in folder_inputs:
-            logger.debug(f"Found in folder: {input}")
+            logger.debug("Found in folder: %s", input)
 
         inputs += folder_inputs
 

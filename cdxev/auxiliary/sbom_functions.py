@@ -42,7 +42,7 @@ class SpecVersion:
         """
         match = fullmatch("([0-9]+)\\.([0-9]+)", s)
         if match is None:
-            logger.warning(f'"{s}" is not a valid specVersion')
+            logger.warning('"%s" is not a valid specVersion', s)
             return None
 
         (major, minor) = (int(x) for x in match.group(1, 2))

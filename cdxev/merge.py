@@ -193,7 +193,7 @@ def merge_2_sboms(
     original_sbom: dict,
     sbom_to_be_merged: dict,
     hierarchical: bool = False,
-    vulnerability_identities: dict[str, VulnerabilityIdentity] = {},
+    vulnerability_identities: t.Optional[dict[str, VulnerabilityIdentity]] = None,
 ) -> dict:
     """
     Function that merges two SBOMs.
@@ -208,6 +208,8 @@ def merge_2_sboms(
     """
     # before used make_bom_refs_unique() and unify_bom_refs must be run on the input
 
+    if vulnerability_identities is None:
+        vulnerability_identities = {}
     if (
         vulnerability_identities == {}
         and original_sbom.get("vulnerabilities", []) != []

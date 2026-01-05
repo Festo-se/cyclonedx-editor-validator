@@ -353,12 +353,12 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
 
     try:
         _validate_update_list(updates, ctx)
-    except AppError as e:
+    except AppError as exc:
         raise AppError(
             "Set not performed",
-            f"Invalid update record: {e.details.description}",
-            log_msg=e.details,
-        )
+            f"Invalid update record: {exc.details.description}",
+            log_msg=exc.details,
+        ) from exc
 
     ctx.component_map = _map_out_components(sbom)
 

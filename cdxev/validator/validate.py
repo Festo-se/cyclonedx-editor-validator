@@ -51,12 +51,12 @@ def validate_sbom(  # noqa: C901
     if input_format == "json":
         try:
             spec_version: str = sbom["specVersion"]
-        except (KeyError, TypeError):
+        except (KeyError, TypeError) as exc:
             raise AppError(
                 "Invalid SBOM",
                 "Failed to validate against built-in schema because 'specVersion' is missing. "
                 "Add the field, then retry.",
-            )
+            ) from exc
         sbom_schema = open_schema(spec_version, schema_type, schema_path)
 
         if filename_regex is not None:
@@ -85,11 +85,11 @@ def validate_sbom(  # noqa: C901
             # every run of the validate command would be excessive.
             try:
                 validator_cls.check_schema(sbom_schema)
-            except jsonschema.exceptions.SchemaError:
+            except jsonschema.exceptions.SchemaError as exc:
                 raise AppError(
                     "Schema not loaded",
                     "Invalid JSON Schema in schema file " + str(schema_path),
-                )
+                ) from exc
         v = validator_cls(
             schema=sbom_schema,
             registry=registry,

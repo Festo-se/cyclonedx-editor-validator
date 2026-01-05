@@ -339,7 +339,7 @@ def create_amend_parser(
     argument_groups: dict[str, list[dict]] = {}
     default_operations: list[str] = []
     for op in operation_details:
-        setattr(op.cls, "_details", op)
+        setattr(op.cls, "_details", op)  # noqa: B010
 
         # Add operation to map
         operations_by_name[op.name] = op

@@ -158,7 +158,7 @@ def write_license_information_to_txt(
             string += write_license_dict_to_txt(entry)
             string += "\n\n"
 
-    string.rstrip("\n\n")
+    string.rstrip("\n")
 
     return string
 

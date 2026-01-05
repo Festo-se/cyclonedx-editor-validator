@@ -103,7 +103,7 @@ def update_tools(sbom: dict) -> None:
         # At this point we can be sure that tools is definitely a list.
         # This assertion is for mypy only and has no runtime relevance, because if tools isn't
         # truly a list that would mean the SBOM is invalid in which case we're fine with letting
-        # the tool crash. Therefore, bandit error B101 is silenced.
+        # the tool crash. Therefore, bandit error S101 is silenced.
         assert isinstance(tools, list)  # nosec
 
     if any(ComponentIdentity.create(tool, allow_unsafe=True) == this_tool_id for tool in tools):

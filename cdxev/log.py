@@ -33,9 +33,7 @@ class LogMessageFormatter(logging.Formatter):
             message = record.msg % record.args
         else:
             if not isinstance(record.msg, LogMessage):
-                raise TypeError(
-                    "This formatter can only process strings and LogMessage instances"
-                )
+                raise TypeError("This formatter can only process strings and LogMessage instances")
 
             frame = None
             if record.exc_info is not None:

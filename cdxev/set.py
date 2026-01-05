@@ -183,11 +183,11 @@ def _should_overwrite(
     property: str, component_id: ComponentIdentity, force: bool, ignore_existing: bool
 ) -> bool:
     if force:
-        logger.debug('Overwriting "%s" on component "%s"', property, component_id)
+        logger.debug(f'Overwriting "{property}" on component "{component_id}"')
         return True
 
     if ignore_existing:
-        logger.debug('Not overwriting "%s" on component "%s"', property, component_id)
+        logger.debug(f'Not overwriting "{property}" on component "{component_id}"')
         return False
 
     if not sys.stdin.isatty():
@@ -204,9 +204,7 @@ def _should_overwrite(
             return True
 
         logger.debug(
-            'Not overwriting "%s" on component "%s" due to user choice.',
-            property,
-            component_id,
+            f'Not overwriting "{property}" on component "{component_id}" due to user choice.'
         )
         return False
 
@@ -259,19 +257,19 @@ def _do_update(component: dict, update: dict, ctx: Context) -> None:
             remap = True
 
         if _should_delete(prop, component, update_set):
-            logger.debug('Deleting "%s" on component "%s".', prop, component_id)
+            logger.debug(f'Deleting "{prop}" on component "{component_id}".')
             del component[prop]
             continue
 
         if _should_merge(prop, component, update_set):
-            logger.debug('Merging "%s" on component "%s".', prop, component_id)
+            logger.debug(f'Merging "{prop}" on component "{component_id}".')
             component[prop].append(update_set[prop])
             continue
 
         if prop not in component or _should_overwrite(
             prop, component_id, ctx.config.force, ctx.config.ignore_existing
         ):
-            logger.debug('Setting "%s" on component "%s".', prop, component_id)
+            logger.debug(f'Setting "{prop}" on component "{component_id}".')
             component[prop] = update_set[prop]
 
     if remap:
@@ -279,8 +277,6 @@ def _do_update(component: dict, update: dict, ctx: Context) -> None:
     elif original_id:
         # If at least one identifying property has been changed, original_id will be set.
         # In this case, we'll update the old keys in the component map with the new ones.
-        new_id = ComponentIdentity.create(component, True)
-        _update_id(original_id, new_id, ctx.component_map)
         new_id = ComponentIdentity.create(component, True)
         _update_id(original_id, new_id, ctx.component_map)
 

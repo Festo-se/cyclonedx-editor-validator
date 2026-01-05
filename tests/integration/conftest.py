@@ -65,9 +65,6 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
 
         metafunc.parametrize(
             "expected_result,schema_type,input,expected_errors",
-            [
-                (x.parent.parent.name, x.parent.name, x, expected_errors.get(x))
-                for x in sboms
-            ],
+            [(x.parent.parent.name, x.parent.name, x, expected_errors.get(x)) for x in sboms],
             ids=lambda item: item.name if isinstance(item, Path) else None,
         )

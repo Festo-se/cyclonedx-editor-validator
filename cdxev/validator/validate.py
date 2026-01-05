@@ -111,9 +111,8 @@ def validate_sbom(  # noqa: C901
                         comp_id = f"Unidentified component at {error.json_path}"
 
                     logger.warning(
-                        "%s is described by an external BOM. "
-                        "The validity of the referenced BOM cannot be checked.",
-                        comp_id,
+                        comp_id + " is described by an external BOM. "
+                        "The validity of the referenced BOM cannot be checked."
                     )
                     continue
                 elif len(error.absolute_path) > 3:

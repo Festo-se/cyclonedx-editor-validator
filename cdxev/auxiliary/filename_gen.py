@@ -34,9 +34,7 @@ def generate_filename(sbom: dict) -> str:
     try:
         timestamp = isoparse(timestamp_str)  # type: ignore # because type errors are caught below
     except (ValueError, TypeError):
-        logger.info(
-            "SBOM has no or an unparsable timestamp. Using current time in filename."
-        )
+        logger.info("SBOM has no or an unparsable timestamp. Using current time in filename.")
         timestamp = datetime.now(timezone.utc)
 
     name = name or "unknown"
@@ -88,8 +86,7 @@ def generate_validation_pattern(sbom: dict) -> str:
         timestamp_regex = "[0-9]{8}T[0-9]{6}"
 
     hashes = [
-        hash["content"]
-        for hash in sbom.get("metadata", {}).get("component", {}).get("hashes", [])
+        hash["content"] for hash in sbom.get("metadata", {}).get("component", {}).get("hashes", [])
     ]
     hashes_regex = "(" + "|".join(hashes) + ")"
 

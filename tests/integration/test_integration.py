@@ -51,9 +51,7 @@ def test_version(argv: Callable[..., None], capsys: pytest.CaptureFixture[str]):
     "CI" not in os.environ,
     reason="Often fails in dev installs. Works after clean install.",
 )
-def test_version_from_pyproject(
-    argv: Callable[..., None], capsys: pytest.CaptureFixture[str]
-):
+def test_version_from_pyproject(argv: Callable[..., None], capsys: pytest.CaptureFixture[str]):
     toml_file = Path(__file__).parents[2] / "pyproject.toml"
     toml_content = toml.load(toml_file)
     expected_version = toml_content.get("project", {}).get("version")
@@ -157,9 +155,7 @@ class TestAmend:
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ):
-        operations = chain.from_iterable(
-            ("--operation", op) for op in data["operations"]
-        )
+        operations = chain.from_iterable(("--operation", op) for op in data["operations"])
         argv(
             "amend",
             *operations,
@@ -206,9 +202,7 @@ class TestAmend:
         _, stderr = capsys.readouterr()
         assert re.search(r"is required for operation", stderr)
 
-    def test_help_operation(
-        self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]
-    ):
+    def test_help_operation(self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]):
         argv("amend", "--help-operation", "add-license-text")
         exit_code, stdout, _ = run_main(capsys=capsys)
 
@@ -400,9 +394,7 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open(
-            "tests/integration/data/list_command/list_components.csv", "r"
-        ) as file:
+        with open("tests/integration/data/list_command/list_components.csv", "r") as file:
             file_contents = file.read()
         assert actual == file_contents
 
@@ -436,9 +428,7 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open(
-            "tests/integration/data/list_command/list_components.txt", "r"
-        ) as file:
+        with open("tests/integration/data/list_command/list_components.txt", "r") as file:
             file_contents = file.read()
         assert actual == file_contents
 
@@ -531,7 +521,6 @@ class TestMerge:
         data_dir: Path,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-
         input_1 = data_dir / "merge.input_1.cdx.json"
 
         argv("merge", str(input_1), str(input_1), "--hierarchical")
@@ -545,7 +534,6 @@ class TestMerge:
         data_dir: Path,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-
         input_1 = data_dir / "merge.vex.input_1.cdx.json"
         input_2 = data_dir / "merge.vex.input_2.cdx.json"
 
@@ -602,7 +590,6 @@ class TestMerge:
         data_dir: Path,
         capsys: pytest.CaptureFixture[str],
     ):
-
         input_folder = data_dir / "merge-from-folder"
 
         input_1 = input_folder / "merge.input_1.cdx.json"
@@ -833,9 +820,7 @@ class TestSet:
         assert exit_code == Status.APP_ERROR
         assert stderr.find("File not found") >= 0
 
-    def test_input_not_found(
-        self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]
-    ):
+    def test_input_not_found(self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]):
         argv(
             "set",
             "notfound",
@@ -975,8 +960,7 @@ class TestSet:
 
         assert exit_code == Status.APP_ERROR
         assert (
-            'The component "COORDINATES[nested]" was not found and could not be updated.'
-            in stderr
+            'The component "COORDINATES[nested]" was not found and could not be updated.' in stderr
         )
 
     def test_empty_set_file(
@@ -1100,9 +1084,7 @@ class TestValidate:
         ]
         assert expected_exit_code == exit_code
 
-    def test_warnings_ng(
-        self, argv: Callable[..., None], data_dir: Path, tmp_path: Path
-    ):
+    def test_warnings_ng(self, argv: Callable[..., None], data_dir: Path, tmp_path: Path):
         report_path = tmp_path / "issues.json"
         argv(
             "validate",
@@ -1175,10 +1157,7 @@ class TestValidate:
         exit_code, stdout, _ = run_main(capsys=capsys)
 
         assert exit_code == Status.OK
-        assert (
-            "filename doesn't match regular expression ^(bom\\.json|.+\\.cdx\\.json)$"
-            in stdout
-        )
+        assert "filename doesn't match regular expression ^(bom\\.json|.+\\.cdx\\.json)$" in stdout
 
     def test_custom_schema(
         self,

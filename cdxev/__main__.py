@@ -869,10 +869,10 @@ def invoke_merge(args: argparse.Namespace) -> int:
         folder_inputs = os_sorted(p for p in folder_inputs if p not in args.input)
 
         if len(folder_inputs) == 0:
-            logger.warning("No additional SBOMs found in folder: %s", args.from_folder)
+            logger.warning(f"No additional SBOMs found in folder: {args.from_folder}")
 
         for input in folder_inputs:
-            logger.debug("Found in folder: %s", input)
+            logger.debug(f"Found in folder: {input}")
 
         inputs += folder_inputs
 

@@ -26,9 +26,7 @@ class AmendTestCase(unittest.TestCase):
     operation: Operation
 
     def setUp(self) -> None:
-        with open(
-            path_to_folder_with_test_sboms + "test.cdx.json", encoding="utf_8"
-        ) as file:
+        with open(path_to_folder_with_test_sboms + "test.cdx.json", encoding="utf_8") as file:
             self.sbom_fixture = json.load(file)
 
     def test_no_metadata_component_doesnt_raise(self) -> None:
@@ -84,9 +82,7 @@ class CompositionsTestCase(AmendTestCase):
         self.operation.handle_metadata(self.sbom_fixture["metadata"])
 
         # Assert that all compositions are empty
-        self.assertFalse(
-            any(comp["assemblies"] for comp in self.sbom_fixture["compositions"])
-        )
+        self.assertFalse(any(comp["assemblies"] for comp in self.sbom_fixture["compositions"]))
 
     def test_meta_component_not_in_compositions(self) -> None:
         del self.sbom_fixture["compositions"][2]
@@ -94,9 +90,7 @@ class CompositionsTestCase(AmendTestCase):
         self.operation.handle_metadata(self.sbom_fixture["metadata"])
 
         # Assert that all compositions are empty
-        self.assertFalse(
-            any(comp["assemblies"] for comp in self.sbom_fixture["compositions"])
-        )
+        self.assertFalse(any(comp["assemblies"] for comp in self.sbom_fixture["compositions"]))
 
     def test_components_added(self) -> None:
         self.operation.prepare(self.sbom_fixture)
@@ -116,17 +110,13 @@ class DefaultAuthorTestCase(AmendTestCase):
 
     def test_default_author_added(self) -> None:
         self.operation.handle_metadata(self.sbom_fixture["metadata"])
-        self.assertSequenceEqual(
-            self.sbom_fixture["metadata"]["authors"], [{"name": "automated"}]
-        )
+        self.assertSequenceEqual(self.sbom_fixture["metadata"]["authors"], [{"name": "automated"}])
 
     def test_existing_author_untouched(self) -> None:
         some_author = {"name": "My Name"}
         self.sbom_fixture["metadata"]["authors"] = [some_author]
         self.operation.handle_metadata(self.sbom_fixture["metadata"])
-        self.assertSequenceEqual(
-            self.sbom_fixture["metadata"]["authors"], [some_author]
-        )
+        self.assertSequenceEqual(self.sbom_fixture["metadata"]["authors"], [some_author])
 
 
 class InferSupplierTestCase(AmendTestCase):
@@ -283,9 +273,7 @@ class LicenseNameToIdTestCase(AmendTestCase):
         self.operation.handle_component(self.sbom_fixture["components"][0])
 
 
-def flat_walk_components(
-    operation: Operation, components: t.Sequence[dict[str, t.Any]]
-) -> None:
+def flat_walk_components(operation: Operation, components: t.Sequence[dict[str, t.Any]]) -> None:
     """
     Test-helper which applies an operation to a flat sequence of components. subcomponents are
     ignored.

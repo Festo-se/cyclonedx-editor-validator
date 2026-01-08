@@ -41,7 +41,6 @@ dev = [
     "coverage==7.13.4",
     "toml==0.10.2",
     "typing-extensions==4.15.0",
-    "bandit[toml]==1.9.2",
     "pre-commit==4.5.1",
     "ruff==0.15.1",
 ]
@@ -102,9 +101,6 @@ source = ["cdxev"]
 
 [tool.coverage.report]
 omit = ["*__init__.py*"]
-
-[tool.bandit]
-exclude_dirs = ["tests"]
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.

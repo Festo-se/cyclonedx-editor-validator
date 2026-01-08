@@ -60,8 +60,8 @@ def initialize_sbom(
     else:
         try:
             validate_email(email, check_deliverability=False)
-        except EmailNotValidError:
-            raise ValueError("Provided email is invalid.")
+        except EmailNotValidError as exc:
+            raise ValueError("Provided email is invalid.") from exc
 
         metadata_authors = OrganizationalContact(
             name=authors,
@@ -108,9 +108,7 @@ def initialize_sbom(
 
     my_json_outputter = JsonV1Dot6(sbom)
 
-    serialized_json: dict[str, Any] = json.loads(
-        my_json_outputter.output_as_string(indent=4)
-    )
+    serialized_json: dict[str, Any] = json.loads(my_json_outputter.output_as_string(indent=4))
 
     # Not yet supported by the model
     serialized_json["compositions"] = [{"aggregate": "unknown", "assemblies": []}]

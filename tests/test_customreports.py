@@ -52,9 +52,7 @@ class WarningsNgTestCase(unittest.TestCase):
             "description": description,
             "moduleName": module_name,
         }
-        self.assertDictEqual(
-            self.logger.handlers[0].buffer["issues"][-1], expected_buffer
-        )
+        self.assertDictEqual(self.logger.handlers[0].buffer["issues"][-1], expected_buffer)
 
     def test_format_without_line(self) -> None:
         line_start = None
@@ -78,9 +76,7 @@ class WarningsNgTestCase(unittest.TestCase):
             "moduleName": module_name,
             "lineStart": 0,
         }
-        self.assertDictEqual(
-            self.logger.handlers[0].buffer["issues"][-1], expected_buffer
-        )
+        self.assertDictEqual(self.logger.handlers[0].buffer["issues"][-1], expected_buffer)
 
     def test_format_without_module(self) -> None:
         line_start = 10
@@ -104,16 +100,12 @@ class WarningsNgTestCase(unittest.TestCase):
             "description": description,
             "moduleName": "",
         }
-        self.assertDictEqual(
-            self.logger.handlers[0].buffer["issues"][-1], expected_buffer
-        )
+        self.assertDictEqual(self.logger.handlers[0].buffer["issues"][-1], expected_buffer)
 
     def test_wrong_format(self) -> None:
         with self.assertRaises(TypeError) as exc:
             self.logger.error("only string message")
-        self.assertEqual(
-            "JenkinsFormatter cannot process string messages", exc.exception.args[0]
-        )
+        self.assertEqual("JenkinsFormatter cannot process string messages", exc.exception.args[0])
 
     def test_close(self) -> None:
         line_start = 10
@@ -122,13 +114,9 @@ class WarningsNgTestCase(unittest.TestCase):
         module_name = None
         msg_obj = log.LogMessage(message, description, module_name, line_start)
         self.logger.error(msg_obj)
-        with mock.patch(
-            "pathlib.Path.write_text", mock.mock_open()
-        ) as write_text_mocked:
+        with mock.patch("pathlib.Path.write_text", mock.mock_open()) as write_text_mocked:
             self.logger.handlers[0].close()
-        self.assertIn(
-            '"origin": "CycloneDX Editor Validator"', write_text_mocked.call_args[0][0]
-        )
+        self.assertIn('"origin": "CycloneDX Editor Validator"', write_text_mocked.call_args[0][0])
 
     def test_file_path_missing(self) -> None:
         self.logger.handlers[0].file_path = None
@@ -151,9 +139,7 @@ class WarningsNgTestCase(unittest.TestCase):
             "description": description,
             "moduleName": "",
         }
-        self.assertDictEqual(
-            self.logger.handlers[0].buffer["issues"][-1], expected_buffer
-        )
+        self.assertDictEqual(self.logger.handlers[0].buffer["issues"][-1], expected_buffer)
         self.logger.handlers[0].file_path = Path(self.expected_file)
 
 
@@ -182,9 +168,7 @@ class TestGitLabCQReporter(unittest.TestCase):
 
         with self.assertRaises(TypeError) as exc:
             self.reporter.emit(record)
-        self.assertEqual(
-            "GitLabFormatter cannot process string messages", exc.exception.args[0]
-        )
+        self.assertEqual("GitLabFormatter cannot process string messages", exc.exception.args[0])
 
     def test_emit_with_frame(self):
         handler = GitLabCQReporter(None, self.target)
@@ -193,9 +177,7 @@ class TestGitLabCQReporter(unittest.TestCase):
         record.exc_info = (None, None, mock.MagicMock())
 
         with mock.patch("traceback.extract_tb") as mock_extract_tb:
-            mock_extract_tb.return_value = [
-                mock.MagicMock(filename="test.py", lineno=30)
-            ]
+            mock_extract_tb.return_value = [mock.MagicMock(filename="test.py", lineno=30)]
             handler.emit(record)
 
         self.assertEqual(len(handler.buffer), 1)
@@ -207,7 +189,6 @@ class TestGitLabCQReporter(unittest.TestCase):
         self.reporter.close()
         self.assertEqual(self.target.write.call_count, 1)
         expected_output = (
-            '[\n    {\n        "issue": "1"\n    }'
-            + ',\n    {\n        "issue": "2"\n    }\n]'
+            '[\n    {\n        "issue": "1"\n    }' + ',\n    {\n        "issue": "2"\n    }\n]'
         )
         self.assertEqual(self.target.write.call_args[0][0], expected_output)

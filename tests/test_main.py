@@ -18,17 +18,13 @@ class TestSupplements(unittest.TestCase):
         with self.assertRaises(InputFileError) as ie:
             mock_is_file.return_value = True
             read_sbom(Path("test.jason"))
-        self.assertIn(
-            "Failed to guess file type from extension", ie.exception.details.description
-        )
+        self.assertIn("Failed to guess file type from extension", ie.exception.details.description)
         with unittest.mock.patch("cdxev.__main__.load_json", return_value={}):
             mock_is_file.return_value = True
             result = read_sbom(Path("test.json"))[0]
             self.assertEqual(result, {})
 
-    @unittest.mock.patch(
-        "pathlib.Path.open", unittest.mock.mock_open(read_data="not a json")
-    )
+    @unittest.mock.patch("pathlib.Path.open", unittest.mock.mock_open(read_data="not a json"))
     def test_load_json(self) -> None:
         with unittest.mock.patch("json.load", return_value={"sbom": []}):
             result = load_json(Path("test.json"))

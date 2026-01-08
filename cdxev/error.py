@@ -41,9 +41,7 @@ class AppError(Exception):
                 log_msg.line_start = line_start
             self.details = log_msg
         elif message is None or description is None:
-            raise ValueError(
-                "Either log_msg or message and description must be passed."
-            )
+            raise ValueError("Either log_msg or message and description must be passed.")
         else:
             self.details = LogMessage(
                 message,

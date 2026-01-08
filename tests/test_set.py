@@ -42,9 +42,7 @@ class SetTestCase(unittest.TestCase):
     sample_coordinates = {"name": "mylibrary", "group": "acme", "version": "0.2.4"}
 
     def setUp(self) -> None:
-        with open(
-            "tests/auxiliary/test_set_sboms/test.cdx.json", encoding="utf_8"
-        ) as file:
+        with open("tests/auxiliary/test_set_sboms/test.cdx.json", encoding="utf_8") as file:
             self.sbom_fixture = json.load(file)
 
     def test_add_property(self) -> None:
@@ -312,9 +310,7 @@ class SetTestCase(unittest.TestCase):
         )
 
         x_ray = self.sbom_fixture["components"][1]["components"][1]
-        expected = dict(
-            x_ray, author="New author", licenses=[{"license": {"id": "Apache-2.0"}}]
-        )
+        expected = dict(x_ray, author="New author", licenses=[{"license": {"id": "Apache-2.0"}}])
 
         cdxev.set.run(self.sbom_fixture, updates, cfg)
 
@@ -330,9 +326,7 @@ class SetTestCase(unittest.TestCase):
             None,
         )
 
-        self.assertRaises(
-            cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg
-        )
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
 
     def test_too_many_identifiers_raises(self) -> None:
         updates = [
@@ -352,9 +346,7 @@ class SetTestCase(unittest.TestCase):
             None,
         )
 
-        self.assertRaises(
-            cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg
-        )
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
 
     def test_unsettable_raises(self) -> None:
         updates = [
@@ -371,9 +363,7 @@ class SetTestCase(unittest.TestCase):
             None,
         )
 
-        self.assertRaises(
-            cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg
-        )
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
 
     def test_ids_not_found_raises(self) -> None:
         updates = [
@@ -398,9 +388,7 @@ class SetTestCase(unittest.TestCase):
             pathlib.Path("Some.json"),
         )
 
-        self.assertRaises(
-            cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg
-        )
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
 
     def test_duplicate_target_components(self) -> None:
         updates = [
@@ -427,9 +415,7 @@ class SetTestCase(unittest.TestCase):
         )
         self.assertEqual(
             "some author",
-            self.sbom_fixture["components"][1]["components"][1]["components"][0][
-                "author"
-            ],
+            self.sbom_fixture["components"][1]["components"][1]["components"][0]["author"],
         )
 
     def test_set_protected_raises(self) -> None:
@@ -450,9 +436,7 @@ class SetTestCase(unittest.TestCase):
             None,
         )
 
-        self.assertRaises(
-            cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg
-        )
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
 
     def test_set_allowed_protected(self) -> None:
         updates = [
@@ -515,9 +499,7 @@ class SetTestCase(unittest.TestCase):
                 cfg,
             )
 
-        self.assertIn(
-            "not found and could not be updated", cm.exception.details.description
-        )
+        self.assertIn("not found and could not be updated", cm.exception.details.description)
 
         with self.assertRaises(
             cdxev.error.AppError,
@@ -529,9 +511,7 @@ class SetTestCase(unittest.TestCase):
                 cfg,
             )
 
-        self.assertIn(
-            "not found and could not be updated", cm.exception.details.description
-        )
+        self.assertIn("not found and could not be updated", cm.exception.details.description)
 
     def test_set_ignore_missing(self) -> None:
         updates = [
@@ -592,12 +572,8 @@ class TestVersionRange(unittest.TestCase):
             group="group",
             version_range="vers:generic/<1.5.1",
         )
-        regular_key_1 = Key.from_coordinates(
-            name="component_name", group="group", version="1.1.1"
-        )
-        regular_key_2 = Key.from_coordinates(
-            name="component_name", group="group", version="1.5.2"
-        )
+        regular_key_1 = Key.from_coordinates(name="component_name", group="group", version="1.1.1")
+        regular_key_2 = Key.from_coordinates(name="component_name", group="group", version="1.5.2")
         regular_key_other_name = Key.from_coordinates(
             name="component_other_name", group="group", version="1.1.1"
         )
@@ -626,9 +602,7 @@ class TestVersionRange(unittest.TestCase):
             [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
-        self.assertRaises(
-            cdxev.error.AppError, cdxev.set._validate_update_list, updates, cfg
-        )
+        self.assertRaises(cdxev.error.AppError, cdxev.set._validate_update_list, updates, cfg)
 
     def test_version_range(self) -> None:
         component_base = {
@@ -660,9 +634,7 @@ class TestVersionRange(unittest.TestCase):
         update_all_versions["version-range"] = "vers:generic/*"
 
         id_update = cdxev.set.UpdateIdentity.create(update, True)
-        id_update_all_versions = cdxev.set.UpdateIdentity.create(
-            update_all_versions, True
-        )
+        id_update_all_versions = cdxev.set.UpdateIdentity.create(update_all_versions, True)
 
         id_version_in = ComponentIdentity.create(component_version_in, True)
         id_version_not_in = ComponentIdentity.create(component_version_not_in, True)
@@ -768,15 +740,9 @@ class TestVersionRange(unittest.TestCase):
         )
 
         cdxev.set.run(self.sbom_fixture, updates, cfg)
-        self.assertEqual(
-            self.sbom_fixture["components"][3]["copyright"], "1990 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][4]["copyright"], "1990 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][5]["copyright"], "1990 Acme Inc"
-        )
+        self.assertEqual(self.sbom_fixture["components"][3]["copyright"], "1990 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][4]["copyright"], "1990 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][5]["copyright"], "1990 Acme Inc")
 
     def test_add_copyright_to_all_several_updates(self) -> None:
         updates: t.Sequence[dict[str, t.Any]] = [
@@ -820,35 +786,17 @@ class TestVersionRange(unittest.TestCase):
         )
 
         cdxev.set.run(self.sbom_fixture, updates, cfg)
-        self.assertEqual(
-            self.sbom_fixture["components"][3]["copyright"], "1990 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][4]["copyright"], "1990 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][5]["copyright"], "1990 Acme Inc"
-        )
+        self.assertEqual(self.sbom_fixture["components"][3]["copyright"], "1990 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][4]["copyright"], "1990 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][5]["copyright"], "1990 Acme Inc")
 
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["copyright"], "2000 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][1]["copyright"], "2000 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][2]["copyright"], "2000 Acme Inc"
-        )
+        self.assertEqual(self.sbom_fixture["components"][0]["copyright"], "2000 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][1]["copyright"], "2000 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][2]["copyright"], "2000 Acme Inc")
 
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"], {"name": "New supplier"}
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][4]["supplier"], {"name": "New supplier"}
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][5]["supplier"], {"name": "New supplier"}
-        )
+        self.assertEqual(self.sbom_fixture["components"][0]["supplier"], {"name": "New supplier"})
+        self.assertEqual(self.sbom_fixture["components"][4]["supplier"], {"name": "New supplier"})
+        self.assertEqual(self.sbom_fixture["components"][5]["supplier"], {"name": "New supplier"})
 
     def test_wildcard_updates(self) -> None:
         updates: t.Sequence[dict[str, t.Any]] = [
@@ -884,41 +832,17 @@ class TestVersionRange(unittest.TestCase):
         )
 
         cdxev.set.run(self.sbom_fixture, updates, cfg)
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["copyright"], "2000 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][1]["copyright"], "2000 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][2]["copyright"], "2000 Acme Inc"
-        )
+        self.assertEqual(self.sbom_fixture["components"][0]["copyright"], "2000 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][1]["copyright"], "2000 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][2]["copyright"], "2000 Acme Inc")
 
-        self.assertEqual(
-            self.sbom_fixture["components"][3]["copyright"], "2000 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][4]["copyright"], "2000 Acme Inc"
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][5]["copyright"], "2000 Acme Inc"
-        )
+        self.assertEqual(self.sbom_fixture["components"][3]["copyright"], "2000 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][4]["copyright"], "2000 Acme Inc")
+        self.assertEqual(self.sbom_fixture["components"][5]["copyright"], "2000 Acme Inc")
 
-        self.assertEqual(
-            self.sbom_fixture["components"][0]["supplier"], {"name": "New supplier"}
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][1]["supplier"], {"name": "New supplier"}
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][2]["supplier"], {"name": "New supplier"}
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][3]["supplier"], {"name": "New supplier"}
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][4]["supplier"], {"name": "New supplier"}
-        )
-        self.assertEqual(
-            self.sbom_fixture["components"][5]["supplier"], {"name": "New supplier"}
-        )
+        self.assertEqual(self.sbom_fixture["components"][0]["supplier"], {"name": "New supplier"})
+        self.assertEqual(self.sbom_fixture["components"][1]["supplier"], {"name": "New supplier"})
+        self.assertEqual(self.sbom_fixture["components"][2]["supplier"], {"name": "New supplier"})
+        self.assertEqual(self.sbom_fixture["components"][3]["supplier"], {"name": "New supplier"})
+        self.assertEqual(self.sbom_fixture["components"][4]["supplier"], {"name": "New supplier"})
+        self.assertEqual(self.sbom_fixture["components"][5]["supplier"], {"name": "New supplier"})

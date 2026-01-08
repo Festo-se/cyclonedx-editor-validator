@@ -6,7 +6,7 @@ import logging
 import typing as t
 
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
-from cdxev.auxiliary.sbomFunctions import (
+from cdxev.auxiliary.sbom_functions import (
     collect_affects_of_vulnerabilities,
     extract_components,
     extract_new_affects,
@@ -103,9 +103,9 @@ def merge_components(
 
     present_component_identities: dict[ComponentIdentity, dict] = {}
     for component in extract_components(governing_sbom.get("components", [])):
-        present_component_identities[
-            ComponentIdentity.create(component, allow_unsafe=True)
-        ] = component
+        present_component_identities[ComponentIdentity.create(component, allow_unsafe=True)] = (
+            component
+        )
 
     add_to_existing: dict[ComponentIdentity, dict] = {}
     list_present_component_identities = list(present_component_identities.keys())
@@ -120,8 +120,7 @@ def merge_components(
     if hierarchical:
         for key in add_to_existing.keys():
             list_of_subcomponents = (
-                present_component_identities[key].get("components", [])
-                + add_to_existing[key]
+                present_component_identities[key].get("components", []) + add_to_existing[key]
             )
             present_component_identities[key]["components"] = list_of_subcomponents
     else:
@@ -132,9 +131,7 @@ def merge_components(
     return list_of_merged_components
 
 
-def merge_dependency(
-    depedency_original: dict, dependency_new: dict
-) -> dict[str, t.Any]:
+def merge_dependency(depedency_original: dict, dependency_new: dict) -> dict[str, t.Any]:
     """
     Function that merges the dependsOn lists of two dependencies uniquely into one.
 
@@ -147,7 +144,7 @@ def merge_dependency(
     """
     dependson_new = depedency_original.get("dependsOn", [])
     for refs in dependency_new.get("dependsOn", []):
-        if not (refs in dependson_new):
+        if refs not in dependson_new:
             dependson_new.append(refs)
     merged_dependency = {
         "ref": depedency_original.get("ref", ""),
@@ -172,16 +169,12 @@ def merge_dependency_lists(
     list_of_merged_dependencies: List with the merged dict of dependencies
     """
 
-    list_of_original_references = get_bom_refs_from_dependencies(
-        original_list_of_dependencies
-    )
+    list_of_original_references = get_bom_refs_from_dependencies(original_list_of_dependencies)
     list_of_new_references = get_bom_refs_from_dependencies(new_list_of_dependencies)
     list_of_merged_dependencies = []
     for reference in list_of_new_references:
         if reference in list_of_original_references:
-            original_dependency = get_dependency_by_ref(
-                reference, original_list_of_dependencies
-            )
+            original_dependency = get_dependency_by_ref(reference, original_list_of_dependencies)
             new_dependency = get_dependency_by_ref(reference, new_list_of_dependencies)
             merged_dependency = merge_dependency(original_dependency, new_dependency)
             list_of_merged_dependencies.append(merged_dependency)
@@ -190,10 +183,8 @@ def merge_dependency_lists(
             list_of_merged_dependencies.append(new_dependency)
     list_of_new_references = get_bom_refs_from_dependencies(list_of_merged_dependencies)
     for reference in list_of_original_references:
-        if not (reference in list_of_new_references):
-            original_dependency = get_dependency_by_ref(
-                reference, original_list_of_dependencies
-            )
+        if reference not in list_of_new_references:
+            original_dependency = get_dependency_by_ref(reference, original_list_of_dependencies)
             list_of_merged_dependencies.append(original_dependency)
     return list_of_merged_dependencies
 
@@ -202,7 +193,7 @@ def merge_2_sboms(
     original_sbom: dict,
     sbom_to_be_merged: dict,
     hierarchical: bool = False,
-    vulnerability_identities: dict[str, VulnerabilityIdentity] = {},
+    vulnerability_identities: t.Optional[dict[str, VulnerabilityIdentity]] = None,
 ) -> dict:
     """
     Function that merges two SBOMs.
@@ -217,12 +208,13 @@ def merge_2_sboms(
     """
     # before used make_bom_refs_unique() and unify_bom_refs must be run on the input
 
+    if vulnerability_identities is None:
+        vulnerability_identities = {}
     if (
         vulnerability_identities == {}
         and original_sbom.get("vulnerabilities", []) != []
         and sbom_to_be_merged.get("vulnerabilities", []) != []
     ):
-
         vulnerability_identities = get_identities_for_vulnerabilities(
             original_sbom["vulnerabilities"] + sbom_to_be_merged["vulnerabilities"]
         )
@@ -262,9 +254,7 @@ def merge_2_sboms(
     if original_sbom.get("components", []) and sbom_to_be_merged.get("components", []):
         merged_sbom["components"] = list_of_merged_components
 
-    if original_sbom.get("dependencies", []) and sbom_to_be_merged.get(
-        "dependencies", []
-    ):
+    if original_sbom.get("dependencies", []) and sbom_to_be_merged.get("dependencies", []):
         merged_sbom["dependencies"] = merged_dependencies
 
     if merged_sbom.get("compositions", []) or sbom_to_be_merged.get("compositions", []):
@@ -340,9 +330,9 @@ def merge_compositions(
             for new_composition in list_of_new_compositions:
                 found_matching_aggregate = False
                 for original_composition in list_to_be_merged_in:
-                    if original_composition.get(
-                        "aggregate", "original"
-                    ) == new_composition.get("aggregate", "new"):
+                    if original_composition.get("aggregate", "original") == new_composition.get(
+                        "aggregate", "new"
+                    ):
                         found_matching_aggregate = True
                         merged_assemblies = original_composition.get("assemblies", [])
                         for reference in new_composition.get("assemblies", []):
@@ -385,9 +375,7 @@ def merge_vulnerabilities(
     """
     # Create copies in case both inputs are the same object
     # what would cause a crash
-    list_of_original_vulnerabilities = copy.deepcopy(
-        list_of_original_vulnerabilities_input
-    )
+    list_of_original_vulnerabilities = copy.deepcopy(list_of_original_vulnerabilities_input)
     list_of_new_vulnerabilities = copy.deepcopy(list_of_new_vulnerabilities_input)
 
     collected_affects = collect_affects_of_vulnerabilities(
@@ -403,17 +391,11 @@ def merge_vulnerabilities(
     for original_vulnerability in list_of_original_vulnerabilities:
         is_in = False
         same_affects_state = False
-        id_str_original_vulnerability = json.dumps(
-            original_vulnerability, sort_keys=True
-        )
-        id_object_original_vulnerability = vulnerability_identities[
-            id_str_original_vulnerability
-        ]
+        id_str_original_vulnerability = json.dumps(original_vulnerability, sort_keys=True)
+        id_object_original_vulnerability = vulnerability_identities[id_str_original_vulnerability]
         for new_vulnerability in list_of_new_vulnerabilities:
             id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
-            id_object_new_vulnerability = vulnerability_identities[
-                id_str_new_vulnerability
-            ]
+            id_object_new_vulnerability = vulnerability_identities[id_str_new_vulnerability]
             if id_object_new_vulnerability == id_object_original_vulnerability:
                 is_in = True
                 if original_vulnerability.get("analysis", {}).get(
@@ -439,9 +421,7 @@ def merge_vulnerabilities(
         # The loop is over the original vulnerabilities and not the merged ones to avoid
         # data losses in the case of duplicate entries in new_vulnerabilities
         for original_vulnerability in list_of_original_vulnerabilities:
-            id_str_original_vulnerability = json.dumps(
-                original_vulnerability, sort_keys=True
-            )
+            id_str_original_vulnerability = json.dumps(original_vulnerability, sort_keys=True)
             id_object_original_vulnerability = vulnerability_identities[
                 id_str_original_vulnerability
             ]

@@ -143,9 +143,6 @@ exclude = [
 line-length = 99
 indent-width = 4
 
-# Assume Python 3.10
-target-version = "py310"
-
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and pycodestyle (`E`) codes by default.
 # Additionally adds isort (`I`), pep8-naming (`N`), bandit (`S`), and enables

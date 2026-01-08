@@ -185,9 +185,7 @@ class TestValidateMetadata(unittest.TestCase):
             sbom["metadata"]["component"]["author"] = "festo"
             sbom["metadata"]["component"]["copyright"] = "totally not Festo"
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_metadata_internal_component_copyright_missing(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -881,9 +879,7 @@ class TestInternalNameSchema(unittest.TestCase):
                 "copyright": "3rd Party",
             }
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_components_supplier_festo_no_copyright_with_licenses(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -935,9 +931,7 @@ class TestInternalNameSchema(unittest.TestCase):
                 "copyright": "3rd Party",
             }
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_copyright_festo_supplier_not_no_licenses(
         self,
@@ -957,9 +951,7 @@ class TestInternalNameSchema(unittest.TestCase):
                 "copyright": "festo",
             }
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_copyright_festo_supplier_not_with_licenses(
         self,
@@ -1022,9 +1014,7 @@ class TestInternalNameSchema(unittest.TestCase):
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("supplier", issues), True)
-            self.assertEqual(
-                search_for_word_issues("([Ff][Ee][Ss][Tt][Oo])", issues), True
-            )
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_internal_component_copyright_festo_supplier_empty(self) -> None:
         sbom = get_test_sbom()

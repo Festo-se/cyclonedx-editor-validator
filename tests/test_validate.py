@@ -173,9 +173,7 @@ class TestValidateMetadata(unittest.TestCase):
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("copyright")
             sbom["metadata"]["component"]["supplier"] = {"name": "Acme"}
-            sbom["metadata"]["component"]["licenses"] = [
-                {"license": {"id": "Apache-1.0"}}
-            ]
+            sbom["metadata"]["component"]["licenses"] = [{"license": {"id": "Apache-1.0"}}]
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
 
@@ -187,9 +185,7 @@ class TestValidateMetadata(unittest.TestCase):
             sbom["metadata"]["component"]["author"] = "festo"
             sbom["metadata"]["component"]["copyright"] = "something"
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_metadata_internal_component_copyright_missing(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -197,9 +193,7 @@ class TestValidateMetadata(unittest.TestCase):
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("copyright")
             issues = validate_test(sbom)
-            sbom["metadata"]["component"]["licenses"] = [
-                {"license": {"name": "license"}}
-            ]
+            sbom["metadata"]["component"]["licenses"] = [{"license": {"name": "license"}}]
             sbom["metadata"]["component"]["properties"] = [
                 {"name": "something", "value": "something"}
             ]
@@ -237,7 +231,7 @@ class TestValidateMetadata(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertTrue(search_for_word_issues("CycloneDX", issues))
 
-    def test_metadata_component_licensetype_appliance_no_licensor_or_licensee(
+    def test_metadata_component_licensetype_appliance_no_licensor(
         self,
     ) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
@@ -273,9 +267,7 @@ class TestValidateMetadata(unittest.TestCase):
                 "name": "Acme_Application",
                 "version": "9.1.1",
                 "licenses": [{"license": {"id": "Apache-2.0"}}],
-                "hashes": [
-                    {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                ],
+                "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
             }
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
@@ -294,9 +286,7 @@ class TestValidateMetadata(unittest.TestCase):
                 "name": "Acme_Application",
                 "version": "9.1.1",
                 "licenses": [{"license": {"id": "Apache-2.0"}}],
-                "hashes": [
-                    {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                ],
+                "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
             }
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
@@ -406,9 +396,7 @@ class TestValidateComponents(unittest.TestCase):
                     "license": {
                         "id": "GPL-2.0-only",
                         "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text2": {
-                            "content": "GNU GENERAL PUBLIC LICENSE\r\nVersion 2, ..."
-                        },
+                        "text2": {"content": "GNU GENERAL PUBLIC LICENSE\r\nVersion 2, ..."},
                     }
                 }
             ]
@@ -435,9 +423,7 @@ class TestValidateComponents(unittest.TestCase):
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {"license": {"name": "something", "text": {}}}
-            ]
+            sbom["components"][0]["licenses"] = [{"license": {"name": "something", "text": {}}}]
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("content", issues), True)
 
@@ -454,9 +440,7 @@ class TestValidateComponents(unittest.TestCase):
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("not a valid SPDX ID", issues), True
-            )
+            self.assertEqual(search_for_word_issues("not a valid SPDX ID", issues), True)
 
     def test_components_no_license_or_copyright_for_device(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -503,9 +487,7 @@ class TestValidateComponents(unittest.TestCase):
             sbom["specVersion"] = spec_version
             sbom["components"][0]["version"] = ""
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("'version' should not be empty", issues), True
-            )
+            self.assertEqual(search_for_word_issues("'version' should not be empty", issues), True)
 
     def test_supplier_empty(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -513,9 +495,7 @@ class TestValidateComponents(unittest.TestCase):
             sbom["specVersion"] = spec_version
             sbom["components"][0]["supplier"] = {"name": ""}
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("'name' should not be empty", issues), True
-            )
+            self.assertEqual(search_for_word_issues("'name' should not be empty", issues), True)
 
     def test_no_components_no_dependencies(
         self,
@@ -584,9 +564,7 @@ class TestValidateDependencies(unittest.TestCase):
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
-            sbom["dependencies"][0]["dependsOn"].append(
-                sbom["dependencies"][0]["dependsOn"][0]
-            )
+            sbom["dependencies"][0]["dependsOn"].append(sbom["dependencies"][0]["dependsOn"][0])
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("are non-unique", issues), True)
 
@@ -659,9 +637,7 @@ class TestValidateUseOwnSchema(unittest.TestCase):
     def test_use_own_schema_invalid_json(self) -> None:
         sbom = get_test_sbom()
         with self.assertRaises(AppError) as ap:
-            validate_test(
-                sbom, schema_path=Path("cdxev/auxiliary/schema"), schema_type=None
-            )
+            validate_test(sbom, schema_path=Path("cdxev/auxiliary/schema"), schema_type=None)
         self.assertIn(
             "Path does not exist or is not a file",
             ap.exception.details.description,
@@ -682,7 +658,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["other"],
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -703,7 +678,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "text": {"content": "some text"},
                         "licensing": {
                             "licenseTypes": ["other"],
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -712,28 +686,7 @@ class TestValidateLicensing(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("licensor", issues), True)
 
-    def test_no_licensee(self) -> None:
-        for spec_version in list_of_spec_versions_containing_licensing:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [
-                {
-                    "license": {
-                        "name": "some_name",
-                        "url": "https://spdx.org/licenses/GPL-2.0-only.html",
-                        "text": {"content": "some text"},
-                        "licensing": {
-                            "licenseTypes": ["other"],
-                            "licensor": {"individual": {"name": "Something"}},
-                            "expiration": "2023-04-13T20:20:39+00:00",
-                        },
-                    }
-                }
-            ]
-            issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("licensee", issues), True)
-
-    def test_licensetype_appliance_no_licensor_or_licensee(self) -> None:
+    def test_licensetype_appliance_no_licensor(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -765,7 +718,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "text": {"content": "some text"},
                         "licensing": {
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -802,7 +754,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["other"],
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -824,7 +775,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["something"],
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -833,7 +783,7 @@ class TestValidateLicensing(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("something", issues), True)
 
-    def test_licensing_neither_organization_nor_individual(self) -> None:
+    def test_licensing_licensor_empty(self) -> None:
         for spec_version in list_of_spec_versions_containing_licensing:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
@@ -846,7 +796,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["other"],
                             "licensor": {},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                         },
                     }
@@ -869,7 +818,6 @@ class TestValidateLicensing(unittest.TestCase):
                         "licensing": {
                             "licenseTypes": ["other"],
                             "licensor": {"individual": {"name": "Something"}},
-                            "licensee": {"organization": {"name": "Acme.ing"}},
                             "expiration": "2023-04-13T20:20:39+00:00",
                             "additional_field": "",
                         },
@@ -893,9 +841,7 @@ class TestValidateLicensing(unittest.TestCase):
                 }
             ]
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("'content' should not be empty", issues), True
-            )
+            self.assertEqual(search_for_word_issues("'content' should not be empty", issues), True)
 
 
 class TestValidateUseSchemaType(unittest.TestCase):
@@ -927,15 +873,11 @@ class TestInternalNameSchema(unittest.TestCase):
                 "group": "",
                 "name": "someprogramm",
                 "version": "T4.0.1.30",
-                "hashes": [
-                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
-                ],
+                "hashes": [{"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}],
                 "copyright": "3rd Party",
             }
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_components_supplier_festo_no_copyright_with_licenses(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -948,9 +890,7 @@ class TestInternalNameSchema(unittest.TestCase):
                 "group": "",
                 "name": "someprogramm",
                 "version": "T4.0.1.30",
-                "hashes": [
-                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
-                ],
+                "hashes": [{"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}],
                 "licenses": [{"license": {"id": "Apache-2.0"}}],
             }
             issues = validate_test(sbom)
@@ -967,9 +907,7 @@ class TestInternalNameSchema(unittest.TestCase):
                 "group": "",
                 "name": "someprogramm",
                 "version": "T4.0.1.30",
-                "hashes": [
-                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
-                ],
+                "hashes": [{"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}],
                 "licenses": [{"license": {"id": "Apache-2.0"}}],
             }
             issues = validate_test(sbom)
@@ -986,16 +924,12 @@ class TestInternalNameSchema(unittest.TestCase):
                 "group": "",
                 "name": "someprogramm",
                 "version": "T4.0.1.30",
-                "hashes": [
-                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
-                ],
+                "hashes": [{"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}],
                 "licenses": [{"license": {"id": "Apache-2.0"}}],
                 "copyright": "3rd Party",
             }
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_copyright_festo_supplier_not_no_licenses(
         self,
@@ -1011,15 +945,11 @@ class TestInternalNameSchema(unittest.TestCase):
                 "group": "com.festo.internal",
                 "name": "someprogramm",
                 "version": "T4.0.1.30",
-                "hashes": [
-                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
-                ],
+                "hashes": [{"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}],
                 "copyright": "festo",
             }
             issues = validate_test(sbom)
-            self.assertEqual(
-                search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True
-            )
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_copyright_festo_supplier_not_with_licenses(
         self,
@@ -1035,9 +965,7 @@ class TestInternalNameSchema(unittest.TestCase):
                 "group": "com.festo.internal",
                 "name": "someprogramm",
                 "version": "T4.0.1.30",
-                "hashes": [
-                    {"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}
-                ],
+                "hashes": [{"alg": "SHA-256", "content": "3942447fac867ae5cdb3229b658f4d48"}],
                 "licenses": [{"license": {"id": "Apache-2.0"}}],
                 "copyright": "festo",
             }
@@ -1060,12 +988,8 @@ class TestInternalNameSchema(unittest.TestCase):
                     "copyright": "Acme",
                     "name": "Acme_Application",
                     "version": "9.1.1",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 },
             },
             "components": [
@@ -1077,12 +1001,8 @@ class TestInternalNameSchema(unittest.TestCase):
                     "copyright": "Festo SE & Co. KG 2022, all rights reserved",
                     "version": "9.1.1",
                     "group": "com.festo.internal",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 }
             ],
             "compositions": [],
@@ -1092,16 +1012,12 @@ class TestInternalNameSchema(unittest.TestCase):
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("supplier", issues), True)
-            self.assertEqual(
-                search_for_word_issues("([Ff][Ee][Ss][Tt][Oo])", issues), True
-            )
+            self.assertEqual(search_for_word_issues("([Ff][Ee][Ss][Tt][Oo])", issues), True)
 
     def test_internal_component_copyright_festo_supplier_empty(self) -> None:
         sbom = get_test_sbom()
         sbom["components"][0]["supplier"] = {}
-        sbom["components"][0][
-            "copyright"
-        ] = "Festo SE & Co. KG 2022, all rights reserved"
+        sbom["components"][0]["copyright"] = "Festo SE & Co. KG 2022, all rights reserved"
         for spec_version in list_of_spec_versions:
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
@@ -1125,12 +1041,8 @@ class TestInternalMetaData(unittest.TestCase):
                     "name": "Acme_Application",
                     "licenses": [{"license": {"id": "Apache-1.0"}}],
                     "version": "9.1.1",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 },
             },
             "compositions": [],
@@ -1157,12 +1069,8 @@ class TestInternalMetaData(unittest.TestCase):
                     "author": "festo",
                     "name": "Acme_Application",
                     "version": "9.1.1",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 },
             },
             "compositions": [],
@@ -1189,12 +1097,8 @@ class TestInternalMetaData(unittest.TestCase):
                     "supplier": {"name": "festo"},
                     "name": "Acme_Application",
                     "version": "9.1.1",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 },
             },
             "compositions": [],
@@ -1222,12 +1126,8 @@ class TestInternalMetaData(unittest.TestCase):
                     "supplier": {"name": "acme"},
                     "name": "Acme_Application",
                     "version": "9.1.1",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 },
             },
             "compositions": [],
@@ -1255,12 +1155,8 @@ class TestInternalMetaData(unittest.TestCase):
                     "supplier": {"name": "acme"},
                     "name": "Acme_Application",
                     "version": "9.1.1",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 },
             },
             "compositions": [],
@@ -1287,12 +1183,8 @@ class TestInternalMetaData(unittest.TestCase):
                     "supplier": {"name": "festo"},
                     "name": "Acme_Application",
                     "version": "9.1.1",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 },
             },
             "compositions": [],
@@ -1319,12 +1211,8 @@ class TestInternalMetaData(unittest.TestCase):
                     "copyright": "Festo SE & Co. KG 2022, all rights reserved",
                     "name": "Acme_Application",
                     "version": "9.1.1",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 },
             },
             "compositions": [],
@@ -1352,12 +1240,8 @@ class TestInternalMetaData(unittest.TestCase):
                     "copyright": "Festo SE & Co. KG 2022, all rights reserved",
                     "name": "Acme_Application",
                     "version": "9.1.1",
-                    "hashes": [
-                        {"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}
-                    ],
-                    "properties": [
-                        {"name": "internal:component:status", "value": "internal"}
-                    ],
+                    "hashes": [{"alg": "MD5", "content": "ec7781220ec7781220ec778122012345"}],
+                    "properties": [{"name": "internal:component:status", "value": "internal"}],
                 },
                 "tools": {
                     "components": [

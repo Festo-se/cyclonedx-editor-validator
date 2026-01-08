@@ -66,9 +66,7 @@ def _get_builtin_schema(schema_type: str, spec_version: str) -> dict:
 
 
 def load_spdx_schema() -> dict:
-    path_to_embedded_schema = (
-        resources.files("cdxev.auxiliary.schema") / "spdx.schema.json"
-    )
+    path_to_embedded_schema = resources.files("cdxev.auxiliary.schema") / "spdx.schema.json"
     with path_to_embedded_schema.open() as f:
         schema = json.load(f)
         if isinstance(schema, dict):

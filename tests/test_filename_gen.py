@@ -60,9 +60,7 @@ class FilenameGeneratorTestCase(unittest.TestCase):
 
     @patch(f"{fn.__name__}.datetime", wraps=dt.datetime)
     def test_no_timestamp(self, mock_dt):
-        mock_dt.now.return_value = dt.datetime(
-            1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc
-        )
+        mock_dt.now.return_value = dt.datetime(1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc)
 
         del self.sbom["metadata"]["timestamp"]
         filename = fn.generate_filename(self.sbom)
@@ -73,9 +71,7 @@ class FilenameGeneratorTestCase(unittest.TestCase):
 
     @patch(f"{fn.__name__}.datetime", wraps=dt.datetime)
     def test_only_name(self, mock_dt):
-        mock_dt.now.return_value = dt.datetime(
-            1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc
-        )
+        mock_dt.now.return_value = dt.datetime(1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc)
 
         del self.sbom["metadata"]["timestamp"]
         del self.sbom["metadata"]["component"]["version"]
@@ -87,9 +83,7 @@ class FilenameGeneratorTestCase(unittest.TestCase):
 
     @patch(f"{fn.__name__}.datetime", wraps=dt.datetime)
     def test_only_version(self, mock_dt):
-        mock_dt.now.return_value = dt.datetime(
-            1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc
-        )
+        mock_dt.now.return_value = dt.datetime(1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc)
 
         del self.sbom["metadata"]["timestamp"]
         del self.sbom["metadata"]["component"]["name"]
@@ -111,9 +105,7 @@ class FilenameGeneratorTestCase(unittest.TestCase):
     @patch(f"{fn.__name__}.datetime", wraps=dt.datetime)
     @patch(f"{fn.__name__}.logger")
     def test_invalid_timestamp(self, mock_logger, mock_dt):
-        mock_dt.now.return_value = dt.datetime(
-            1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc
-        )
+        mock_dt.now.return_value = dt.datetime(1999, 1, 1, 10, 11, 12, tzinfo=dt.timezone.utc)
 
         self.sbom["metadata"]["timestamp"] = "foo"
         filename = fn.generate_filename(self.sbom)

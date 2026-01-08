@@ -5,7 +5,7 @@ from cyclonedx.model.bom import Bom, BomMetaData
 from cyclonedx.model.component import Component
 from cyclonedx.model.license import DisjunctiveLicense, License, LicenseExpression
 
-from cdxev.auxiliary.sbomFunctions import deserialize, extract_cyclonedx_components
+from cdxev.auxiliary.sbom_functions import deserialize, extract_cyclonedx_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 
@@ -47,9 +47,7 @@ def extract_metadata_license_information(metadata: BomMetaData) -> dict[str, Any
             software_information["name"] = metadata_component.name
 
         if metadata_component.licenses is not None:
-            license_list = extract_license_strings_from_licenses(
-                metadata_component.licenses
-            )
+            license_list = extract_license_strings_from_licenses(metadata_component.licenses)
             software_information["licenses"] = license_list
 
         if metadata_component.copyright is not None:
@@ -146,7 +144,6 @@ def write_license_dict_to_csv(info_dict: dict[str, Any]) -> str:
 def write_license_information_to_txt(
     software_information: dict[str, Any], component_information: list[dict[str, Any]]
 ) -> str:
-
     string = write_license_dict_to_txt(software_information)
 
     if not component_information:
@@ -161,7 +158,7 @@ def write_license_information_to_txt(
             string += write_license_dict_to_txt(entry)
             string += "\n\n"
 
-    string.rstrip("\n\n")
+    string.rstrip("\n")
 
     return string
 
@@ -186,27 +183,20 @@ def write_license_information_to_csv(
 
 
 def list_license_information(sbom: Bom, format: str = "txt") -> str:
-
     metadata = sbom.metadata
 
     software_information = extract_metadata_license_information(metadata)
     component_information = extract_components_metadata_information(sbom.components)
     if format == "txt":
-        txt_string = write_license_information_to_txt(
-            software_information, component_information
-        )
+        txt_string = write_license_information_to_txt(software_information, component_information)
 
     if format == "csv":
-        txt_string = write_license_information_to_csv(
-            software_information, component_information
-        )
+        txt_string = write_license_information_to_csv(software_information, component_information)
 
     return txt_string
 
 
-def list_component_information_csv(
-    component: Component, division_character: str = ","
-) -> str:
+def list_component_information_csv(component: Component, division_character: str = ",") -> str:
     string = ""
     if component.name is not None:
         string += '"' + component.name + '"'
@@ -230,9 +220,7 @@ def list_component_information_csv(
     return string
 
 
-def list_component_information_txt(
-    component: Component, division_character: str = "\n"
-) -> str:
+def list_component_information_txt(component: Component, division_character: str = "\n") -> str:
     string = ""
     if component.name is not None:
         string += component.name

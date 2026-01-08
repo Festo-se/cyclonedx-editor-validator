@@ -2,7 +2,7 @@
 
 import unittest
 
-from cdxev.auxiliary.sbomFunctions import CycloneDXVersion, SpecVersion
+from cdxev.auxiliary.sbom_functions import CycloneDXVersion, SpecVersion
 
 
 class SpecVersionTestCase(unittest.TestCase):

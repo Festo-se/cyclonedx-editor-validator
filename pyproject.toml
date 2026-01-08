@@ -20,7 +20,7 @@ dependencies = [
     "natsort>=8.4.0,<9",
     "univers==31.1.0",
     "cyclonedx-python-lib==11.6.0",
-    "email-validator (>=2.2.0,<3.0.0)",
+    "email-validator==2.3.0",
 ]
 
 [project.urls]
@@ -34,9 +34,6 @@ cdx-ev = "cdxev.__main__:main"
 
 [dependency-groups]
 dev = [
-    "flake8==7.3.0",
-    "black==25.12.0",
-    "pep8-naming==0.15.1",
     "mypy==1.19.1",
     "types-python-dateutil==2.9.0.20251115",
     "types-jsonschema==4.25.1.20251009",
@@ -44,9 +41,8 @@ dev = [
     "coverage==7.13.1",
     "toml==0.10.2",
     "typing-extensions==4.15.0",
-    "bandit[toml]==1.9.2",
-    "isort==7.0.0",
     "pre-commit==4.5.1",
+    "ruff==0.14.10",
 ]
 docs = [
     "sphinx-argparse==0.5.2",
@@ -86,7 +82,7 @@ module = [
     "cdxev.validator.helper",
     "cdxev.validator.validate",
     "cdxev.auxiliary.io_processing",
-    "cdxev.auxiliary.sbomFunctions",
+    "cdxev.auxiliary.sbom_functions",
     "cdxev.auxiliary.filename_gen",
     "cdxev.auxiliary.identity",
     "cdxev.validator.customreports",
@@ -106,10 +102,62 @@ source = ["cdxev"]
 [tool.coverage.report]
 omit = ["*__init__.py*"]
 
-[tool.black]
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
 
-[tool.bandit]
-exclude_dirs = ["tests"]
+line-length = 99
+indent-width = 4
 
-[tool.isort]
-profile = "black"
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and pycodestyle (`E`) codes by default.
+# Additionally adds isort (`I`), pep8-naming (`N`), bandit (`S`), and enables
+# pycodestyle warnings (`W`), McCabe complexity (`C901`) and flake8-bugbear (`B`).
+select = ["E", "F", "I", "N", "W", "C901", "S", "B"]
+ignore = ["E203", "E722"]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[too.ruff.lint.pycodestyle]
+max-line-length=99
+
+[tool.ruff.lint.mccabe]
+max-complexity = 20
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/*" = ["S101"]

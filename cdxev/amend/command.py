@@ -3,7 +3,7 @@
 import logging
 import typing as t
 
-from cdxev.auxiliary.sbomFunctions import walk_components
+from cdxev.auxiliary.sbom_functions import walk_components
 
 from .operations import Operation
 
@@ -28,7 +28,7 @@ def create_operations(
 def run(
     sbom: dict,
     selected: t.Optional[list[type[Operation]]] = None,
-    config: dict[type[Operation], dict[str, t.Any]] = {},
+    config: t.Optional[dict[type[Operation], dict[str, t.Any]]] = None,
 ) -> None:
     """
     Runs the amend command on an SBOM. The SBOM is modified in-place.
@@ -39,6 +39,8 @@ def run(
                    __init__() method as kw-args.
     """
     # If no operations are selected, select the default operations.
+    if config is None:
+        config = {}
     if not selected:
         selected = [op for op in get_all_operations() if hasattr(op, "_amendDefault")]
 
@@ -66,7 +68,5 @@ def _metadata(operations: list[Operation], sbom: dict) -> None:
 
 def _do_amend(component: dict, operations: list[Operation]) -> None:
     for operation in operations:
-        logger.debug(
-            "Processing component %s", (component.get("bom-ref", "<no bom-ref>"))
-        )
+        logger.debug("Processing component %s", (component.get("bom-ref", "<no bom-ref>")))
         operation.handle_component(component)

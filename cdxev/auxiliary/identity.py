@@ -128,9 +128,7 @@ class ComponentIdentity:
         return self._keys.__iter__()
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, ComponentIdentity) and any(
-            k in self._keys for k in other._keys
-        )
+        return isinstance(other, ComponentIdentity) and any(k in self._keys for k in other._keys)
 
     def __str__(self) -> str:
         return str(self._keys[0]) if len(self) > 0 else ""

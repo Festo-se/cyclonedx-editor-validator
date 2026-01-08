@@ -22,7 +22,7 @@ from cdxev.validator.helper import load_spdx_schema, open_schema, validate_filen
 logger = logging.getLogger(__name__)
 
 
-def validate_sbom(
+def validate_sbom(  # noqa: C901
     sbom: dict,
     input_format: str,
     file: Path,
@@ -51,19 +51,17 @@ def validate_sbom(
     if input_format == "json":
         try:
             spec_version: str = sbom["specVersion"]
-        except (KeyError, TypeError):
+        except (KeyError, TypeError) as exc:
             raise AppError(
                 "Invalid SBOM",
                 "Failed to validate against built-in schema because 'specVersion' is missing. "
                 "Add the field, then retry.",
-            )
+            ) from exc
         sbom_schema = open_schema(spec_version, schema_type, schema_path)
 
         if filename_regex is not None:
             # Filename should be validated
-            filename_error = validate_filename(
-                file.name, filename_regex, sbom, schema_type
-            )
+            filename_error = validate_filename(file.name, filename_regex, sbom, schema_type)
             if filename_error:
                 if filename_regex == "" and schema_type != "custom":
                     # Implicit validation against CycloneDX recommendations is only a warning
@@ -87,11 +85,11 @@ def validate_sbom(
             # every run of the validate command would be excessive.
             try:
                 validator_cls.check_schema(sbom_schema)
-            except jsonschema.exceptions.SchemaError:
+            except jsonschema.exceptions.SchemaError as exc:
                 raise AppError(
                     "Schema not loaded",
                     "Invalid JSON Schema in schema file " + str(schema_path),
-                )
+                ) from exc
         v = validator_cls(
             schema=sbom_schema,
             registry=registry,
@@ -101,8 +99,7 @@ def validate_sbom(
             try:
                 if (
                     error.validator == "required"  # type: ignore[comparison-overlap]
-                    and error.validator_value
-                    == ["this_is_an_externally_described_component"]
+                    and error.validator_value == ["this_is_an_externally_described_component"]
                 ):
                     # This requirement in the schema allows us to produce warnings.
                     comp = t.cast(dict, error.instance)
@@ -155,15 +152,9 @@ def validate_sbom(
             if error.context is not None and len(error.context) > 0:
                 error_message = ""
                 for i in range(len(error.context)):
-                    error_field = re.search(
-                        r"'\w+'|(is too short)", error.context[i].message
-                    )
-                    if (error_field is None) or (
-                        error_field.group(0) == "is too short"
-                    ):
-                        validation_field = (
-                            "'" + error.context[i].json_path.split(".")[-1] + "'"
-                        )
+                    error_field = re.search(r"'\w+'|(is too short)", error.context[i].message)
+                    if (error_field is None) or (error_field.group(0) == "is too short"):
+                        validation_field = "'" + error.context[i].json_path.split(".")[-1] + "'"
                     else:
                         validation_field = error_field.group(0)
                     if i < (len(error.context) - 1):
@@ -176,9 +167,7 @@ def validate_sbom(
                 error_message += " is a required property"
                 errors.append(error_path + error_message)
             else:
-                if ("license.id" in error.json_path) and (
-                    "is not one of" in error.message
-                ):
+                if ("license.id" in error.json_path) and ("is not one of" in error.message):
                     # if mistake is a wrong SPDX ID omit printing every single option
                     errors.append(
                         error_path + "used license ID is not a valid SPDX ID. "
@@ -200,9 +189,7 @@ def validate_sbom(
                             "SBOM has the mistake: Could not find reference for dependencies"
                         )
                 elif "non-empty" in error.message:
-                    errors.append(
-                        f"{error_path}'{error.absolute_path[-1]}' should not be empty"
-                    )
+                    errors.append(f"{error_path}'{error.absolute_path[-1]}' should not be empty")
                 elif error.validator == "pattern":  # type: ignore[comparison-overlap]
                     errors.append(error_path + error.message.replace("\\", ""))
                 else:

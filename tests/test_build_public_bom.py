@@ -9,22 +9,17 @@ from pathlib import Path
 from cdxev import build_public_bom as b_p_b
 
 path_to_sbom = (
-    "tests/auxiliary/test_build_public_bom_sboms/"
-    "Acme_Application_9.1.1_20220217T101458.cdx.json"
+    "tests/auxiliary/test_build_public_bom_sboms/Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
-path_to_public_sbom = (
-    "tests/auxiliary/test_build_public_bom_sboms/internal_removed_sbom.json"
-)
+path_to_public_sbom = "tests/auxiliary/test_build_public_bom_sboms/internal_removed_sbom.json"
 
 path_to_docu_sbom_dic = (
-    "tests/auxiliary/test_build_public_bom_sboms/"
-    "sboms_for_documentation_examples.json"
+    "tests/auxiliary/test_build_public_bom_sboms/sboms_for_documentation_examples.json"
 )
 
 path_to_public_docu_sbom_dic = (
-    "tests/auxiliary/test_build_public_bom_sboms/"
-    "public_sboms_for_documentation_examples.json"
+    "tests/auxiliary/test_build_public_bom_sboms/public_sboms_for_documentation_examples.json"
 )
 
 
@@ -42,30 +37,22 @@ path_to_example_schema_2 = Path(os.path.abspath(relative_path_to_example_schema_
 relative_path_to_documentation_schema_1 = (
     "tests/auxiliary/test_build_public_bom_sboms/schema/documentation_schema_1.json"
 )
-path_to_documentation_schema_1 = Path(
-    os.path.abspath(relative_path_to_documentation_schema_1)
-)
+path_to_documentation_schema_1 = Path(os.path.abspath(relative_path_to_documentation_schema_1))
 
 relative_path_to_documentation_schema_2 = (
     "tests/auxiliary/test_build_public_bom_sboms/schema/documentation_schema_2.json"
 )
-path_to_documentation_schema_2 = Path(
-    os.path.abspath(relative_path_to_documentation_schema_2)
-)
+path_to_documentation_schema_2 = Path(os.path.abspath(relative_path_to_documentation_schema_2))
 
 relative_path_to_documentation_schema_3 = (
     "tests/auxiliary/test_build_public_bom_sboms/schema/documentation_schema_3.json"
 )
-path_to_documentation_schema_3 = Path(
-    os.path.abspath(relative_path_to_documentation_schema_3)
-)
+path_to_documentation_schema_3 = Path(os.path.abspath(relative_path_to_documentation_schema_3))
 
 relative_path_to_documentation_schema_4 = (
     "tests/auxiliary/test_build_public_bom_sboms/schema/documentation_schema_4.json"
 )
-path_to_documentation_schema_4 = Path(
-    os.path.abspath(relative_path_to_documentation_schema_4)
-)
+path_to_documentation_schema_4 = Path(os.path.abspath(relative_path_to_documentation_schema_4))
 
 
 def get_sbom(pathsbom: str) -> dict:
@@ -122,9 +109,7 @@ class TestRemoveInternalInformationFromProperties(unittest.TestCase):
             {"name": "something:component:status", "value": "public"},
         ]
     }
-    component_cleared = {
-        "properties": [{"name": "something:component:status", "value": "public"}]
-    }
+    component_cleared = {"properties": [{"name": "something:component:status", "value": "public"}]}
 
     def test_remove_several_component(self) -> None:
         b_p_b.remove_internal_information_from_properties(self.component)
@@ -367,9 +352,7 @@ class TestCreateExternalBom(unittest.TestCase):
             "components": [
                 {
                     "properties": [{"name": "internal:stuff", "value": "gone"}],
-                    "components": [
-                        {"properties": [{"name": "internal:stuff", "value": "gone"}]}
-                    ],
+                    "components": [{"properties": [{"name": "internal:stuff", "value": "gone"}]}],
                 }
             ],
         }

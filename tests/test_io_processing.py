@@ -40,9 +40,7 @@ class OutputTestCase(unittest.TestCase):
         sbom = self.minimal_sbom
 
         expected_sbom = copy.deepcopy(self.minimal_sbom)
-        expected_sbom["metadata"] = {
-            "timestamp": expected_timestamp.isoformat(timespec="seconds")
-        }
+        expected_sbom["metadata"] = {"timestamp": expected_timestamp.isoformat(timespec="seconds")}
 
         mock_dt.now.return_value = expected_timestamp
         out.update_timestamp(sbom)
@@ -55,9 +53,7 @@ class OutputTestCase(unittest.TestCase):
 
         sbom = self.minimal_sbom
         expected_sbom = copy.deepcopy(self.minimal_sbom)
-        expected_sbom["metadata"] = {
-            "timestamp": expected_timestamp.isoformat(timespec="seconds")
-        }
+        expected_sbom["metadata"] = {"timestamp": expected_timestamp.isoformat(timespec="seconds")}
 
         sbom["metadata"] = {"timestamp": "1900-01-01T10:11:12Z"}
 

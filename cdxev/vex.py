@@ -47,9 +47,7 @@ def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
         list_str += "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             vul_id = vulnerability.get("id", "-")
-            vul_ref_id = vulnerability.get("references", [{"id": "-"}])[0].get(
-                "id", "-"
-            )
+            vul_ref_id = vulnerability.get("references", [{"id": "-"}])[0].get("id", "-")
             # write cwe string
             cwes = vulnerability.get("cwes", [])
             cwe_str = ""
@@ -75,9 +73,7 @@ def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
                 severity_string = "-"
             publish_date = vulnerability.get("published", "-")
             update_date = vulnerability.get("updated", "-")
-            vul_description = re.sub(
-                r"[\t\n\r\|]+", "", vulnerability.get("description", "-")
-            )
+            vul_description = re.sub(r"[\t\n\r\|]+", "", vulnerability.get("description", "-"))
             list_str += (
                 vul_id
                 + "|"
@@ -131,7 +127,7 @@ def search_key(data: dict[str, Any], key: str, value: str) -> bool:
     """
     if key in data and data[key] == value:
         return True
-    for k, v in data.items():
+    for _, v in data.items():
         if isinstance(v, dict):
             if search_key(v, key, value):
                 return True

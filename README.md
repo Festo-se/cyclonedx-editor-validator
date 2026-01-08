@@ -2,10 +2,8 @@
 [![build and test](https://github.com/Festo-se/cyclonedx-editor-validator/actions/workflows/main.yml/badge.svg)](https://github.com/Festo-se/cyclonedx-editor-validator/actions/workflows/main.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Festo-se/cyclonedx-editor-validator/badge)](https://scorecard.dev/viewer/?uri=github.com/Festo-se/cyclonedx-editor-validator)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10485/badge)](https://www.bestpractices.dev/projects/10485)
-[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
-[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![Static Badge](https://img.shields.io/badge/CycloneDX-v1.2%2C1.3%2C1.4%2C1.5%2C1.6-blue?link=https%3A%2F%2Fcyclonedx.org%2Fdocs%2F1.6%2Fjson%2F%23)](https://cyclonedx.org/docs/1.6/json/)
 
 # CycloneDX Editor/Validator

@@ -127,9 +127,7 @@ class GitLabCQReporter(logging.Handler):
         issue = self.format_record(record)
         self.buffer.append(issue)
 
-    def format_record(
-        self, record: logging.LogRecord
-    ) -> dict[str, t.Union[str, int, dict]]:
+    def format_record(self, record: logging.LogRecord) -> dict[str, t.Union[str, int, dict]]:
         if not isinstance(record.msg, LogMessage):
             raise TypeError("GitLabFormatter cannot process string messages")
 
@@ -152,9 +150,7 @@ class GitLabCQReporter(logging.Handler):
         issue: dict[str, t.Union[str, int, dict]] = {
             "description": record.msg.description,
             "check_name": "CycloneDX Editor Validator",
-            "fingerprint": hashlib.md5(
-                "unknown".encode(), usedforsecurity=False
-            ).hexdigest(),
+            "fingerprint": hashlib.md5("unknown".encode(), usedforsecurity=False).hexdigest(),
             "severity": "blocker",
             "location": {
                 "path": file_name,

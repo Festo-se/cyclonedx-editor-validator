@@ -32,9 +32,9 @@ class TestMergeSboms(unittest.TestCase):
     def test_vulnerabilities_in_the_second(self) -> None:
         sbom1 = helper.load_governing_program()
         sbom2 = helper.load_sub_program()
-        vulnerabilities = helper.load_sections_for_test_sbom()[
-            "merge_vulnerabilities_tests"
-        ]["test_merge_vulnerabilities"]
+        vulnerabilities = helper.load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
         original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
 
         sbom2["vulnerabilities"] = original_vulnerabilities
@@ -44,9 +44,9 @@ class TestMergeSboms(unittest.TestCase):
 
     def test_vulnerabilities_in_the_first(self) -> None:
         sbom1 = helper.load_governing_program()
-        vulnerabilities = helper.load_sections_for_test_sbom()[
-            "merge_vulnerabilities_tests"
-        ]["test_merge_vulnerabilities"]
+        vulnerabilities = helper.load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
         original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
 
         sbom1["vulnerabilities"] = original_vulnerabilities
@@ -56,9 +56,9 @@ class TestMergeSboms(unittest.TestCase):
         self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
     def test_merge_sboms_same_sbom(self) -> None:
-        vulnerabilities = helper.load_sections_for_test_sbom()[
-            "merge_vulnerabilities_tests"
-        ]["test_merge_vulnerabilities"]
+        vulnerabilities = helper.load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
         original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
         new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
         merged_vulnerabilities = vulnerabilities["merged_vulnerabilities"]
@@ -77,9 +77,7 @@ class TestMergeSboms(unittest.TestCase):
         self.assertTrue(helper.compare_sboms(merge.merge([sbom2, sbom2]), sbom2))
         self.assertTrue(helper.compare_sboms(merge.merge([sbom3, sbom3]), sbom3))
         self.assertTrue(helper.compare_sboms(merge.merge([sbom4, sbom4]), sbom4))
-        self.assertTrue(
-            helper.compare_sboms(merge.merge([sbom_merged, sbom_merged]), sbom_merged)
-        )
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom_merged, sbom_merged]), sbom_merged))
 
     def test_no_composition_in_sboms(self) -> None:
         sbom1 = helper.load_governing_program()
@@ -142,12 +140,8 @@ class TestMergeComponents(unittest.TestCase):
         present_components = [
             ComponentIdentity.create(components["component_1"], allow_unsafe=True),
             ComponentIdentity.create(components["component_3"], allow_unsafe=True),
-            ComponentIdentity.create(
-                components["component_2_sub_1"], allow_unsafe=True
-            ),
-            ComponentIdentity.create(
-                components["component_4_sub_1_sub_2"], allow_unsafe=True
-            ),
+            ComponentIdentity.create(components["component_2_sub_1"], allow_unsafe=True),
+            ComponentIdentity.create(components["component_4_sub_1_sub_2"], allow_unsafe=True),
         ]
 
         new_components = helper.load_sections_for_test_sbom()[
@@ -167,9 +161,9 @@ class TestMergeComponents(unittest.TestCase):
             ComponentIdentity.create(components["component_1"], allow_unsafe=True): [
                 components["component_1_sub_1"]
             ],
-            ComponentIdentity.create(
-                components["component_2_sub_1"], allow_unsafe=True
-            ): [components["component_2_sub_1_sub_1"]],
+            ComponentIdentity.create(components["component_2_sub_1"], allow_unsafe=True): [
+                components["component_2_sub_1_sub_1"]
+            ],
         }
 
         add_to_existing_identical = True
@@ -177,9 +171,7 @@ class TestMergeComponents(unittest.TestCase):
             if add_to_existing_expected[key] != add_to_existing[key]:
                 add_to_existing_identical = False
 
-        self.assertTrue(
-            len(add_to_existing.keys()) == len(add_to_existing_expected.keys())
-        )
+        self.assertTrue(len(add_to_existing.keys()) == len(add_to_existing_expected.keys()))
         self.assertTrue(add_to_existing_identical)
 
     def test_individual_merge_cases(self) -> None:
@@ -217,9 +209,7 @@ class TestMergeComponents(unittest.TestCase):
             hierarchical=True,
         )
 
-        expected_components = helper.load_sections_for_test_sbom()[
-            "hierarchical_expected"
-        ]
+        expected_components = helper.load_sections_for_test_sbom()["hierarchical_expected"]
 
         self.assertEqual(merged_components, expected_components)
 
@@ -235,17 +225,13 @@ class TestMergeCompositions(unittest.TestCase):
         self.assertTrue(helper.compare_sboms(merged_sbom, goal_sbom))
 
     def test_only_second_sbom_contains_compositions(self) -> None:
-        compositions_2 = [
-            {"aggregate": "incomplete", "assemblies": ["first_ref", "second_ref"]}
-        ]
+        compositions_2 = [{"aggregate": "incomplete", "assemblies": ["first_ref", "second_ref"]}]
         compositions_1: list[dict] = []
         merge.merge_compositions(compositions_1, compositions_2)
         self.assertEqual(compositions_1, compositions_2)
 
     def test_merge_compositions_one_aggregate(self) -> None:
-        compositions_1 = [
-            {"aggregate": "incomplete", "assemblies": ["first_ref", "second_ref"]}
-        ]
+        compositions_1 = [{"aggregate": "incomplete", "assemblies": ["first_ref", "second_ref"]}]
         compositions_2 = [
             {
                 "aggregate": "incomplete",
@@ -324,9 +310,7 @@ class TestMergeVulnerabilities(unittest.TestCase):
             },
             {
                 "ref": "Product 2",
-                "versions": [
-                    {"range": "vers:generic/>=4.5|<=5.0", "status": "affected"}
-                ],
+                "versions": [{"range": "vers:generic/>=4.5|<=5.0", "status": "affected"}],
             },
         ],
     }
@@ -335,12 +319,12 @@ class TestMergeVulnerabilities(unittest.TestCase):
         self, vulnerability_1: dict, vulnerability_2: dict
     ) -> list[dict]:
         vulnerability_identities = {
-            json.dumps(
-                vulnerability_1, sort_keys=True
-            ): VulnerabilityIdentity.from_vulnerability(vulnerability_1),
-            json.dumps(
-                vulnerability_2, sort_keys=True
-            ): VulnerabilityIdentity.from_vulnerability(vulnerability_2),
+            json.dumps(vulnerability_1, sort_keys=True): VulnerabilityIdentity.from_vulnerability(
+                vulnerability_1
+            ),
+            json.dumps(vulnerability_2, sort_keys=True): VulnerabilityIdentity.from_vulnerability(
+                vulnerability_2
+            ),
         }
         return merge.merge_vulnerabilities(
             [vulnerability_1], [vulnerability_2], vulnerability_identities
@@ -421,15 +405,11 @@ class TestMergeVulnerabilities(unittest.TestCase):
         vulnerability_5_merged["affects"] = [
             {
                 "ref": "Product 1",
-                "versions": [
-                    {"range": "vers:generic/<2.6|!=2.4", "status": "unaffected"}
-                ],
+                "versions": [{"range": "vers:generic/<2.6|!=2.4", "status": "unaffected"}],
             }
         ]
         # drops one and removes the other from the range
-        self.assertEqual(
-            merged_vulnerabilities, [vulnerability_1, vulnerability_5_merged]
-        )
+        self.assertEqual(merged_vulnerabilities, [vulnerability_1, vulnerability_5_merged])
 
     def test_same_vulnerabilities_same_analysis_and_other_affects(self) -> None:
         # Merge of the same vulnerability with other affects
@@ -505,9 +485,9 @@ class TestMergeVulnerabilities(unittest.TestCase):
         self.assertEqual(merged_vulnerabilities, [vulnerability_merged])
 
     def test_merge_vulnerabilities(self) -> None:
-        vulnerabilities = helper.load_sections_for_test_sbom()[
-            "merge_vulnerabilities_tests"
-        ]["test_merge_vulnerabilities"]
+        vulnerabilities = helper.load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
         original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
         new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
         merged_vulnerabilities = vulnerabilities["merged_vulnerabilities"]
@@ -521,33 +501,23 @@ class TestMergeVulnerabilities(unittest.TestCase):
         self.assertEqual(merged_vulnerabilities, actual_merged)
 
     def test_merge_only_one_vulnerabilities(self) -> None:
-        vulnerabilities = helper.load_sections_for_test_sbom()[
-            "merge_vulnerabilities_tests"
-        ]["test_merge_vulnerabilities"]
+        vulnerabilities = helper.load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
         original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
         new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
 
-        identities_1 = merge.get_identities_for_vulnerabilities(
-            original_vulnerabilities
-        )
+        identities_1 = merge.get_identities_for_vulnerabilities(original_vulnerabilities)
 
         identities_2 = merge.get_identities_for_vulnerabilities(new_vulnerabilities)
 
-        actual_merged = merge.merge_vulnerabilities(
-            original_vulnerabilities, [], identities_1
-        )
+        actual_merged = merge.merge_vulnerabilities(original_vulnerabilities, [], identities_1)
 
-        actual_merged_2 = merge.merge_vulnerabilities(
-            new_vulnerabilities, [], identities_2
-        )
+        actual_merged_2 = merge.merge_vulnerabilities(new_vulnerabilities, [], identities_2)
 
-        actual_merged_3 = merge.merge_vulnerabilities(
-            [], original_vulnerabilities, identities_1
-        )
+        actual_merged_3 = merge.merge_vulnerabilities([], original_vulnerabilities, identities_1)
 
-        actual_merged_4 = merge.merge_vulnerabilities(
-            [], new_vulnerabilities, identities_2
-        )
+        actual_merged_4 = merge.merge_vulnerabilities([], new_vulnerabilities, identities_2)
 
         self.assertEqual(original_vulnerabilities, actual_merged)
         self.assertEqual(new_vulnerabilities, actual_merged_2)
@@ -566,9 +536,9 @@ class TestMergeVulnerabilities(unittest.TestCase):
         self.assertEqual(merged_sbom, goal_sbom)
 
     def test_merge_with_only_vex(self) -> None:
-        vulnerabilities = helper.load_sections_for_test_sbom()[
-            "merge_vulnerabilities_tests"
-        ]["test_merge_vulnerabilities"]
+        vulnerabilities = helper.load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
         original_vulnerabilities = vulnerabilities["original_vulnerabilities"]
         new_vulnerabilities = vulnerabilities["new_vulnerabilities"]
         merged_vulnerabilities = vulnerabilities["merged_vulnerabilities"]

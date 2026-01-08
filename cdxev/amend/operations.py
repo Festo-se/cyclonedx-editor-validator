@@ -60,7 +60,6 @@ import json
 import logging
 import typing as t
 import uuid
-from functools import cache
 from pathlib import Path
 
 import charset_normalizer
@@ -80,7 +79,7 @@ def default(cls: type["Operation"]) -> type["Operation"]:
     Add this decorator to a subclass of `Operation` to make it run if no operations
     are explicitly selected.
     """
-    setattr(cls, "_amendDefault", True)
+    setattr(cls, "_amendDefault", True)  # noqa: B010
     return cls
 
 
@@ -197,9 +196,7 @@ class Compositions(Operation):
         try:
             self.__add_to_assemblies(component["bom-ref"])
         except KeyError:
-            logger.debug(
-                "Cannot add component to compositions because it has no bom-ref."
-            )
+            logger.debug("Cannot add component to compositions because it has no bom-ref.")
             pass
 
     def __add_to_assemblies(self, bom_ref: str) -> None:
@@ -259,18 +256,11 @@ class InferSupplier(Operation):
             accepted_url_schemes = ("http://", "https://")
             for key in accepted_references:
                 ext_ref = next(
-                    (
-                        x
-                        for x in component["externalReferences"]
-                        if x.get("type") == key
-                    ),
+                    (x for x in component["externalReferences"] if x.get("type") == key),
                     None,
                 )
                 if ext_ref is not None and (
-                    any(
-                        ext_ref["url"].startswith(scheme)
-                        for scheme in accepted_url_schemes
-                    )
+                    any(ext_ref["url"].startswith(scheme) for scheme in accepted_url_schemes)
                 ):
                     supplier["url"] = [ext_ref["url"]]
                     logger.debug(
@@ -378,7 +368,6 @@ class AddLicenseText(Operation):
     def _add_text(self, license: dict, text: str) -> None:
         license["text"] = {"content": text}
 
-    @cache
     def _find_text(self, license_name: str) -> t.Optional[str]:
         if license_name in self.aliases:
             license_name = self.aliases[license_name]

@@ -40,16 +40,10 @@ jobs:
           enable-cache: true
       - name: Install dependencies for development
         run: uv sync --only-dev --frozen
-      - name: Run black
-        run: uv run black cdxev tests --check
-      - name: Run isort
-        run: uv run isort cdxev/ tests/ --check-only
-      - name: Run flake8
-        run: uv run flake8 cdxev tests
+      - name: Run ruff
+        run: uv run ruff check cdxev tests
       - name: Run mypy
         run: uv run mypy --install-types --non-interactive --config-file=pyproject.toml
-      - name: Run bandit
-        run: uv run bandit -c pyproject.toml -r cdxev
 
   pytest:
     runs-on: ubuntu-latest

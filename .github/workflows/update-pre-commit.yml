@@ -3,6 +3,9 @@ name: Weekly pre-commit autoupdate
 on:
   schedule:
     - cron: '0 3 * * 1'  # every Monday at 03:00 UTC
+  pull_request:          # for testing if workflow works
+    branches:
+      - main
 
 permissions:
   contents: read

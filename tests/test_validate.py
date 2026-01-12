@@ -177,13 +177,13 @@ class TestValidateMetadata(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
 
-    def test_metadata_component_author_festo_copyright_not_festo(self) -> None:
+    def test_metadata_component_author_festo_copyright_not_festo_but_similar(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"].pop("supplier")
             sbom["metadata"]["component"]["author"] = "festo"
-            sbom["metadata"]["component"]["copyright"] = "something"
+            sbom["metadata"]["component"]["copyright"] = "totally not Festo"
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
@@ -1014,7 +1014,7 @@ class TestInternalNameSchema(unittest.TestCase):
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("supplier", issues), True)
-            self.assertEqual(search_for_word_issues("([Ff][Ee][Ss][Tt][Oo])", issues), True)
+            self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
     def test_internal_component_copyright_festo_supplier_empty(self) -> None:
         sbom = get_test_sbom()

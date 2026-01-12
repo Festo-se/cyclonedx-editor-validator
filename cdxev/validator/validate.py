@@ -170,7 +170,10 @@ def validate_sbom(  # noqa: C901
                 if ("license.id" in error.json_path) and ("is not one of" in error.message):
                     # if mistake is a wrong SPDX ID omit printing every single option
                     errors.append(
-                        error_path + "used license ID is not a valid SPDX ID. "
+                        error_path
+                        + "used license ID "
+                        + error.args[0].split()[0]
+                        + " is not a valid SPDX ID. "
                         "Please use either the field 'name' or provide a valid ID."
                     )
                 elif ("dependsOn" in error.json_path) and (

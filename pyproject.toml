@@ -64,13 +64,6 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["cdxev"]
 
-[tool.semantic_release]
-version_variable = ["pyproject.toml:version"]
-branch = "master"
-upload_to_repository = false
-upload_to_release = false
-build_command = "pip install uv && uv build"
-
 [tool.mypy]
 python_version = "3.10"
 packages = "cdxev"

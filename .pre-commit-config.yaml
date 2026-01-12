@@ -20,7 +20,7 @@ repos:
     hooks:
       # Run the linter.
       - id: ruff-check
-        args: [ --fix ]
+        args: [--fix]
       # Run the formatter.
       - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -32,7 +32,7 @@ repos:
         additional_dependencies:
           - types-python-dateutil==2.9.0.20251115
           - typing-extensions==4.15.0
-          - types-jsonschema==4.25.1.20251009
+          - types-jsonschema==4.26.0.20260109
           - cyclonedx-python-lib==11.6.0
           - univers==31.1.0
           - charset-normalizer==3.4.4

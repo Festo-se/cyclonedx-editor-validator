@@ -89,6 +89,15 @@ class TestMergeSboms(unittest.TestCase):
         sbom_merged.pop("compositions")
         self.assertTrue(helper.compare_sboms(merged_sbom, sbom_merged))
 
+    def test_merge_metadata_component(self) -> None:
+        sections = helper.load_sections_for_test_sbom()["test_merge_metadata_component"]
+        sbom_1 = sections["sbom_1"]
+        sbom_2 = sections["sbom_2"]
+        expected = sections["expected"]
+
+        actual = merge.merge([sbom_1, sbom_2])
+        self.assertEqual(actual, expected)
+
 
 class TestMergeSeveralSboms(unittest.TestCase):
     def test_merge_3_sboms(self) -> None:

@@ -100,6 +100,11 @@ def merge_components(
     """
     list_of_merged_components: t.List[dict] = governing_sbom.get("components", [])
     list_of_added_components = sbom_to_be_merged.get("components", [])
+    if sbom_to_be_merged.get("metadata", {}).get("component", {}):
+        component_from_metadata = sbom_to_be_merged.get("metadata", {}).get(
+            "component", {}
+        )
+        list_of_added_components.append(component_from_metadata)
 
     present_component_identities: dict[ComponentIdentity, dict] = {}
     for component in extract_components(governing_sbom.get("components", [])):
@@ -220,9 +225,6 @@ def merge_2_sboms(
         )
 
     merged_sbom = original_sbom
-    component_from_metadata = sbom_to_be_merged.get("metadata", {}).get("component", {})
-    components_of_sbom_to_be_merged = sbom_to_be_merged.get("components", [])
-    components_of_sbom_to_be_merged.append(component_from_metadata)
     list_of_original_dependencies = original_sbom.get("dependencies", [])
     list_of_new_dependencies = sbom_to_be_merged.get("dependencies", [])
     list_of_original_vulnerabilities = original_sbom.get("vulnerabilities", [])
@@ -251,7 +253,7 @@ def merge_2_sboms(
         )
         merged_sbom["vulnerabilities"] = list_of_merged_vulnerabilities
 
-    if original_sbom.get("components", []) and sbom_to_be_merged.get("components", []):
+    if list_of_merged_components:
         merged_sbom["components"] = list_of_merged_components
 
     if original_sbom.get("dependencies", []) and sbom_to_be_merged.get("dependencies", []):

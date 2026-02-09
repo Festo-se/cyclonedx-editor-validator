@@ -98,7 +98,7 @@ def validate_sbom(  # noqa: C901
         for error in sorted(v.iter_errors(sbom), key=str):
             try:
                 if (
-                    error.validator == "required"  # type: ignore[comparison-overlap]
+                    error.validator == "required"
                     and error.validator_value == ["this_is_an_externally_described_component"]
                 ):
                     # This requirement in the schema allows us to produce warnings.
@@ -193,7 +193,7 @@ def validate_sbom(  # noqa: C901
                         )
                 elif "non-empty" in error.message:
                     errors.append(f"{error_path}'{error.absolute_path[-1]}' should not be empty")
-                elif error.validator == "pattern":  # type: ignore[comparison-overlap]
+                elif error.validator == "pattern":
                     errors.append(error_path + error.message.replace("\\", ""))
                 else:
                     errors.append(error_path + error.message)

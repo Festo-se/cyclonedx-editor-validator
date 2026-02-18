@@ -107,6 +107,13 @@ def merge_components(
             component
         )
 
+    governing_sbom_metadata = governing_sbom.get("metadata", {})
+    governing_sbom_metadata_component = governing_sbom_metadata.get("component", {})
+    if governing_sbom_metadata_component:
+        present_component_identities[
+            ComponentIdentity.create(governing_sbom_metadata_component, allow_unsafe=True)
+        ] = governing_sbom_metadata_component
+
     add_to_existing: dict[ComponentIdentity, dict] = {}
     list_present_component_identities = list(present_component_identities.keys())
     list_of_filtered_components = filter_component(

@@ -29,6 +29,12 @@ class TestMergeSboms(unittest.TestCase):
         sbom_merged = helper.load_governing_program_merged_sub_program()
         self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
 
+    def test_merge_sbom_with_itself_vulnerabilities(self) -> None:
+        sbom1 = helper.load_governing_program()
+        sbom2 = helper.load_governing_program()
+        sbom_merged = helper.load_governing_program()
+        self.assertTrue(helper.compare_sboms(merge.merge([sbom1, sbom2]), sbom_merged))
+
     def test_vulnerabilities_in_the_second(self) -> None:
         sbom1 = helper.load_governing_program()
         sbom2 = helper.load_sub_program()

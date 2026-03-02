@@ -85,3 +85,4 @@ jobs:
         junitxml-path: reports/unittest.xml
         pytest-xml-coverage-path: reports/py-coverage.cobertura.xml
         report-only-changed-files: true
+        hide-emoji: true

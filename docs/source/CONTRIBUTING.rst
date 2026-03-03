@@ -13,7 +13,7 @@ Issues
 Create Issues
 -------------
 
-Before submitting, please ensure that you are using the latests code by performing a :code:`git pull`. Also, please ensure that an issue does not already exists.
+Before submitting, please ensure that you are using the latests code by performing a :code:`git pull`, respectively :code:`pip install -upgrade cyclonedx-editor-validator`. Also, please ensure that an issue does not already exists.
 
 Always include your python version number (:code:`python --version`) and the tool version (:code:`cdx-ev --version`).
 
@@ -34,7 +34,7 @@ Prerequisites
 * Make sure to use the latest code by performing a :code:`git pull`.
 * For a major change it is recommended that you get in touch with us by :ref:`creating an issue <contributing:create issues>` to discuss changes prior to dedicating time and resources. This process allows us to better coordinate our efforts and prevent duplication of work.
 * Commit your changes using a descriptive commit message that follows our :ref:`commit message format <contributing:commit message format>`. The same applies for titles of PRs. This is required as we generate our release notes from these messages.
-* Otherwise, feel free to directly [submit a pull request](#submitting-pull-requests).
+* Otherwise, feel free to directly :ref:`submit a pull request <contributing:submitting pull requests>`.
 
 ----------------------------------------
 Write new commands, options or arguments
@@ -127,3 +127,132 @@ Examples
 :code:`feat: add 'amend' option`
 
 :code:`refactor: apply ruff`
+
+**************************************
+Setting up the Development Environment
+**************************************
+
+Before you begin, ensure the following are installed:
+
+- Git (for version control)
+- Optional: Python 3.10+ (if you plan using `pip` to install `uv`, otherwise `uv` will handle Python installations for you)
+
+---------------
+Installing `uv`
+---------------
+
+If `uv` is not yet installed on your system:
+
+.. code:: bash
+
+    # macOS / Linux
+    curl -LsSf https://astral.sh/uv/install.sh | less
+
+    # Windows (PowerShell)
+    powershell -c "irm https://astral.sh/uv/install.ps1 | more"
+
+    # Alternatively, via pip (not recommended)
+    pip install uv
+
+This provides `uv`, which automatically handles Python versions, environment creation, dependency resolution, and isolated environments.
+
+**From now on: Do not run Python / pip directly. All Python commands must be run via `uv`.**
+
+-----------------------------------------
+Environment Variables for Corporate Usage
+-----------------------------------------
+
+Development in corporate contexts may require special environment variables, such as:
+
+- `PRE_COMMIT_HOME`: Specifies the directory for caching `pre-commit` related files.
+- `UV_PYTHON_INSTALL_DIR`: Specifies the directory for storing managed Python installations.
+- `UV_PYTHON_BIN_DIR`: Specifies the directory to place links to installed, managed Python executables.
+- `UV_PYTHON_CACHE_DIR`: Specifies the directory for caching the archives of managed Python installations before installation.
+- `UV_CACHE_DIR`: Specifies the directory for caching instead of the default cache directory.
+- `UV_TOOL_BIN_DIR`: Specifies the "bin" directory for installing tool executables.
+- `UV_TOOL_DIR`: Specifies the directory where uv stores managed tools.
+
+Example export (assuming git bash):
+
+.. code:: bash
+
+    export PRE_COMMIT_HOME=C:/opt/corp/pre-commit
+    export UV_PYTHON_INSTALL_DIR=C:/corp/uv
+    export UV_PYTHON_BIN_DIR=C:/corp/uv/bin
+    export UV_PYTHON_CACHE_DIR=C:/corp/uv/cache
+    export UV_CACHE_DIR=C:/corp/uv/cache
+    export UV_TOOL_BIN_DIR=C:/corp/uv/tools/bin
+    export UV_TOOL_DIR=C:/corp/uv/tools
+
+You can also maintain a `.bashrc` file that is sourced by your shell as needed.
+
+--------------------------
+Setting Up the Environment
+--------------------------
+
+For the creation of the development environment, run the following command:
+
+.. code:: bash
+
+    # Using uv to install the correct Python version
+    uv python install 3.10
+
+Once inside your project directory:
+
+.. code:: bash
+
+    # Sync and install all declared dependencies (runtime + dev)
+    uv sync
+
+This creates and populates the local environment based on `pyproject.toml` and `uv.lock`.
+
+If you want to add dependencies, e.g. for development, use:
+
+.. code:: bash
+
+    uv add --group dev <package-name>
+
+
+We enforce `pre-commit` to run checks (linters, formatters, etc.) prior to each commit. It should be installed **inside the `uv` environment** and registered for the repository.
+
+1. Install `pre-commit` with `uv`:
+
+   .. code:: bash
+
+       uv tool install pre-commit
+
+2. Register hooks:
+
+   .. code:: bash
+
+       uv run pre-commit install
+
+3. You can also run all pre-commit checks manually:
+
+   .. code:: bash
+
+       uv run pre-commit run --all-files
+
+---------------------------------
+Typical Workflow and Contribution
+---------------------------------
+
+1. Clone the repository:
+
+   .. code:: bash
+
+       git clone https://github.com/Festo-se/cyclonedx-editor-validator.git
+
+2. Develop features / fix bugs.
+3. Add tests if necessary.
+4. Validate changes locally (tests, linting, formatting).
+
+.. code:: bash
+
+    uv run coverage run -m pytest
+    uv run ruff check cdxev tests --fix
+    uv run mypy --install-types --non-interactive --config-file=pyproject.toml
+    uv run pre-commit run --all-files
+
+5. Commit changes (pre-commit auto-runs).
+6. Push and open a pull request.

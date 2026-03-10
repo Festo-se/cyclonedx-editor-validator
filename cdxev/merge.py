@@ -54,8 +54,16 @@ def filter_component(
             )
             if component.get("components", []):
                 component["components"] = nested_components
-            filtered_components.append(component)
-
+            if component not in filtered_components:
+                filtered_components.append(component)
+            else:
+                logger.warning(
+                    LogMessage(
+                        "Potential loss of information",
+                        "SBOM contained duplicate component, "
+                        f"dropping one instance of ({component_id}) from the merge result.",
+                    )
+                )
         # component already present
         # contained components get filtered and added to the component in the main sbom
         else:

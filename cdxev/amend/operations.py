@@ -197,7 +197,6 @@ class Compositions(Operation):
             self.__add_to_assemblies(component["bom-ref"])
         except KeyError:
             logger.debug("Cannot add component to compositions because it has no bom-ref.")
-            pass
 
     def __add_to_assemblies(self, bom_ref: str) -> None:
         logger.debug("Added %s to compositions.", bom_ref)

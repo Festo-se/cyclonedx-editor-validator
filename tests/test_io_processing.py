@@ -162,7 +162,7 @@ class OutputTestCase(unittest.TestCase):
         sbom = self.minimal_sbom
         expected_sbom = copy.deepcopy(sbom)
 
-        versions = [0, *random.sample(range(0, 2**32), 3)]
+        versions = [0, *random.sample(range(2**32), 3)]
 
         for ver in versions:
             sbom["version"] = ver

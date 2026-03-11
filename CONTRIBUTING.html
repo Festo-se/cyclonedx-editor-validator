@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contributing &mdash; CycloneDX Editor Validator Tool 0.30.6 documentation</title>
+  <title>Contributing &mdash; CycloneDX Editor Validator Tool 0.30.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=c81b49a3"></script>
+      <script src="_static/documentation_options.js?v=6c63cdba"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -71,6 +71,13 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-the-development-environment">Setting up the Development Environment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-uv">Installing <cite>uv</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#environment-variables-for-corporate-usage">Environment Variables for Corporate Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setting-up-the-environment">Setting Up the Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#typical-workflow-and-contribution">Typical Workflow and Contribution</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -107,7 +114,7 @@ To get an overview of the project, read the <a class="reference internal" href="
 <h2>Issues<a class="headerlink" href="#issues" title="Link to this heading"></a></h2>
 <section id="create-issues">
 <h3>Create Issues<a class="headerlink" href="#create-issues" title="Link to this heading"></a></h3>
-<p>Before submitting, please ensure that you are using the latests code by performing a <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>. Also, please ensure that an issue does not already exists.</p>
+<p>Before submitting, please ensure that you are using the latests code by performing a <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>, respectively <code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-upgrade</span> <span class="pre">cyclonedx-editor-validator</span></code>. Also, please ensure that an issue does not already exists.</p>
 <p>Always include your python version number (<code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code>) and the tool version (<code class="code docutils literal notranslate"><span class="pre">cdx-ev</span> <span class="pre">--version</span></code>).</p>
 </section>
 <section id="solve-issue">
@@ -124,7 +131,7 @@ To get an overview of the project, read the <a class="reference internal" href="
 <li><p>Make sure to use the latest code by performing a <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>.</p></li>
 <li><p>For a major change it is recommended that you get in touch with us by <a class="reference internal" href="#create-issues"><span class="std std-ref">creating an issue</span></a> to discuss changes prior to dedicating time and resources. This process allows us to better coordinate our efforts and prevent duplication of work.</p></li>
 <li><p>Commit your changes using a descriptive commit message that follows our <a class="reference internal" href="#commit-message-format"><span class="std std-ref">commit message format</span></a>. The same applies for titles of PRs. This is required as we generate our release notes from these messages.</p></li>
-<li><p>Otherwise, feel free to directly [submit a pull request](#submitting-pull-requests).</p></li>
+<li><p>Otherwise, feel free to directly <a class="reference internal" href="#submitting-pull-requests"><span class="std std-ref">submit a pull request</span></a>.</p></li>
 </ul>
 </section>
 <section id="write-new-commands-options-or-arguments">
@@ -217,6 +224,113 @@ To get an overview of the project, read the <a class="reference internal" href="
 <p><code class="code docutils literal notranslate"><span class="pre">feat:</span> <span class="pre">add</span> <span class="pre">'amend'</span> <span class="pre">option</span></code></p>
 <p><code class="code docutils literal notranslate"><span class="pre">refactor:</span> <span class="pre">apply</span> <span class="pre">ruff</span></code></p>
 </section>
+</section>
+</section>
+<section id="setting-up-the-development-environment">
+<h2>Setting up the Development Environment<a class="headerlink" href="#setting-up-the-development-environment" title="Link to this heading"></a></h2>
+<p>Before you begin, ensure the following are installed:</p>
+<ul class="simple">
+<li><p>Git (for version control)</p></li>
+<li><p>Optional: Python 3.10+ (if you plan using <cite>pip</cite> to install <cite>uv</cite>, otherwise <cite>uv</cite> will handle Python installations for you)</p></li>
+</ul>
+<section id="installing-uv">
+<h3>Installing <cite>uv</cite><a class="headerlink" href="#installing-uv" title="Link to this heading"></a></h3>
+<p>If <cite>uv</cite> is not yet installed on your system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># macOS / Linux</span>
+curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>less
+
+<span class="c1"># Windows (PowerShell)</span>
+powershell<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;irm https://astral.sh/uv/install.ps1 | more&quot;</span>
+
+<span class="c1"># Alternatively, via pip (not recommended)</span>
+pip<span class="w"> </span>install<span class="w"> </span>uv
+</pre></div>
+</div>
+<p>This provides <cite>uv</cite>, which automatically handles Python versions, environment creation, dependency resolution, and isolated environments.</p>
+<p><strong>From now on: Do not run Python / pip directly. All Python commands must be run via `uv`.</strong></p>
+</section>
+<section id="environment-variables-for-corporate-usage">
+<h3>Environment Variables for Corporate Usage<a class="headerlink" href="#environment-variables-for-corporate-usage" title="Link to this heading"></a></h3>
+<p>Development in corporate contexts may require special environment variables, such as:</p>
+<ul class="simple">
+<li><p><cite>PRE_COMMIT_HOME</cite>: Specifies the directory for caching <cite>pre-commit</cite> related files.</p></li>
+<li><p><cite>UV_PYTHON_INSTALL_DIR</cite>: Specifies the directory for storing managed Python installations.</p></li>
+<li><p><cite>UV_PYTHON_BIN_DIR</cite>: Specifies the directory to place links to installed, managed Python executables.</p></li>
+<li><p><cite>UV_PYTHON_CACHE_DIR</cite>: Specifies the directory for caching the archives of managed Python installations before installation.</p></li>
+<li><p><cite>UV_CACHE_DIR</cite>: Specifies the directory for caching instead of the default cache directory.</p></li>
+<li><p><cite>UV_TOOL_BIN_DIR</cite>: Specifies the “bin” directory for installing tool executables.</p></li>
+<li><p><cite>UV_TOOL_DIR</cite>: Specifies the directory where uv stores managed tools.</p></li>
+</ul>
+<p>Example export (assuming git bash):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PRE_COMMIT_HOME</span><span class="o">=</span>C:/opt/corp/pre-commit
+<span class="nb">export</span><span class="w"> </span><span class="nv">UV_PYTHON_INSTALL_DIR</span><span class="o">=</span>C:/corp/uv
+<span class="nb">export</span><span class="w"> </span><span class="nv">UV_PYTHON_BIN_DIR</span><span class="o">=</span>C:/corp/uv/bin
+<span class="nb">export</span><span class="w"> </span><span class="nv">UV_PYTHON_CACHE_DIR</span><span class="o">=</span>C:/corp/uv/cache
+<span class="nb">export</span><span class="w"> </span><span class="nv">UV_CACHE_DIR</span><span class="o">=</span>C:/corp/uv/cache
+<span class="nb">export</span><span class="w"> </span><span class="nv">UV_TOOL_BIN_DIR</span><span class="o">=</span>C:/corp/uv/tools/bin
+<span class="nb">export</span><span class="w"> </span><span class="nv">UV_TOOL_DIR</span><span class="o">=</span>C:/corp/uv/tools
+</pre></div>
+</div>
+<p>You can also maintain a <cite>.bashrc</cite> file that is sourced by your shell as needed.</p>
+</section>
+<section id="setting-up-the-environment">
+<h3>Setting Up the Environment<a class="headerlink" href="#setting-up-the-environment" title="Link to this heading"></a></h3>
+<p>For the creation of the development environment, run the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using uv to install the correct Python version</span>
+uv<span class="w"> </span>python<span class="w"> </span>install<span class="w"> </span><span class="m">3</span>.10
+</pre></div>
+</div>
+<p>Once inside your project directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sync and install all declared dependencies (runtime + dev)</span>
+uv<span class="w"> </span>sync
+</pre></div>
+</div>
+<p>This creates and populates the local environment based on <cite>pyproject.toml</cite> and <cite>uv.lock</cite>.</p>
+<p>If you want to add dependencies, e.g. for development, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>add<span class="w"> </span>--group<span class="w"> </span>dev<span class="w"> </span>&lt;package-name&gt;
+</pre></div>
+</div>
+<p>We enforce <cite>pre-commit</cite> to run checks (linters, formatters, etc.) prior to each commit. It should be installed <strong>inside the `uv` environment</strong> and registered for the repository.</p>
+<ol class="arabic">
+<li><p>Install <cite>pre-commit</cite> with <cite>uv</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>pre-commit
+</pre></div>
+</div>
+</li>
+<li><p>Register hooks:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
+</pre></div>
+</div>
+</li>
+<li><p>You can also run all pre-commit checks manually:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="typical-workflow-and-contribution">
+<h3>Typical Workflow and Contribution<a class="headerlink" href="#typical-workflow-and-contribution" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p>Clone the repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Festo-se/cyclonedx-editor-validator.git
+</pre></div>
+</div>
+</li>
+<li><p>Develop features / fix bugs.</p></li>
+<li><p>Add tests if necessary.</p></li>
+<li><p>Validate changes locally (tests, linting, formatting).</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>coverage<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </span>pytest
+uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>cdxev<span class="w"> </span>tests<span class="w"> </span>--fix
+uv<span class="w"> </span>run<span class="w"> </span>mypy<span class="w"> </span>--install-types<span class="w"> </span>--non-interactive<span class="w"> </span>--config-file<span class="o">=</span>pyproject.toml
+uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>Commit changes (pre-commit auto-runs).</p></li>
+<li><p>Push and open a pull request.</p></li>
+</ol>
 </section>
 </section>
 </section>

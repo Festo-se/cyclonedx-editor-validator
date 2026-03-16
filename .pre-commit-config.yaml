@@ -35,7 +35,7 @@ repos:
           - types-jsonschema==4.26.0.20260202
           - cyclonedx-python-lib==11.6.0
           - univers==31.1.0
-          - charset-normalizer==3.4.5
+          - charset-normalizer==3.4.6
           - natsort==8.4.0
           - docstring-parser==0.17.0
           - email-validator==2.3.0

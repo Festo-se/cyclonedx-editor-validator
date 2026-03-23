@@ -38,7 +38,7 @@ dev = [
     "types-python-dateutil==2.9.0.20260305",
     "types-jsonschema==4.26.0.20260202",
     "pytest==9.0.2",
-    "coverage==7.13.4",
+    "coverage==7.13.5",
     "toml==0.10.2",
     "typing-extensions==4.15.0",
     "pre-commit==4.5.1",

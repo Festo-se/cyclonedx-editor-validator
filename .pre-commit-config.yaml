@@ -37,7 +37,7 @@ repos:
           - univers==31.1.0
           - charset-normalizer==3.4.7
           - natsort==8.4.0
-          - docstring-parser==0.17.0
+          - docstring-parser==0.18.0
           - email-validator==2.3.0
         files: "^cdxev/.*\\.py$"
         args: ["--config-file", "pyproject.toml"]

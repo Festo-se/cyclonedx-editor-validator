@@ -30,14 +30,14 @@ repos:
         # List type stub dependencies explicitly, as --install-types should be avoided as per
         # https://github.com/pre-commit/mirrors-mypy/blob/main/README.md
         additional_dependencies:
-          - types-python-dateutil==2.9.0.20260305
+          - types-python-dateutil==2.9.0.20260408
           - typing-extensions==4.15.0
-          - types-jsonschema==4.26.0.20260202
-          - cyclonedx-python-lib==11.6.0
+          - types-jsonschema==4.26.0.20260408
+          - cyclonedx-python-lib==11.7.0
           - univers==31.1.0
-          - charset-normalizer==3.4.5
+          - charset-normalizer==3.4.7
           - natsort==8.4.0
-          - docstring-parser==0.17.0
+          - docstring-parser==0.18.0
           - email-validator==2.3.0
         files: "^cdxev/.*\\.py$"
         args: ["--config-file", "pyproject.toml"]

@@ -1228,7 +1228,7 @@ class TestValidateCycloneDX17(unittest.TestCase):
             sbom = json.load(f)
         sbom["components"][0]["licenses"][0]["license"]["id"] = "NOT-A-VALID-SPDX-ID"
         issues = validate_test(sbom, schema_type="custom")
-        self.assertFalse(issues == ["no issue"])
+        self.assertNotEqual(issues, ["no issue"])
 
     @unittest.skipUnless("CI" in os.environ, "running only in CI")
     def test_17_sbom_passes_default_schema(self) -> None:

@@ -54,6 +54,18 @@ class SpecVersionTestCase(unittest.TestCase):
 
         self.assertIsNone(parsed)
 
+    def test_parse_v1_7(self):
+        s = "1.7"
+        parsed = SpecVersion.parse(s)
+
+        self.assertEqual(parsed, CycloneDXVersion.V1_7)
+        self.assertEqual(CycloneDXVersion.V1_7, parsed)
+        self.assertEqual(s, str(parsed))
+
+    def test_v1_7_greater_than_v1_6(self):
+        self.assertGreater(CycloneDXVersion.V1_7, CycloneDXVersion.V1_6)
+        self.assertLess(CycloneDXVersion.V1_6, CycloneDXVersion.V1_7)
+
     def test_compare(self):
         self.assertLessEqual(CycloneDXVersion.V1_0, CycloneDXVersion.V1_0)
         self.assertEqual(CycloneDXVersion.V1_0, CycloneDXVersion.V1_0)

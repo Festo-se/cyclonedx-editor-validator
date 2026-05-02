@@ -187,6 +187,34 @@ class TestValidateMetadata(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
+    def test_copyright_festool_is_rejected(self) -> None:
+        """'Festool GmbH' must not satisfy the Festo pattern.
+
+        The component retains a valid Festo supplier so the schema rule
+        'supplier matches Festo → copyright must also match Festo' is
+        triggered.  'Festool GmbH' starts with 'Festo' but is immediately
+        followed by the letter 'o', which the updated regex rejects.
+        """
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["metadata"]["component"]["copyright"] = "Festool GmbH 2026"
+            issues = validate_test(sbom)
+            self.assertNotEqual(issues, ["no issue"], msg=f"spec {spec_version}")
+
+    def test_copyright_with_copyright_prefix_is_accepted(self) -> None:
+        """Values like '© 2026 Festo SE' must pass the updated Festo pattern.
+
+        The old pattern required the string to start literally with 'Festo',
+        which incorrectly rejected valid copyright-prefixed strings.
+        """
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["metadata"]["component"]["copyright"] = "© 2026 Festo SE"
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
+
     def test_metadata_internal_component_copyright_missing(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()

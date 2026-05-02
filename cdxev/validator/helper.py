@@ -54,7 +54,7 @@ def _get_builtin_schema(schema_type: str, spec_version: str) -> dict:
             f"No built-in schema found for CycloneDX version {spec_version} and "
             f"schema type '{schema_type}'.",
         )
-    schema_json = schema_file.read_text()
+    schema_json = schema_file.read_text(encoding="utf-8")
     schema = json.loads(schema_json)
     if isinstance(schema, dict):
         return schema

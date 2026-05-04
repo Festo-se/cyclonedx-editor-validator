@@ -24,8 +24,8 @@ path_to_modified_sbom = (
     "Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
-list_of_spec_versions = ["1.3", "1.4", "1.5", "1.6"]
-list_of_spec_versions_containing_licensing = ["1.5", "1.6"]
+list_of_spec_versions = ["1.3", "1.4", "1.5", "1.6", "1.7"]
+list_of_spec_versions_containing_licensing = ["1.5", "1.6", "1.7"]
 
 
 def search_for_word_issues(word: str, issue_list: list) -> bool:
@@ -1196,6 +1196,56 @@ class TestInternalMetaData(unittest.TestCase):
             sbom["specVersion"] = spec_version
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
+
+
+path_to_sbom_v1_7 = (
+    path_to_folder_with_test_sboms
+    + "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458_v1.7.cdx.json"
+)
+
+
+class TestValidateCycloneDX17(unittest.TestCase):
+    """Tests specific to CycloneDX 1.7 support."""
+
+    def test_valid_17_sbom_passes_custom_schema(self) -> None:
+        """A well-formed 1.7 SBOM validates without errors against the custom schema."""
+        with open(path_to_sbom_v1_7, "r") as f:
+            sbom = json.load(f)
+        issues = validate_test(sbom, schema_type="custom")
+        self.assertEqual(issues, ["no issue"])
+
+    def test_17_sbom_missing_metadata_fails(self) -> None:
+        """A 1.7 SBOM that is missing the required metadata field triggers a validation error."""
+        with open(path_to_sbom_v1_7, "r") as f:
+            sbom = json.load(f)
+        sbom.pop("metadata")
+        issues = validate_test(sbom, schema_type="custom")
+        self.assertTrue(search_for_word_issues("metadata", issues))
+
+    def test_17_sbom_invalid_license_id_fails(self) -> None:
+        """A component with an unknown SPDX license ID triggers a validation error."""
+        with open(path_to_sbom_v1_7, "r") as f:
+            sbom = json.load(f)
+        sbom["components"][0]["licenses"][0]["license"]["id"] = "NOT-A-VALID-SPDX-ID"
+        issues = validate_test(sbom, schema_type="custom")
+        self.assertNotEqual(issues, ["no issue"])
+
+    @unittest.skipUnless("CI" in os.environ, "running only in CI")
+    def test_17_sbom_passes_default_schema(self) -> None:
+        """A well-formed 1.7 SBOM validates without errors against the official 1.7 schema."""
+        with open(path_to_sbom_v1_7, "r") as f:
+            sbom = json.load(f)
+        issues = validate_test(sbom, schema_type="default")
+        self.assertEqual(issues, ["no issue"])
+
+    def test_17_sbom_passes_custom_schema_path(self) -> None:
+        """A well-formed 1.7 SBOM validates against a user-supplied custom schema file."""
+        with open(path_to_sbom_v1_7, "r") as f:
+            sbom = json.load(f)
+        schema_path = Path(path_to_folder_with_test_sboms + "test_schema.json")
+        issues = validate_test(sbom, schema_type=None, schema_path=schema_path)
+        # test_schema.json is an empty (permissive) schema; all SBOMs pass
+        self.assertEqual(issues, ["no issue"])
 
     def test_internal_component_metadata_copyright_festo_no_supplier(self) -> None:
         sbom = {

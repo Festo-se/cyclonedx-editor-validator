@@ -78,6 +78,30 @@ def load_spdx_schema() -> dict:
             )
 
 
+def load_bundled_schema(filename: str) -> dict:
+    """
+    Loads a bundled helper schema (e.g. jsf-0.82.schema.json, cryptography-defs.schema.json)
+    from the package's schema resource directory.
+
+    :param filename: The filename of the schema to load (e.g. 'jsf-0.82.schema.json').
+    :return: The parsed schema as a dictionary.
+    """
+    path = resources.files("cdxev.auxiliary.schema") / filename
+    if not path.is_file():
+        raise AppError(
+            "Schema not loaded",
+            f"Bundled helper schema not found: {filename}",
+        )
+    with path.open() as f:
+        schema = json.load(f)
+    if isinstance(schema, dict):
+        return schema
+    raise AppError(
+        "Schema error",
+        f"Bundled helper schema is not of type dict: {filename}",
+    )
+
+
 def validate_filename(
     filename: str,
     regex: str,

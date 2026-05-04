@@ -30,9 +30,9 @@ For all built-in schemas, the tool determines the CycloneDX version from the inp
 =========== ============================
 Type        Supported CycloneDX versions
 =========== ============================
-``default`` 1.2 to 1.6
+``default`` 1.2 to 1.7
 ``strict``  1.2 to 1.3
-``custom``  1.3 to 1.6
+``custom``  1.3 to 1.7
 =========== ============================
 
 Validation of filename

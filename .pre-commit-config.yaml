@@ -34,7 +34,7 @@ repos:
           - typing-extensions==4.15.0
           - types-jsonschema==4.26.0.20260408
           - cyclonedx-python-lib==11.7.0
-          - univers==31.1.0
+          - univers==32.0.1
           - charset-normalizer==3.4.7
           - natsort==8.4.0
           - docstring-parser==0.18.0

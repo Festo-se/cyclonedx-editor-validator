@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Install uv
-        uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
       - name: Install dependencies
         run: uv sync --only-group docs --frozen
       - name: Test build of documentation
@@ -35,7 +35,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Install uv
-        uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           enable-cache: true
       - name: Install dependencies for development
@@ -59,7 +59,7 @@ jobs:
       with:
         python-version: '3.10'
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
     - name: Install package
       run: uv sync --no-group docs --frozen
     - name: Run pytest
@@ -69,19 +69,20 @@ jobs:
     - name: Save test results
       run: uv run coverage xml -o reports/py-coverage.cobertura.xml
     - name: Archive test results
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: test-report
         path: reports/unittest.xml
     - name: Archive code coverage results
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: code-coverage-report
         path: reports/py-coverage.cobertura.xml
     - name: Coverage commit
       if: ${{ success() && GITHUB.EVENT_NAME == 'pull_request' && !github.event.pull_request.head.repo.fork }}
-      uses: MishaKav/pytest-coverage-comment@46a1348587126fb199084ee9024ce511cb3abbdb # v1.4.0
+      uses: MishaKav/pytest-coverage-comment@dd5b80bde6d16941f336518e92929e89069d8451 # v1.7.2
       with:
         junitxml-path: reports/unittest.xml
         pytest-xml-coverage-path: reports/py-coverage.cobertura.xml
         report-only-changed-files: true
+        hide-emoji: true

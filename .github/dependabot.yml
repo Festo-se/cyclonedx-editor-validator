@@ -13,3 +13,9 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     target-branch: main
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    target-branch: main

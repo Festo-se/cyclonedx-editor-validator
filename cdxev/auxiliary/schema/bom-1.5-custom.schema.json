@@ -4,6 +4,30 @@
   "type": "object",
   "title": "CycloneDX Software Bill of Materials Standard",
   "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "if": {
+    "required": [
+      "components"
+    ]
+  },
+  "then": {
+    "required": [
+      "bomFormat",
+      "specVersion",
+      "version",
+      "metadata",
+      "compositions",
+      "dependencies"
+    ]
+  },
+  "else": {
+    "required": [
+      "bomFormat",
+      "specVersion",
+      "version",
+      "metadata",
+      "compositions"
+    ]
+  },
   "additionalProperties": false,
   "properties": {
     "$schema": {
@@ -141,6 +165,7 @@
     "refType": {
       "description": "Identifier for referable and therefore interlink-able elements.",
       "type": "string",
+      "additionalProperties": false,
       "minLength": 1,
       "$comment": "value SHOULD not start with the BOM-Link intro 'urn:cdx:'"
     },
@@ -254,10 +279,7 @@
                 "components": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "required": [
-                      "type"
-                    ]
+                    "$ref": "#/definitions/tools_component"
                   },
                   "uniqueItems": true,
                   "title": "Components",
@@ -266,7 +288,7 @@
                 "services": {
                   "type": "array",
                   "items": {
-                    "type": "object"
+                    "$ref": "#/definitions/service"
                   },
                   "uniqueItems": true,
                   "title": "Services",
@@ -308,12 +330,8 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "title": "BOM License(s)",
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          }
+          "$ref": "#/definitions/licenseChoice",
+          "title": "Component License(s)"
         },
         "properties": {
           "type": "array",
@@ -383,11 +401,11 @@
         "name": {
           "type": "string",
           "title": "Name",
+          "minLength": 1,
           "description": "The name of the organization",
           "examples": [
             "Example Inc."
-          ],
-          "minLength": 1
+          ]
         },
         "url": {
           "type": "array",
@@ -513,6 +531,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
+          "minLength": 1,
           "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
         },
         "supplier": {
@@ -546,21 +565,21 @@
         },
         "name": {
           "type": "string",
+          "minLength": 1,
           "title": "Component Name",
           "description": "The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery",
           "examples": [
             "tomcat-catalina"
-          ],
-          "minLength": 1
+          ]
         },
         "version": {
           "type": "string",
           "title": "Component Version",
+          "minLength": 1,
           "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.",
           "examples": [
             "9.0.14"
-          ],
-          "minLength": 1
+          ]
         },
         "description": {
           "type": "string",
@@ -586,12 +605,8 @@
           }
         },
         "licenses": {
-          "title": "Component License(s)",
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          }
+          "$ref": "#/definitions/licenseChoice",
+          "title": "Component License(s)"
         },
         "copyright": {
           "type": "string",
@@ -1110,8 +1125,8 @@
         "content": {
           "type": "string",
           "title": "Attachment Text",
-          "description": "The attachment data. Proactive controls such as input validation and sanitization should be employed to prevent misuse of attachment text.",
-          "minLength": 1
+          "minLength": 1,
+          "description": "The attachment data. Proactive controls such as input validation and sanitization should be employed to prevent misuse of attachment text."
         }
       }
     },
@@ -1148,7 +1163,8 @@
         "BLAKE2b-512",
         "BLAKE3"
       ],
-      "title": "Hash Algorithm"
+      "title": "Hash Algorithm",
+      "additionalProperties": false
     },
     "hash-content": {
       "type": "string",
@@ -1156,7 +1172,8 @@
       "examples": [
         "3942447fac867ae5cdb3229b658f4d48"
       ],
-      "pattern": "^([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{96}|[a-fA-F0-9]{128})$"
+      "pattern": "^([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{96}|[a-fA-F0-9]{128})$",
+      "additionalProperties": false
     },
     "license": {
       "type": "object",
@@ -1191,11 +1208,11 @@
         "name": {
           "type": "string",
           "title": "License Name",
+          "minLength": 1,
           "description": "If SPDX does not define the license used, this field may be used to provide the license name",
           "examples": [
             "Acme Software License"
-          ],
-          "minLength": 1
+          ]
         },
         "text": {
           "title": "License text",
@@ -1359,28 +1376,29 @@
               "description": "The timestamp indicating when the current license expires (if applicable)."
             }
           },
-          "required": [
-            "licenseTypes"
-          ],
-          "if": {
-            "properties": {
-              "licenseTypes": {
-                "contains": {
-                  "not": {
-                    "const": "appliance"
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "licenseTypes": {
+                    "contains": {
+                      "const": "appliance"
+                    }
                   }
-                }
+                },
+                "required": [
+                  "licenseTypes"
+                ]
+              },
+              "then": {},
+              "else": {
+                "required": [
+                  "licenseTypes",
+                  "licensor"
+                ]
               }
-            },
-            "required": [
-              "licenseTypes"
-            ]
-          },
-          "then": {
-            "required": [
-              "licensor"
-            ]
-          }
+            }
+          ]
         },
         "properties": {
           "type": "array",
@@ -1399,32 +1417,59 @@
       }
     },
     "licenseChoice": {
-      "type": "object",
-      "title": "License(s)",
-      "additionalProperties": false,
-      "properties": {
-        "license": {
-          "$ref": "#/definitions/license"
-        },
-        "expression": {
-          "type": "string",
-          "minLength": 1,
-          "title": "SPDX License Expression",
-          "examples": [
-            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-            "GPL-3.0-only WITH Classpath-exception-2.0"
-          ]
-        }
-      },
+      "title": "License Choice",
+      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "type": "array",
+      "minItems": 1,
       "oneOf": [
         {
-          "required": [
-            "license"
-          ]
+          "title": "Multiple licenses",
+          "description": "A list of SPDX licenses and/or named licenses.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "license"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "license": {
+                "$ref": "#/definitions/license"
+              }
+            }
+          }
         },
         {
-          "required": [
-            "expression"
+          "title": "SPDX License Expression",
+          "description": "A tuple of exactly one SPDX License Expression.",
+          "type": "array",
+          "additionalItems": false,
+          "minItems": 1,
+          "maxItems": 1,
+          "items": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "expression"
+              ],
+              "properties": {
+                "expression": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "SPDX License Expression",
+                  "examples": [
+                    "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                    "GPL-3.0-only WITH Classpath-exception-2.0"
+                  ]
+                },
+                "bom-ref": {
+                  "$ref": "#/definitions/refType",
+                  "title": "BOM Reference",
+                  "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+                }
+              }
+            }
           ]
         }
       ]
@@ -1624,7 +1669,8 @@
             {
               "title": "URL",
               "type": "string",
-              "format": "iri-reference"
+              "format": "iri-reference",
+              "minLength": 1
             },
             {
               "title": "BOM-Link",
@@ -1632,8 +1678,7 @@
             }
           ],
           "title": "URL",
-          "description": "The URI (URL or URN) to the external reference. External references are URIs and therefore can accept any URL scheme including https ([RFC-7230](https://www.ietf.org/rfc/rfc7230.txt)), mailto ([RFC-2368](https://www.ietf.org/rfc/rfc2368.txt)), tel ([RFC-3966](https://www.ietf.org/rfc/rfc3966.txt)), and dns ([RFC-4501](https://www.ietf.org/rfc/rfc4501.txt)). External references may also include formally registered URNs such as [CycloneDX BOM-Link](https://cyclonedx.org/capabilities/bomlink/) to reference CycloneDX BOMs or any object within a BOM. BOM-Link transforms applicable external references into relationships that can be expressed in a BOM or across BOMs.",
-          "minLength": 1
+          "description": "The URI (URL or URN) to the external reference. External references are URIs and therefore can accept any URL scheme including https ([RFC-7230](https://www.ietf.org/rfc/rfc7230.txt)), mailto ([RFC-2368](https://www.ietf.org/rfc/rfc2368.txt)), tel ([RFC-3966](https://www.ietf.org/rfc/rfc3966.txt)), and dns ([RFC-4501](https://www.ietf.org/rfc/rfc4501.txt)). External references may also include formally registered URNs such as [CycloneDX BOM-Link](https://cyclonedx.org/capabilities/bomlink/) to reference CycloneDX BOMs or any object within a BOM. BOM-Link transforms applicable external references into relationships that can be expressed in a BOM or across BOMs."
         },
         "comment": {
           "type": "string",
@@ -1804,11 +1849,8 @@
           "description": "Specifies information about the data including the directional flow of data and the data classification."
         },
         "licenses": {
-          "title": "Component License(s)",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          }
+          "$ref": "#/definitions/licenseChoice",
+          "title": "Component License(s)"
         },
         "externalReferences": {
           "type": "array",
@@ -1932,7 +1974,8 @@
         "unknown"
       ],
       "title": "Data flow direction",
-      "description": "Specifies the flow direction of the data. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known."
+      "description": "Specifies the flow direction of the data. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.",
+      "additionalProperties": false
     },
     "copyright": {
       "type": "object",
@@ -2130,11 +2173,8 @@
           }
         },
         "licenses": {
-          "title": "Component License(s)",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          }
+          "$ref": "#/definitions/licenseChoice",
+          "title": "Component License(s)"
         },
         "copyright": {
           "type": "array",
@@ -2221,7 +2261,8 @@
         "incomplete_third_party_opensource_only",
         "unknown",
         "not_specified"
-      ]
+      ],
+      "additionalProperties": false
     },
     "property": {
       "type": "object",
@@ -2238,13 +2279,15 @@
           "title": "Value",
           "description": "The value of the property."
         }
-      }
+      },
+      "additionalProperties": false
     },
     "localeType": {
       "type": "string",
       "pattern": "^([a-z]{2})(-[A-Z]{2})?$",
       "title": "Locale",
-      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code MUST be lower case. If the country code is specified, the country code MUST be upper case. The language code and country code MUST be separated by a minus sign. Examples: en, en-US, fr, fr-CA"
+      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code MUST be lower case. If the country code is specified, the country code MUST be upper case. The language code and country code MUST be separated by a minus sign. Examples: en, en-US, fr, fr-CA",
+      "additionalProperties": false
     },
     "releaseType": {
       "type": "string",
@@ -2255,7 +2298,8 @@
         "pre-release",
         "internal"
       ],
-      "description": "The software versioning type. It is RECOMMENDED that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
+      "description": "The software versioning type. It is RECOMMENDED that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it.",
+      "additionalProperties": false
     },
     "note": {
       "type": "object",
@@ -2387,7 +2431,8 @@
       "type": "integer",
       "minimum": 1,
       "title": "CWE",
-      "description": "Integer representation of a Common Weaknesses Enumerations (CWE). For example 399 (of https://cwe.mitre.org/data/definitions/399.html)"
+      "description": "Integer representation of a Common Weaknesses Enumerations (CWE). For example 399 (of https://cwe.mitre.org/data/definitions/399.html)",
+      "additionalProperties": false
     },
     "severity": {
       "type": "string",
@@ -2401,7 +2446,8 @@
         "info",
         "none",
         "unknown"
-      ]
+      ],
+      "additionalProperties": false
     },
     "scoreMethod": {
       "type": "string",
@@ -2415,7 +2461,8 @@
         "OWASP",
         "SSVC",
         "other"
-      ]
+      ],
+      "additionalProperties": false
     },
     "impactAnalysisState": {
       "type": "string",
@@ -2444,7 +2491,8 @@
         "protected_at_runtime",
         "protected_at_perimeter",
         "protected_by_mitigating_control"
-      ]
+      ],
+      "additionalProperties": false
     },
     "rating": {
       "type": "object",
@@ -2693,7 +2741,7 @@
                 "components": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/component"
+                    "$ref": "#/definitions/tools_component"
                   },
                   "uniqueItems": true,
                   "title": "Components",
@@ -2848,19 +2896,22 @@
         "affected",
         "unaffected",
         "unknown"
-      ]
+      ],
+      "additionalProperties": false
     },
     "version": {
       "description": "A single version of a component or service.",
       "type": "string",
       "minLength": 1,
-      "maxLength": 1024
+      "maxLength": 1024,
+      "additionalProperties": false
     },
     "range": {
       "description": "A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/VERSION-RANGE-SPEC.rst",
       "type": "string",
       "minLength": 1,
-      "maxLength": 1024
+      "maxLength": 1024,
+      "additionalProperties": false
     },
     "annotations": {
       "type": "object",
@@ -2935,7 +2986,7 @@
             },
             "component": {
               "description": "The tool or component that created the annotation",
-              "$ref": "#/definitions/component"
+              "$ref": "#/definitions/tools_component"
             },
             "service": {
               "description": "The service that created the annotation",
@@ -4378,31 +4429,266 @@
     "signature": {
       "$ref": "jsf-0.82.schema.json#/definitions/signature",
       "title": "Signature",
-      "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+      "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html).",
+      "additionalProperties": false
+    },
+    "tools_component": {
+      "type": "object",
+      "title": "Component Object",
+      "required": [
+        "type",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "application",
+            "framework",
+            "library",
+            "container",
+            "platform",
+            "operating-system",
+            "device",
+            "device-driver",
+            "firmware",
+            "file",
+            "machine-learning-model",
+            "data"
+          ],
+          "title": "Component Type",
+          "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component. Types include:\n\n* __application__ = A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.\n* __framework__ = A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.\n* __library__ = A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing))\n for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is RECOMMENDED.\n* __container__ = A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization)\n* __platform__ = A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.\n* __operating-system__ = A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system)\n* __device__ = A hardware device such as a processor, or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself, and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device.\n  See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).\n* __device-driver__ = A special type of software that operates or controls a particular type of device. Refer to [https://en.wikipedia.org/wiki/Device_driver](https://en.wikipedia.org/wiki/Device_driver)\n* __firmware__ = A special type of software that provides low-level control over a devices hardware. Refer to [https://en.wikipedia.org/wiki/Firmware](https://en.wikipedia.org/wiki/Firmware)\n* __file__ = A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.\n* __machine-learning-model__ = A model based on training data that can make predictions or decisions without being explicitly programmed to do so.\n* __data__ = A collection of discrete values that convey information.",
+          "examples": [
+            "library"
+          ]
+        },
+        "mime-type": {
+          "type": "string",
+          "title": "Mime-Type",
+          "description": "The optional mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented such as an image, font, or executable. Some library or framework components may also have an associated mime-type.",
+          "examples": [
+            "image/jpeg"
+          ],
+          "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
+        },
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
+        "supplier": {
+          "title": "Component Supplier",
+          "description": " The organization that supplied the component. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
+          "$ref": "#/definitions/organizationalEntity"
+        },
+        "author": {
+          "type": "string",
+          "title": "Component Author",
+          "description": "The person(s) or organization(s) that authored the component",
+          "examples": [
+            "Acme Inc"
+          ]
+        },
+        "publisher": {
+          "type": "string",
+          "title": "Component Publisher",
+          "description": "The person(s) or organization(s) that published the component",
+          "examples": [
+            "Acme Inc"
+          ]
+        },
+        "group": {
+          "type": "string",
+          "title": "Component Group",
+          "description": "The grouping name or identifier. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.",
+          "examples": [
+            "com.acme"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "title": "Component Name",
+          "description": "The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery",
+          "examples": [
+            "tomcat-catalina"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "title": "Component Version",
+          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.",
+          "examples": [
+            "9.0.14"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Component Description",
+          "description": "Specifies a description for the component"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "required",
+            "optional",
+            "excluded"
+          ],
+          "title": "Component Scope",
+          "description": "Specifies the scope of the component. If scope is not specified, 'required' scope SHOULD be assumed by the consumer of the BOM.",
+          "default": "required"
+        },
+        "hashes": {
+          "type": "array",
+          "title": "Component Hashes",
+          "items": {
+            "$ref": "#/definitions/hash"
+          }
+        },
+        "licenses": {
+          "$ref": "#/definitions/licenseChoice",
+          "title": "Component License(s)"
+        },
+        "copyright": {
+          "type": "string",
+          "title": "Component Copyright",
+          "description": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
+          "examples": [
+            "Acme Inc"
+          ]
+        },
+        "cpe": {
+          "type": "string",
+          "title": "Component Common Platform Enumeration (CPE)",
+          "description": "Specifies a well-formed CPE name that conforms to the CPE 2.2 or 2.3 specification. See [https://nvd.nist.gov/products/cpe](https://nvd.nist.gov/products/cpe)",
+          "examples": [
+            "cpe:2.3:a:acme:component_framework:-:*:*:*:*:*:*:*"
+          ]
+        },
+        "purl": {
+          "type": "string",
+          "title": "Component Package URL (purl)",
+          "description": "Specifies the package-url (purl). The purl, if specified, MUST be valid and conform to the specification defined at: [https://github.com/package-url/purl-spec](https://github.com/package-url/purl-spec)",
+          "examples": [
+            "pkg:maven/com.acme/tomcat-catalina@9.0.14?packaging=jar"
+          ]
+        },
+        "swid": {
+          "$ref": "#/definitions/swid",
+          "title": "SWID Tag",
+          "description": "Specifies metadata and content for [ISO-IEC 19770-2 Software Identification (SWID) Tags](https://www.iso.org/standard/65666.html)."
+        },
+        "modified": {
+          "type": "boolean",
+          "title": "Component Modified From Original",
+          "description": "[Deprecated] - DO NOT USE. This will be removed in a future version. Use the pedigree element instead to supply information on exactly how the component was modified. A boolean value indicating if the component has been modified from the original. A value of true indicates the component is a derivative of the original. A value of false indicates the component has not been modified from the original."
+        },
+        "pedigree": {
+          "type": "object",
+          "title": "Component Pedigree",
+          "description": "Component pedigree is a way to document complex supply chain scenarios where components are created, distributed, modified, redistributed, combined with other components, etc. Pedigree supports viewing this complex chain from the beginning, the end, or anywhere in the middle. It also provides a way to document variants where the exact relation may not be known.",
+          "additionalProperties": false,
+          "properties": {
+            "ancestors": {
+              "type": "array",
+              "title": "Ancestors",
+              "description": "Describes zero or more components in which a component is derived from. This is commonly used to describe forks from existing projects where the forked version contains a ancestor node containing the original component it was forked from. For example, Component A is the original component. Component B is the component being used and documented in the BOM. However, Component B contains a pedigree node with a single ancestor documenting Component A - the original component from which Component B is derived from.",
+              "items": {
+                "$ref": "#/definitions/component"
+              }
+            },
+            "descendants": {
+              "type": "array",
+              "title": "Descendants",
+              "description": "Descendants are the exact opposite of ancestors. This provides a way to document all forks (and their forks) of an original or root component.",
+              "items": {
+                "$ref": "#/definitions/component"
+              }
+            },
+            "variants": {
+              "type": "array",
+              "title": "Variants",
+              "description": "Variants describe relations where the relationship between the components are not known. For example, if Component A contains nearly identical code to Component B. They are both related, but it is unclear if one is derived from the other, or if they share a common ancestor.",
+              "items": {
+                "$ref": "#/definitions/component"
+              }
+            },
+            "commits": {
+              "type": "array",
+              "title": "Commits",
+              "description": "A list of zero or more commits which provide a trail describing how the component deviates from an ancestor, descendant, or variant.",
+              "items": {
+                "$ref": "#/definitions/commit"
+              }
+            },
+            "patches": {
+              "type": "array",
+              "title": "Patches",
+              "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complimentary to commits or may be used in place of commits.",
+              "items": {
+                "$ref": "#/definitions/patch"
+              }
+            },
+            "notes": {
+              "type": "string",
+              "title": "Notes",
+              "description": "Notes, observations, and other non-structured commentary describing the components pedigree."
+            }
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/externalReference"
+          },
+          "title": "External References",
+          "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/component"
+          },
+          "uniqueItems": true,
+          "title": "Components",
+          "description": "A list of software and hardware components included in the parent component. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+        },
+        "evidence": {
+          "$ref": "#/definitions/componentEvidence",
+          "title": "Evidence",
+          "description": "Provides the ability to document evidence collected through various forms of extraction or analysis."
+        },
+        "releaseNotes": {
+          "$ref": "#/definitions/releaseNotes",
+          "title": "Release notes",
+          "description": "Specifies optional release notes."
+        },
+        "modelCard": {
+          "$ref": "#/definitions/modelCard",
+          "title": "Machine Learning Model Card"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/componentData"
+          },
+          "title": "Data",
+          "description": "This object SHOULD be specified for any component of type `data` and MUST NOT be specified for other component types."
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+          "items": {
+            "$ref": "#/definitions/property"
+          }
+        },
+        "signature": {
+          "$ref": "#/definitions/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        }
+      }
     }
-  },
-  "if": {
-    "required": [
-      "components"
-    ]
-  },
-  "then": {
-    "required": [
-      "bomFormat",
-      "specVersion",
-      "version",
-      "metadata",
-      "compositions",
-      "dependencies"
-    ]
-  },
-  "else": {
-    "required": [
-      "bomFormat",
-      "specVersion",
-      "version",
-      "metadata",
-      "compositions"
-    ]
   }
 }

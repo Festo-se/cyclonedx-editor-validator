@@ -1427,58 +1427,32 @@
       }
     },
     "licenseChoice": {
-      "title": "License Choice",
-      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
-      "type": "array",
+      "type": "object",
+      "title": "License(s)",
+      "additionalProperties": false,
+      "properties": {
+        "license": {
+          "$ref": "#/definitions/license"
+        },
+        "expression": {
+          "type": "string",
+          "minLength": 1,
+          "title": "SPDX License Expression",
+          "examples": [
+            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+            "GPL-3.0-only WITH Classpath-exception-2.0"
+          ]
+        }
+      },
       "oneOf": [
         {
-          "title": "Multiple licenses",
-          "description": "A list of SPDX licenses and/or named licenses.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "license"
-            ],
-            "additionalProperties": false,
-            "properties": {
-              "license": {
-                "$ref": "#/definitions/license"
-              }
-            }
-          }
+          "required": [
+            "license"
+          ]
         },
         {
-          "title": "SPDX License Expression",
-          "description": "A tuple of exactly one SPDX License Expression.",
-          "type": "array",
-          "additionalItems": false,
-          "minItems": 1,
-          "maxItems": 1,
-          "items": [
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "expression"
-              ],
-              "properties": {
-                "expression": {
-                  "type": "string",
-                  "title": "SPDX License Expression",
-                  "minLength": 1,
-                  "examples": [
-                    "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-                    "GPL-3.0-only WITH Classpath-exception-2.0"
-                  ]
-                },
-                "bom-ref": {
-                  "$ref": "#/definitions/refType",
-                  "title": "BOM Reference",
-                  "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
-                }
-              }
-            }
+          "required": [
+            "expression"
           ]
         }
       ]

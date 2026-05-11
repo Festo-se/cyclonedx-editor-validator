@@ -785,12 +785,15 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
-          "title": "Component License(s)",
-          "minItems": 1
+          "allOf": [
+            {
+              "$ref": "#/definitions/licenseChoice"
+            },
+            {
+              "minItems": 1
+            }
+          ],
+          "title": "Component License(s)"
         },
         "properties": {
           "type": "array",
@@ -1100,13 +1103,15 @@
           }
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
-          "title": "Component License(s)",
-          "minItems": 1
+          "allOf": [
+            {
+              "$ref": "#/definitions/licenseChoice"
+            },
+            {
+              "minItems": 1
+            }
+          ],
+          "title": "Component License(s)"
         },
         "copyright": {
           "type": "string",
@@ -1993,44 +1998,48 @@
       }
     },
     "licenseChoice": {
-      "type": "object",
-      "title": "License(s)",
-      "additionalProperties": false,
-      "properties": {
-        "license": {
-          "$ref": "#/definitions/license"
-        },
-        "expression": {
-          "type": "string",
-          "minLength": 1,
-          "title": "SPDX License Expression",
-          "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements",
-          "examples": [
-            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-            "GPL-3.0-only WITH Classpath-exception-2.0"
-          ]
-        },
-        "acknowledgement": {
-          "$ref": "#/definitions/licenseAcknowledgementEnumeration"
-        },
-        "bom-ref": {
-          "$ref": "#/definitions/refType",
-          "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+      "title": "License Choice",
+      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "required": [
+              "license"
+            ]
+          },
+          {
+            "required": [
+              "expression"
+            ]
+          }
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "license": {
+            "$ref": "#/definitions/license"
+          },
+          "expression": {
+            "type": "string",
+            "title": "SPDX License Expression",
+            "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements",
+            "minLength": 1,
+            "examples": [
+              "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+              "GPL-3.0-only WITH Classpath-exception-2.0"
+            ]
+          },
+          "acknowledgement": {
+            "$ref": "#/definitions/licenseAcknowledgementEnumeration"
+          },
+          "bom-ref": {
+            "$ref": "#/definitions/refType",
+            "title": "BOM Reference",
+            "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          }
         }
-      },
-      "oneOf": [
-        {
-          "required": [
-            "license"
-          ]
-        },
-        {
-          "required": [
-            "expression"
-          ]
-        }
-      ]
+      }
     },
     "commit": {
       "type": "object",

@@ -330,13 +330,15 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
-          "title": "Component License(s)",
-          "minItems": 1
+          "allOf": [
+            {
+              "$ref": "#/definitions/licenseChoice"
+            },
+            {
+              "minItems": 1
+            }
+          ],
+          "title": "Component License(s)"
         },
         "properties": {
           "type": "array",
@@ -610,12 +612,14 @@
           }
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
-          "minItems": 1,
+          "allOf": [
+            {
+              "$ref": "#/definitions/licenseChoice"
+            },
+            {
+              "minItems": 1
+            }
+          ],
           "title": "Component License(s)"
         },
         "copyright": {
@@ -1427,35 +1431,44 @@
       }
     },
     "licenseChoice": {
-      "type": "object",
-      "title": "License(s)",
-      "additionalProperties": false,
-      "properties": {
-        "license": {
-          "$ref": "#/definitions/license"
-        },
-        "expression": {
-          "type": "string",
-          "minLength": 1,
-          "title": "SPDX License Expression",
-          "examples": [
-            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-            "GPL-3.0-only WITH Classpath-exception-2.0"
-          ]
+      "title": "License Choice",
+      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "required": [
+              "license"
+            ]
+          },
+          {
+            "required": [
+              "expression"
+            ]
+          }
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "license": {
+            "$ref": "#/definitions/license"
+          },
+          "expression": {
+            "type": "string",
+            "title": "SPDX License Expression",
+            "minLength": 1,
+            "examples": [
+              "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+              "GPL-3.0-only WITH Classpath-exception-2.0"
+            ]
+          },
+          "bom-ref": {
+            "$ref": "#/definitions/refType",
+            "title": "BOM Reference",
+            "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+          }
         }
-      },
-      "oneOf": [
-        {
-          "required": [
-            "license"
-          ]
-        },
-        {
-          "required": [
-            "expression"
-          ]
-        }
-      ]
+      }
     },
     "commit": {
       "type": "object",

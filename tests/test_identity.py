@@ -230,9 +230,6 @@ class IdentityTestCase(unittest.TestCase):
         self.assertNotEqual(id_base, id_coords)
 
     def test_hash_contract(self) -> None:
-        # Objects that compare equal must have the same hash value (Python's hash contract).
-        # This is non-trivial here because two equal ComponentIdentities may have different
-        # key sets (e.g. one with only PURL, another with PURL+CPE).
         purl_only = ComponentIdentity(Key.from_purl(self.sample_purl))
         purl_and_cpe = ComponentIdentity(
             Key.from_purl(self.sample_purl), Key.from_cpe(self.sample_cpe)

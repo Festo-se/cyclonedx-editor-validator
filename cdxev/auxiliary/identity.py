@@ -156,6 +156,14 @@ class ComponentIdentity:
 
         return False
 
+    def __hash__(self) -> int:
+        # The equality check is hierarchical and non-transitive: two objects may compare equal
+        # via different key types (e.g. A==B via PURL, B==C via CPE), so there is no
+        # key-derived hash that satisfies the contract "equal objects have equal hashes."
+        # A constant hash is the only correct choice; dict/set operations remain correct
+        # but degrade to O(n) due to collisions, which is acceptable for SBOM component counts.
+        return 0
+
     def __str__(self) -> str:
         return str(self._keys[0]) if len(self) > 0 else ""
 

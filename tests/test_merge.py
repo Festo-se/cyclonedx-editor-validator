@@ -600,6 +600,15 @@ class TestMergeVulnerabilities(unittest.TestCase):
 
 
 class TestMergeSimilarComponents(unittest.TestCase):
+    """
+    Tests for the hierarchical component identity comparison used during merge.
+
+    Keys are prioritized in this order: PURL > SWID > CPE > name/group/version.
+    Comparison iterates through key types in that order and stops at the first
+    type that is present on BOTH components. The components are considered
+    identical when those two keys match, and different when they do not.
+    """
+
     def setUp(self):
         self.component = {
             "type": "library",
@@ -643,13 +652,6 @@ class TestMergeSimilarComponents(unittest.TestCase):
             "dependencies": [],
         }
 
-    # TODO: Throughout this test case the expectations might need to be adjusted.
-    # Tests currently assume the following algorithm:
-    # - Keys are prioritized in this order: PURL > SWID > CPE > name/group/version
-    # - Comparison goes through keys in above order and stops as soon as both components
-    #   have a key of the same type. The components are considered identical, when those
-    #   two keys match.
-
     def test_identical_components_are_dropped(self) -> None:
         result = merge.merge([self.sbom1, self.sbom2])
         self.assertEqual(len(result["components"]), 2)
@@ -691,6 +693,85 @@ class TestMergeSimilarComponents(unittest.TestCase):
                     del self.sbom2["components"][0][identifier]
                 result = merge.merge([self.sbom1, self.sbom2])
                 self.assertEqual(len(result["components"]), 2)
+
+    # --- SWID-level priority (no PURL on either side) ---
+
+    def test_swid_decisive_when_purl_absent_from_both_same_swid(self) -> None:
+        # Without PURL on either component, SWID becomes the deciding key.
+        # Same SWID → components are identical and the duplicate is dropped.
+        del self.sbom1["components"][0]["purl"]
+        del self.component["purl"]
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 2)
+
+    def test_swid_decisive_when_purl_absent_from_both_different_swid(self) -> None:
+        # Without PURL on either component, SWID is decisive.
+        # Different SWID → components are different, even when CPE and coordinates match.
+        del self.sbom1["components"][0]["purl"]
+        del self.component["purl"]
+        self.component["swid"] = {"tagId": "OTHER_tag", "name": "Library A", "version": "1.0.0"}
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 3)
+
+    def test_swid_beats_cpe_same_swid_different_cpe(self) -> None:
+        # SWID has higher priority than CPE.
+        # When neither component has PURL but both share the same SWID,
+        # a different CPE is irrelevant – the components are considered identical.
+        del self.sbom1["components"][0]["purl"]
+        del self.component["purl"]
+        self.component["cpe"] = "cpe:2.3:a:example:OTHER:1.0.0:*:*:*:*:*:*:*"
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 2)
+
+    # --- CPE-level priority (no PURL or SWID on either side) ---
+
+    def test_cpe_decisive_when_purl_and_swid_absent_from_both_same_cpe(self) -> None:
+        # Without PURL or SWID on either component, CPE becomes the deciding key.
+        # Same CPE → components are identical.
+        del self.sbom1["components"][0]["purl"]
+        del self.sbom1["components"][0]["swid"]
+        del self.component["purl"]
+        del self.component["swid"]
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 2)
+
+    def test_cpe_decisive_when_purl_and_swid_absent_from_both_different_cpe(self) -> None:
+        # Without PURL or SWID on either component, CPE is decisive.
+        # Different CPE → components are different, even when name and version match.
+        del self.sbom1["components"][0]["purl"]
+        del self.sbom1["components"][0]["swid"]
+        del self.component["purl"]
+        del self.component["swid"]
+        self.component["cpe"] = "cpe:2.3:a:example:OTHER:1.0.0:*:*:*:*:*:*:*"
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 3)
+
+    # --- Coordinates-level priority (no safe keys on either side) ---
+
+    def test_coordinates_decisive_when_no_safe_keys_shared_same_coords(self) -> None:
+        # When no safe key (PURL, SWID, CPE) is present on both components,
+        # name/group/version (coordinates) are the final fallback.
+        # Same coordinates → components are identical.
+        del self.sbom1["components"][0]["purl"]
+        del self.sbom1["components"][0]["swid"]
+        del self.sbom1["components"][0]["cpe"]
+        del self.component["purl"]
+        del self.component["swid"]
+        del self.component["cpe"]
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 2)
+
+    def test_coordinates_decisive_when_no_safe_keys_shared_different_coords(self) -> None:
+        # When no safe key is present, different coordinates → different components.
+        del self.sbom1["components"][0]["purl"]
+        del self.sbom1["components"][0]["swid"]
+        del self.sbom1["components"][0]["cpe"]
+        del self.component["purl"]
+        del self.component["swid"]
+        del self.component["cpe"]
+        self.component["version"] = "2.0.0"
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(len(result["components"]), 3)
 
 
 if __name__ == "__main__":

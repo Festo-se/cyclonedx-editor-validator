@@ -229,6 +229,28 @@ class IdentityTestCase(unittest.TestCase):
         self.assertNotEqual(id_base, id_swid)
         self.assertNotEqual(id_base, id_coords)
 
+    def test_hash_contract(self) -> None:
+        # Objects that compare equal must have the same hash value (Python's hash contract).
+        # This is non-trivial here because two equal ComponentIdentities may have different
+        # key sets (e.g. one with only PURL, another with PURL+CPE).
+        purl_only = ComponentIdentity(Key.from_purl(self.sample_purl))
+        purl_and_cpe = ComponentIdentity(
+            Key.from_purl(self.sample_purl), Key.from_cpe(self.sample_cpe)
+        )
+        self.assertEqual(purl_only, purl_and_cpe)
+        self.assertEqual(hash(purl_only), hash(purl_and_cpe))
+
+    def test_usable_as_dict_key_with_different_key_sets(self) -> None:
+        # Verifies that dict lookup works correctly when a stored key and the lookup key
+        # compare equal via __eq__ but have different underlying key sets.
+        # (This was a latent bug when the frozen-dataclass-generated __hash__ was used.)
+        id_full = ComponentIdentity(Key.from_purl(self.sample_purl), Key.from_cpe(self.sample_cpe))
+        id_partial = ComponentIdentity(Key.from_purl(self.sample_purl))
+
+        d = {id_full: "component"}
+        self.assertIn(id_partial, d)
+        self.assertEqual(d[id_partial], "component")
+
     def test_key_in_id(self) -> None:
         component = {
             "type": "library",

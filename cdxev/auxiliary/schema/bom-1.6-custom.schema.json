@@ -46,13 +46,13 @@
       "title": "CycloneDX Specification Version",
       "description": "The version of the CycloneDX specification the BOM conforms to.",
       "examples": [
-        "1.6"
+        "1.6.1"
       ]
     },
     "serialNumber": {
       "type": "string",
       "title": "BOM Serial Number",
-      "description": "Every BOM generated SHOULD have a unique serial number, even if the contents of the BOM have not changed over time. If specified, the serial number must conform to RFC-4122. Use of serial numbers is recommended.",
+      "description": "Every BOM generated SHOULD have a unique serial number, even if the contents of the BOM have not changed over time. If specified, the serial number must conform to [RFC 4122](https://www.ietf.org/rfc/rfc4122.html). Use of serial numbers is recommended.",
       "examples": [
         "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
       ],
@@ -785,8 +785,9 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "$ref": "#/definitions/licenseChoice",
-          "title": "Component License(s)"
+          "title": "BOM License(s)",
+          "description": "The license information for the BOM document.\nThis may be different from the license(s) of the component(s) that the BOM describes.",
+          "$ref": "#/definitions/licenseChoice"
         },
         "properties": {
           "type": "array",
@@ -1137,7 +1138,7 @@
         },
         "swhid": {
           "type": "array",
-          "title": "SoftWare Heritage Identifier",
+          "title": "Software Heritage Identifier",
           "description": "Asserts the identity of the component using the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: [https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
           "items": {
             "type": "string"

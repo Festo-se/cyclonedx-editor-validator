@@ -330,8 +330,8 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "$ref": "#/definitions/licenseChoice",
-          "title": "Component License(s)"
+          "title": "BOM License(s)",
+          "$ref": "#/definitions/licenseChoice"
         },
         "properties": {
           "type": "array",

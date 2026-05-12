@@ -149,7 +149,7 @@ def validate_sbom(  # noqa: C901
             except AttributeError:
                 error_path = error.json_path + " has the mistake: "
             if error.context is not None and len(error.context) > 0:
-                if error.validator in ("oneOf", "anyOf") and "licenses" in error.json_path:
+                if error.validator == "oneOf" and "licenses" in error.json_path:
                     # When licenseChoice (array oneOf) fails, the actual errors are nested in
                     # the context of the branch that was closest to passing. Walk the context
                     # tree to find the most relevant leaf errors to surface.
@@ -172,13 +172,8 @@ def validate_sbom(  # noqa: C901
                                 seen_messages.add(leaf.message)
                                 all_leaves.append(leaf)
 
-                    if not all_leaves:
-                        all_leaves = collect_leaf_errors(error.context[0])
-
                     for leaf in all_leaves:
-                        if (
-                            "license.id" in leaf.json_path or "license.id" in error.json_path
-                        ) and ("is not one of" in leaf.message):
+                        if "license.id" in leaf.json_path and "is not one of" in leaf.message:
                             errors.append(
                                 error_path
                                 + "used license ID "

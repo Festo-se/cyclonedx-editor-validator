@@ -179,7 +179,8 @@ def validate_sbom(  # noqa: C901
                                 + "used license ID "
                                 + leaf.args[0].split()[0]
                                 + " is not a valid SPDX ID. "
-                                "Please use either the field 'name' or provide a valid ID."
+                                "Please use either the field 'name' and 'text' or "
+                                "provide a valid ID."
                             )
                         elif "non-empty" in leaf.message:
                             errors.append(

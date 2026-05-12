@@ -238,9 +238,6 @@ class IdentityTestCase(unittest.TestCase):
         self.assertEqual(hash(purl_only), hash(purl_and_cpe))
 
     def test_usable_as_dict_key_with_different_key_sets(self) -> None:
-        # Verifies that dict lookup works correctly when a stored key and the lookup key
-        # compare equal via __eq__ but have different underlying key sets.
-        # (This was a latent bug when the frozen-dataclass-generated __hash__ was used.)
         id_full = ComponentIdentity(Key.from_purl(self.sample_purl), Key.from_cpe(self.sample_cpe))
         id_partial = ComponentIdentity(Key.from_purl(self.sample_purl))
 

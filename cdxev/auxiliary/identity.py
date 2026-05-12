@@ -84,7 +84,7 @@ class SWID(dict):
     SWIDs are a complex construct which can contain a lot of information.
 
     This class employs a naive approach to SWID equality. Two SWIDs are considered
-    to refer to the same component iff the required fields tagId and name are identical
+    to refer to the same component if the required fields tagId and name are identical
     and the version field is the same or not present on both objects.
     """
 

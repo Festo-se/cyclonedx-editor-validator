@@ -654,45 +654,67 @@ class TestMergeSimilarComponents(unittest.TestCase):
 
     def test_identical_components_are_dropped(self) -> None:
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 2)
-        self.assertEqual(result["components"][1], self.sbom2["metadata"]["component"])
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.sbom2["metadata"]["component"]],
+        )
 
     def test_comps_with_different_purl_considered_different(self) -> None:
         self.component["purl"] = "pkg:npm/newpurl"
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 3)
-        self.assertEqual(result["components"][1], self.component)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.component, self.sbom2["metadata"]["component"]],
+        )
 
     def test_comps_with_different_swid_considered_identical(self) -> None:
         self.component["swid"] = {"tagId": "newtag", "name": "new name"}
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 2)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.sbom2["metadata"]["component"]],
+        )
 
     def test_comps_with_different_cpe_considered_identical(self) -> None:
         self.component["cpe"] = "cpe:2.3:a:example:newcpe:1.0.0:*:*:*:*:*:*:*"
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 2)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.sbom2["metadata"]["component"]],
+        )
 
     def test_comps_with_different_name_considered_identical(self) -> None:
         self.component["name"] = "new name"
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 2)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.sbom2["metadata"]["component"]],
+        )
 
     def test_comps_with_subset_of_keys_considered_identical(self) -> None:
         # A set of tests where all possible combinations of PURL, SWID, and CPE are deleted
-        # before the merge.
-        # Name/version are always left behind.
+        # from the sbom2 component before the merge. Name/version are always left behind.
+        # Even with a subset of keys, the shared remaining key still identifies the components
+        # as identical so the sbom2 component is dropped.
         original_component = copy.deepcopy(self.component)
         identifiers = ["cpe", "purl", "swid"]
         for test_case in chain.from_iterable(
             combinations(identifiers, r + 1) for r in range(len(identifiers))
         ):
             with self.subTest(missing_keys=test_case):
-                self.sbom2["components"][0] = copy.deepcopy(original_component)
+                # Use fresh deep copies each iteration: merge mutates both input SBOMs
+                # (appends sbom2 metadata to sbom2 components, grows sbom1 components).
+                sbom1 = copy.deepcopy(self.sbom1)
+                partial_component = copy.deepcopy(original_component)
                 for identifier in test_case:
-                    del self.sbom2["components"][0][identifier]
-                result = merge.merge([self.sbom1, self.sbom2])
-                self.assertEqual(len(result["components"]), 2)
+                    del partial_component[identifier]
+                sbom2 = copy.deepcopy(self.sbom2)
+                sbom2["components"] = [partial_component]
+                result = merge.merge([sbom1, sbom2])
+                self.assertEqual(
+                    result["components"],
+                    [sbom1["components"][0], sbom2["metadata"]["component"]],
+                )
 
     # --- SWID-level priority (no PURL on either side) ---
 
@@ -702,7 +724,10 @@ class TestMergeSimilarComponents(unittest.TestCase):
         del self.sbom1["components"][0]["purl"]
         del self.component["purl"]
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 2)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.sbom2["metadata"]["component"]],
+        )
 
     def test_swid_decisive_when_purl_absent_from_both_different_swid(self) -> None:
         # Without PURL on either component, SWID is decisive.
@@ -711,7 +736,10 @@ class TestMergeSimilarComponents(unittest.TestCase):
         del self.component["purl"]
         self.component["swid"] = {"tagId": "OTHER_tag", "name": "Library A", "version": "1.0.0"}
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 3)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.component, self.sbom2["metadata"]["component"]],
+        )
 
     def test_swid_beats_cpe_same_swid_different_cpe(self) -> None:
         # SWID has higher priority than CPE.
@@ -721,7 +749,10 @@ class TestMergeSimilarComponents(unittest.TestCase):
         del self.component["purl"]
         self.component["cpe"] = "cpe:2.3:a:example:OTHER:1.0.0:*:*:*:*:*:*:*"
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 2)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.sbom2["metadata"]["component"]],
+        )
 
     # --- CPE-level priority (no PURL or SWID on either side) ---
 
@@ -733,7 +764,10 @@ class TestMergeSimilarComponents(unittest.TestCase):
         del self.component["purl"]
         del self.component["swid"]
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 2)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.sbom2["metadata"]["component"]],
+        )
 
     def test_cpe_decisive_when_purl_and_swid_absent_from_both_different_cpe(self) -> None:
         # Without PURL or SWID on either component, CPE is decisive.
@@ -744,7 +778,10 @@ class TestMergeSimilarComponents(unittest.TestCase):
         del self.component["swid"]
         self.component["cpe"] = "cpe:2.3:a:example:OTHER:1.0.0:*:*:*:*:*:*:*"
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 3)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.component, self.sbom2["metadata"]["component"]],
+        )
 
     # --- Coordinates-level priority (no safe keys on either side) ---
 
@@ -759,7 +796,10 @@ class TestMergeSimilarComponents(unittest.TestCase):
         del self.component["swid"]
         del self.component["cpe"]
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 2)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.sbom2["metadata"]["component"]],
+        )
 
     def test_coordinates_decisive_when_no_safe_keys_shared_different_coords(self) -> None:
         # When no safe key is present, different coordinates → different components.
@@ -771,7 +811,10 @@ class TestMergeSimilarComponents(unittest.TestCase):
         del self.component["cpe"]
         self.component["version"] = "2.0.0"
         result = merge.merge([self.sbom1, self.sbom2])
-        self.assertEqual(len(result["components"]), 3)
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.component, self.sbom2["metadata"]["component"]],
+        )
 
 
 if __name__ == "__main__":

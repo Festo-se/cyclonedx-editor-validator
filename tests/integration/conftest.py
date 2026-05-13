@@ -60,7 +60,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
             if not errors_file.is_file():
                 continue
 
-            with errors_file.open() as f:
+            with errors_file.open(encoding="utf_8_sig") as f:
                 expected_errors[sbom] = json.load(f)
 
         metafunc.parametrize(

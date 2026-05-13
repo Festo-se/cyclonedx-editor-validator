@@ -356,7 +356,7 @@ class TestListCommand:
     def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
         input_path = data_dir / request.param["input"]
         expected_path = data_dir / request.param["expected"]
-        with open(expected_path, "r") as file:
+        with open(expected_path, "r", encoding="utf_8_sig") as file:
             expected_json = json.load(file)
 
         return self.DataFixture(
@@ -377,7 +377,9 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open("tests/integration/data/list_command/list_licenses.csv", "r") as file:
+        with open(
+            "tests/integration/data/list_command/list_licenses.csv", "r", encoding="utf_8_sig"
+        ) as file:
             file_contents = file.read()
         assert actual == file_contents
 
@@ -394,7 +396,9 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open("tests/integration/data/list_command/list_components.csv", "r") as file:
+        with open(
+            "tests/integration/data/list_command/list_components.csv", "r", encoding="utf_8_sig"
+        ) as file:
             file_contents = file.read()
         assert actual == file_contents
 
@@ -411,7 +415,9 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open("tests/integration/data/list_command/list_licenses.txt", "r") as file:
+        with open(
+            "tests/integration/data/list_command/list_licenses.txt", "r", encoding="utf_8_sig"
+        ) as file:
             file_contents = file.read()
         assert actual == file_contents
 
@@ -428,7 +434,9 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open("tests/integration/data/list_command/list_components.txt", "r") as file:
+        with open(
+            "tests/integration/data/list_command/list_components.txt", "r", encoding="utf_8_sig"
+        ) as file:
             file_contents = file.read()
         assert actual == file_contents
 
@@ -1100,7 +1108,7 @@ class TestValidate:
 
         # Assert that the report file exists and has the expected structure
         assert report_path.is_file()
-        with open(report_path) as f:
+        with open(report_path, encoding="utf_8_sig") as f:
             report = json.load(f)
         assert "issues" in report
         assert len(report["issues"]) == 1
@@ -1122,7 +1130,7 @@ class TestValidate:
 
         # Assert that the report file exists and has the expected structure
         assert report_path.is_file()
-        with open(report_path) as f:
+        with open(report_path, encoding="utf_8_sig") as f:
             report = json.load(f)
         assert len(report) == 1
         assert "check_name" in report[0]
@@ -1276,7 +1284,7 @@ class TestVex:
         expected_vex = load_sbom(expected_path)
         expected_search = load_sbom(expected_search_path)
         expected_trim = load_sbom(expected_trim_path)
-        with expected_list_path.open() as file:
+        with expected_list_path.open(encoding="utf_8_sig") as file:
             expected_list = file.read()
 
         return self.DataFixture(

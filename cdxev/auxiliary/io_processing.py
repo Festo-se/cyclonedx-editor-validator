@@ -44,7 +44,7 @@ def write_sbom(sbom: dict, destination: t.Optional[Path], update_metadata: bool 
         file = sys.stdout
     else:
         destination = create_destination_path(destination, sbom, generate_filename)
-        file = destination.open("w")
+        file = destination.open("w", encoding="utf_8")
 
     json.dump(sbom, file, indent=4)
 
@@ -146,7 +146,7 @@ def write_list(
         file = sys.stdout
     else:
         destination = create_destination_path(destination, sbom, create_list_file_filename)
-        file = destination.open("w")
+        file = destination.open("w", encoding="utf_8")
     file.write(list_file)
 
 

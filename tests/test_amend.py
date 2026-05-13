@@ -26,7 +26,7 @@ class AmendTestCase(unittest.TestCase):
     operation: Operation
 
     def setUp(self) -> None:
-        with open(path_to_folder_with_test_sboms + "test.cdx.json", encoding="utf_8") as file:
+        with open(path_to_folder_with_test_sboms + "test.cdx.json", encoding="utf_8_sig") as file:
             self.sbom_fixture = json.load(file)
 
     def test_no_metadata_component_doesnt_raise(self) -> None:

@@ -56,20 +56,20 @@ path_to_documentation_schema_4 = Path(os.path.abspath(relative_path_to_documenta
 
 
 def get_sbom(pathsbom: str) -> dict:
-    with open(pathsbom, "r") as read_file:
+    with open(pathsbom, "r", encoding="utf_8_sig") as read_file:
         sbom = json.load(read_file)
     return sbom
 
 
 def dumpsbom(sbom: dict, name: str = "watchsbom.json") -> None:
-    with open(name, "w") as write_file:
+    with open(name, "w", encoding="utf_8") as write_file:
         json.dump(sbom, write_file, indent=4)
 
 
 class TestCreateInternalValidator(unittest.TestCase):
     def test_valid_schema(self) -> None:
         validator = b_p_b.create_internal_validator(path_to_example_schema_1)
-        with path_to_example_schema_1.open() as schema_f:
+        with path_to_example_schema_1.open(encoding="utf_8_sig") as schema_f:
             schema_internal = json.load(schema_f)
         self.assertTrue(validator.is_valid(schema_internal))
 

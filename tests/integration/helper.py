@@ -11,14 +11,14 @@ from cdxev.__main__ import main
 
 
 def load_sbom(path: Path) -> dict:
-    with path.open() as f:
+    with path.open(encoding="utf_8_sig") as f:
         sbom = json.load(f)
     delete_non_reproducible(sbom)
     return sbom
 
 
 def load_list(path: Path) -> dict:
-    with path.open() as f:
+    with path.open(encoding="utf_8_sig") as f:
         list = f.read()
     return list
 

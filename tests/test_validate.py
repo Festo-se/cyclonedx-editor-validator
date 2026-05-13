@@ -63,7 +63,7 @@ def validate_test(
 
 
 def get_test_sbom(path_bom: str = path_to_sbom) -> dict:
-    with open(path_bom, "r") as read_file:
+    with open(path_bom, "r", encoding="utf_8_sig") as read_file:
         sbom = json.load(read_file)
     return sbom
 

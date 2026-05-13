@@ -100,7 +100,7 @@ def read_sbom(sbom_file: Path, file_type: Optional[str] = None) -> Tuple[dict, s
 def load_json(path: Path) -> t.Any:
     """Loads a JSON file into a dictionary."""
     try:
-        with path.open(encoding="utf-8-sig") as file:
+        with path.open(encoding="utf_8_sig") as file:
             return json.load(file)
     except json.JSONDecodeError as ex:
         raise InputFileError("Invalid JSON", None, ex.lineno) from ex
@@ -969,7 +969,7 @@ def invoke_set(args: argparse.Namespace) -> int:
 
         updates = []
         try:
-            with open(args.from_file) as from_file:
+            with open(args.from_file, encoding="utf_8_sig") as from_file:
                 updates = json.load(from_file)
         except json.JSONDecodeError as ex:
             raise InputFileError(

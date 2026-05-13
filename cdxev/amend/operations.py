@@ -305,7 +305,7 @@ class LicenseNameToId(Operation):
         license_mapping_file = (
             importlib.resources.files(__spec__.parent) / "license_name_spdx_id_map.json"  # type: ignore[arg-type]  # noqa: E501
         )
-        license_mapping_json = license_mapping_file.read_text(encoding="utf-8-sig")
+        license_mapping_json = license_mapping_file.read_text(encoding="utf_8_sig")
         license_mapping = json.loads(license_mapping_json)
         for mapping in license_mapping:
             for name in mapping["names"]:

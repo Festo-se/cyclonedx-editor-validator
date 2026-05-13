@@ -30,7 +30,7 @@ def open_schema(
                     "Schema not loaded",
                     "Path does not exist or is not a file: " + str(schema_path),
                 )
-            with schema_path.open() as fp:
+            with schema_path.open(encoding="utf_8_sig") as fp:
                 return json.load(fp)  # type:ignore [no-any-return]
     except OSError as e:
         raise AppError("Schema not loaded", str(e)) from e
@@ -54,7 +54,7 @@ def _get_builtin_schema(schema_type: str, spec_version: str) -> dict:
             f"No built-in schema found for CycloneDX version {spec_version} and "
             f"schema type '{schema_type}'.",
         )
-    schema_json = schema_file.read_text()
+    schema_json = schema_file.read_text(encoding="utf_8_sig")
     schema = json.loads(schema_json)
     if isinstance(schema, dict):
         return schema
@@ -67,7 +67,7 @@ def _get_builtin_schema(schema_type: str, spec_version: str) -> dict:
 
 def load_spdx_schema() -> dict:
     path_to_embedded_schema = resources.files("cdxev.auxiliary.schema") / "spdx.schema.json"
-    with path_to_embedded_schema.open() as f:
+    with path_to_embedded_schema.open(encoding="utf_8_sig") as f:
         schema = json.load(f)
         if isinstance(schema, dict):
             return schema

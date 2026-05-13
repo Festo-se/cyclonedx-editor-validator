@@ -10,7 +10,7 @@ path_to_test_folder = "tests/auxiliary/test_vex/"
 
 
 def load_file(file_path: Path) -> dict:
-    with open(path_to_test_folder + file_path, "r", encoding="utf-8-sig") as my_file:
+    with open(path_to_test_folder + file_path, "r", encoding="utf_8_sig") as my_file:
         vex_file = json.load(my_file)
     return vex_file
 
@@ -209,7 +209,7 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         self.assertEqual(len(result["vulnerabilities"]), 1)
 
     def test_vex_extract_command(self):
-        with open(path_to_test_folder + "embedded_vex.json", "r", encoding="utf-8-sig") as my_file:
+        with open(path_to_test_folder + "embedded_vex.json", "r", encoding="utf_8_sig") as my_file:
             embedded_vex = json.load(my_file)
         result = vex.vex("extract", embedded_vex, "", "", "", "")
         self.assertEqual(result["vulnerabilities"], embedded_vex["vulnerabilities"])

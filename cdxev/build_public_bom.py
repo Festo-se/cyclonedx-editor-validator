@@ -282,7 +282,7 @@ def build_public_bom(
 
 
 def create_internal_validator(path_to_schema: Path) -> Draft7Validator:
-    with path_to_schema.open() as schema_f:
+    with path_to_schema.open(encoding="utf_8_sig") as schema_f:
         schema_internal = json.load(schema_f)
     validator_for_being_internal = Draft7Validator(schema_internal, format_checker=FormatChecker())
     validator_for_being_internal.check_schema(schema_internal)

@@ -10,7 +10,7 @@ path_to_sbom = (
 
 
 def get_test_sbom(path_sbom: str = path_to_sbom) -> dict:
-    with open(path_sbom, "r") as read_file:
+    with open(path_sbom, "r", encoding="utf_8_sig") as read_file:
         sbom = json.load(read_file)
     return sbom
 

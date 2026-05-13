@@ -42,7 +42,7 @@ class SetTestCase(unittest.TestCase):
     sample_coordinates = {"name": "mylibrary", "group": "acme", "version": "0.2.4"}
 
     def setUp(self) -> None:
-        with open("tests/auxiliary/test_set_sboms/test.cdx.json", encoding="utf_8") as file:
+        with open("tests/auxiliary/test_set_sboms/test.cdx.json", encoding="utf_8_sig") as file:
             self.sbom_fixture = json.load(file)
 
     def test_add_property(self) -> None:
@@ -557,7 +557,7 @@ class TestVersionRange(unittest.TestCase):
                 "tests/auxiliary/test_set_sboms/Acme_Application_"
                 "9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json"
             ),
-            encoding="utf_8",
+            encoding="utf_8_sig",
         ) as file:
             self.sbom_fixture = json.load(file)
 

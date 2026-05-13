@@ -255,7 +255,7 @@ class OutputToFileTestCase(unittest.TestCase):
         path = pathlib.Path("output.json")
 
         out.write_sbom(sbom, path, False)
-        output = path.read_text()
+        output = path.read_text(encoding="utf_8_sig")
 
         self.assertEqual(expected, output)
 
@@ -266,7 +266,7 @@ class OutputToFileTestCase(unittest.TestCase):
         path = pathlib.Path("doesnotexist") / "output.json"
 
         out.write_sbom(sbom, path, False)
-        output = path.read_text()
+        output = path.read_text(encoding="utf_8_sig")
 
         self.assertEqual(expected, output)
 
@@ -281,5 +281,5 @@ class OutputToFileTestCase(unittest.TestCase):
 
         self.assertTrue(expected_file_path.is_file())
 
-        output = expected_file_path.read_text()
+        output = expected_file_path.read_text(encoding="utf_8_sig")
         self.assertEqual(expected, output)

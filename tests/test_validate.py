@@ -24,8 +24,8 @@ path_to_modified_sbom = (
     "Acme_Application_9.1.1_20220217T101458.cdx.json"
 )
 
-list_of_spec_versions = ["1.3", "1.4", "1.5", "1.6"]
-list_of_spec_versions_containing_licensing = ["1.5", "1.6"]
+list_of_spec_versions = ["1.3", "1.4", "1.5", "1.6", "1.7"]
+list_of_spec_versions_containing_licensing = ["1.5", "1.6", "1.7"]
 
 
 def search_for_word_issues(word: str, issue_list: list) -> bool:

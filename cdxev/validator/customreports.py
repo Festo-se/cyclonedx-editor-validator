@@ -92,7 +92,7 @@ class WarningsNgReporter(logging.Handler):
         s = json.dumps(self.buffer, indent=4)
         try:
             if isinstance(self.target, pathlib.Path):
-                self.target.write_text(s)
+                self.target.write_text(s, encoding="utf_8")
             else:
                 self.target.write(s)
         finally:
@@ -169,7 +169,7 @@ class GitLabCQReporter(logging.Handler):
         s = json.dumps(self.buffer, indent=4)
         try:
             if isinstance(self.target, pathlib.Path):
-                self.target.write_text(s)
+                self.target.write_text(s, encoding="utf_8")
             else:
                 self.target.write(s)
         finally:

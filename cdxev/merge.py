@@ -16,6 +16,8 @@ from cdxev.auxiliary.sbomFunctions import (
     make_bom_refs_unique,
     merge_affects_versions,
     unify_bom_refs,
+    add_merged_metadata_component_to_dependencies,
+    get_bom_ref_from_components
 )
 from cdxev.log import LogMessage
 
@@ -104,7 +106,16 @@ def merge_components(
         component_from_metadata = sbom_to_be_merged.get("metadata", {}).get(
             "component", {}
         )
-        list_of_added_components.append(component_from_metadata)
+        list_of_bom_ref = get_bom_ref_from_components(list_of_merged_components)
+        list_of_bom_ref.append(governing_sbom.get("metadata", {}).get("component", {}).get("bom-ref", ""))
+        if not component_from_metadata.get("bom-ref", 1) in list_of_bom_ref:
+            list_of_merged_components.append(component_from_metadata)
+        elif hierarchical:
+            # The added SBOM's root component already exists in the governing SBOM.
+            # In hierarchical mode, route its sub-components to be nested under it.
+            wrapper = dict(component_from_metadata)
+            wrapper["components"] = list_of_added_components
+            list_of_added_components = [wrapper]
 
     present_component_identities: dict[ComponentIdentity, dict] = {}
     for component in extract_components(governing_sbom.get("components", [])):
@@ -264,7 +275,7 @@ def merge_2_sboms(
     if list_of_merged_components:
         merged_sbom["components"] = list_of_merged_components
 
-    if original_sbom.get("dependencies", []) and sbom_to_be_merged.get(
+    if original_sbom.get("dependencies", []) or sbom_to_be_merged.get(
         "dependencies", []
     ):
         merged_sbom["dependencies"] = merged_dependencies
@@ -274,6 +285,10 @@ def merge_2_sboms(
             merged_sbom.get("compositions", []),
             sbom_to_be_merged.get("compositions", []),
         )
+
+
+    if merged_sbom.get("metadata", {}).get("component", {}) and merged_sbom.get("components", []):
+        add_merged_metadata_component_to_dependencies(merged_sbom, sbom_to_be_merged)
 
     return merged_sbom
 

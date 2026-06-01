@@ -98,7 +98,67 @@ class TestMergeSboms(unittest.TestCase):
         expected = sections["expected"]
 
         actual = merge.merge([sbom_1, sbom_2])
+
         self.assertEqual(actual, expected)
+
+    def test_merge_in_empty_sbom(self) -> None:
+        sections = helper.load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
+            "test_merge_vulnerabilities"
+        ]
+        added_sbom = sections["merge.input_1"]
+        governing_sbom = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.3",
+            "version": 1,
+            "metadata": {
+                "timestamp": "2022-10-17T19:59:12",
+                "authors": [
+                    {
+                        "name": "automated"
+                    }
+                ],
+                "component": {
+                    "type": "library",
+                    "bom-ref": "Main_program",
+                    "supplier": {
+                        "name": "Company Legal"
+                    },
+                    "group": "com.company.governing",
+                    "name": "Main_program",
+                    "version": "T5.0.3.96",
+                    "licenses": [
+                        {
+                            "license": {
+                                "name": "company internal"
+                            }
+                        }
+                    ],
+                    "copyright": "Company Legal 2022, all rights reserved"
+                }
+            },
+            "components": [
+                {
+                    "type": "application",
+                    "bom-ref": "governing_program",
+                    "supplier": {
+                        "name": "Company Legal"
+                    },
+                    "group": "com.company.governing",
+                    "name": "governing_program",
+                    "version": "T5.0.3.96",
+                    "licenses": [
+                        {
+                            "license": {
+                                "name": "company internal"
+                            }
+                        }
+                    ],
+                    "copyright": "Company Legal 2022, all rights reserved"
+                }
+            ]
+        }
+        merged_sbom = merge.merge([governing_sbom, added_sbom], hierarchical=True)
+        self.assertEqual(len(merged_sbom["components"]), 1)
 
 
 class TestMergeSeveralSboms(unittest.TestCase):
@@ -108,7 +168,6 @@ class TestMergeSeveralSboms(unittest.TestCase):
         sub_sub_program = helper.load_additional_sbom_dict()["sub_sub_program"]
         goal_sbom = helper.load_additional_sbom_dict()["merge_government_sub_sub_sub"]
         merged_bom = merge.merge([governing_program, sub_program, sub_sub_program])
-
         self.assertTrue(helper.compare_sboms(merged_bom, goal_sbom))
 
     def test_merge_4_sboms(self) -> None:

@@ -6692,7 +6692,15 @@
           "name": "Second app",
           "version": "1.0.0"
         }
-      ]
+      ],
+      "dependencies": [
+        {
+            "ref": "app",
+            "dependsOn": [
+                "second"
+            ]
+        }
+    ]
     }
   }
 }

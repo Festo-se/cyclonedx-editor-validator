@@ -179,6 +179,22 @@ def get_bom_refs_from_dependencies(dependencies: Sequence[dict]) -> list[str]:
     return list_of_bom_refs
 
 
+def get_bom_refs_from_dependencies_dependson(dependencies: Sequence[dict]) -> list[str]:
+    """
+    Function that gets a list of dependencies and returns a list with their sboms
+
+    Input:
+    dependencies: List with dict of dependencies
+
+    Output:
+    bom_refs: List of Strings, containing the bom-refs of the dependencies
+    """
+    list_of_bom_refs = []
+    for dependency in dependencies:
+        list_of_bom_refs += dependency.get("dependsOn", [])
+    return list_of_bom_refs
+
+
 def extract_components(list_of_components: Sequence[dict]) -> Sequence[dict]:
     extracted_components = []
     for component in list_of_components:
@@ -765,3 +781,38 @@ def merge_affects_versions(
                     original_affect_versions.append(version)
         if not ref_is_in:
             original_affects.append(affect)
+
+def add_merged_metadata_component_to_dependencies(merged_sbom: dict, added_sbom: dict) -> None:
+
+    added_sbom_ref = (
+        added_sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")
+    )
+    merged_sbom_ref = (
+        merged_sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")
+    )
+
+    if merged_sbom_ref not in get_bom_refs_from_dependencies(merged_sbom.get("dependencies", [])):
+
+        product_dependancy = {
+            "ref": merged_sbom_ref,
+            "dependsOn": [added_sbom_ref],
+        }
+        if merged_sbom.get("dependencies", []):
+            merged_sbom["dependencies"].append(product_dependancy)
+        else:
+            merged_sbom["dependencies"] = [product_dependancy]
+
+    else:
+        product_dependancy = get_dependency_by_ref(merged_sbom_ref, merged_sbom.get("dependencies", []))
+        first_level_dependson = product_dependancy.get("dependsOn", [])
+
+        if added_sbom_ref not in get_bom_refs_from_dependencies_dependson(merged_sbom.get("dependencies", [])):
+            first_level_dependson.append(added_sbom_ref)
+
+
+def get_bom_ref_from_components(list_of_components: list[dict]) -> list[str]:
+    list_of_bom_refs = []
+    all_components = extract_components(list_of_components)
+    for component in all_components:
+        list_of_bom_refs.append(component.get("bom-ref", ""))
+    return list_of_bom_refs

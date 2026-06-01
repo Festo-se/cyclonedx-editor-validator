@@ -4,28 +4,16 @@
   "type": "object",
   "title": "CycloneDX Bill of Materials Standard",
   "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
-  "if": {
-    "required": [
-      "components"
-    ]
-  },
-  "then": {
-    "required": [
-      "bomFormat",
-      "specVersion",
-      "version",
-      "metadata",
-      "compositions",
+  "required": [
+    "bomFormat",
+    "specVersion",
+    "version",
+    "metadata",
+    "compositions"
+  ],
+  "dependencies": {
+    "components": [
       "dependencies"
-    ]
-  },
-  "else": {
-    "required": [
-      "bomFormat",
-      "specVersion",
-      "version",
-      "metadata",
-      "compositions"
     ]
   },
   "additionalProperties": false,
@@ -46,13 +34,13 @@
       "title": "CycloneDX Specification Version",
       "description": "The version of the CycloneDX specification the BOM conforms to.",
       "examples": [
-        "1.6"
+        "1.6.1"
       ]
     },
     "serialNumber": {
       "type": "string",
       "title": "BOM Serial Number",
-      "description": "Every BOM generated SHOULD have a unique serial number, even if the contents of the BOM have not changed over time. If specified, the serial number must conform to RFC-4122. Use of serial numbers is recommended.",
+      "description": "Every BOM generated SHOULD have a unique serial number, even if the contents of the BOM have not changed over time. If specified, the serial number must conform to [RFC 4122](https://www.ietf.org/rfc/rfc4122.html). Use of serial numbers is recommended.",
       "examples": [
         "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
       ],
@@ -785,12 +773,9 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
-          "title": "Component License(s)",
-          "minItems": 1
+          "title": "BOM License(s)",
+          "description": "The license information for the BOM document.\nThis may be different from the license(s) of the component(s) that the BOM describes.",
+          "$ref": "#/definitions/licenseChoice"
         },
         "properties": {
           "type": "array",
@@ -1100,13 +1085,8 @@
           }
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
-          "items": {
-            "$ref": "#/definitions/licenseChoice"
-          },
-          "title": "Component License(s)",
-          "minItems": 1
+          "$ref": "#/definitions/licenseChoice",
+          "title": "Component License(s)"
         },
         "copyright": {
           "type": "string",
@@ -1146,7 +1126,7 @@
         },
         "swhid": {
           "type": "array",
-          "title": "SoftWare Heritage Identifier",
+          "title": "Software Heritage Identifier",
           "description": "Asserts the identity of the component using the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: [https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
           "items": {
             "type": "string"
@@ -1993,32 +1973,63 @@
       }
     },
     "licenseChoice": {
-      "type": "object",
-      "title": "License(s)",
-      "additionalProperties": false,
-      "properties": {
-        "license": {
-          "$ref": "#/definitions/license"
-        },
-        "expression": {
-          "type": "string",
-          "minLength": 1,
-          "title": "SPDX License Expression",
-          "examples": [
-            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-            "GPL-3.0-only WITH Classpath-exception-2.0"
-          ]
-        }
-      },
+      "title": "License Choice",
+      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "type": "array",
+      "minItems": 1,
       "oneOf": [
         {
-          "required": [
-            "license"
-          ]
+          "title": "Multiple licenses",
+          "description": "A list of SPDX licenses and/or named licenses.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "title": "License",
+            "required": [
+              "license"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "license": {
+                "$ref": "#/definitions/license"
+              }
+            }
+          }
         },
         {
-          "required": [
-            "expression"
+          "title": "SPDX License Expression",
+          "description": "A tuple of exactly one SPDX License Expression.",
+          "type": "array",
+          "additionalItems": false,
+          "minItems": 1,
+          "maxItems": 1,
+          "items": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "expression"
+              ],
+              "properties": {
+                "expression": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "SPDX License Expression",
+                  "examples": [
+                    "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                    "GPL-3.0-only WITH Classpath-exception-2.0"
+                  ]
+                },
+                "acknowledgement": {
+                  "$ref": "#/definitions/licenseAcknowledgementEnumeration"
+                },
+                "bom-ref": {
+                  "$ref": "#/definitions/refType",
+                  "title": "BOM Reference",
+                  "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                }
+              }
+            }
           ]
         }
       ]
@@ -2469,8 +2480,6 @@
           "description": "Specifies information about the data including the directional flow of data and the data classification."
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
           "$ref": "#/definitions/licenseChoice",
           "title": "Service License(s)"
         },

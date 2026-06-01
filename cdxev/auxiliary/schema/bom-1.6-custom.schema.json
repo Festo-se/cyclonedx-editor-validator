@@ -1363,7 +1363,7 @@
             "if": {
               "properties": {
                 "copyright": {
-                  "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                  "pattern": "^([Cc]opyright\\s+)?(\u00a9\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
                 }
               },
               "required": [
@@ -1382,7 +1382,7 @@
                     {
                       "properties": {
                         "copyright": {
-                          "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                          "pattern": "^([Cc]opyright\\s+)?(\u00a9\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
                         }
                       }
                     }
@@ -1394,7 +1394,7 @@
                   "supplier": {
                     "properties": {
                       "name": {
-                        "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                        "pattern": "^([Cc]opyright\\s+)?(\u00a9\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
                       }
                     }
                   }
@@ -1424,7 +1424,7 @@
                     "supplier": {
                       "properties": {
                         "name": {
-                          "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                          "pattern": "^([Cc]opyright\\s+)?(\u00a9\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
                         }
                       }
                     }
@@ -1481,7 +1481,7 @@
                     {
                       "properties": {
                         "copyright": {
-                          "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                          "pattern": "^([Cc]opyright\\s+)?(\u00a9\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
                         }
                       }
                     }
@@ -1491,7 +1491,7 @@
               "then": {
                 "properties": {
                   "copyright": {
-                    "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                    "pattern": "^([Cc]opyright\\s+)?(\u00a9\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
                   }
                 },
                 "required": [
@@ -1506,7 +1506,7 @@
                 {
                   "properties": {
                     "author": {
-                      "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                      "pattern": "^([Cc]opyright\\s+)?(\u00a9\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
                     }
                   },
                   "required": [
@@ -1548,7 +1548,7 @@
             "then": {
               "properties": {
                 "copyright": {
-                  "pattern": "([Ff][Ee][Ss][Tt][Oo])"
+                  "pattern": "^([Cc]opyright\\s+)?(\u00a9\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
                 }
               },
               "required": [

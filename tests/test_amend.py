@@ -833,7 +833,12 @@ class CleanupSelfReferencesTestCase(AmendTestCase):
             self.sbom_fixture["compositions"],
         )
         self.assertEqual(
-            [{"id": "CVE-2024-1234", "affects": [{"ref": "meta-ref"}, {"ref": "orphan-ref"}, {"ref": 12}]}],
+            [
+                {
+                    "id": "CVE-2024-1234",
+                    "affects": [{"ref": "meta-ref"}, {"ref": "orphan-ref"}, {"ref": 12}],
+                }
+            ],
             self.sbom_fixture["vulnerabilities"],
         )
 

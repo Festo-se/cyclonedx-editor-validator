@@ -533,13 +533,19 @@ class CleanupSelfReferencesTestCase(AmendTestCase):
 
         self.assertEqual(
             [
-                {"ref": "meta-ref", "dependsOn": ["dep-a"]},
+                {"ref": "meta-ref", "dependsOn": ["dep-a", "dangling-ref"]},
                 {"ref": "dep-a", "dependsOn": ["meta-ref"]},
+                {"ref": "dangling-ref", "dependsOn": ["meta-ref"]},
             ],
             self.sbom_fixture["dependencies"],
         )
         self.assertEqual(
-            [{"aggregate": "complete", "assemblies": ["meta-ref"]}],
+            [
+                {
+                    "aggregate": "complete",
+                    "assemblies": ["meta-ref", "dangling-ref"],
+                }
+            ],
             self.sbom_fixture["compositions"],
         )
         self.assertEqual(
@@ -549,6 +555,7 @@ class CleanupSelfReferencesTestCase(AmendTestCase):
                     "versions": [{"version": "1.0.0"}, {"version": "2.0.0"}],
                 },
                 {"ref": "dep-a"},
+                {"ref": "dangling-ref"},
             ],
             self.sbom_fixture["vulnerabilities"][0]["affects"],
         )
@@ -744,7 +751,11 @@ class CleanupSelfReferencesTestCase(AmendTestCase):
         self.operation.prepare(self.sbom_fixture)
 
         self.assertEqual(
-            [{"ref": "meta-ref", "dependsOn": []}],
+            [
+                {"ref": "meta-ref", "dependsOn": "invalid"},
+                {"ref": "meta-ref", "dependsOn": [1]},
+                {"ref": 12, "dependsOn": ["meta-ref"]},
+            ],
             self.sbom_fixture["dependencies"],
         )
         self.assertEqual(
@@ -752,7 +763,7 @@ class CleanupSelfReferencesTestCase(AmendTestCase):
             self.sbom_fixture["compositions"][0]["assemblies"],
         )
         self.assertEqual(
-            ["meta-ref"],
+            ["meta-ref", 3],
             self.sbom_fixture["compositions"][1]["assemblies"],
         )
         self.assertEqual(
@@ -760,9 +771,70 @@ class CleanupSelfReferencesTestCase(AmendTestCase):
                 {
                     "ref": "meta-ref",
                     "versions": [{"version": "1.0.0"}, {"version": "2.0.0"}],
-                }
+                },
+                {"ref": "unknown"},
+                {"ref": 123},
             ],
             self.sbom_fixture["vulnerabilities"][1]["affects"],
+        )
+
+    def test_preserve_orphaned_and_invalid_refs(self):
+        self.sbom_fixture["metadata"]["component"] = {
+            "type": "application",
+            "name": "root-app",
+            "version": "1.0.0",
+            "purl": "pkg:npm/root-app@1.0.0",
+            "bom-ref": "meta-ref",
+        }
+        self.sbom_fixture["components"] = [
+            {
+                "type": "application",
+                "name": "root-app",
+                "version": "1.0.0",
+                "purl": "pkg:npm/root-app@1.0.0",
+                "bom-ref": "legacy-ref",
+            },
+            {
+                "type": "library",
+                "name": "depA",
+                "version": "1.0.0",
+                "bom-ref": "dep-a",
+            },
+        ]
+        self.sbom_fixture["dependencies"] = [
+            {"ref": "legacy-ref", "dependsOn": ["legacy-ref", "dep-a", "orphan-ref"]},
+            {"ref": "dep-a", "dependsOn": ["legacy-ref", "orphan-ref"]},
+            {"ref": "orphan-ref", "dependsOn": ["legacy-ref"]},
+            {"ref": 7, "dependsOn": ["legacy-ref"]},
+        ]
+        self.sbom_fixture["compositions"] = [
+            {"aggregate": "complete", "assemblies": ["legacy-ref", "orphan-ref"]}
+        ]
+        self.sbom_fixture["vulnerabilities"] = [
+            {
+                "id": "CVE-2024-1234",
+                "affects": [{"ref": "legacy-ref"}, {"ref": "orphan-ref"}, {"ref": 12}],
+            }
+        ]
+
+        self.operation.prepare(self.sbom_fixture)
+
+        self.assertEqual(
+            [
+                {"ref": "meta-ref", "dependsOn": ["dep-a", "orphan-ref"]},
+                {"ref": "dep-a", "dependsOn": ["meta-ref", "orphan-ref"]},
+                {"ref": "orphan-ref", "dependsOn": ["meta-ref"]},
+                {"ref": 7, "dependsOn": ["meta-ref"]},
+            ],
+            self.sbom_fixture["dependencies"],
+        )
+        self.assertEqual(
+            [{"aggregate": "complete", "assemblies": ["meta-ref", "orphan-ref"]}],
+            self.sbom_fixture["compositions"],
+        )
+        self.assertEqual(
+            [{"id": "CVE-2024-1234", "affects": [{"ref": "meta-ref"}, {"ref": "orphan-ref"}, {"ref": 12}]}],
+            self.sbom_fixture["vulnerabilities"],
         )
 
 

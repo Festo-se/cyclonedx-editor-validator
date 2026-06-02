@@ -66,7 +66,6 @@ import charset_normalizer
 
 from cdxev.amend.license import foreach_license, license_has_id, license_has_text
 from cdxev.auxiliary.identity import ComponentIdentity
-from cdxev.auxiliary.sbom_functions import walk_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 
@@ -506,11 +505,11 @@ class CleanupSelfReferences(Operation):
             return
 
         for duplicate_ref in duplicate_refs:
-            self._replace_ref_everywhere(sbom, duplicate_ref, metadata_ref)
+            self._replace_ref_in_dependencies(sbom, duplicate_ref, metadata_ref)
+            self._replace_ref_in_compositions(sbom, duplicate_ref, metadata_ref)
+            self._replace_ref_in_vulnerabilities(sbom, duplicate_ref, metadata_ref)
 
-        self._cleanup_dependency_graph(sbom)
-        self._cleanup_compositions(sbom)
-        self._cleanup_vulnerabilities(sbom)
+        self._merge_dependencies_for_ref(sbom, metadata_ref)
 
     def _ensure_bom_ref(self, metadata_component: dict) -> str:
         metadata_ref = metadata_component.get("bom-ref")
@@ -617,125 +616,164 @@ class CleanupSelfReferences(Operation):
             return json.dumps(item, sort_keys=True)
         return str(item)
 
-    def _replace_ref_everywhere(self, sbom: dict, old_ref: str, new_ref: str) -> None:
+    def _replace_ref_in_dependencies(self, sbom: dict, old_ref: str, new_ref: str) -> None:
         if old_ref == new_ref:
             return
 
-        for dependency in sbom.get("dependencies", []):
-            if dependency.get("ref") == old_ref:
-                dependency["ref"] = new_ref
-
-            depends_on = dependency.get("dependsOn")
-            if isinstance(depends_on, list):
-                dependency["dependsOn"] = [
-                    new_ref if ref == old_ref else ref for ref in depends_on
-                ]
-
-        for composition in sbom.get("compositions", []):
-            assemblies = composition.get("assemblies")
-            if isinstance(assemblies, list):
-                composition["assemblies"] = [
-                    new_ref if ref == old_ref else ref for ref in assemblies
-                ]
-
-        for vulnerability in sbom.get("vulnerabilities", []):
-            affects = vulnerability.get("affects")
-            if not isinstance(affects, list):
-                continue
-
-            for affected in affects:
-                if not isinstance(affected, dict):
-                    continue
-                if affected.get("ref") == old_ref:
-                    affected["ref"] = new_ref
-
-    def _valid_component_refs(self, sbom: dict) -> set[str]:
-        refs = set()
-        metadata_ref = sbom.get("metadata", {}).get("component", {}).get("bom-ref")
-        if isinstance(metadata_ref, str) and metadata_ref:
-            refs.add(metadata_ref)
-
-        def collect(component: dict, known_refs: set[str]) -> None:
-            component_ref = component.get("bom-ref")
-            if isinstance(component_ref, str) and component_ref:
-                known_refs.add(component_ref)
-
-        walk_components(sbom, collect, refs, skip_meta=True)
-        return refs
-
-    def _cleanup_dependency_graph(self, sbom: dict) -> None:
         dependencies = sbom.get("dependencies")
         if not isinstance(dependencies, list):
             return
 
-        valid_refs = self._valid_component_refs(sbom)
-        merged: dict[str, list[str]] = {}
-
         for dependency in dependencies:
-            ref = dependency.get("ref")
-            if not isinstance(ref, str) or ref not in valid_refs:
-                continue
+            dependency_ref_was_old = dependency.get("ref") == old_ref
+            did_change = False
+            if dependency.get("ref") == old_ref:
+                dependency["ref"] = new_ref
+                did_change = True
 
-            depends_on = dependency.get("dependsOn", [])
-            if not isinstance(depends_on, list):
-                depends_on = []
+            depends_on = dependency.get("dependsOn")
+            old_ref_in_depends_on = isinstance(depends_on, list) and old_ref in depends_on
+            if isinstance(depends_on, list):
+                replaced = [new_ref if ref == old_ref else ref for ref in depends_on]
+                if replaced != depends_on:
+                    dependency["dependsOn"] = replaced
+                    did_change = True
 
-            merged.setdefault(ref, [])
-            for entry in depends_on:
-                if not isinstance(entry, str):
-                    continue
-                if entry == ref or entry not in valid_refs:
-                    continue
-                if entry not in merged[ref]:
-                    merged[ref].append(entry)
+            if did_change and isinstance(dependency.get("dependsOn"), list):
+                dep_ref = dependency.get("ref")
+                cleaned = []
+                seen_new_ref = False
+                for ref in dependency["dependsOn"]:
+                    if (
+                        dep_ref == new_ref
+                        and ref == new_ref
+                        and (dependency_ref_was_old or old_ref_in_depends_on)
+                    ):
+                        continue
+                    if ref == new_ref:
+                        if seen_new_ref:
+                            continue
+                        seen_new_ref = True
 
-        sbom["dependencies"] = [{"ref": ref, "dependsOn": merged[ref]} for ref in merged]
+                    if ref not in cleaned or ref != new_ref:
+                        cleaned.append(ref)
+                dependency["dependsOn"] = cleaned
 
-    def _cleanup_compositions(self, sbom: dict) -> None:
+    def _replace_ref_in_compositions(self, sbom: dict, old_ref: str, new_ref: str) -> None:
+        if old_ref == new_ref:
+            return
+
         compositions = sbom.get("compositions")
         if not isinstance(compositions, list):
             return
 
-        valid_refs = self._valid_component_refs(sbom)
         for composition in compositions:
             assemblies = composition.get("assemblies")
-            if not isinstance(assemblies, list):
+            if not isinstance(assemblies, list) or old_ref not in assemblies:
                 continue
 
-            cleaned_assemblies: list[str] = []
-            for ref in assemblies:
-                if not isinstance(ref, str) or ref not in valid_refs:
-                    continue
-                if ref not in cleaned_assemblies:
-                    cleaned_assemblies.append(ref)
-            composition["assemblies"] = cleaned_assemblies
+            replaced = [new_ref if ref == old_ref else ref for ref in assemblies]
+            composition["assemblies"] = self._collapse_ref_occurrences(replaced, new_ref)
 
-    def _cleanup_vulnerabilities(self, sbom: dict) -> None:
+    def _replace_ref_in_vulnerabilities(self, sbom: dict, old_ref: str, new_ref: str) -> None:
+        if old_ref == new_ref:
+            return
+
         vulnerabilities = sbom.get("vulnerabilities")
         if not isinstance(vulnerabilities, list):
             return
 
-        valid_refs = self._valid_component_refs(sbom)
         for vulnerability in vulnerabilities:
             affects = vulnerability.get("affects")
             if not isinstance(affects, list):
                 continue
 
-            merged_affects: dict[str, dict] = {}
+            if not any(
+                isinstance(affected, dict) and affected.get("ref") == old_ref
+                for affected in affects
+            ):
+                continue
+
             for affected in affects:
-                ref = affected.get("ref")
-                if not isinstance(ref, str) or ref not in valid_refs:
+                if isinstance(affected, dict) and affected.get("ref") == old_ref:
+                    affected["ref"] = new_ref
+
+            self._merge_affects_for_ref(affects, new_ref)
+
+    def _collapse_ref_occurrences(self, refs: list[t.Any], target_ref: str) -> list[t.Any]:
+        collapsed = []
+        seen_target = False
+        for ref in refs:
+            if ref == target_ref:
+                if seen_target:
                     continue
+                seen_target = True
+            collapsed.append(ref)
+        return collapsed
 
-                if ref not in merged_affects:
-                    merged_affects[ref] = affected
+    def _merge_affects_for_ref(self, affects: list[t.Any], target_ref: str) -> None:
+        matching_indices = [
+            idx
+            for idx, affected in enumerate(affects)
+            if isinstance(affected, dict) and affected.get("ref") == target_ref
+        ]
+        if len(matching_indices) <= 1:
+            return
+
+        primary = affects[matching_indices[0]]
+        if not isinstance(primary, dict):
+            return
+
+        for idx in reversed(matching_indices[1:]):
+            candidate = affects[idx]
+            if isinstance(candidate, dict):
+                primary_versions = primary.get("versions")
+                candidate_versions = candidate.get("versions")
+                if isinstance(primary_versions, list) and isinstance(candidate_versions, list):
+                    self._merge_lists(primary_versions, candidate_versions)
+                elif candidate_versions and not primary_versions:
+                    primary["versions"] = candidate_versions
+            affects.pop(idx)
+
+    def _merge_dependencies_for_ref(self, sbom: dict, ref: str) -> None:
+        dependencies = sbom.get("dependencies")
+        if not isinstance(dependencies, list):
+            return
+
+        matching = [d for d in dependencies if d.get("ref") == ref]
+        if len(matching) <= 1:
+            return
+
+        # Preserve malformed entries verbatim. Only merge when all matching dependency
+        # records have list-based dependsOn values.
+        if any(not isinstance(d.get("dependsOn"), list) for d in matching):
+            return
+
+        merged_depends_on: list[t.Any] = []
+        for dependency in matching:
+            depends_on = dependency.get("dependsOn")
+            if not isinstance(depends_on, list):
+                continue
+            for entry in depends_on:
+                if entry == ref:
                     continue
+                if entry not in merged_depends_on:
+                    merged_depends_on.append(entry)
 
-                existing_versions = merged_affects[ref].get("versions")
-                incoming_versions = affected.get("versions")
-                if isinstance(existing_versions, list) and isinstance(incoming_versions, list):
-                    self._merge_lists(existing_versions, incoming_versions)
-                elif incoming_versions and not existing_versions:
-                    merged_affects[ref]["versions"] = incoming_versions
+        first_index = next(index for index, d in enumerate(dependencies) if d.get("ref") == ref)
+        merged_dependency = dependencies[first_index]
+        merged_dependency["dependsOn"] = merged_depends_on
 
-            vulnerability["affects"] = list(merged_affects.values())
+        filtered: list[dict] = []
+        seen_target = False
+        for dependency in dependencies:
+            if dependency.get("ref") != ref:
+                filtered.append(dependency)
+                continue
+
+            if not seen_target:
+                filtered.append(merged_dependency)
+                seen_target = True
+
+        sbom["dependencies"] = filtered
+

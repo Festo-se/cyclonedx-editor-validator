@@ -1,19 +1,31 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "./bom-1.6-custom.schema.json",
+  "$id": "./bom-1.7-custom.schema.json",
   "type": "object",
   "title": "CycloneDX Bill of Materials Standard",
   "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
-  "required": [
-    "bomFormat",
-    "specVersion",
-    "version",
-    "metadata",
-    "compositions"
-  ],
-  "dependencies": {
-    "components": [
+  "if": {
+    "required": [
+      "components"
+    ]
+  },
+  "then": {
+    "required": [
+      "bomFormat",
+      "specVersion",
+      "version",
+      "metadata",
+      "compositions",
       "dependencies"
+    ]
+  },
+  "else": {
+    "required": [
+      "bomFormat",
+      "specVersion",
+      "version",
+      "metadata",
+      "compositions"
     ]
   },
   "additionalProperties": false,
@@ -34,13 +46,13 @@
       "title": "CycloneDX Specification Version",
       "description": "The version of the CycloneDX specification the BOM conforms to.",
       "examples": [
-        "1.6.1"
+        "1.7"
       ]
     },
     "serialNumber": {
       "type": "string",
       "title": "BOM Serial Number",
-      "description": "Every BOM generated SHOULD have a unique serial number, even if the contents of the BOM have not changed over time. If specified, the serial number must conform to [RFC 4122](https://www.ietf.org/rfc/rfc4122.html). Use of serial numbers is recommended.",
+      "description": "Every BOM generated SHOULD have a unique serial number, even if the contents of the BOM have not changed over time. If specified, the serial number must conform to RFC-4122. Use of serial numbers is recommended.",
       "examples": [
         "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
       ],
@@ -1126,7 +1138,7 @@
         },
         "swhid": {
           "type": "array",
-          "title": "Software Heritage Identifier",
+          "title": "SoftWare Heritage Identifier",
           "description": "Asserts the identity of the component using the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: [https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
           "items": {
             "type": "string"
@@ -1974,15 +1986,12 @@
     },
     "licenseChoice": {
       "title": "License Choice",
-      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "description": "A list of SPDX licenses and/or named licenses and/or SPDX License Expression.",
       "type": "array",
       "minItems": 1,
-      "oneOf": [
-        {
-          "title": "Multiple licenses",
-          "description": "A list of SPDX licenses and/or named licenses.",
-          "type": "array",
-          "items": {
+      "items": {
+        "oneOf": [
+          {
             "type": "object",
             "title": "License",
             "required": [
@@ -1994,45 +2003,93 @@
                 "$ref": "#/definitions/license"
               }
             }
-          }
-        },
-        {
-          "title": "SPDX License Expression",
-          "description": "A tuple of exactly one SPDX License Expression.",
-          "type": "array",
-          "additionalItems": false,
-          "minItems": 1,
-          "maxItems": 1,
-          "items": [
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "expression"
-              ],
+          },
+          {
+            "title": "License Expression",
+            "description": "Specifies the details and attributes related to a software license.\nIt must be a valid SPDX license expression, along with additional properties such as license acknowledgment.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "expression"
+            ],
+            "properties": {
+              "expression": {
+                "type": "string",
+                "minLength": 1,
+                "title": "SPDX License Expression",
+                "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements.",
+                "examples": [
+                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                  "GPL-3.0-only WITH Classpath-exception-2.0"
+                ]
+              },
+              "expressionDetails": {
+                "title": "Expression Details",
+                "description": "Details for parts of the `expression`.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "description": "This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.\nThe `license_identifier` property serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.",
+                  "required": [
+                    "licenseIdentifier"
+                  ],
+                  "properties": {
+                    "licenseIdentifier": {
+                      "title": "License Identifier",
+                      "description": "The valid SPDX license identifier. Refer to https://spdx.org/specifications for syntax requirements.\nThis property serves as the primary key, which uniquely identifies each record.",
+                      "type": "string",
+                      "examples": [
+                        "Apache-2.0",
+                        "GPL-3.0-only WITH Classpath-exception-2.0",
+                        "LicenseRef-my-custom-license"
+                      ]
+                    },
+                    "bom-ref": {
+                      "$ref": "#/definitions/refType",
+                      "title": "BOM Reference",
+                      "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                    },
+                    "text": {
+                      "title": "License texts",
+                      "description": "A way to include the textual content of the license.",
+                      "$ref": "#/definitions/attachment"
+                    },
+                    "url": {
+                      "type": "string",
+                      "title": "License URL",
+                      "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness",
+                      "examples": [
+                        "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                      ],
+                      "format": "iri-reference"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "acknowledgement": {
+                "$ref": "#/definitions/licenseAcknowledgementEnumeration"
+              },
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+              },
+              "licensing": {
+                "$ref": "#/definitions/licensing"
+              },
               "properties": {
-                "expression": {
-                  "type": "string",
-                  "minLength": 1,
-                  "title": "SPDX License Expression",
-                  "examples": [
-                    "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-                    "GPL-3.0-only WITH Classpath-exception-2.0"
-                  ]
-                },
-                "acknowledgement": {
-                  "$ref": "#/definitions/licenseAcknowledgementEnumeration"
-                },
-                "bom-ref": {
-                  "$ref": "#/definitions/refType",
-                  "title": "BOM Reference",
-                  "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                "type": "array",
+                "title": "Properties",
+                "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+                "items": {
+                  "$ref": "#/definitions/property"
                 }
               }
             }
-          ]
-        }
-      ]
+          }
+        ]
+      }
     },
     "commit": {
       "type": "object",

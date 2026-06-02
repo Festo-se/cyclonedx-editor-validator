@@ -17,7 +17,12 @@ from referencing.jsonschema import DRAFT202012, Schema
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
-from cdxev.validator.helper import load_spdx_schema, open_schema, validate_filename
+from cdxev.validator.helper import (
+    load_bundled_schema,
+    load_spdx_schema,
+    open_schema,
+    validate_filename,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +81,21 @@ def validate_sbom(  # noqa: C901
         registry: Registry[Schema] = Registry().with_resource(
             uri="spdx.schema.json", resource=schema_spdx
         )
+        for helper_schema_name in ("jsf-0.82.schema.json", "cryptography-defs.schema.json"):
+            try:
+                helper_schema = load_bundled_schema(helper_schema_name)
+                helper_resource = Resource.from_contents(
+                    contents=helper_schema, default_specification=DRAFT202012
+                )
+                registry = registry.with_resource(uri=helper_schema_name, resource=helper_resource)
+            except Exception:
+                # Helper schema absent – skip; validation will still work unless the
+                # BOM itself exercises the missing reference.
+                logger.debug(
+                    "Bundled helper schema '%s' could not be loaded; skipping.",
+                    helper_schema_name,
+                    exc_info=True,
+                )
 
         validator_cls: type[jsonschema.Validator] = jsonschema.validators.validator_for(
             sbom_schema

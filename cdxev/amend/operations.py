@@ -66,6 +66,7 @@ import charset_normalizer
 
 from cdxev.amend.license import foreach_license, license_has_id, license_has_text
 from cdxev.auxiliary.identity import ComponentIdentity
+from cdxev.auxiliary.sbom_functions import walk_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 
@@ -482,3 +483,259 @@ class DeleteAmbiguousLicenses(Operation):
 
     def handle_component(self, component: dict) -> None:
         self._filter_licenses(component)
+
+
+class CleanupSelfReferences(Operation):
+    """
+    Removes accidental duplicate of metadata component from components.
+
+    Legacy merge behavior could create SBOMs where ``metadata.component`` is also present in
+    ``components`` with a different ``bom-ref``. This operation removes those duplicates,
+    preserves additional data by merging it into ``metadata.component`` and rewrites affected
+    references in dependencies, compositions and vulnerability affects.
+    """
+
+    def prepare(self, sbom: dict) -> None:
+        metadata_component = sbom.get("metadata", {}).get("component")
+        if not isinstance(metadata_component, dict) or not metadata_component:
+            return
+
+        metadata_ref = self._ensure_bom_ref(metadata_component)
+        duplicate_refs = self._remove_duplicates_and_merge_data(sbom, metadata_component)
+        if not duplicate_refs:
+            return
+
+        for duplicate_ref in duplicate_refs:
+            self._replace_ref_everywhere(sbom, duplicate_ref, metadata_ref)
+
+        self._cleanup_dependency_graph(sbom)
+        self._cleanup_compositions(sbom)
+        self._cleanup_vulnerabilities(sbom)
+
+    def _ensure_bom_ref(self, metadata_component: dict) -> str:
+        metadata_ref = metadata_component.get("bom-ref")
+        if isinstance(metadata_ref, str) and metadata_ref:
+            return metadata_ref
+
+        identity = ComponentIdentity.create(metadata_component, allow_unsafe=True)
+        metadata_ref = str(identity) if len(identity) > 0 else str(uuid.uuid4())
+        metadata_component["bom-ref"] = metadata_ref
+        return metadata_ref
+
+    def _remove_duplicates_and_merge_data(self, sbom: dict, metadata_component: dict) -> list[str]:
+        duplicate_refs: list[str] = []
+        components = sbom.get("components")
+        if not isinstance(components, list):
+            return duplicate_refs
+
+        self._filter_component_tree(components, metadata_component, duplicate_refs)
+        return duplicate_refs
+
+    def _filter_component_tree(
+        self,
+        components: list[dict],
+        metadata_component: dict,
+        duplicate_refs: list[str],
+    ) -> None:
+        index = 0
+        while index < len(components):
+            component = components[index]
+            if self._is_duplicate_of_metadata(component, metadata_component):
+                component_ref = component.get("bom-ref")
+                if isinstance(component_ref, str) and component_ref:
+                    duplicate_refs.append(component_ref)
+
+                self._merge_component_data(metadata_component, component)
+                components.pop(index)
+                continue
+
+            nested = component.get("components")
+            if isinstance(nested, list):
+                self._filter_component_tree(nested, metadata_component, duplicate_refs)
+            index += 1
+
+    def _normalize_value(self, value: t.Any) -> t.Any:
+        if isinstance(value, str):
+            return value.strip().lower()
+
+        if isinstance(value, dict):
+            return json.dumps(value, sort_keys=True)
+
+        return value
+
+    def _is_duplicate_of_metadata(self, component: dict, metadata_component: dict) -> bool:
+        identity_component = ComponentIdentity.create(component, allow_unsafe=True)
+        identity_metadata = ComponentIdentity.create(metadata_component, allow_unsafe=True)
+        if len(identity_component) == 0 or len(identity_metadata) == 0:
+            return False
+
+        for key in ("purl", "cpe", "swid"):
+            left = component.get(key)
+            right = metadata_component.get(key)
+            if left is not None and right is not None:
+                if self._normalize_value(left) != self._normalize_value(right):
+                    return False
+
+        return identity_component == identity_metadata
+
+    def _merge_component_data(self, target: dict, source: dict) -> None:
+        for key, source_value in source.items():
+            if key == "bom-ref":
+                continue
+
+            if key not in target:
+                target[key] = source_value
+                continue
+
+            target_value = target[key]
+            if isinstance(target_value, dict) and isinstance(source_value, dict):
+                self._merge_component_data(target_value, source_value)
+            elif isinstance(target_value, list) and isinstance(source_value, list):
+                self._merge_lists(target_value, source_value)
+            elif self._is_empty(target_value) and not self._is_empty(source_value):
+                target[key] = source_value
+
+    def _is_empty(self, value: t.Any) -> bool:
+        if value is None:
+            return True
+        if isinstance(value, str):
+            return value == ""
+        if isinstance(value, (list, dict)):
+            return len(value) == 0
+        return False
+
+    def _merge_lists(self, target: list, source: list) -> None:
+        seen = {self._item_key(item) for item in target}
+        for item in source:
+            key = self._item_key(item)
+            if key not in seen:
+                target.append(item)
+                seen.add(key)
+
+    def _item_key(self, item: t.Any) -> str:
+        if isinstance(item, dict):
+            return json.dumps(item, sort_keys=True)
+        return str(item)
+
+    def _replace_ref_everywhere(self, sbom: dict, old_ref: str, new_ref: str) -> None:
+        if old_ref == new_ref:
+            return
+
+        for dependency in sbom.get("dependencies", []):
+            if dependency.get("ref") == old_ref:
+                dependency["ref"] = new_ref
+
+            depends_on = dependency.get("dependsOn")
+            if isinstance(depends_on, list):
+                dependency["dependsOn"] = [
+                    new_ref if ref == old_ref else ref for ref in depends_on
+                ]
+
+        for composition in sbom.get("compositions", []):
+            assemblies = composition.get("assemblies")
+            if isinstance(assemblies, list):
+                composition["assemblies"] = [
+                    new_ref if ref == old_ref else ref for ref in assemblies
+                ]
+
+        for vulnerability in sbom.get("vulnerabilities", []):
+            affects = vulnerability.get("affects")
+            if not isinstance(affects, list):
+                continue
+
+            for affected in affects:
+                if not isinstance(affected, dict):
+                    continue
+                if affected.get("ref") == old_ref:
+                    affected["ref"] = new_ref
+
+    def _valid_component_refs(self, sbom: dict) -> set[str]:
+        refs = set()
+        metadata_ref = sbom.get("metadata", {}).get("component", {}).get("bom-ref")
+        if isinstance(metadata_ref, str) and metadata_ref:
+            refs.add(metadata_ref)
+
+        def collect(component: dict, known_refs: set[str]) -> None:
+            component_ref = component.get("bom-ref")
+            if isinstance(component_ref, str) and component_ref:
+                known_refs.add(component_ref)
+
+        walk_components(sbom, collect, refs, skip_meta=True)
+        return refs
+
+    def _cleanup_dependency_graph(self, sbom: dict) -> None:
+        dependencies = sbom.get("dependencies")
+        if not isinstance(dependencies, list):
+            return
+
+        valid_refs = self._valid_component_refs(sbom)
+        merged: dict[str, list[str]] = {}
+
+        for dependency in dependencies:
+            ref = dependency.get("ref")
+            if not isinstance(ref, str) or ref not in valid_refs:
+                continue
+
+            depends_on = dependency.get("dependsOn", [])
+            if not isinstance(depends_on, list):
+                depends_on = []
+
+            merged.setdefault(ref, [])
+            for entry in depends_on:
+                if not isinstance(entry, str):
+                    continue
+                if entry == ref or entry not in valid_refs:
+                    continue
+                if entry not in merged[ref]:
+                    merged[ref].append(entry)
+
+        sbom["dependencies"] = [{"ref": ref, "dependsOn": merged[ref]} for ref in merged]
+
+    def _cleanup_compositions(self, sbom: dict) -> None:
+        compositions = sbom.get("compositions")
+        if not isinstance(compositions, list):
+            return
+
+        valid_refs = self._valid_component_refs(sbom)
+        for composition in compositions:
+            assemblies = composition.get("assemblies")
+            if not isinstance(assemblies, list):
+                continue
+
+            cleaned_assemblies: list[str] = []
+            for ref in assemblies:
+                if not isinstance(ref, str) or ref not in valid_refs:
+                    continue
+                if ref not in cleaned_assemblies:
+                    cleaned_assemblies.append(ref)
+            composition["assemblies"] = cleaned_assemblies
+
+    def _cleanup_vulnerabilities(self, sbom: dict) -> None:
+        vulnerabilities = sbom.get("vulnerabilities")
+        if not isinstance(vulnerabilities, list):
+            return
+
+        valid_refs = self._valid_component_refs(sbom)
+        for vulnerability in vulnerabilities:
+            affects = vulnerability.get("affects")
+            if not isinstance(affects, list):
+                continue
+
+            merged_affects: dict[str, dict] = {}
+            for affected in affects:
+                ref = affected.get("ref")
+                if not isinstance(ref, str) or ref not in valid_refs:
+                    continue
+
+                if ref not in merged_affects:
+                    merged_affects[ref] = affected
+                    continue
+
+                existing_versions = merged_affects[ref].get("versions")
+                incoming_versions = affected.get("versions")
+                if isinstance(existing_versions, list) and isinstance(incoming_versions, list):
+                    self._merge_lists(existing_versions, incoming_versions)
+                elif incoming_versions and not existing_versions:
+                    merged_affects[ref]["versions"] = incoming_versions
+
+            vulnerability["affects"] = list(merged_affects.values())

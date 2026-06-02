@@ -169,22 +169,66 @@ def validate_sbom(  # noqa: C901
             except AttributeError:
                 error_path = error.json_path + " has the mistake: "
             if error.context is not None and len(error.context) > 0:
-                error_message = ""
-                for i in range(len(error.context)):
-                    error_field = re.search(r"'\w+'|(is too short)", error.context[i].message)
-                    if (error_field is None) or (error_field.group(0) == "is too short"):
-                        validation_field = "'" + error.context[i].json_path.split(".")[-1] + "'"
-                    else:
-                        validation_field = error_field.group(0)
-                    if i < (len(error.context) - 1):
-                        if error_message == "":
-                            error_message += validation_field
+                if error.validator == "oneOf" and "licenses" in error.json_path:
+                    # When licenseChoice (array oneOf) fails, the actual errors are nested in
+                    # the context of the branch that was closest to passing. Walk the context
+                    # tree to find the most relevant leaf errors to surface.
+                    def collect_leaf_errors(
+                        err: jsonschema.exceptions.ValidationError,
+                    ) -> list[jsonschema.exceptions.ValidationError]:
+                        if err.context:
+                            leaves = []
+                            for sub in err.context:
+                                leaves.extend(collect_leaf_errors(sub))
+                            return leaves
+                        return [err]
+
+                    # Collect all leaf errors from all branches (deduplicated by message)
+                    all_leaves: list[jsonschema.exceptions.ValidationError] = []
+                    seen_messages: set[str] = set()
+                    for ctx_error in error.context:
+                        for leaf in collect_leaf_errors(ctx_error):
+                            if leaf.message not in seen_messages:
+                                seen_messages.add(leaf.message)
+                                all_leaves.append(leaf)
+
+                    for leaf in all_leaves:
+                        if "license.id" in leaf.json_path and "is not one of" in leaf.message:
+                            errors.append(
+                                error_path
+                                + "used license ID "
+                                + leaf.args[0].split()[0]
+                                + " is not a valid SPDX ID. "
+                                "Please use either the field 'name' and 'text' or "
+                                "provide a valid ID."
+                            )
+                        elif "non-empty" in leaf.message:
+                            errors.append(
+                                f"{error_path}'{leaf.absolute_path[-1]}' should not be empty"
+                            )
+                        elif leaf.validator == "pattern":
+                            errors.append(error_path + leaf.message.replace("\\", ""))
                         else:
-                            error_message += ", " + validation_field
-                    else:
-                        error_message += " or " + validation_field
-                error_message += " is a required property"
-                errors.append(error_path + error_message)
+                            errors.append(error_path + leaf.message)
+                else:
+                    error_message = ""
+                    for i in range(len(error.context)):
+                        error_field = re.search(r"'\w+'|(is too short)", error.context[i].message)
+                        if (error_field is None) or (error_field.group(0) == "is too short"):
+                            validation_field = (
+                                "'" + error.context[i].json_path.split(".")[-1] + "'"
+                            )
+                        else:
+                            validation_field = error_field.group(0)
+                        if i < (len(error.context) - 1):
+                            if error_message == "":
+                                error_message += validation_field
+                            else:
+                                error_message += ", " + validation_field
+                        else:
+                            error_message += " or " + validation_field
+                    error_message += " is a required property"
+                    errors.append(error_path + error_message)
             else:
                 if ("license.id" in error.json_path) and ("is not one of" in error.message):
                     # if mistake is a wrong SPDX ID omit printing every single option

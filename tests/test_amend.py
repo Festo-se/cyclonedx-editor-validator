@@ -5,6 +5,7 @@ import json
 import typing as t
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from cdxev.amend.command import run as run_amend
 from cdxev.amend.operations import (
@@ -378,6 +379,28 @@ class AddLicenseTextTestCase(AmendTestCase):
         with self.assertRaises(AppError):
             operation.prepare(self.sbom_fixture)
 
+    def test_find_text_returns_none_for_unknown_license(self):
+        self.assertIsNone(self.operation._find_text("does-not-exist"))
+
+    def test_find_text_raises_if_encoding_cannot_be_detected(self):
+        with patch("cdxev.amend.operations.charset_normalizer.from_path") as mocked:
+            mocked.return_value.best.return_value = None
+            with self.assertRaises(ValueError):
+                self.operation._find_text("license_name")
+
+    def test_handle_metadata_adds_license_text(self):
+        metadata = {
+            "component": {
+                "name": "meta",
+                "licenses": [{"license": {"name": "license_name"}}],
+            }
+        }
+        self.operation.handle_metadata(metadata)
+        self.assertEqual(
+            "The text describing a license.",
+            metadata["component"]["licenses"][0]["license"]["text"]["content"],
+        )
+
 
 class DeleteAmbiguousLicensesTestCase(AmendTestCase):
     def setUp(self):
@@ -459,6 +482,27 @@ class DeleteAmbiguousLicensesTestCase(AmendTestCase):
 
         self.operation.handle_component(self.component)
         self.assertDictEqual(self.component, expected)
+
+    def test_dont_delete_name_with_url(self):
+        self.component["licenses"] = [
+            {"license": {"name": "Some license", "url": "https://example.org/license"}},
+        ]
+        expected = copy.deepcopy(self.component)
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_handle_metadata_filters_metadata_component_licenses(self):
+        metadata = {
+            "component": {
+                "licenses": [
+                    {"license": {"name": "Some license"}},
+                    {"license": {"id": "MIT"}},
+                ]
+            }
+        }
+        self.operation.handle_metadata(metadata)
+        self.assertEqual([{"license": {"id": "MIT"}}], metadata["component"]["licenses"])
 
 
 class CleanupSelfReferencesTestCase(AmendTestCase):
@@ -840,6 +884,116 @@ class CleanupSelfReferencesTestCase(AmendTestCase):
                 }
             ],
             self.sbom_fixture["vulnerabilities"],
+        )
+
+    def test_private_helpers_cover_edge_branches(self):
+        op = self.operation
+
+        self.assertEqual("x", op._normalize_value(" X "))
+        self.assertEqual('{"a": 1}', op._normalize_value({"a": 1}))
+        self.assertEqual([1], op._normalize_value([1]))
+
+        self.assertTrue(op._is_empty(None))
+        self.assertTrue(op._is_empty([]))
+        self.assertFalse(op._is_empty(0))
+        self.assertEqual("7", op._item_key(7))
+
+        self.assertFalse(op._is_duplicate_of_metadata({}, {}))
+
+        target = {"nested": {"x": ""}, "arr": [{"k": 1}], "publisher": "", "keep": "yes"}
+        source = {
+            "nested": {"x": "v"},
+            "arr": [{"k": 1}, {"k": 2}],
+            "publisher": "pub",
+            "keep": "no",
+        }
+        op._merge_component_data(target, source)
+        self.assertEqual("v", target["nested"]["x"])
+        self.assertEqual([{"k": 1}, {"k": 2}], target["arr"])
+        self.assertEqual("pub", target["publisher"])
+        self.assertEqual("yes", target["keep"])
+
+    def test_replace_helpers_short_circuit_and_targeted_cleanup(self):
+        op = self.operation
+
+        sbom_dependencies: dict[str, t.Any] = {"dependencies": []}
+        op._replace_ref_in_dependencies(sbom_dependencies, "same", "same")
+        self.assertEqual([], sbom_dependencies["dependencies"])
+
+        sbom_dependencies = {
+            "dependencies": [
+                {"ref": "a", "dependsOn": ["legacy", "legacy", "b"]},
+            ]
+        }
+        op._replace_ref_in_dependencies(sbom_dependencies, "legacy", "meta")
+        self.assertEqual(
+            [{"ref": "a", "dependsOn": ["meta", "b"]}],
+            sbom_dependencies["dependencies"],
+        )
+
+        sbom_dependencies = {"dependencies": {"ref": "x"}}
+        op._replace_ref_in_dependencies(sbom_dependencies, "legacy", "meta")
+        self.assertEqual({"ref": "x"}, sbom_dependencies["dependencies"])
+
+        sbom_compositions: dict[str, t.Any] = {"compositions": []}
+        op._replace_ref_in_compositions(sbom_compositions, "same", "same")
+        self.assertEqual([], sbom_compositions["compositions"])
+
+        sbom_compositions = {"compositions": {"assemblies": ["legacy"]}}
+        op._replace_ref_in_compositions(sbom_compositions, "legacy", "meta")
+        self.assertEqual({"assemblies": ["legacy"]}, sbom_compositions["compositions"])
+
+        sbom_vuln: dict[str, t.Any] = {"vulnerabilities": []}
+        op._replace_ref_in_vulnerabilities(sbom_vuln, "same", "same")
+        self.assertEqual([], sbom_vuln["vulnerabilities"])
+
+        sbom_vuln = {
+            "vulnerabilities": [
+                {"affects": [{"ref": "other"}]},
+                {"affects": "invalid"},
+            ]
+        }
+        op._replace_ref_in_vulnerabilities(sbom_vuln, "legacy", "meta")
+        self.assertEqual(
+            [{"affects": [{"ref": "other"}]}, {"affects": "invalid"}],
+            sbom_vuln["vulnerabilities"],
+        )
+
+    def test_merge_helpers_branch_coverage(self):
+        op = self.operation
+
+        affects: list[t.Any] = [
+            {"ref": "meta"},
+            {"ref": "meta", "versions": [{"version": "1.0.0"}]},
+            {"ref": "other"},
+        ]
+        op._merge_affects_for_ref(affects, "meta")
+        self.assertEqual(
+            [
+                {"ref": "meta", "versions": [{"version": "1.0.0"}]},
+                {"ref": "other"},
+            ],
+            affects,
+        )
+
+        sbom: dict[str, t.Any] = {"dependencies": {"ref": "x"}}
+        op._merge_dependencies_for_ref(sbom, "x")
+        self.assertEqual({"ref": "x"}, sbom["dependencies"])
+
+        sbom = {
+            "dependencies": [
+                {"ref": "meta", "dependsOn": ["meta", "a"]},
+                {"ref": "meta", "dependsOn": ["b"]},
+                {"ref": "other", "dependsOn": ["meta"]},
+            ]
+        }
+        op._merge_dependencies_for_ref(sbom, "meta")
+        self.assertEqual(
+            [
+                {"ref": "meta", "dependsOn": ["a", "b"]},
+                {"ref": "other", "dependsOn": ["meta"]},
+            ],
+            sbom["dependencies"],
         )
 
 

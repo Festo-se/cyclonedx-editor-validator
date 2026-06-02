@@ -6,6 +6,7 @@ import unittest
 
 from cdxev import merge
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
+from cdxev.auxiliary.sbom_functions import add_merged_metadata_component_to_dependencies
 from tests.auxiliary import helper as helper
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
@@ -102,6 +103,119 @@ class TestMergeSboms(unittest.TestCase):
         merged_sbom = merge.merge([sbom1, sbom2])
         sbom_merged.pop("compositions")
         self.assertTrue(helper.compare_sboms(merged_sbom, sbom_merged))
+
+    def test_merge_metadata_component_is_independent_of_components_key(self) -> None:
+        sbom_1 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "metadata": {
+                "component": {
+                    "bom-ref": "app",
+                    "type": "application",
+                    "name": "Acme Application",
+                    "version": "1.0.0",
+                }
+            },
+        }
+
+        sbom_2 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "metadata": {
+                "component": {
+                    "bom-ref": "second",
+                    "type": "application",
+                    "name": "Second app",
+                    "version": "1.0.0",
+                }
+            },
+        }
+
+        expected = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "metadata": {
+                "component": {
+                    "bom-ref": "app",
+                    "type": "application",
+                    "name": "Acme Application",
+                    "version": "1.0.0",
+                }
+            },
+            "components": [
+                {
+                    "bom-ref": "second",
+                    "type": "application",
+                    "name": "Second app",
+                    "version": "1.0.0",
+                }
+            ],
+            "dependencies": [{"ref": "app", "dependsOn": ["second"]}],
+        }
+
+        self.assertEqual(merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)]), expected)
+
+        sbom_2_with_empty_components = copy.deepcopy(sbom_2)
+        sbom_2_with_empty_components["components"] = []
+        self.assertEqual(
+            merge.merge([copy.deepcopy(sbom_1), sbom_2_with_empty_components]),
+            expected,
+        )
+
+    def test_merge_metadata_component_updates_dependencies(self) -> None:
+        sbom_1 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "metadata": {
+                "component": {
+                    "bom-ref": "app",
+                    "type": "application",
+                    "name": "Acme Application",
+                    "version": "1.0.0",
+                }
+            },
+            "dependencies": [{"ref": "app", "dependsOn": ["existing"]}],
+        }
+
+        sbom_2 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "metadata": {
+                "component": {
+                    "bom-ref": "second",
+                    "type": "application",
+                    "name": "Second app",
+                    "version": "1.0.0",
+                }
+            },
+        }
+
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)])
+        self.assertEqual(
+            merged["dependencies"],
+            [{"ref": "app", "dependsOn": ["existing", "second"]}],
+        )
+
+    def test_merge_metadata_component_without_bom_ref_does_not_update_dependencies(self) -> None:
+        merged_sbom = {
+            "metadata": {"component": {"bom-ref": "app"}},
+            "dependencies": [{"ref": "app", "dependsOn": ["existing"]}],
+        }
+        added_sbom_without_bom_ref = {
+            "metadata": {"component": {"name": "Second app", "version": "1.0.0"}}
+        }
+
+        add_merged_metadata_component_to_dependencies(merged_sbom, added_sbom_without_bom_ref)
+
+        self.assertEqual(
+            merged_sbom["dependencies"],
+            [{"ref": "app", "dependsOn": ["existing"]}],
+        )
 
 
 class TestMergeSeveralSboms(unittest.TestCase):

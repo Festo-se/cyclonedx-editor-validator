@@ -705,7 +705,8 @@
       "ref": "governing_program",
       "dependsOn": [
         "sub_program",
-        "gp_first_component-copy"
+        "gp_first_component-copy",
+        "pkg:npm/test-app@1.0.0"
       ]
     },
     {

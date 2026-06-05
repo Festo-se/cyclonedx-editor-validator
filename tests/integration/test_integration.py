@@ -1085,7 +1085,7 @@ class TestValidate:
             for e in expected_errors:
                 assert e in stdout
         else:
-            exit_code, _ = run_main()
+            exit_code, _, _ = run_main()
 
         expected_exit_code = {"valid": Status.OK, "invalid": Status.VALIDATION_ERROR}[
             expected_result

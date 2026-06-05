@@ -17,12 +17,6 @@ def load_sbom(path: Path) -> dict:
     return sbom
 
 
-def load_list(path: Path) -> dict:
-    with path.open(encoding="utf_8_sig") as f:
-        list = f.read()
-    return list
-
-
 def delete_non_reproducible(sbom: dict):
     """
     Deletes any fields from the SBOM that are typically not reproducible between builds.

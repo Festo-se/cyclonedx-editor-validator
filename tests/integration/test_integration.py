@@ -6,7 +6,7 @@ import re
 from collections.abc import Callable
 from itertools import chain
 from pathlib import Path
-from typing import TypedDict
+from typing import TypeAlias, TypedDict
 from uuid import UUID
 
 import pytest
@@ -1253,114 +1253,100 @@ class TestValidate:
 
 
 class TestVex:
-    class DataFixture(TypedDict):
-        input: Path
-        expected_list_default: list
-        expected_list_lightweight: list
-        expected_trim_json: dict
-        expected_search_json: dict
-        expected_extract_json: dict
+    GetOutputAsString: TypeAlias = Callable[[str], str]
+    GetOutputAsDict: TypeAlias = Callable[[str], dict]
 
-    @pytest.fixture(
-        scope="class",
-        params=[
-            {
-                "input": "vex.embedded.json",
-                "expected": "vex.json",
-                "expected_search": "vex.expected_search.json",
-                "expected_trim": "vex.expected_trim.json",
-                "expected_list": "vex.expected_list_default.csv",
-            }
-        ],
-    )
-    def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
-        input_path = data_dir / request.param["input"]
-        expected_path = data_dir / request.param["expected"]
-        expected_search_path = data_dir / request.param["expected_search"]
-        expected_trim_path = data_dir / request.param["expected_trim"]
-        expected_list_path = data_dir / request.param["expected_list"]
-        input_vex_embedded_path = input_path
+    @pytest.fixture(scope="class")
+    def input_path(self, data_dir: Path) -> Path:
+        return data_dir / "vex.embedded.json"
 
-        expected_vex = load_sbom(expected_path)
-        expected_search = load_sbom(expected_search_path)
-        expected_trim = load_sbom(expected_trim_path)
-        with expected_list_path.open(encoding="utf_8_sig") as file:
-            expected_list = file.read()
+    @pytest.fixture(scope="class")
+    def get_expected_output(self, data_dir: Path) -> GetOutputAsString:
+        def _f(name: str) -> str:
+            output_path = data_dir / f"vex.expected_{name}"
+            return output_path.read_text(encoding="utf_8_sig")
 
-        return self.DataFixture(
-            input_vex_embedded_path=input_vex_embedded_path,
-            expected_vex=expected_vex,
-            expected_search=expected_search,
-            expected_list=expected_list,
-            expected_trim=expected_trim,
-        )
+        return _f
+
+    @pytest.fixture(scope="class")
+    def get_expected_output_as_dict(self, data_dir: Path) -> GetOutputAsDict:
+        def _f(name: str) -> dict:
+            output_path = data_dir / f"vex.expected_{name}"
+            with output_path.open(encoding="utf_8_sig") as fp:
+                return json.load(fp)
+
+        return _f
 
     def test_extract_vex_from_sbom_from_embedded_file(
         self,
-        data: DataFixture,
+        input_path: Path,
+        get_expected_output_as_dict: GetOutputAsDict,
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        argv("vex", "extract", str(data["input_vex_embedded_path"]))
-        exit_code, actual, _ = run_main(capsys)
+        argv("vex", "extract", str(input_path))
+        exit_code, actual, _ = run_main(capsys, "json")
 
         # Verify that command completed successfully
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        expected_output = data["expected_vex"]
-        assert json.loads(actual) == expected_output
+        expected_output = get_expected_output_as_dict("extract.json")
+        assert actual == expected_output
 
     def test_search_for_vulnerability(
         self,
-        data: DataFixture,
+        input_path: Path,
+        get_expected_output_as_dict: GetOutputAsDict,
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        argv("vex", "search", str(data["input_vex_embedded_path"]), "CVE-1013-0002")
-        exit_code, actual, _ = run_main(capsys)
+        argv("vex", "search", str(input_path), "CVE-1013-0002")
+        exit_code, actual, _ = run_main(capsys, "json")
 
         # Verify that command completed successfully
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        expected_output = data["expected_search"]
-        assert json.loads(actual) == expected_output
+        expected_output = get_expected_output_as_dict("search.json")
+        assert actual == expected_output
 
     def test_trim_vulnerabilities(
         self,
-        data: DataFixture,
+        input_path: Path,
+        get_expected_output_as_dict: GetOutputAsDict,
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ) -> None:
         argv(
             "vex",
             "trim",
-            str(data["input_vex_embedded_path"]),
+            str(input_path),
             "--key=state",
             "--value=not_affected",
         )
-        exit_code, actual, _ = run_main(capsys)
+        exit_code, actual, _ = run_main(capsys, "json")
 
         # Verify that command completed successfully
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        expected_output = data["expected_trim"]
-        assert json.loads(actual) == expected_output
+        expected_output = get_expected_output_as_dict("trim.json")
+        assert actual == expected_output
 
     def test_list_vulnerability_ids(
         self,
-        data: DataFixture,
+        input_path: Path,
+        get_expected_output: GetOutputAsString,
         argv: Callable[..., None],
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        argv("vex", "list", str(data["input_vex_embedded_path"]))
+        argv("vex", "list", str(input_path))
         exit_code, actual, _ = run_main(capsys)
 
         # Verify that command completed successfully
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        expected_output = data["expected_list"]
+        expected_output = get_expected_output("list_default.csv")
         assert actual == expected_output

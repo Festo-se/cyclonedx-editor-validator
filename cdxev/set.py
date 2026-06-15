@@ -166,10 +166,7 @@ class CoordinatesRegexIdentity:
 
         if self.group_pattern is not None:
             comp_group = component.get("group")
-            if (
-                not isinstance(comp_group, str)
-                or not self.group_pattern.fullmatch(comp_group)
-            ):
+            if not isinstance(comp_group, str) or not self.group_pattern.fullmatch(comp_group):
                 return False
 
         if self.version is not None:
@@ -183,10 +180,7 @@ class CoordinatesRegexIdentity:
             if comp_version is None:
                 return False
             try:
-                if (
-                    self.version_range.version_class(comp_version)
-                    not in self.version_range
-                ):
+                if self.version_range.version_class(comp_version) not in self.version_range:
                     return False
             except univers.versions.InvalidVersion:
                 return False
@@ -194,9 +188,7 @@ class CoordinatesRegexIdentity:
         return True
 
     def __str__(self) -> str:
-        group_str = (
-            f"/{self.group_expression}" if self.group_expression is not None else ""
-        )
+        group_str = f"/{self.group_expression}" if self.group_expression is not None else ""
         if self.version is not None:
             ver_str = f"@{self.version}"
         elif self.version_range is not None:
@@ -420,8 +412,7 @@ def _extract_regex_str(value: t.Any, field: str) -> str:
     if not isinstance(expr, str):
         raise AppError(
             "Invalid set file",
-            f'The update object identifier "{field}" has a regex expression '
-            "that is not a string.",
+            f'The update object identifier "{field}" has a regex expression that is not a string.',
         )
     return expr
 
@@ -461,8 +452,7 @@ def _parse_simple_regex(
     except re.error as exc:
         raise AppError(
             "Invalid set file",
-            f'The update object identifier "{source}" has an invalid '
-            f"regular expression: {exc}",
+            f'The update object identifier "{source}" has an invalid regular expression: {exc}',
         ) from exc
 
 
@@ -509,8 +499,7 @@ def _parse_coordinates_regex(
         else:
             raise AppError(
                 "Invalid set file",
-                'The update object identifier "group" must be a string or '
-                '{"regex": "..."}.',
+                'The update object identifier "group" must be a string or {"regex": "..."}.',
             )
 
     version: t.Optional[str] = None
@@ -612,9 +601,7 @@ _AnyRegexIdentity = t.Union[RegexUpdateIdentity, CoordinatesRegexIdentity]
 def _get_regex_targets(sbom: dict, update_id: _AnyRegexIdentity) -> list[dict]:
     targets: list[dict] = []
 
-    def _collect(
-        component: dict, target_list: list[dict], target_id: _AnyRegexIdentity
-    ) -> None:
+    def _collect(component: dict, target_list: list[dict], target_id: _AnyRegexIdentity) -> None:
         if target_id.matches(component):
             target_list.append(component)
 

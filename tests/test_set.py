@@ -783,9 +783,7 @@ class SetTestCase(unittest.TestCase):
 
         self.assertEqual(self.sbom_fixture["components"][0]["copyright"], "version matched")
         # depB already has a copyright; it must not have been overwritten
-        self.assertEqual(
-            self.sbom_fixture["components"][1]["copyright"], "Some Vendor Inc."
-        )
+        self.assertEqual(self.sbom_fixture["components"][1]["copyright"], "Some Vendor Inc.")
         self.assertNotIn("copyright", self.sbom_fixture["components"][2])
 
     def test_set_regex_name_with_exact_group(self) -> None:
@@ -811,9 +809,7 @@ class SetTestCase(unittest.TestCase):
 
         self.assertEqual(self.sbom_fixture["components"][0]["copyright"], "group matched")
         # depB already has a copyright; it must not have been overwritten
-        self.assertEqual(
-            self.sbom_fixture["components"][1]["copyright"], "Some Vendor Inc."
-        )
+        self.assertEqual(self.sbom_fixture["components"][1]["copyright"], "Some Vendor Inc.")
 
     def test_set_regex_name_with_group_regex(self) -> None:
         # gravity and x-ray both belong to group "physics"
@@ -1000,7 +996,9 @@ class SetTestCase(unittest.TestCase):
         with self.assertRaises(cdxev.error.AppError) as ctx:
             cdxev.set.run(self.sbom_fixture, updates, cfg)
 
-        self.assertIn('"group" must be a string or {"regex": "..."}', ctx.exception.details.description)
+        self.assertIn(
+            '"group" must be a string or {"regex": "..."}', ctx.exception.details.description
+        )
 
     def test_set_regex_name_version_must_be_string(self) -> None:
         updates = [

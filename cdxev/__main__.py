@@ -668,10 +668,7 @@ def create_set_parser(
     identifiers.add_argument(
         "--group-pattern",
         metavar="<regex>",
-        help=(
-            "Regex for target component group. "
-            "Only valid in combination with --name-pattern."
-        ),
+        help=("Regex for target component group. Only valid in combination with --name-pattern."),
     )
     identifiers.add_argument(
         "--cpe-pattern",
@@ -979,11 +976,7 @@ def _set_target_update_id(args: argparse.Namespace) -> dict[str, t.Any]:
         usage_error("--group-pattern requires --name-pattern.", args.parser)
 
     if (args.cpe_pattern or args.purl_pattern) and (
-        args.name
-        or args.group
-        or group_pattern
-        or args.version
-        or args.version_range
+        args.name or args.group or group_pattern or args.version or args.version_range
     ):
         usage_error(
             "--cpe-pattern and --purl-pattern cannot be combined with "
@@ -1000,11 +993,7 @@ def _set_target_update_id(args: argparse.Namespace) -> dict[str, t.Any]:
         ("cpePattern", args.cpe_pattern),
         ("purlPattern", args.purl_pattern),
     ]
-    actual_targets = [
-        (kind, target)
-        for (kind, target) in possible_targets
-        if target is not None
-    ]
+    actual_targets = [(kind, target) for (kind, target) in possible_targets if target is not None]
     if len(actual_targets) > 1:
         usage_error("Cannot specify more than one <target>.", args.parser)
 

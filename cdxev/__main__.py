@@ -666,6 +666,14 @@ def create_set_parser(
         help="Regex for target component name.",
     )
     identifiers.add_argument(
+        "--group-pattern",
+        metavar="<regex>",
+        help=(
+            "Regex for target component group. "
+            "Only valid in combination with --name-pattern."
+        ),
+    )
+    identifiers.add_argument(
         "--cpe-pattern",
         metavar="<regex>",
         help="Regex for target component CPE.",
@@ -912,6 +920,46 @@ def _set_has_target(args: argparse.Namespace) -> bool:
     )
 
 
+def _build_name_pattern_id(
+    args: argparse.Namespace,
+    pattern: str,
+    group_pattern: t.Optional[str],
+) -> dict[str, t.Any]:
+    if args.group and group_pattern:
+        usage_error("--group and --group-pattern cannot be combined.", args.parser)
+
+    update_id: dict[str, t.Any] = {"namePattern": pattern}
+    if args.group is not None:
+        update_id["group"] = args.group
+    if group_pattern is not None:
+        update_id["group"] = {"regex": group_pattern}
+    if args.version is not None:
+        update_id["version"] = args.version
+    if args.version_range is not None:
+        update_id["version-range"] = args.version_range
+    return update_id
+
+
+def _build_key_id(target_key: Key, update_id: dict[str, t.Any]) -> None:
+    if target_key.type is KeyType.CPE:
+        update_id["cpe"] = target_key.key
+    elif target_key.type is KeyType.PURL:
+        update_id["purl"] = target_key.key
+    elif target_key.type is KeyType.SWID:
+        update_id["swid"] = target_key.key
+    elif target_key.type is KeyType.COORDINATES:
+        update_id["name"] = target_key.key.name
+        if target_key.key.group is not None:
+            update_id["group"] = target_key.key.group
+        if target_key.key.version is not None:
+            update_id["version"] = target_key.key.version
+        if (
+            isinstance(target_key.key, cdxev.set.CoordinatesWithVersionRange)
+            and target_key.key.version_range is not None
+        ):
+            update_id["version-range"] = str(target_key.key.version_range)
+
+
 def _set_target_update_id(args: argparse.Namespace) -> dict[str, t.Any]:
     if args.name is not None:
         try:
@@ -926,12 +974,20 @@ def _set_target_update_id(args: argparse.Namespace) -> dict[str, t.Any]:
     else:
         coordinates = None
 
-    if (args.name_pattern or args.cpe_pattern or args.purl_pattern) and (
-        args.name or args.group or args.version or args.version_range
+    group_pattern = args.group_pattern
+    if group_pattern is not None and not args.name_pattern:
+        usage_error("--group-pattern requires --name-pattern.", args.parser)
+
+    if (args.cpe_pattern or args.purl_pattern) and (
+        args.name
+        or args.group
+        or group_pattern
+        or args.version
+        or args.version_range
     ):
         usage_error(
-            "--name-pattern, --cpe-pattern and --purl-pattern cannot be combined with "
-            "--name, --group, --version or --version-range.",
+            "--cpe-pattern and --purl-pattern cannot be combined with "
+            "--name, --group, --group-pattern, --version or --version-range.",
             args.parser,
         )
 
@@ -944,33 +1000,22 @@ def _set_target_update_id(args: argparse.Namespace) -> dict[str, t.Any]:
         ("cpePattern", args.cpe_pattern),
         ("purlPattern", args.purl_pattern),
     ]
-    actual_targets = [(kind, target) for (kind, target) in possible_targets if target is not None]
+    actual_targets = [
+        (kind, target)
+        for (kind, target) in possible_targets
+        if target is not None
+    ]
     if len(actual_targets) > 1:
         usage_error("Cannot specify more than one <target>.", args.parser)
 
     target_kind, target = actual_targets[0]
     update_id: dict[str, t.Any] = {}
-    if target_kind in {"namePattern", "cpePattern", "purlPattern"}:
+    if target_kind == "namePattern":
+        update_id = _build_name_pattern_id(args, target, group_pattern)
+    elif target_kind in {"cpePattern", "purlPattern"}:
         update_id[target_kind] = target
     else:
-        target_key = t.cast(Key, target)
-        if target_key.type is KeyType.CPE:
-            update_id["cpe"] = target_key.key
-        elif target_key.type is KeyType.PURL:
-            update_id["purl"] = target_key.key
-        elif target_key.type is KeyType.SWID:
-            update_id["swid"] = target_key.key
-        elif target_key.type is KeyType.COORDINATES:
-            update_id["name"] = target_key.key.name
-            if target_key.key.group is not None:
-                update_id["group"] = target_key.key.group
-            if target_key.key.version is not None:
-                update_id["version"] = target_key.key.version
-            if (
-                isinstance(target_key.key, cdxev.set.CoordinatesWithVersionRange)
-                and target_key.key.version_range is not None
-            ):
-                update_id["version-range"] = str(target_key.key.version_range)
+        _build_key_id(t.cast(Key, target), update_id)
 
     return update_id
 

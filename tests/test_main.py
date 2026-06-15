@@ -57,6 +57,7 @@ class TestSetCliHelpers(unittest.TestCase):
             version=None,
             version_range=None,
             name_pattern=None,
+            group_pattern=None,
             cpe_pattern=None,
             purl_pattern=None,
             parser=None,
@@ -86,3 +87,64 @@ class TestSetCliHelpers(unittest.TestCase):
                 "version-range": "vers:generic/*",
             },
         )
+
+    def test_set_target_update_id_name_pattern_with_version_range(self) -> None:
+        args = self._base_set_args()
+        args.name_pattern = "web-.*"
+        args.version_range = "vers:generic/*"
+
+        update_id = _set_target_update_id(args)
+
+        self.assertEqual(
+            update_id,
+            {
+                "namePattern": "web-.*",
+                "version-range": "vers:generic/*",
+            },
+        )
+
+    def test_set_target_update_id_name_pattern_with_group_pattern(self) -> None:
+        args = self._base_set_args()
+        args.name_pattern = "web-.*"
+        args.group_pattern = "org\\..*"
+
+        update_id = _set_target_update_id(args)
+
+        self.assertEqual(
+            update_id,
+            {
+                "namePattern": "web-.*",
+                "group": {"regex": "org\\..*"},
+            },
+        )
+
+    def test_set_target_update_id_cpe_pattern(self) -> None:
+        args = self._base_set_args()
+        args.cpe_pattern = "cpe:/a:example:.*"
+
+        update_id = _set_target_update_id(args)
+
+        self.assertEqual(update_id, {"cpePattern": "cpe:/a:example:.*"})
+
+    def test_set_target_update_id_purl_pattern(self) -> None:
+        args = self._base_set_args()
+        args.purl_pattern = "pkg:npm/test-app@.*"
+
+        update_id = _set_target_update_id(args)
+
+        self.assertEqual(update_id, {"purlPattern": "pkg:npm/test-app@.*"})
+
+    def test_set_target_update_id_group_pattern_requires_name_pattern(self) -> None:
+        args = self._base_set_args()
+        args.group_pattern = "org\\..*"
+
+        with self.assertRaises(SystemExit):
+            _set_target_update_id(args)
+
+    def test_set_target_update_id_cpe_pattern_rejects_coordinates_options(self) -> None:
+        args = self._base_set_args()
+        args.cpe_pattern = "cpe:/a:example:.*"
+        args.version_range = "vers:generic/*"
+
+        with self.assertRaises(SystemExit):
+            _set_target_update_id(args)

@@ -118,6 +118,95 @@ class CoordinatesWithVersionRange(Coordinates):
 
 
 @dataclass(frozen=True)
+class CoordinatesRegexIdentity:
+    """
+    Matches components by a regex on *name*, optionally narrowed by
+    *group* (literal string or regex), *version* (exact), or *version-range*.
+    """
+
+    name_expression: str
+    name_pattern: re.Pattern[str]
+    group_expression: t.Optional[str]
+    group_pattern: t.Optional[re.Pattern[str]]
+    version: t.Optional[str]
+    version_range: t.Optional[univers.version_range.VersionRange]
+
+    @classmethod
+    def create(
+        cls,
+        name_expression: str,
+        group_expression: t.Optional[str] = None,
+        group_is_regex: bool = False,
+        version: t.Optional[str] = None,
+        version_range: t.Optional[univers.version_range.VersionRange] = None,
+    ) -> "CoordinatesRegexIdentity":
+        name_pattern = re.compile(f"^(?:{name_expression})$")
+        if group_expression is not None:
+            grp_str = (
+                f"^(?:{group_expression})$"
+                if group_is_regex
+                else f"^{re.escape(group_expression)}$"
+            )
+            group_pat: t.Optional[re.Pattern[str]] = re.compile(grp_str)
+        else:
+            group_pat = None
+        return cls(
+            name_expression=name_expression,
+            name_pattern=name_pattern,
+            group_expression=group_expression,
+            group_pattern=group_pat,
+            version=version,
+            version_range=version_range,
+        )
+
+    def matches(self, component: dict) -> bool:
+        name = component.get("name")
+        if not isinstance(name, str) or not self.name_pattern.fullmatch(name):
+            return False
+
+        if self.group_pattern is not None:
+            comp_group = component.get("group")
+            if (
+                not isinstance(comp_group, str)
+                or not self.group_pattern.fullmatch(comp_group)
+            ):
+                return False
+
+        if self.version is not None:
+            if component.get("version") != self.version:
+                return False
+
+        if self.version_range is not None:
+            if t.TYPE_CHECKING:
+                assert self.version_range.version_class is not None  # nosec
+            comp_version = component.get("version")
+            if comp_version is None:
+                return False
+            try:
+                if (
+                    self.version_range.version_class(comp_version)
+                    not in self.version_range
+                ):
+                    return False
+            except univers.versions.InvalidVersion:
+                return False
+
+        return True
+
+    def __str__(self) -> str:
+        group_str = (
+            f"/{self.group_expression}" if self.group_expression is not None else ""
+        )
+        if self.version is not None:
+            ver_str = f"@{self.version}"
+        elif self.version_range is not None:
+            ver_str = f"@{self.version_range}"
+        else:
+            ver_str = ""
+        return f"name[regex:{self.name_expression}]{group_str}{ver_str}"
+
+
+@dataclass(frozen=True)
 class UpdateIdentity(ComponentIdentity):
     """
     Represents the identity of components the set command shall apply an update to.
@@ -172,7 +261,6 @@ class UpdateIdentity(ComponentIdentity):
 
 _IDENTIFIERS = {"cpe", "purl", "swid", "name", "version", "group"}
 _PROTECTED = _IDENTIFIERS | {"components"}
-_REGEX_IDENTIFIER_TARGETS = {"name", "cpe", "purl"}
 _REGEX_IDENTIFIER_ALIASES = {
     "namePattern": "name",
     "cpePattern": "cpe",
@@ -307,7 +395,6 @@ def _map_out_components(sbom: dict) -> dict[Key, list[dict]]:
 
 
 def _get_protected(update_set: dict) -> t.Union[t.Literal[False], set]:
-    global _PROTECTED
     intersection = _PROTECTED & update_set.keys()
     if intersection:
         return intersection
@@ -315,71 +402,49 @@ def _get_protected(update_set: dict) -> t.Union[t.Literal[False], set]:
         return False
 
 
-def _parse_regex_update_identity(
+def _extract_regex_str(value: t.Any, field: str) -> str:
+    """Validate and extract the expression from a ``{"regex": "..."}`` dict."""
+    if not isinstance(value, dict) or "regex" not in value:
+        raise AppError(
+            "Invalid set file",
+            f'The update object identifier "{field}" must be a string or '
+            'an object with a single "regex" property.',
+        )
+    if len(value) != 1:
+        raise AppError(
+            "Invalid set file",
+            f'The update object identifier "{field}" uses regex and may only '
+            'contain the property "regex".',
+        )
+    expr = value["regex"]
+    if not isinstance(expr, str):
+        raise AppError(
+            "Invalid set file",
+            f'The update object identifier "{field}" has a regex expression '
+            "that is not a string.",
+        )
+    return expr
+
+
+def _parse_simple_regex(
     update_id: t.Mapping[str, t.Any],
 ) -> t.Optional[RegexUpdateIdentity]:
-    if not isinstance(update_id, t.Mapping):
-        return None
-
+    """Parse a single-field cpe or purl regex identifier."""
     matches: list[tuple[str, str, str]] = []
-
-    for alias, target in _REGEX_IDENTIFIER_ALIASES.items():
+    for alias in ("cpePattern", "purlPattern"):
         if alias in update_id:
-            expression = update_id[alias]
-            if not isinstance(expression, str):
+            expr = update_id[alias]
+            if not isinstance(expr, str):
                 raise AppError(
                     "Invalid set file",
                     f'The update object identifier "{alias}" must be a string.',
                 )
-            matches.append((target, expression, alias))
+            matches.append((_REGEX_IDENTIFIER_ALIASES[alias], expr, alias))
 
-    for target in _REGEX_IDENTIFIER_TARGETS:
+    for target in ("cpe", "purl"):
         value = update_id.get(target)
-        if isinstance(value, dict) and "regex" in value:
-            if len(value) != 1:
-                raise AppError(
-                    "Invalid set file",
-                    (
-                        f'The update object identifier "{target}" uses regex and may only '
-                        'contain the property "regex".'
-                    ),
-                )
-
-            expression = value["regex"]
-            if not isinstance(expression, str):
-                raise AppError(
-                    "Invalid set file",
-                    (
-                        f'The update object identifier "{target}" has a regex expression that '
-                        "is not a string."
-                    ),
-                )
-            matches.append((target, expression, target))
-
-    for id_field, value in update_id.items():
-        if id_field in _REGEX_IDENTIFIER_ALIASES:
-            continue
-        if id_field not in _IDENTIFIERS:
-            continue
-        if not isinstance(value, dict):
-            continue
-
-        if id_field in _REGEX_IDENTIFIER_TARGETS:
-            if "regex" in value and len(value) == 1 and isinstance(value["regex"], str):
-                continue
-
-            raise AppError(
-                "Invalid set file",
-                (
-                    f'The update object identifier "{id_field}" must be a string or '
-                    'an object with a single "regex" property.'
-                ),
-            )
-
-        raise AppError(
-            "Invalid set file",
-            f'The update object identifier "{id_field}" does not support regex.',
-        )
+        if isinstance(value, dict):
+            matches.append((target, _extract_regex_str(value, target), target))
 
     if not matches:
         return None
@@ -387,23 +452,168 @@ def _parse_regex_update_identity(
     if len(matches) > 1 or len(update_id) > 1:
         raise AppError(
             "Invalid set file",
-            f"The update object with id {update_id} has more than one id.",
+            f"The update object with id {dict(update_id)} has more than one id.",
         )
 
-    (target, expression, source) = matches[0]
+    target, expression, source = matches[0]
     try:
         return RegexUpdateIdentity.create(target, expression)
     except re.error as exc:
         raise AppError(
             "Invalid set file",
-            (f'The update object identifier "{source}" has an invalid regular expression: {exc}'),
+            f'The update object identifier "{source}" has an invalid '
+            f"regular expression: {exc}",
         ) from exc
 
 
-def _get_regex_targets(sbom: dict, update_id: RegexUpdateIdentity) -> list[dict]:
+def _parse_coordinates_regex(
+    update_id: t.Mapping[str, t.Any],
+) -> t.Optional[CoordinatesRegexIdentity]:
+    """Parse a name-based regex identifier with optional group/version companions."""
+    name_expression: t.Optional[str] = None
+    name_source: t.Optional[str] = None
+
+    if "namePattern" in update_id:
+        expr = update_id["namePattern"]
+        if not isinstance(expr, str):
+            raise AppError(
+                "Invalid set file",
+                'The update object identifier "namePattern" must be a string.',
+            )
+        name_expression = expr
+        name_source = "namePattern"
+    elif isinstance(update_id.get("name"), dict):
+        name_expression = _extract_regex_str(update_id["name"], "name")
+        name_source = "name"
+
+    if name_expression is None:
+        return None
+
+    allowed = {name_source} | {"group", "version", "version-range"}
+    unexpected = set(update_id.keys()) - allowed
+    if unexpected:
+        raise AppError(
+            "Invalid set file",
+            f"The update object with id {dict(update_id)} has more than one id.",
+        )
+
+    group_expression: t.Optional[str] = None
+    group_is_regex = False
+    if "group" in update_id:
+        g = update_id["group"]
+        if isinstance(g, str):
+            group_expression = g
+        elif isinstance(g, dict):
+            group_expression = _extract_regex_str(g, "group")
+            group_is_regex = True
+        else:
+            raise AppError(
+                "Invalid set file",
+                'The update object identifier "group" must be a string or '
+                '{"regex": "..."}.',
+            )
+
+    version: t.Optional[str] = None
+    if "version" in update_id:
+        v = update_id["version"]
+        if not isinstance(v, str):
+            raise AppError(
+                "Invalid set file",
+                'The update object identifier "version" must be a string.',
+            )
+        version = v
+
+    version_range_obj: t.Optional[univers.version_range.VersionRange] = None
+    if "version-range" in update_id:
+        vr = update_id["version-range"]
+        if not isinstance(vr, str):
+            raise AppError(
+                "Invalid set file",
+                'The update object identifier "version-range" must be a string.',
+            )
+        try:
+            version_range_obj = univers.version_range.VersionRange.from_string(vr)
+        except (ValueError, univers.versions.InvalidVersion) as exc:
+            raise AppError(
+                "Invalid set file",
+                f"An update object has an invalid version-range: {exc}",
+            ) from exc
+
+    try:
+        return CoordinatesRegexIdentity.create(
+            name_expression=name_expression,
+            group_expression=group_expression,
+            group_is_regex=group_is_regex,
+            version=version,
+            version_range=version_range_obj,
+        )
+    except re.error as exc:
+        raise AppError(
+            "Invalid set file",
+            f'The update object identifier "{name_source}" has an invalid '
+            f"regular expression: {exc}",
+        ) from exc
+
+
+def _reject_unsupported_id_dicts(update_id: t.Mapping[str, t.Any]) -> None:
+    """Raise AppError if any identifier field carries an unsupported dict value."""
+    for id_field, value in update_id.items():
+        if id_field in _REGEX_IDENTIFIER_ALIASES:
+            continue
+        if id_field not in _IDENTIFIERS:
+            continue
+        if not isinstance(value, dict):
+            continue
+        if "regex" not in value:
+            continue
+
+        if id_field == "group":
+            raise AppError(
+                "Invalid set file",
+                'The update object identifier "group" supports regex only '
+                "in combination with a name regex identifier.",
+            )
+
+        raise AppError(
+            "Invalid set file",
+            f'The update object identifier "{id_field}" does not support regex.',
+        )
+
+
+def _parse_regex_update_identity(
+    update_id: t.Mapping[str, t.Any],
+) -> t.Optional[t.Union[RegexUpdateIdentity, CoordinatesRegexIdentity]]:
+    if not isinstance(update_id, t.Mapping):
+        return None
+
+    name_result = _parse_coordinates_regex(update_id)
+    simple_result = _parse_simple_regex(update_id)
+
+    if name_result is not None and simple_result is not None:
+        raise AppError(
+            "Invalid set file",
+            f"The update object with id {dict(update_id)} has more than one id.",
+        )
+
+    if name_result is not None:
+        return name_result
+
+    if simple_result is not None:
+        return simple_result
+
+    _reject_unsupported_id_dicts(update_id)
+    return None
+
+
+_AnyRegexIdentity = t.Union[RegexUpdateIdentity, CoordinatesRegexIdentity]
+
+
+def _get_regex_targets(sbom: dict, update_id: _AnyRegexIdentity) -> list[dict]:
     targets: list[dict] = []
 
-    def _collect(component: dict, target_list: list[dict], target_id: RegexUpdateIdentity) -> None:
+    def _collect(
+        component: dict, target_list: list[dict], target_id: _AnyRegexIdentity
+    ) -> None:
         if target_id.matches(component):
             target_list.append(component)
 
@@ -419,7 +629,11 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
     for upd in updates:
         if "id" not in upd:
             raise AppError("Invalid set file", "An update object is missing the 'id' property.")
-        if "version" in upd["id"] and "version-range" in upd["id"]:
+        if (
+            isinstance(upd["id"], t.Mapping)
+            and "version" in upd["id"]
+            and "version-range" in upd["id"]
+        ):
             raise AppError(
                 "Invalid set file",
                 "An update object for"
@@ -427,7 +641,7 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
             )
 
         regex_component_id = _parse_regex_update_identity(upd["id"])
-        component_id: t.Union[ComponentIdentity, RegexUpdateIdentity]
+        component_id: t.Union[ComponentIdentity, RegexUpdateIdentity, CoordinatesRegexIdentity]
 
         if regex_component_id is None:
             try:
@@ -447,7 +661,7 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
 
         upd["id"] = component_id
 
-        if not isinstance(component_id, RegexUpdateIdentity):
+        if not isinstance(component_id, (RegexUpdateIdentity, CoordinatesRegexIdentity)):
             if len(component_id) == 0:
                 raise AppError("Invalid set file", "An update object has an empty 'id' property.")
             if len(component_id) > 1:
@@ -488,7 +702,7 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
         target_list: list[dict] = []
         update_id = update["id"]
 
-        if isinstance(update_id, RegexUpdateIdentity):
+        if isinstance(update_id, (RegexUpdateIdentity, CoordinatesRegexIdentity)):
             target_list = _get_regex_targets(sbom, update_id)
         else:
             update_key = update_id[0]

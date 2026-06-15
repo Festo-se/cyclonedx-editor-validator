@@ -59,15 +59,29 @@ Regex target matching
 Regex matching can be used for *name*, *purl* and *cpe* identifiers.
 It is opt-in per identifier and is never applied implicitly.
 
+**purl and cpe** support single-field regex and cannot be combined with other identifiers.
+
+**name** supports regex and can additionally be combined with:
+
+- an exact or regex *group* filter
+- an exact *version* or a *version-range*
+
 On the command-line, use one of:
 
-- ``--name-pattern``
+- ``--name-pattern`` — can also be combined with ``--group``, ``--group-pattern``, ``--version`` or ``--version-range``
 - ``--purl-pattern``
 - ``--cpe-pattern``
 
-Example::
+Examples::
 
-    cdx-ev set bom.json --purl-pattern 'pkg:npm/test-app@1\.0\.0' --key author --value '"Regex Author"' --force
+    # All components whose name starts with "web"
+    cdx-ev set bom.json --name-pattern 'web.*' --key author --value '"Team A"' --force
+
+    # Only components in a group matching a regex, filtered by version range
+    cdx-ev set bom.json --name-pattern 'web-framework' \
+        --group-pattern 'org\..*' \
+        --version-range vers:generic/<3.0.0 \
+        --key copyright --value '"ACME Inc."' --force
 
 When using ``--from-file``, regex can be specified explicitly in either of these forms::
 
@@ -83,8 +97,28 @@ or::
         "set": {"author": "Team A"}
     }
 
+Group and version companions can be added to any name regex form::
+
+    {
+        "id": {
+            "name": {"regex": "web-.*"},
+            "group": {"regex": "org\\..*"},
+            "version-range": "vers:generic/<3.0.0"
+        },
+        "set": {"copyright": "ACME Inc."}
+    }
+
+A literal group string can be used instead of a regex::
+
+    {
+        "id": {"namePattern": "web-.*", "group": "org.acme", "version": "2.1.0"},
+        "set": {"copyright": "ACME Inc."}
+    }
+
 Regex evaluation uses full-match semantics. Anchors (``^`` and ``$``) are not required.
 Identifier fields that do not support regex (for example, *swid*) are rejected as invalid input.
+A *group* regex is only valid in combination with a name regex.
+Existing non-regex identifiers remain exact-match and are unchanged for backward compatibility.
 
 If the target component isn't found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the ``--ignore-missing`` flag.
 
@@ -151,9 +185,11 @@ When passing the targets, names and values in a file, the file must conform to t
                 # Multiple identifiers are not allowed (with the special exception of name,
                 # group and version/version-range which are only valid together)
                 "cpe": "CPE of target component goes here"
-                # Regex is opt-in and supported for cpe, purl and name only:
+                # Regex is opt-in; supported for cpe, purl and name (see Regex section):
                 # "cpePattern": "cpe:/a:example:.*"
                 # "name": {"regex": "my-component.*"}
+                # name regex additionally allows group and version companions:
+                # "namePattern": "web-.*", "group": {"regex": "org\\..*"}, "version-range": "vers:generic/*"
             },
             "set": {
                 # Sets a simple property

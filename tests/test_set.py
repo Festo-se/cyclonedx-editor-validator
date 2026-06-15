@@ -612,6 +612,103 @@ class SetTestCase(unittest.TestCase):
 
         self.assertEqual(self.sbom_fixture["components"][0]["author"], "regex cpe author")
 
+    def test_set_regex_cpe_pattern_alias(self) -> None:
+        self.sbom_fixture["components"][0]["cpe"] = "cpe:/a:example:depA:4.0.2"
+
+        updates = [
+            {
+                "id": {"cpePattern": "cpe:/a:example:depA:.*"},
+                "set": {"author": "regex cpe alias"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["author"], "regex cpe alias")
+
+    def test_set_regex_purl_object(self) -> None:
+        updates = [
+            {
+                "id": {"purl": {"regex": "pkg:npm/test-app@.*"}},
+                "set": {"author": "regex purl author"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["metadata"]["component"]["author"], "regex purl author")
+
+    def test_set_regex_purl_pattern_alias(self) -> None:
+        updates = [
+            {
+                "id": {"purlPattern": "pkg:npm/test-app@.*"},
+                "set": {"author": "regex purl alias"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["metadata"]["component"]["author"], "regex purl alias")
+
+    def test_set_exact_cpe_not_interpreted_as_regex(self) -> None:
+        # Keep exact matching behavior intact for backward compatibility.
+        self.sbom_fixture["components"][0]["cpe"] = "cpe:/a:example:depA:4.0.2"
+
+        updates = [
+            {
+                "id": {"cpe": "cpe:/a:example:depA:.*"},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
+
+    def test_set_exact_purl_not_interpreted_as_regex(self) -> None:
+        # Keep exact matching behavior intact for backward compatibility.
+        updates = [
+            {
+                "id": {"purl": "pkg:npm/test-app@.*"},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
+
     def test_set_regex_requires_explicit_opt_in(self) -> None:
         updates = [
             {
@@ -665,6 +762,106 @@ class SetTestCase(unittest.TestCase):
             cdxev.set.run(self.sbom_fixture, updates, cfg)
 
         self.assertIn("does not support regex", ctx.exception.details.description)
+
+    def test_set_regex_name_with_exact_version(self) -> None:
+        # depA version=4.0.2, depB version=1.2.3 — only depA should match
+        updates = [
+            {
+                "id": {"namePattern": "dep[A-C]", "version": "4.0.2"},
+                "set": {"copyright": "version matched"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["copyright"], "version matched")
+        # depB already has a copyright; it must not have been overwritten
+        self.assertEqual(
+            self.sbom_fixture["components"][1]["copyright"], "Some Vendor Inc."
+        )
+        self.assertNotIn("copyright", self.sbom_fixture["components"][2])
+
+    def test_set_regex_name_with_exact_group(self) -> None:
+        # Only depA has group "com.company.unit"
+        updates = [
+            {
+                "id": {
+                    "name": {"regex": "dep."},
+                    "group": "com.company.unit",
+                },
+                "set": {"copyright": "group matched"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["copyright"], "group matched")
+        # depB already has a copyright; it must not have been overwritten
+        self.assertEqual(
+            self.sbom_fixture["components"][1]["copyright"], "Some Vendor Inc."
+        )
+
+    def test_set_regex_name_with_group_regex(self) -> None:
+        # gravity and x-ray both belong to group "physics"
+        updates = [
+            {
+                "id": {
+                    "namePattern": ".*",
+                    "group": {"regex": "phys.*"},
+                },
+                "set": {"copyright": "group regex matched"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        gravity = self.sbom_fixture["components"][1]["components"][0]
+        x_ray = self.sbom_fixture["components"][1]["components"][1]
+        self.assertEqual(gravity["copyright"], "group regex matched")
+        self.assertEqual(x_ray["copyright"], "group regex matched")
+        # depA / depB / depC top-level should not be affected
+        self.assertNotIn("copyright", self.sbom_fixture["components"][0])
+
+    def test_set_regex_group_without_name_raises(self) -> None:
+        updates = [
+            {
+                "id": {"group": {"regex": "phys.*"}},
+                "set": {"copyright": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("only in combination with", ctx.exception.details.description)
 
 
 class TestVersionRange(unittest.TestCase):
@@ -963,3 +1160,38 @@ class TestVersionRange(unittest.TestCase):
         self.assertEqual(self.sbom_fixture["components"][3]["supplier"], {"name": "New supplier"})
         self.assertEqual(self.sbom_fixture["components"][4]["supplier"], {"name": "New supplier"})
         self.assertEqual(self.sbom_fixture["components"][5]["supplier"], {"name": "New supplier"})
+
+    def test_set_regex_name_with_version_range(self) -> None:
+        # web-framework components have various versions; only those < 3.0.0 should match
+        updates = [
+            {
+                "id": {
+                    "name": {"regex": "web-framework"},
+                    "group": {"regex": "org\\.acme"},
+                    "version-range": "vers:pypi/<3.0.0",
+                },
+                "set": {"copyright": "range matched"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [
+                pathlib.Path(
+                    "tests/auxiliary/test_set_sboms/Acme_Application_"
+                    "9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json"
+                )
+            ],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        for component in self.sbom_fixture["components"]:
+            if component.get("group") == "org.acme":
+                version = component.get("version", "")
+                parts = [int(x) for x in version.split(".")]
+                if parts[0] < 3:
+                    self.assertEqual(component.get("copyright"), "range matched")
+                else:
+                    self.assertNotEqual(component.get("copyright"), "range matched")

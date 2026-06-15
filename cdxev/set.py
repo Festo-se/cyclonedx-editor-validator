@@ -532,7 +532,8 @@ def _parse_coordinates_regex(
                 'The update object identifier "version-range" must be a string.',
             )
         try:
-            version_range_obj = univers.version_range.VersionRange.from_string(vr)
+            from_string = univers.version_range.VersionRange.from_string
+            version_range_obj = from_string(vr)  # type: ignore[no-untyped-call]
         except (ValueError, univers.versions.InvalidVersion) as exc:
             raise AppError(
                 "Invalid set file",

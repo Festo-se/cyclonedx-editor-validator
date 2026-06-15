@@ -2,10 +2,17 @@
 
 import unittest
 import unittest.mock
+from argparse import Namespace
 from pathlib import Path
 
 # noinspection PyProtectedMember
-from cdxev.__main__ import InputFileError, load_json, load_xml, read_sbom
+from cdxev.__main__ import (
+    InputFileError,
+    _set_target_update_id,
+    load_json,
+    load_xml,
+    read_sbom,
+)
 
 
 class TestSupplements(unittest.TestCase):
@@ -37,3 +44,45 @@ class TestSupplements(unittest.TestCase):
         with self.assertRaises(InputFileError) as ie:
             load_xml(Path("test.xml"))
         self.assertIn("XML files aren't supported", ie.exception.details.description)
+
+
+class TestSetCliHelpers(unittest.TestCase):
+    def _base_set_args(self) -> Namespace:
+        return Namespace(
+            swid=None,
+            cpe=None,
+            purl=None,
+            name=None,
+            group=None,
+            version=None,
+            version_range=None,
+            name_pattern=None,
+            cpe_pattern=None,
+            purl_pattern=None,
+            parser=None,
+        )
+
+    def test_set_target_update_id_name_pattern(self) -> None:
+        args = self._base_set_args()
+        args.name_pattern = "dep.*"
+
+        update_id = _set_target_update_id(args)
+
+        self.assertEqual(update_id, {"namePattern": "dep.*"})
+
+    def test_set_target_update_id_coordinates_with_version_range(self) -> None:
+        args = self._base_set_args()
+        args.name = "web-framework"
+        args.group = "org.acme"
+        args.version_range = "vers:generic/*"
+
+        update_id = _set_target_update_id(args)
+
+        self.assertEqual(
+            update_id,
+            {
+                "name": "web-framework",
+                "group": "org.acme",
+                "version-range": "vers:generic/*",
+            },
+        )

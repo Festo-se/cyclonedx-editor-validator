@@ -954,12 +954,8 @@ def _set_target_update_id(args: argparse.Namespace) -> dict[str, t.Any]:
 
     target_kind, target = actual_targets[0]
     update_id: dict[str, t.Any] = {}
-    if target_kind == "namePattern":
-        update_id["namePattern"] = target
-    elif target_kind == "cpePattern":
-        update_id["cpePattern"] = target
-    elif target_kind == "purlPattern":
-        update_id["purlPattern"] = target
+    if target_kind in {"namePattern", "cpePattern", "purlPattern"}:
+        update_id[target_kind] = target
     else:
         target_key = t.cast(Key, target)
         if target_key.type is KeyType.CPE:

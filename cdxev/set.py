@@ -356,6 +356,35 @@ def _parse_regex_update_identity(
                 )
             matches.append((target, expression, target))
 
+    for id_field, value in update_id.items():
+        if id_field in _REGEX_IDENTIFIER_ALIASES:
+            continue
+        if id_field not in _IDENTIFIERS:
+            continue
+        if not isinstance(value, dict):
+            continue
+
+        if id_field in _REGEX_IDENTIFIER_TARGETS:
+            if (
+                "regex" in value
+                and len(value) == 1
+                and isinstance(value["regex"], str)
+            ):
+                continue
+
+            raise AppError(
+                "Invalid set file",
+                (
+                    f'The update object identifier "{id_field}" must be a string or '
+                    'an object with a single "regex" property.'
+                ),
+            )
+
+        raise AppError(
+            "Invalid set file",
+            f'The update object identifier "{id_field}" does not support regex.',
+        )
+
     if not matches:
         return None
 
@@ -410,10 +439,15 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
         if regex_component_id is None:
             try:
                 component_id = UpdateIdentity.create(upd["id"], True)
-            except (univers.versions.InvalidVersion, ValueError) as exc:
+            except (
+                univers.versions.InvalidVersion,
+                ValueError,
+                TypeError,
+                KeyError,
+            ) as exc:
                 raise AppError(
                     "Invalid set file",
-                    f"An update object has an invalid version-range: {exc}",
+                    f"An update object has an invalid identifier: {exc}",
                 ) from exc
         else:
             component_id = regex_component_id

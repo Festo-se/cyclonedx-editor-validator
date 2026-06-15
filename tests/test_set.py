@@ -646,6 +646,26 @@ class SetTestCase(unittest.TestCase):
 
         self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
 
+    def test_set_regex_unsupported_identifier_field_raises(self) -> None:
+        updates = [
+            {
+                "id": {"swid": {"regex": "x"}},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("does not support regex", ctx.exception.details.description)
+
 
 class TestVersionRange(unittest.TestCase):
     def setUp(self) -> None:

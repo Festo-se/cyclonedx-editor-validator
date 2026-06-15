@@ -549,6 +549,103 @@ class SetTestCase(unittest.TestCase):
             cfg,
         )
 
+    def test_set_regex_name_pattern_alias(self) -> None:
+        updates = [
+            {
+                "id": {"namePattern": "dep[A-C]"},
+                "set": {"author": "regex author"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["author"], "regex author")
+        self.assertEqual(self.sbom_fixture["components"][1]["author"], "regex author")
+        self.assertEqual(self.sbom_fixture["components"][2]["author"], "regex author")
+
+    def test_set_regex_name_object(self) -> None:
+        updates = [
+            {
+                "id": {"name": {"regex": "x-ray"}},
+                "set": {"author": "regex target"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(
+            self.sbom_fixture["components"][1]["components"][1]["author"], "regex target"
+        )
+
+    def test_set_regex_cpe_object(self) -> None:
+        self.sbom_fixture["components"][0]["cpe"] = "cpe:/a:example:depA:4.0.2"
+
+        updates = [
+            {
+                "id": {"cpe": {"regex": "cpe:/a:example:depA:.*"}},
+                "set": {"author": "regex cpe author"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["author"], "regex cpe author")
+
+    def test_set_regex_requires_explicit_opt_in(self) -> None:
+        updates = [
+            {
+                "id": {"name": "dep.*"},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
+
+    def test_set_regex_uses_full_match(self) -> None:
+        updates = [
+            {
+                "id": {"name": {"regex": "dep"}},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
+
 
 class TestVersionRange(unittest.TestCase):
     def setUp(self) -> None:

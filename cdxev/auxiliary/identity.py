@@ -2,6 +2,7 @@
 
 import functools
 import json
+import re
 import typing as t
 from dataclasses import dataclass
 from enum import Enum
@@ -182,6 +183,24 @@ class ComponentIdentity:
             coordinates = None
 
         return ComponentIdentity(cpe, purl, swid, coordinates)
+
+
+@dataclass(frozen=True)
+class RegexUpdateIdentity:
+    field: str
+    expression: str
+    pattern: re.Pattern[str]
+
+    @classmethod
+    def create(cls, field: str, expression: str) -> "RegexUpdateIdentity":
+        return cls(field=field, expression=expression, pattern=re.compile(f"^(?:{expression})$"))
+
+    def matches(self, component: dict) -> bool:
+        value = component.get(self.field)
+        return isinstance(value, str) and self.pattern.fullmatch(value) is not None
+
+    def __str__(self) -> str:
+        return f"{self.field}[regex:{self.expression}]"
 
 
 @dataclass(frozen=True, init=True)

@@ -2,6 +2,7 @@
 
 import logging
 import pathlib
+import re
 import sys
 import typing as t
 from dataclasses import dataclass, field, fields
@@ -9,7 +10,13 @@ from dataclasses import dataclass, field, fields
 import univers.version_range
 import univers.versions
 
-from cdxev.auxiliary.identity import ComponentIdentity, Coordinates, Key, KeyType
+from cdxev.auxiliary.identity import (
+    ComponentIdentity,
+    Coordinates,
+    Key,
+    KeyType,
+    RegexUpdateIdentity,
+)
 from cdxev.auxiliary.sbom_functions import walk_components
 from cdxev.error import AppError
 from cdxev.log import LogMessage
@@ -165,6 +172,12 @@ class UpdateIdentity(ComponentIdentity):
 
 _IDENTIFIERS = {"cpe", "purl", "swid", "name", "version", "group"}
 _PROTECTED = _IDENTIFIERS | {"components"}
+_REGEX_IDENTIFIER_TARGETS = {"name", "cpe", "purl"}
+_REGEX_IDENTIFIER_ALIASES = {
+    "namePattern": "name",
+    "cpePattern": "cpe",
+    "purlPattern": "purl",
+}
 
 
 def _should_merge(property: str, component: dict, update_set: dict) -> bool:
@@ -302,6 +315,78 @@ def _get_protected(update_set: dict) -> t.Union[t.Literal[False], set]:
         return False
 
 
+def _parse_regex_update_identity(update_id: t.Mapping[str, t.Any]) -> t.Optional[RegexUpdateIdentity]:
+    if not isinstance(update_id, t.Mapping):
+        return None
+
+    matches: list[tuple[str, str, str]] = []
+
+    for alias, target in _REGEX_IDENTIFIER_ALIASES.items():
+        if alias in update_id:
+            expression = update_id[alias]
+            if not isinstance(expression, str):
+                raise AppError(
+                    "Invalid set file",
+                    f'The update object identifier "{alias}" must be a string.',
+                )
+            matches.append((target, expression, alias))
+
+    for target in _REGEX_IDENTIFIER_TARGETS:
+        value = update_id.get(target)
+        if isinstance(value, dict) and "regex" in value:
+            if len(value) != 1:
+                raise AppError(
+                    "Invalid set file",
+                    (
+                        f'The update object identifier "{target}" uses regex and may only '
+                        'contain the property "regex".'
+                    ),
+                )
+
+            expression = value["regex"]
+            if not isinstance(expression, str):
+                raise AppError(
+                    "Invalid set file",
+                    (
+                        f'The update object identifier "{target}" has a regex expression that '
+                        "is not a string."
+                    ),
+                )
+            matches.append((target, expression, target))
+
+    if not matches:
+        return None
+
+    if len(matches) > 1 or len(update_id) > 1:
+        raise AppError(
+            "Invalid set file",
+            f"The update object with id {update_id} has more than one id.",
+        )
+
+    (target, expression, source) = matches[0]
+    try:
+        return RegexUpdateIdentity.create(target, expression)
+    except re.error as exc:
+        raise AppError(
+            "Invalid set file",
+            (
+                f'The update object identifier "{source}" has an invalid '
+                f"regular expression: {exc}"
+            ),
+        ) from exc
+
+
+def _get_regex_targets(sbom: dict, update_id: RegexUpdateIdentity) -> list[dict]:
+    targets: list[dict] = []
+
+    def _collect(component: dict, target_list: list[dict], target_id: RegexUpdateIdentity) -> None:
+        if target_id.matches(component):
+            target_list.append(component)
+
+    walk_components(sbom, _collect, targets, update_id)
+    return targets
+
+
 def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -> None:
     if len(updates) == 0:
         logger.debug("No updates to perform. This is probably wrong but what do I know.")
@@ -316,23 +401,31 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
                 "An update object for"
                 "contains a 'version' and 'version-range' but only one of them is permitted",
             )
-        try:
-            component_id = UpdateIdentity.create(upd["id"], True)
-        except (univers.versions.InvalidVersion, ValueError) as exc:
-            raise AppError(
-                "Invalid set file",
-                f"An update object has an invalid version-range: {exc}",
-            ) from exc
+
+        regex_component_id = _parse_regex_update_identity(upd["id"])
+        component_id: t.Union[ComponentIdentity, RegexUpdateIdentity]
+
+        if regex_component_id is None:
+            try:
+                component_id = UpdateIdentity.create(upd["id"], True)
+            except (univers.versions.InvalidVersion, ValueError) as exc:
+                raise AppError(
+                    "Invalid set file",
+                    f"An update object has an invalid version-range: {exc}",
+                ) from exc
+        else:
+            component_id = regex_component_id
 
         upd["id"] = component_id
 
-        if len(component_id) == 0:
-            raise AppError("Invalid set file", "An update object has an empty 'id' property.")
-        if len(component_id) > 1:
-            raise AppError(
-                "Invalid set file",
-                f"The update object with id {component_id} has more than one id.",
-            )
+        if not isinstance(component_id, RegexUpdateIdentity):
+            if len(component_id) == 0:
+                raise AppError("Invalid set file", "An update object has an empty 'id' property.")
+            if len(component_id) > 1:
+                raise AppError(
+                    "Invalid set file",
+                    f"The update object with id {component_id} has more than one id.",
+                )
 
         if "set" not in upd:
             raise AppError(
@@ -364,13 +457,18 @@ def run(sbom: dict, updates: t.Sequence[dict[str, t.Any]], cfg: SetConfig) -> No
 
     for update in updates:
         target_list: list[dict] = []
-        update_key = update["id"][0]
-        if isinstance(update_key.key, CoordinatesWithVersionRange):
-            for key in ctx.component_map.keys():
-                if update_key == key:
-                    target_list += ctx.component_map[key]
-        elif update_key in ctx.component_map:
-            target_list = ctx.component_map[update_key]
+        update_id = update["id"]
+
+        if isinstance(update_id, RegexUpdateIdentity):
+            target_list = _get_regex_targets(sbom, update_id)
+        else:
+            update_key = update_id[0]
+            if isinstance(update_key.key, CoordinatesWithVersionRange):
+                for key in ctx.component_map.keys():
+                    if update_key == key:
+                        target_list += ctx.component_map[key]
+            elif update_key in ctx.component_map:
+                target_list = ctx.component_map[update_key]
 
         if len(target_list) == 0:
             if not cfg.ignore_missing:

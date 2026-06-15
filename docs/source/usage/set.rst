@@ -116,6 +116,7 @@ A literal group string can be used instead of a regex::
     }
 
 Regex evaluation uses full-match semantics. Anchors (``^`` and ``$``) are not required.
+Regex target matching traverses all components, including ``metadata.component`` when present.
 Identifier fields that do not support regex (for example, *swid*) are rejected as invalid input.
 A *group* regex is only valid in combination with a name regex.
 Existing non-regex identifiers remain exact-match and are unchanged for backward compatibility.

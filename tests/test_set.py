@@ -974,7 +974,10 @@ class SetTestCase(unittest.TestCase):
         with self.assertRaises(cdxev.error.AppError) as ctx:
             cdxev.set.run(self.sbom_fixture, updates, cfg)
 
-        self.assertIn("has more than one id", ctx.exception.details.description)
+        self.assertIn(
+            "may only be combined with group, version or version-range",
+            ctx.exception.details.description,
+        )
 
     def test_set_regex_name_group_must_be_string_or_regex(self) -> None:
         updates = [
@@ -1107,7 +1110,25 @@ class SetTestCase(unittest.TestCase):
         with self.assertRaises(cdxev.error.AppError) as ctx:
             cdxev.set.run(self.sbom_fixture, updates, cfg)
 
-        self.assertIn("has more than one id", ctx.exception.details.description)
+        self.assertIn(
+            "may only be combined with group, version or version-range",
+            ctx.exception.details.description,
+        )
+
+    def test_parse_coordinates_regex_rejects_version_and_version_range(self) -> None:
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set._parse_coordinates_regex(
+                {
+                    "namePattern": "dep.*",
+                    "version": "1.0.0",
+                    "version-range": "vers:generic/*",
+                }
+            )
+
+        self.assertIn(
+            "contains a 'version' and 'version-range'",
+            ctx.exception.details.description,
+        )
 
     def test_set_regex_simple_pattern_with_extra_identifier_raises(self) -> None:
         updates = [
@@ -1474,7 +1495,58 @@ class TestVersionRange(unittest.TestCase):
         self.assertEqual(self.sbom_fixture["components"][5]["supplier"], {"name": "New supplier"})
 
     def test_set_regex_name_with_version_range(self) -> None:
-        # web-framework components have various versions; only those < 3.0.0 should match
+        # Build a dedicated fixture so this test does not depend on external files.
+        sbom: dict[str, t.Any] = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "version": 1,
+            "components": [
+                {
+                    "type": "library",
+                    "name": "web-framework",
+                    "group": "org.acme",
+                    "version": "2.1.0",
+                    "bom-ref": "wf-2.1.0",
+                },
+                {
+                    "type": "library",
+                    "name": "web-framework",
+                    "group": "org.acme",
+                    "version": "3.0.0",
+                    "bom-ref": "wf-3.0.0",
+                },
+                {
+                    "type": "library",
+                    "name": "api-framework",
+                    "group": "org.acme",
+                    "version": "2.5.0",
+                    "bom-ref": "api-2.5.0",
+                },
+                {
+                    "type": "application",
+                    "name": "container",
+                    "version": "1.0.0",
+                    "bom-ref": "container-1.0.0",
+                    "components": [
+                        {
+                            "type": "library",
+                            "name": "web-framework",
+                            "group": "org.acme",
+                            "version": "2.9.9",
+                            "bom-ref": "wf-2.9.9",
+                        },
+                        {
+                            "type": "library",
+                            "name": "web-framework",
+                            "group": "org.acme",
+                            "version": "4.0.0",
+                            "bom-ref": "wf-4.0.0",
+                        },
+                    ],
+                },
+            ],
+        }
+
         updates = [
             {
                 "id": {
@@ -1486,24 +1558,22 @@ class TestVersionRange(unittest.TestCase):
             }
         ]
         cfg = cdxev.set.SetConfig(
-            True,
             False,
-            [
-                pathlib.Path(
-                    "tests/auxiliary/test_set_sboms/Acme_Application_"
-                    "9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json"
-                )
-            ],
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
             None,
         )
 
-        cdxev.set.run(self.sbom_fixture, updates, cfg)
+        cdxev.set.run(sbom, updates, cfg)
 
-        for component in self.sbom_fixture["components"]:
-            if component.get("group") == "org.acme":
-                version = component.get("version", "")
-                parts = [int(x) for x in version.split(".")]
-                if parts[0] < 3:
-                    self.assertEqual(component.get("copyright"), "range matched")
-                else:
-                    self.assertNotEqual(component.get("copyright"), "range matched")
+        # Positive matches (top-level + nested) in range.
+        self.assertEqual(sbom["components"][0].get("copyright"), "range matched")
+        self.assertEqual(
+            sbom["components"][3]["components"][0].get("copyright"),
+            "range matched",
+        )
+
+        # Negative cases: boundary/out-of-range version and non-matching name.
+        self.assertNotIn("copyright", sbom["components"][1])
+        self.assertNotIn("copyright", sbom["components"][2])
+        self.assertNotIn("copyright", sbom["components"][3]["components"][1])

@@ -482,9 +482,11 @@ def _parse_coordinates_regex(
     allowed = {name_source} | {"group", "version", "version-range"}
     unexpected = set(update_id.keys()) - allowed
     if unexpected:
+        companions = ", ".join(sorted(unexpected))
         raise AppError(
             "Invalid set file",
-            f"The update object with id {dict(update_id)} has more than one id.",
+            "A name regex identifier may only be combined with group, version "
+            f'or version-range, but found unsupported companion(s): {companions}.',
         )
 
     group_expression: t.Optional[str] = None
@@ -513,6 +515,13 @@ def _parse_coordinates_regex(
         version = v
 
     version_range_obj: t.Optional[univers.version_range.VersionRange] = None
+    if version is not None and "version-range" in update_id:
+        raise AppError(
+            "Invalid set file",
+            "An update object contains a 'version' and 'version-range' but only "
+            "one of them is permitted.",
+        )
+
     if "version-range" in update_id:
         vr = update_id["version-range"]
         if not isinstance(vr, str):
@@ -624,8 +633,8 @@ def _validate_update_list(updates: t.Sequence[dict[str, t.Any]], ctx: Context) -
         ):
             raise AppError(
                 "Invalid set file",
-                "An update object for"
-                "contains a 'version' and 'version-range' but only one of them is permitted",
+                "An update object contains a 'version' and 'version-range' but only "
+                "one of them is permitted.",
             )
 
         regex_component_id = _parse_regex_update_identity(upd["id"])

@@ -53,6 +53,39 @@ Note that instead of specific version constraints it is possible to provide a wi
 
 Further information on the supported versions can be found here `univers documentation <https://pypi.org/project/univers/>`_.
 
+Regex target matching
+---------------------
+
+Regex matching can be used for *name*, *purl* and *cpe* identifiers.
+It is opt-in per identifier and is never applied implicitly.
+
+On the command-line, use one of:
+
+- ``--name-pattern``
+- ``--purl-pattern``
+- ``--cpe-pattern``
+
+Example::
+
+    cdx-ev set bom.json --purl-pattern 'pkg:npm/test-app@1\.0\.0' --key author --value '"Regex Author"' --force
+
+When using ``--from-file``, regex can be specified explicitly in either of these forms::
+
+    {
+        "id": {"namePattern": "web-.*"},
+        "set": {"author": "Team A"}
+    }
+
+or::
+
+    {
+        "id": {"name": {"regex": "web-.*"}},
+        "set": {"author": "Team A"}
+    }
+
+Regex evaluation uses full-match semantics. Anchors (``^`` and ``$``) are not required.
+Identifier fields that do not support regex (for example, *swid*) are rejected as invalid input.
+
 If the target component isn't found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the ``--ignore-missing`` flag.
 
 Protected fields
@@ -118,6 +151,9 @@ When passing the targets, names and values in a file, the file must conform to t
                 # Multiple identifiers are not allowed (with the special exception of name,
                 # group and version/version-range which are only valid together)
                 "cpe": "CPE of target component goes here"
+                # Regex is opt-in and supported for cpe, purl and name only:
+                # "cpePattern": "cpe:/a:example:.*"
+                # "name": {"regex": "my-component.*"}
             },
             "set": {
                 # Sets a simple property

@@ -16,7 +16,7 @@ repos:
         args: [--autofix, --no-sort-keys]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.15.16
+    rev: v0.15.17
     hooks:
       # Run the linter.
       - id: ruff-check
@@ -33,7 +33,7 @@ repos:
           - types-python-dateutil==2.9.0.20260518
           - typing-extensions==4.15.0
           - types-jsonschema==4.26.0.20260518
-          - cyclonedx-python-lib==11.9.0
+          - cyclonedx-python-lib==11.10.0
           - univers==32.0.1
           - charset-normalizer==3.4.7
           - natsort==8.4.0
@@ -43,6 +43,6 @@ repos:
         args: ["--config-file", "pyproject.toml"]
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.
-    rev: 0.11.19
+    rev: 0.11.21
     hooks:
       - id: uv-lock

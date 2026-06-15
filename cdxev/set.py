@@ -315,7 +315,9 @@ def _get_protected(update_set: dict) -> t.Union[t.Literal[False], set]:
         return False
 
 
-def _parse_regex_update_identity(update_id: t.Mapping[str, t.Any]) -> t.Optional[RegexUpdateIdentity]:
+def _parse_regex_update_identity(
+    update_id: t.Mapping[str, t.Any],
+) -> t.Optional[RegexUpdateIdentity]:
     if not isinstance(update_id, t.Mapping):
         return None
 

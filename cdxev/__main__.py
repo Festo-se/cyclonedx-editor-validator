@@ -944,11 +944,7 @@ def _set_target_update_id(args: argparse.Namespace) -> dict[str, t.Any]:
         ("cpePattern", args.cpe_pattern),
         ("purlPattern", args.purl_pattern),
     ]
-    actual_targets = [
-        (kind, target)
-        for (kind, target) in possible_targets
-        if target is not None
-    ]
+    actual_targets = [(kind, target) for (kind, target) in possible_targets if target is not None]
     if len(actual_targets) > 1:
         usage_error("Cannot specify more than one <target>.", args.parser)
 

@@ -365,11 +365,7 @@ def _parse_regex_update_identity(
             continue
 
         if id_field in _REGEX_IDENTIFIER_TARGETS:
-            if (
-                "regex" in value
-                and len(value) == 1
-                and isinstance(value["regex"], str)
-            ):
+            if "regex" in value and len(value) == 1 and isinstance(value["regex"], str):
                 continue
 
             raise AppError(
@@ -400,10 +396,7 @@ def _parse_regex_update_identity(
     except re.error as exc:
         raise AppError(
             "Invalid set file",
-            (
-                f'The update object identifier "{source}" has an invalid '
-                f"regular expression: {exc}"
-            ),
+            (f'The update object identifier "{source}" has an invalid regular expression: {exc}'),
         ) from exc
 
 

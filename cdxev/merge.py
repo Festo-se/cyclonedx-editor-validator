@@ -8,6 +8,8 @@ import typing as t
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.auxiliary.sbom_functions import (
     add_merged_metadata_component_to_dependencies,
+    CycloneDXVersion,
+    SpecVersion,
     collect_affects_of_vulnerabilities,
     extract_components,
     extract_new_affects,
@@ -151,6 +153,225 @@ def merge_components(
     return list_of_merged_components
 
 
+def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
+    """
+    Compares two tool objects for equality with strict key matching.
+
+    This intentionally does not use ComponentIdentity equality because that logic
+    is overlap-based and can over-match (e.g. tools sharing only broad attributes
+    like type), which would drop valid tools during merge.
+    """
+    def _norm(value: t.Any) -> str:
+        if value is None:
+            return ""
+        return str(value).strip().lower()
+
+    # Preserve important schema fields where present; missing fields normalize to empty strings.
+    key1 = (
+        _norm(tool1.get("type")),
+        _norm(tool1.get("name")),
+        _norm(tool1.get("version")),
+        _norm(tool1.get("vendor", tool1.get("publisher", tool1.get("organization")))),
+        _norm(tool1.get("bom-ref")),
+    )
+    key2 = (
+        _norm(tool2.get("type")),
+        _norm(tool2.get("name")),
+        _norm(tool2.get("version")),
+        _norm(tool2.get("vendor", tool2.get("publisher", tool2.get("organization")))),
+        _norm(tool2.get("bom-ref")),
+    )
+    return key1 == key2
+
+
+def _convert_tools_array_to_dict(tools_array: list) -> dict:
+    """
+    Converts tools from old format (array) to new format (dict with components/services).
+    Array entries are converted to component objects.
+    """
+    components = []
+    for tool in tools_array:
+        # Convert old format tool to new format
+        component = {
+            "type": "application",
+            "name": tool.get("name", ""),
+            "version": tool.get("version", ""),
+        }
+        if "vendor" in tool:
+            component["publisher"] = tool["vendor"]
+        if "hashes" in tool:
+            component["hashes"] = tool["hashes"]
+        if "bom-ref" in tool:
+            component["bom-ref"] = tool["bom-ref"]
+        # Copy any other fields that might exist
+        for key in tool:
+            if key not in ("name", "vendor", "version", "hashes", "bom-ref"):
+                component[key] = tool[key]
+        components.append(component)
+
+    return {"components": components}
+
+
+def _convert_tools_dict_to_array(tools_dict: dict) -> list:
+    """
+    Converts tools from new format (dict with components/services) to old format (array).
+    """
+    tools_array = []
+
+    # Convert components
+    for component in tools_dict.get("components", []):
+        tool = {
+            "name": component.get("name", ""),
+            "version": component.get("version", ""),
+        }
+        if "publisher" in component:
+            tool["vendor"] = component["publisher"]
+        if "hashes" in component:
+            tool["hashes"] = component["hashes"]
+        if "bom-ref" in component:
+            tool["bom-ref"] = component["bom-ref"]
+        # Copy other fields
+        for key in component:
+            if key not in ("type", "name", "publisher", "version", "hashes", "bom-ref"):
+                tool[key] = component[key]
+        tools_array.append(tool)
+
+    # Convert services (if present, add them as tools as well)
+    for service in tools_dict.get("services", []):
+        tool = {
+            "name": service.get("name", ""),
+            "version": service.get("version", ""),
+        }
+        if "organization" in service:
+            tool["vendor"] = service["organization"]
+        if "hashes" in service:
+            tool["hashes"] = service["hashes"]
+        if "bom-ref" in service:
+            tool["bom-ref"] = service["bom-ref"]
+        # Copy other fields
+        for key in service:
+            if key not in ("bom-ref", "name", "organization", "version", "hashes"):
+                tool[key] = service[key]
+        tools_array.append(tool)
+
+    return tools_array
+
+
+def _merge_tools_array(
+    governing_tools: list, tools_to_merge: list
+) -> list:
+    """
+    Merges two tool arrays (old format), avoiding duplicates.
+    """
+    merged_tools = copy.deepcopy(governing_tools)
+
+    for tool_to_merge in tools_to_merge:
+        # Use explicit equality check - don't use sets
+        is_duplicate = any(
+            _tools_are_equal(tool_to_merge, existing_tool) for existing_tool in merged_tools
+        )
+        if not is_duplicate:
+            merged_tools.append(copy.deepcopy(tool_to_merge))
+
+    return merged_tools
+
+
+def _merge_tools_dict(governing_tools: dict, tools_to_merge: dict) -> dict:
+    """
+    Merges two tool dicts (new format with components/services), avoiding duplicates.
+    """
+    merged_tools = copy.deepcopy(governing_tools)
+
+    # Merge components
+    governing_components = merged_tools.get("components")
+    if governing_components is None:
+        governing_components = []
+        if tools_to_merge.get("components"):
+            merged_tools["components"] = governing_components
+    for component_to_merge in tools_to_merge.get("components", []):
+        is_duplicate = any(
+            _tools_are_equal(component_to_merge, existing_component)
+            for existing_component in governing_components
+        )
+        if not is_duplicate:
+            governing_components.append(copy.deepcopy(component_to_merge))
+
+    # Merge services
+    governing_services = merged_tools.get("services")
+    if governing_services is None:
+        governing_services = []
+        if tools_to_merge.get("services"):
+            merged_tools["services"] = governing_services
+    for service_to_merge in tools_to_merge.get("services", []):
+        is_duplicate = any(
+            _tools_are_equal(service_to_merge, existing_service)
+            for existing_service in governing_services
+        )
+        if not is_duplicate:
+            governing_services.append(copy.deepcopy(service_to_merge))
+
+    return merged_tools
+
+
+def merge_tools(
+    governing_tools: t.Union[list, dict, None],
+    tools_to_be_merged: t.Union[list, dict, None],
+) -> t.Union[list, dict, None]:
+    """
+    Merges tools from two SBOMs, adapting to the format of the governing SBOM.
+
+    In CycloneDX < 1.5, tools is an array of objects with fields like name, vendor, version.
+    In CycloneDX >= 1.5, tools is an object with 'components' and 'services' fields.
+
+    This function:
+    1. Determines the format from governing_tools
+    2. Converts tools_to_be_merged to match that format
+    3. Merges them, avoiding duplicates based on tool identity
+
+    Args:
+        governing_tools: Tools from the governing SBOM (array or dict or None)
+        tools_to_be_merged: Tools from the SBOM to be merged (array or dict or None)
+
+    Returns:
+        Merged tools in the format of governing_tools, or None if both are None/empty
+    """
+    # Handle missing values. Empty dict/list are valid tool containers and must
+    # not be treated like absent values.
+    if governing_tools is None and tools_to_be_merged is None:
+        return governing_tools
+
+    if tools_to_be_merged is None:
+        return governing_tools
+
+    if governing_tools is None:
+        return tools_to_be_merged
+
+    # Determine format from governing_tools and narrow types
+    if isinstance(governing_tools, dict):
+        # Governing is dict format, convert tools_to_be_merged to dict if needed
+        if isinstance(tools_to_be_merged, list):
+            converted_tools = _convert_tools_array_to_dict(tools_to_be_merged)
+        else:
+            # tools_to_be_merged must be a dict at this point
+            converted_tools = copy.deepcopy(t.cast(dict, tools_to_be_merged))
+
+        # Merge into governing_tools (dict format)
+        return _merge_tools_dict(governing_tools, converted_tools)
+    else:
+        # governing_tools must be a list at this point
+        governing_tools_list = t.cast(list, governing_tools)
+
+        # Governing is array format, convert tools_to_be_merged to array if needed
+        if isinstance(tools_to_be_merged, dict):
+            converted_tools = _convert_tools_dict_to_array(tools_to_be_merged)
+        else:
+            # tools_to_be_merged must be a list at this point
+            converted_tools = copy.deepcopy(t.cast(list, tools_to_be_merged))
+
+        # Merge into governing_tools (array format)
+        return _merge_tools_array(governing_tools_list, converted_tools)
+
+
 def merge_dependency(depedency_original: dict, dependency_new: dict) -> dict[str, t.Any]:
     """
     Function that merges the dependsOn lists of two dependencies uniquely into one.
@@ -283,6 +504,25 @@ def merge_2_sboms(
     if merged_sbom.get("metadata", {}).get("component", {}) and merged_sbom.get("components", []):
         add_merged_metadata_component_to_dependencies(merged_sbom, sbom_to_be_merged)
 
+    original_tools = original_sbom.get("metadata", {}).get("tools", None)
+    tools_to_merge = sbom_to_be_merged.get("metadata", {}).get("tools", None)
+    if original_tools is not None or tools_to_merge is not None:
+        # If original SBOM has no tools yet, choose default tools format based on
+        # the original SBOM's version to ensure backward/forward compatibility.
+        governing_tools: t.Union[list, dict, None] = original_tools
+        if governing_tools is None and tools_to_merge is not None:
+            spec_version = SpecVersion.parse(str(original_sbom.get("specVersion", "")))
+            if spec_version is not None and spec_version >= CycloneDXVersion.V1_5:
+                governing_tools = {}
+            else:
+                governing_tools = []
+
+        merged_tools = merge_tools(
+            governing_tools,
+            tools_to_merge,
+        )
+        if merged_tools is not None:
+            merged_sbom.setdefault("metadata", {})["tools"] = merged_tools
     return merged_sbom
 
 

@@ -588,7 +588,8 @@ def merge_2_sboms(
                     LogMessage(
                         "Parsing error",
                         f"Cannot parse specVersion '{original_sbom.get('specVersion', '')}'; "
-                        "defaulting tools format to array. Output may not be schema-valid for the declared version.",
+                        "defaulting tools format to array. Output may not be schema-valid "
+                        "for the declared version.",
                     )
                 )
                 governing_tools = []

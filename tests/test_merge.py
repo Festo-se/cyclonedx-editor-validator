@@ -828,14 +828,14 @@ class TestMergeSboms(unittest.TestCase):
         # Should default to array format (pre-1.5) and log a warning
         tools = merged["metadata"]["tools"]
         self.assertIsInstance(
-            tools, list,
-            "When specVersion parse fails, tools should default to array format"
+            tools, list, "When specVersion parse fails, tools should default to array format"
         )
         self.assertEqual(len(tools), 1)
         self.assertEqual(tools[0]["name"], "tool")
         # Verify warning was logged for the parse failure
-        self.assertTrue(logger_mock.warning.called,
-                        "Expected warning to be logged for malformed specVersion")
+        self.assertTrue(
+            logger_mock.warning.called, "Expected warning to be logged for malformed specVersion"
+        )
 
     def test_merge_tools_missing_spec_version_warns_and_defaults_to_array(self) -> None:
         original_sbom = self._load_reference_sbom("1.6")
@@ -857,13 +857,13 @@ class TestMergeSboms(unittest.TestCase):
         # Should default to array format (pre-1.5) and log a warning
         tools = merged["metadata"]["tools"]
         self.assertIsInstance(
-            tools, list,
-            "When specVersion is missing, tools should default to array format"
+            tools, list, "When specVersion is missing, tools should default to array format"
         )
         self.assertEqual(len(tools), 1)
         self.assertEqual(tools[0]["name"], "tool-2")
-        self.assertTrue(logger_mock.warning.called,
-                        "Expected warning to be logged for missing specVersion")
+        self.assertTrue(
+            logger_mock.warning.called, "Expected warning to be logged for missing specVersion"
+        )
 
 
 class TestMergeSeveralSboms(unittest.TestCase):

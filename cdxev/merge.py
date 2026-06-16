@@ -157,14 +157,22 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
     """
     Compares two tool objects for identity-based equality.
 
-    This intentionally does not use ComponentIdentity equality because that logic
-    is overlap-based and can over-match (e.g. tools sharing only broad attributes
-    like type), which would drop valid tools during merge.
+    Two tools are only treated as duplicates when both their identity key and their
+    full object contents match. This prevents data loss when two tools share the same
+    broad identity but differ in other fields.
+
+    Identity key fields: type (default 'application'), name, version, organization/
+    provider.name/publisher/vendor, and bom-ref. Both the identity key and the full
+    normalized object must match for tools to be considered duplicates.
 
     Notes:
     - Missing type defaults to "application" to avoid duplicates introduced when
         converting pre-1.5 array tools into >=1.5 components.
     - Services can identify vendor via either organization or provider.name.
+    - Near-duplicates are intentionally preserved when non-normalized fields differ
+        (for example provider metadata beyond provider.name).
+    - Short-circuit evaluation: if identity keys differ, full object comparison is
+        skipped for efficiency.
     """
 
     def _norm(value: t.Any) -> str:
@@ -173,12 +181,33 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
         return str(value).strip().lower()
 
     def _organization_or_provider(tool: dict) -> t.Any:
+        # Vendor/organization field priority: organization (services in 1.5+) >
+        # provider.name (services with provider object) > publisher (components in
+        # 1.5+) > vendor (legacy array tools and old components).
         if tool.get("organization") is not None:
             return tool.get("organization")
         provider = tool.get("provider")
         if isinstance(provider, dict):
             return provider.get("name")
         return tool.get("publisher", tool.get("vendor"))
+
+    def _normalize_for_compare(tool: dict) -> dict:
+        normalized = copy.deepcopy(tool)
+
+        if normalized.get("type") is None:
+            normalized["type"] = "application"
+
+        if "vendor" in normalized and "publisher" not in normalized:
+            normalized["publisher"] = normalized.pop("vendor")
+        else:
+            normalized.pop("vendor", None)
+
+        provider = normalized.get("provider")
+        if isinstance(provider, dict) and set(provider.keys()) == {"name"}:
+            normalized["organization"] = provider["name"]
+            normalized.pop("provider", None)
+
+        return normalized
 
     # Preserve important schema fields where present; missing values normalize to empty strings.
     key1 = (
@@ -195,7 +224,7 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
         _norm(_organization_or_provider(tool2)),
         _norm(tool2.get("bom-ref")),
     )
-    return key1 == key2
+    return key1 == key2 and _normalize_for_compare(tool1) == _normalize_for_compare(tool2)
 
 
 def _convert_tools_array_to_dict(tools_array: list) -> dict:
@@ -274,6 +303,27 @@ def _convert_tools_dict_to_array(tools_dict: dict) -> list:
             tool["version"] = service["version"]
         if "organization" in service:
             tool["vendor"] = service["organization"]
+        else:
+            provider = service.get("provider")
+            if isinstance(provider, dict) and provider.get("name"):
+                tool["vendor"] = provider["name"]
+                if set(provider.keys()) - {"name"}:
+                    logger.warning(
+                        LogMessage(
+                            "Potential loss of information",
+                            "Converting metadata.tools.services provider data to pre-1.5 "
+                            "metadata.tools array keeps only provider.name as vendor and "
+                            "drops additional provider fields.",
+                        )
+                    )
+            elif provider:
+                logger.warning(
+                    LogMessage(
+                        "Potential loss of information",
+                        "Converting metadata.tools.services to pre-1.5 metadata.tools array "
+                        "dropped provider information that has no usable provider.name.",
+                    )
+                )
         if "hashes" in service:
             tool["hashes"] = service["hashes"]
         if "bom-ref" in service:
@@ -306,33 +356,31 @@ def _merge_tools_dict(governing_tools: dict, tools_to_merge: dict) -> dict:
     """
     merged_tools = copy.deepcopy(governing_tools)
 
-    # Merge components
-    governing_components = merged_tools.get("components")
-    if governing_components is None:
-        governing_components = []
+    # Merge components. Only add the key to merged_tools if either the governing
+    # tools or the incoming tools have components.
     if "components" in merged_tools or tools_to_merge.get("components"):
+        governing_components = merged_tools.get("components", [])
         merged_tools["components"] = governing_components
-    for component_to_merge in tools_to_merge.get("components", []):
-        is_duplicate = any(
-            _tools_are_equal(component_to_merge, existing_component)
-            for existing_component in governing_components
-        )
-        if not is_duplicate:
-            governing_components.append(copy.deepcopy(component_to_merge))
+        for component_to_merge in tools_to_merge.get("components", []):
+            is_duplicate = any(
+                _tools_are_equal(component_to_merge, existing_component)
+                for existing_component in governing_components
+            )
+            if not is_duplicate:
+                governing_components.append(copy.deepcopy(component_to_merge))
 
-    # Merge services
-    governing_services = merged_tools.get("services")
-    if governing_services is None:
-        governing_services = []
+    # Merge services. Only add the key to merged_tools if either the governing
+    # tools or the incoming tools have services.
     if "services" in merged_tools or tools_to_merge.get("services"):
+        governing_services = merged_tools.get("services", [])
         merged_tools["services"] = governing_services
-    for service_to_merge in tools_to_merge.get("services", []):
-        is_duplicate = any(
-            _tools_are_equal(service_to_merge, existing_service)
-            for existing_service in governing_services
-        )
-        if not is_duplicate:
-            governing_services.append(copy.deepcopy(service_to_merge))
+        for service_to_merge in tools_to_merge.get("services", []):
+            is_duplicate = any(
+                _tools_are_equal(service_to_merge, existing_service)
+                for existing_service in governing_services
+            )
+            if not is_duplicate:
+                governing_services.append(copy.deepcopy(service_to_merge))
 
     return merged_tools
 
@@ -533,7 +581,18 @@ def merge_2_sboms(
         governing_tools: t.Union[list, dict, None] = original_tools
         if governing_tools is None and tools_to_merge is not None:
             spec_version = SpecVersion.parse(str(original_sbom.get("specVersion", "")))
-            if spec_version is not None and spec_version >= CycloneDXVersion.V1_5:
+            if spec_version is None:
+                # specVersion parsing failed; default to array format but warn
+                # since output may not match the declared specVersion
+                logger.warning(
+                    LogMessage(
+                        "Parsing error",
+                        f"Cannot parse specVersion '{original_sbom.get('specVersion', '')}'; "
+                        "defaulting tools format to array. Output may not be schema-valid for the declared version.",
+                    )
+                )
+                governing_tools = []
+            elif spec_version >= CycloneDXVersion.V1_5:
                 governing_tools = {}
             else:
                 governing_tools = []

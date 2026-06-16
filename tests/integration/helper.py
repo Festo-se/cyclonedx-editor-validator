@@ -17,12 +17,6 @@ def load_sbom(path: Path) -> dict:
     return sbom
 
 
-def load_list(path: Path) -> dict:
-    with path.open(encoding="utf_8_sig") as f:
-        list = f.read()
-    return list
-
-
 def delete_non_reproducible(sbom: dict):
     """
     Deletes any fields from the SBOM that are typically not reproducible between builds.
@@ -55,7 +49,7 @@ def _delete_tool_version(sbom: dict):
 
 
 @t.overload
-def run_main(capsys: None = ..., parse_output: None = ...) -> t.Tuple[int, None]: ...
+def run_main(capsys: None = ..., parse_output: None = ...) -> t.Tuple[int, None, None]: ...
 
 
 @t.overload
@@ -88,15 +82,15 @@ def run_main(
                          returned.
                          If ``"filename"``, the filename printed to stdout is extracted and
                          returned as a ``pathlib.Path`` object.
-                         If ``None``, stdout is returned as-is.
-    :returns: A tuple of ``(exit_code, stdout, stderr)``, where *stdout* might be ``None``,
-              ``str``, ``Path``, or ``dict`` depending on parameters. *stderr* is always returned
-              as-is.
+                         If ``None``, stdout is returned as a ``str``.
+    :returns: A tuple of ``(exit_code, stdout, stderr)``, where *stdout* and *stderr* are
+               ``None`` if *capsys* is ``None``. In every other case, *stderr* is a ``str`` and
+               the type of *stdout* depends on *parse_output*.
     """
     exit_code = main()
 
     if capsys is None:
-        return (exit_code, None)
+        return (exit_code, None, None)
 
     (out, err) = capsys.readouterr()
 

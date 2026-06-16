@@ -62,6 +62,10 @@ class UpdateIdentity(ComponentIdentity):
             k in self._keys for k in other._keys
         )
 
+    # Prevent @dataclass(frozen=True) from regenerating __hash__ based on _keys,
+    # which would violate the hash contract given the non-transitive __eq__.
+    __hash__ = ComponentIdentity.__hash__
+
     @classmethod
     def create(
         cls, component: t.Mapping[str, t.Any], allow_unsafe: bool = False

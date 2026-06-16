@@ -626,7 +626,7 @@ class TestMergeSboms(unittest.TestCase):
         self._assert_sbom_valid_for_spec(merged)
 
     def test_merge_tools_new_into_old_warns_on_component_metadata_loss(self) -> None:
-        original_sbom = self._load_reference_sbom("1.3")
+        original_sbom = self._load_reference_sbom("1.4")
         original_sbom.setdefault("metadata", {}).pop("tools", None)
 
         sbom_to_be_merged = self._load_reference_sbom("1.7")
@@ -655,15 +655,238 @@ class TestMergeSboms(unittest.TestCase):
 
         self.assertEqual(merged["metadata"]["tools"][0]["name"], "modern-tool")
         self.assertNotIn("description", merged["metadata"]["tools"][0])
+        self.assertIn("externalReferences", merged["metadata"]["tools"][0])
         self.assertTrue(logger_mock.warning.called)
         self.assertTrue(
             any(
                 "drops component metadata fields" in str(call.args[0]).lower()
                 and "description" in str(call.args[0]).lower()
+                for call in logger_mock.warning.call_args_list
+            )
+        )
+        self.assertFalse(
+            any(
+                "drops component metadata fields" in str(call.args[0]).lower()
                 and "externalreferences" in str(call.args[0]).lower()
                 for call in logger_mock.warning.call_args_list
             )
         )
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_1_6_governing_legacy_array_upgrades_to_object_format(self) -> None:
+        original_sbom = self._load_reference_sbom("1.6")
+        original_sbom.setdefault("metadata", {})["tools"] = [
+            {"name": "governing-legacy-tool", "vendor": "acme", "version": "1.0.0"}
+        ]
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "incoming-modern-tool",
+                    "publisher": "contoso",
+                    "version": "2.0.0",
+                }
+            ],
+            "services": [{"name": "incoming-service", "provider": {"name": "contoso"}}],
+        }
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        tools = merged["metadata"]["tools"]
+        self.assertIsInstance(tools, dict)
+        self.assertIn("components", tools)
+        self.assertIn("services", tools)
+        self.assertTrue(
+            any(
+                component.get("name") == "governing-legacy-tool"
+                for component in tools["components"]
+            )
+        )
+        self.assertTrue(
+            any(
+                component.get("name") == "incoming-modern-tool"
+                for component in tools["components"]
+            )
+        )
+        self.assertTrue(
+            any(service.get("name") == "incoming-service" for service in tools["services"])
+        )
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_1_4_governing_array_with_incoming_object_stays_array(self) -> None:
+        original_sbom = self._load_reference_sbom("1.4")
+        original_sbom.setdefault("metadata", {})["tools"] = [
+            {"name": "governing-legacy-tool", "vendor": "acme", "version": "1.0.0"}
+        ]
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "incoming-modern-tool",
+                    "publisher": "contoso",
+                    "version": "2.0.0",
+                }
+            ]
+        }
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        tools = merged["metadata"]["tools"]
+        self.assertIsInstance(tools, list)
+        self.assertTrue(any(tool.get("name") == "governing-legacy-tool" for tool in tools))
+        self.assertTrue(any(tool.get("name") == "incoming-modern-tool" for tool in tools))
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_new_into_old_preserves_external_references(self) -> None:
+        original_sbom = self._load_reference_sbom("1.4")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "modern-tool",
+                    "publisher": "acme",
+                    "externalReferences": [
+                        {
+                            "type": "website",
+                            "url": "https://example.com/tool",
+                        }
+                    ],
+                }
+            ]
+        }
+
+        with patch("cdxev.merge.logger") as logger_mock:
+            merged = merge.merge_2_sboms(
+                copy.deepcopy(original_sbom),
+                copy.deepcopy(sbom_to_be_merged),
+            )
+
+        tools = merged["metadata"]["tools"]
+        self.assertIsInstance(tools, list)
+        self.assertEqual(tools[0]["name"], "modern-tool")
+        self.assertIn("externalReferences", tools[0])
+        self.assertFalse(
+            any(
+                "drops component metadata fields" in str(call.args[0]).lower()
+                and "externalreferences" in str(call.args[0]).lower()
+                for call in logger_mock.warning.call_args_list
+            )
+        )
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_nameless_legacy_tool_is_skipped_when_target_is_1_6(self) -> None:
+        original_sbom = self._load_reference_sbom("1.6")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.3")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = [
+            {"vendor": "acme", "version": "1.0.0"},
+            {"name": "kept-tool", "vendor": "acme", "version": "2.0.0"},
+        ]
+
+        with patch("cdxev.merge.logger") as logger_mock:
+            merged = merge.merge_2_sboms(
+                copy.deepcopy(original_sbom),
+                copy.deepcopy(sbom_to_be_merged),
+            )
+
+        components = merged["metadata"]["tools"].get("components", [])
+        self.assertEqual(len(components), 1)
+        self.assertEqual(components[0]["name"], "kept-tool")
+        self.assertTrue(
+            any(
+                "without a usable name" in str(call.args[0]).lower()
+                for call in logger_mock.warning.call_args_list
+            )
+        )
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_new_into_old_outputs_only_legacy_tool_keys(self) -> None:
+        original_sbom = self._load_reference_sbom("1.4")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "framework",
+                    "name": "modern-tool",
+                    "publisher": "acme",
+                    "version": "2.0.0",
+                    "hashes": [{"alg": "MD5", "content": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],
+                    "externalReferences": [
+                        {
+                            "type": "website",
+                            "url": "https://example.com/tool",
+                        }
+                    ],
+                    "description": "tool description",
+                    "bom-ref": "tool-ref",
+                }
+            ]
+        }
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        tool = merged["metadata"]["tools"][0]
+        allowed_legacy_keys = {"name", "vendor", "version", "hashes", "externalReferences"}
+        self.assertTrue(set(tool).issubset(allowed_legacy_keys))
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_1_7_duplicate_bom_ref_is_renamed_to_unique(self) -> None:
+        original_sbom = self._load_reference_sbom("1.7")
+        original_sbom.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "governing-tool",
+                    "publisher": "acme",
+                    "version": "1.0.0",
+                    "bom-ref": "tool-ref",
+                }
+            ]
+        }
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "incoming-tool",
+                    "publisher": "contoso",
+                    "version": "1.0.0",
+                    "bom-ref": "tool-ref",
+                }
+            ]
+        }
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        components = merged["metadata"]["tools"].get("components", [])
+        self.assertEqual(len(components), 2)
+        refs = [component.get("bom-ref") for component in components]
+        self.assertEqual(len(set(refs)), 2)
+        self.assertTrue(any(ref == "tool-ref" for ref in refs))
+        self.assertTrue(any(ref and ref.startswith("tool-ref-tool-") for ref in refs))
         self._assert_sbom_valid_for_spec(merged)
 
     def test_merge_tools_dict_dedup_keeps_distinct_services(self) -> None:
@@ -1010,8 +1233,60 @@ class TestMergeSboms(unittest.TestCase):
         self.assertEqual(tools_to_be_merged, merged_snapshot)
         self.assertEqual(len(merged_tools["components"]), 2)
 
+    def test_merge_tools_target_object_does_not_mutate_legacy_array_inputs(self) -> None:
+        governing_tools = [{"name": "legacy-governing", "vendor": "acme", "version": "1.0.0"}]
+        tools_to_be_merged = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "incoming-modern",
+                    "publisher": "contoso",
+                    "version": "2.0.0",
+                }
+            ]
+        }
+        governing_snapshot = copy.deepcopy(governing_tools)
+        merged_snapshot = copy.deepcopy(tools_to_be_merged)
+
+        merged_tools = merge.merge_tools(
+            governing_tools,
+            tools_to_be_merged,
+            target_format="object",
+        )
+
+        self.assertEqual(governing_tools, governing_snapshot)
+        self.assertEqual(tools_to_be_merged, merged_snapshot)
+        self.assertIsInstance(merged_tools, dict)
+        self.assertIn("components", merged_tools)
+        self.assertEqual(len(merged_tools["components"]), 2)
+
 
 class TestMergeSeveralSboms(unittest.TestCase):
+    def _load_reference_sbom(self, spec_version: str) -> dict:
+        with open(
+            "tests/auxiliary/test_validate_sboms/"
+            "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json",
+            "r",
+            encoding="utf_8_sig",
+        ) as f:
+            sbom = json.load(f)
+        sbom["specVersion"] = spec_version
+        return sbom
+
+    def _assert_sbom_valid_for_spec(self, sbom: dict) -> None:
+        with patch("cdxev.validator.validate.logger"):
+            errors = validate_sbom(
+                sbom=sbom,
+                input_format="json",
+                file=Path("bom.json"),
+                report_format="stdout",
+                report_path=Path("."),
+                schema_type="custom",
+                filename_regex=".*",
+                schema_path=None,
+            )
+        self.assertEqual(errors, 0)
+
     def test_merge_3_sboms(self) -> None:
         governing_program = helper.load_governing_program()
         sub_program = helper.load_sub_program()
@@ -1065,6 +1340,55 @@ class TestMergeSeveralSboms(unittest.TestCase):
             result["metadata"]["component"]["bom-ref"],
             result["components"][0]["bom-ref"],
         )
+
+    def test_merge_3_sboms_1_6_tools_format_follows_governing_spec(self) -> None:
+        sbom_1 = self._load_reference_sbom("1.6")
+        sbom_1.setdefault("metadata", {})["tools"] = [
+            {"name": "legacy-tool", "vendor": "acme", "version": "1.0.0"}
+        ]
+
+        sbom_2 = self._load_reference_sbom("1.3")
+        sbom_2.setdefault("metadata", {})["tools"] = [
+            {"name": "legacy-tool-2", "vendor": "contoso", "version": "2.0.0"}
+        ]
+
+        sbom_3 = self._load_reference_sbom("1.7")
+        sbom_3.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "modern-tool",
+                    "publisher": "fabrikam",
+                    "version": "3.0.0",
+                }
+            ],
+            "services": [
+                {
+                    "name": "modern-service",
+                    "provider": {"name": "fabrikam"},
+                }
+            ],
+        }
+
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2), copy.deepcopy(sbom_3)])
+
+        tools = merged.get("metadata", {}).get("tools")
+        self.assertIsInstance(tools, dict)
+        self.assertIn("components", tools)
+        self.assertIn("services", tools)
+        self.assertTrue(
+            any(component.get("name") == "legacy-tool" for component in tools["components"])
+        )
+        self.assertTrue(
+            any(component.get("name") == "legacy-tool-2" for component in tools["components"])
+        )
+        self.assertTrue(
+            any(component.get("name") == "modern-tool" for component in tools["components"])
+        )
+        self.assertTrue(
+            any(service.get("name") == "modern-service" for service in tools["services"])
+        )
+        self._assert_sbom_valid_for_spec(merged)
 
 
 class TestMergeComponents(unittest.TestCase):

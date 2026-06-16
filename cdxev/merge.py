@@ -244,12 +244,23 @@ def _convert_tools_array_to_dict(tools_array: list) -> dict:
     """
     components = []
     for tool in tools_array:
+        name = tool.get("name")
+        if name is None or not str(name).strip():
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    "Converting legacy metadata.tools array to CycloneDX >=1.5 object format "
+                    "skips a tool entry without a usable name because tool components require "
+                    "both type and name.",
+                )
+            )
+            continue
+
         # Convert old format tool to new format
         component = {
             "type": tool.get("type", "application"),
         }
-        if "name" in tool:
-            component["name"] = tool["name"]
+        component["name"] = name
         if "version" in tool:
             component["version"] = tool["version"]
         if "vendor" in tool:
@@ -289,9 +300,9 @@ def _convert_tools_dict_to_array(tools_dict: dict) -> list:
         if "hashes" in component:
             tool["hashes"] = component["hashes"]
             copied_component_keys.add("hashes")
-        if "bom-ref" in component:
-            tool["bom-ref"] = component["bom-ref"]
-            copied_component_keys.add("bom-ref")
+        if "externalReferences" in component:
+            tool["externalReferences"] = component["externalReferences"]
+            copied_component_keys.add("externalReferences")
         if component.get("type") and component["type"] != "application":
             logger.warning(
                 LogMessage(
@@ -352,8 +363,8 @@ def _convert_tools_dict_to_array(tools_dict: dict) -> list:
                 )
         if "hashes" in service:
             tool["hashes"] = service["hashes"]
-        if "bom-ref" in service:
-            tool["bom-ref"] = service["bom-ref"]
+        if "externalReferences" in service:
+            tool["externalReferences"] = service["externalReferences"]
         tools_array.append(tool)
 
     return tools_array
@@ -408,12 +419,59 @@ def _merge_tools_dict(governing_tools: dict, tools_to_merge: dict) -> dict:
             if not is_duplicate:
                 governing_services.append(copy.deepcopy(service_to_merge))
 
+    _make_merged_tool_bom_refs_unique(merged_tools)
+
     return merged_tools
+
+
+def _make_merged_tool_bom_refs_unique(merged_tools: dict) -> None:
+    """
+    Ensure bom-ref uniqueness across metadata.tools components/services in-place.
+    Keeps first occurrence and deterministically renames subsequent collisions.
+    """
+
+    entries: list[tuple[str, int, dict]] = []
+    for key in ("components", "services"):
+        for idx, entry in enumerate(merged_tools.get(key, [])):
+            if isinstance(entry, dict):
+                entries.append((key, idx, entry))
+
+    used_refs: set[str] = set()
+    rename_counters: dict[str, int] = {}
+    for key, idx, entry in entries:
+        bom_ref = entry.get("bom-ref")
+        if bom_ref is None:
+            continue
+        bom_ref_str = str(bom_ref)
+        if not bom_ref_str:
+            continue
+        if bom_ref_str not in used_refs:
+            used_refs.add(bom_ref_str)
+            continue
+
+        suffix = rename_counters.get(bom_ref_str, 1)
+        candidate = f"{bom_ref_str}-tool-{suffix}"
+        while candidate in used_refs:
+            suffix += 1
+            candidate = f"{bom_ref_str}-tool-{suffix}"
+        rename_counters[bom_ref_str] = suffix + 1
+
+        entry["bom-ref"] = candidate
+        used_refs.add(candidate)
+        logger.warning(
+            LogMessage(
+                "Potential loss of information",
+                "Duplicate metadata.tools bom-ref detected while merging; "
+                f"renamed {key}[{idx}] bom-ref from '{bom_ref_str}' to '{candidate}' "
+                "to preserve uniqueness.",
+            )
+        )
 
 
 def merge_tools(
     governing_tools: t.Union[list, dict, None],
     tools_to_be_merged: t.Union[list, dict, None],
+    target_format: t.Optional[str] = None,
 ) -> t.Union[list, dict, None]:
     """
     Merges tools from two SBOMs, adapting to the format of the governing SBOM.
@@ -444,8 +502,18 @@ def merge_tools(
     if governing_tools is None:
         return tools_to_be_merged
 
-    # Determine format from governing_tools and narrow types
-    if isinstance(governing_tools, dict):
+    resolved_target_format = target_format
+    if resolved_target_format is None:
+        resolved_target_format = "object" if isinstance(governing_tools, dict) else "array"
+
+    # Determine format from target format and narrow types
+    if resolved_target_format == "object":
+        governing_tools_dict: dict
+        if isinstance(governing_tools, list):
+            governing_tools_dict = _convert_tools_array_to_dict(governing_tools)
+        else:
+            governing_tools_dict = copy.deepcopy(governing_tools)
+
         # Governing is dict format, convert tools_to_be_merged to dict if needed
         converted_tools_dict: dict
         if isinstance(tools_to_be_merged, list):
@@ -454,9 +522,14 @@ def merge_tools(
             converted_tools_dict = copy.deepcopy(tools_to_be_merged)
 
         # Merge into governing_tools (dict format)
-        return _merge_tools_dict(governing_tools, converted_tools_dict)
+        return _merge_tools_dict(governing_tools_dict, converted_tools_dict)
 
-    # governing_tools is list here
+    governing_tools_list: list
+    if isinstance(governing_tools, dict):
+        governing_tools_list = _convert_tools_dict_to_array(governing_tools)
+    else:
+        governing_tools_list = copy.deepcopy(governing_tools)
+
     converted_tools_list: list
     if isinstance(tools_to_be_merged, dict):
         converted_tools_list = _convert_tools_dict_to_array(tools_to_be_merged)
@@ -464,7 +537,7 @@ def merge_tools(
         converted_tools_list = copy.deepcopy(tools_to_be_merged)
 
     # Merge into governing_tools (array format)
-    return _merge_tools_array(governing_tools, converted_tools_list)
+    return _merge_tools_array(governing_tools_list, converted_tools_list)
 
 
 def merge_dependency(depedency_original: dict, dependency_new: dict) -> dict[str, t.Any]:
@@ -599,34 +672,33 @@ def merge_2_sboms(
     if merged_sbom.get("metadata", {}).get("component", {}) and merged_sbom.get("components", []):
         add_merged_metadata_component_to_dependencies(merged_sbom, sbom_to_be_merged)
 
+    spec_version = SpecVersion.parse(str(original_sbom.get("specVersion", "")))
+    target_tools_format = "array"
+    if spec_version is None:
+        # specVersion parsing failed; default to array format but warn
+        # since output may not match the declared specVersion
+        logger.warning(
+            LogMessage(
+                "Parsing error",
+                f"Cannot parse specVersion '{original_sbom.get('specVersion', '')}'; "
+                "defaulting tools format to array. Output may not be schema-valid "
+                "for the declared version.",
+            )
+        )
+    elif spec_version >= CycloneDXVersion.V1_5:
+        target_tools_format = "object"
+
     original_tools = original_sbom.get("metadata", {}).get("tools", None)
     tools_to_merge = sbom_to_be_merged.get("metadata", {}).get("tools", None)
     if tools_to_merge is not None:
-        # If original SBOM has no tools yet, choose default tools format based on
-        # the original SBOM's version to ensure backward/forward compatibility.
         governing_tools: t.Union[list, dict, None] = original_tools
         if governing_tools is None:
-            spec_version = SpecVersion.parse(str(original_sbom.get("specVersion", "")))
-            if spec_version is None:
-                # specVersion parsing failed; default to array format but warn
-                # since output may not match the declared specVersion
-                logger.warning(
-                    LogMessage(
-                        "Parsing error",
-                        f"Cannot parse specVersion '{original_sbom.get('specVersion', '')}'; "
-                        "defaulting tools format to array. Output may not be schema-valid "
-                        "for the declared version.",
-                    )
-                )
-                governing_tools = []
-            elif spec_version >= CycloneDXVersion.V1_5:
-                governing_tools = {}
-            else:
-                governing_tools = []
+            governing_tools = {} if target_tools_format == "object" else []
 
         merged_tools = merge_tools(
             governing_tools,
             tools_to_merge,
+            target_format=target_tools_format,
         )
         if merged_tools is not None:
             merged_sbom.setdefault("metadata", {})["tools"] = merged_tools

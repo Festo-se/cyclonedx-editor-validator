@@ -348,27 +348,24 @@ def merge_tools(
     # Determine format from governing_tools and narrow types
     if isinstance(governing_tools, dict):
         # Governing is dict format, convert tools_to_be_merged to dict if needed
+        converted_tools_dict: dict
         if isinstance(tools_to_be_merged, list):
-            converted_tools = _convert_tools_array_to_dict(tools_to_be_merged)
+            converted_tools_dict = _convert_tools_array_to_dict(tools_to_be_merged)
         else:
-            # tools_to_be_merged must be a dict at this point
-            converted_tools = copy.deepcopy(t.cast(dict, tools_to_be_merged))
+            converted_tools_dict = copy.deepcopy(tools_to_be_merged)
 
         # Merge into governing_tools (dict format)
-        return _merge_tools_dict(governing_tools, converted_tools)
+        return _merge_tools_dict(governing_tools, converted_tools_dict)
+
+    # governing_tools is list here
+    converted_tools_list: list
+    if isinstance(tools_to_be_merged, dict):
+        converted_tools_list = _convert_tools_dict_to_array(tools_to_be_merged)
     else:
-        # governing_tools must be a list at this point
-        governing_tools_list = t.cast(list, governing_tools)
+        converted_tools_list = copy.deepcopy(tools_to_be_merged)
 
-        # Governing is array format, convert tools_to_be_merged to array if needed
-        if isinstance(tools_to_be_merged, dict):
-            converted_tools = _convert_tools_dict_to_array(tools_to_be_merged)
-        else:
-            # tools_to_be_merged must be a list at this point
-            converted_tools = copy.deepcopy(t.cast(list, tools_to_be_merged))
-
-        # Merge into governing_tools (array format)
-        return _merge_tools_array(governing_tools_list, converted_tools)
+    # Merge into governing_tools (array format)
+    return _merge_tools_array(governing_tools, converted_tools_list)
 
 
 def merge_dependency(depedency_original: dict, dependency_new: dict) -> dict[str, t.Any]:

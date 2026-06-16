@@ -22,7 +22,7 @@ import cdxev.amend.command as amend
 import cdxev.set
 from cdxev import pkg
 from cdxev.amend.operations import Operation
-from cdxev.auxiliary.identity import CoordinatesWithVersionRange, Key, KeyType
+from cdxev.auxiliary.identity import Key, KeyType
 from cdxev.auxiliary.io_processing import (
     add_input_argument,
     add_output_argument,
@@ -951,7 +951,7 @@ def _build_key_id(target_key: Key, update_id: dict[str, t.Any]) -> None:
         if target_key.key.version is not None:
             update_id["version"] = target_key.key.version
         if (
-            isinstance(target_key.key, CoordinatesWithVersionRange)
+            isinstance(target_key.key, cdxev.set.CoordinatesWithVersionRange)
             and target_key.key.version_range is not None
         ):
             update_id["version-range"] = str(target_key.key.version_range)

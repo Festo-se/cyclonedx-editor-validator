@@ -40,7 +40,7 @@ class TestMergeSboms(unittest.TestCase):
         return sbom
 
     def _assert_sbom_valid_for_spec(self, sbom: dict) -> None:
-        with patch("cdxev.validator.validate.logger") as mock_logger:
+        with patch("cdxev.validator.validate.logger"):
             errors = validate_sbom(
                 sbom=sbom,
                 input_format="json",
@@ -255,7 +255,10 @@ class TestMergeSboms(unittest.TestCase):
             {"name": "legacy-tool", "vendor": "acme", "version": "1.0.0"}
         ]
 
-        merged = merge.merge_2_sboms(copy.deepcopy(original_sbom), copy.deepcopy(sbom_to_be_merged))
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
         tools = merged["metadata"]["tools"]
 
         self.assertIsInstance(tools, dict)
@@ -287,7 +290,10 @@ class TestMergeSboms(unittest.TestCase):
             ],
         }
 
-        merged = merge.merge_2_sboms(copy.deepcopy(original_sbom), copy.deepcopy(sbom_to_be_merged))
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
         tools = merged["metadata"]["tools"]
 
         self.assertIsInstance(tools, list)
@@ -332,7 +338,10 @@ class TestMergeSboms(unittest.TestCase):
             ],
         }
 
-        merged = merge.merge_2_sboms(copy.deepcopy(original_sbom), copy.deepcopy(sbom_to_be_merged))
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
         tools = merged["metadata"]["tools"]
 
         self.assertIsInstance(tools, dict)
@@ -355,7 +364,10 @@ class TestMergeSboms(unittest.TestCase):
             {"name": "sub-legacy-tool", "vendor": "contoso", "version": "2.0.0"}
         ]
 
-        merged = merge.merge_2_sboms(copy.deepcopy(original_sbom), copy.deepcopy(sbom_to_be_merged))
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
         tools = merged["metadata"]["tools"]
 
         self.assertIsInstance(tools, list)

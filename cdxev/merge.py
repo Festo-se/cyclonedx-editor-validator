@@ -161,6 +161,7 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
     is overlap-based and can over-match (e.g. tools sharing only broad attributes
     like type), which would drop valid tools during merge.
     """
+
     def _norm(value: t.Any) -> str:
         if value is None:
             return ""
@@ -257,9 +258,7 @@ def _convert_tools_dict_to_array(tools_dict: dict) -> list:
     return tools_array
 
 
-def _merge_tools_array(
-    governing_tools: list, tools_to_merge: list
-) -> list:
+def _merge_tools_array(governing_tools: list, tools_to_merge: list) -> list:
     """
     Merges two tool arrays (old format), avoiding duplicates.
     """

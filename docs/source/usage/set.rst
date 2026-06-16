@@ -43,7 +43,7 @@ To target all versions higher than and not including 2.0.0 that are also smaller
 
     vers:generic/>2.0.0|!=4.1.1|<=4.5.0
 
-To target all versions to target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 as well as the additional version 5.0.0 the version range to provide would be::
+To target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 as well as the additional version 5.0.0 the version range to provide would be::
 
     vers:generic/>2.0.0|<=4.5.0|5.0.0
 
@@ -197,7 +197,7 @@ When passing the targets, names and values in a file, the file must conform to t
                 "copyright": "2022 Acme Inc",
                 # Deletes a property
                 "author": null,
-                # Sets an array array-valued property. If the property already exists on the target,
+                # Sets an array-valued property. If the property already exists on the target,
                 # the new value will be appended to the existing one.
                 "licenses": [
                     {

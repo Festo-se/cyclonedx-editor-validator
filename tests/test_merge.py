@@ -3,6 +3,7 @@
 import copy
 import json
 import unittest
+from itertools import chain, combinations
 
 from cdxev import merge
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
@@ -127,6 +128,37 @@ class TestMergeSeveralSboms(unittest.TestCase):
         )
 
         self.assertTrue(helper.compare_sboms(merged_bom, goal_sbom))
+
+    def test_identical_metadata_bomrefs(self) -> None:
+        metacomp1 = {
+            "bom-ref": "app",
+            "type": "application",
+            "name": "foo",
+        }
+        metacomp2 = {
+            "bom-ref": "app",
+            "type": "application",
+            "name": "bar",
+        }
+        sbom_template = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "components": [],
+            "dependencies": [],
+        }
+
+        sbom1 = sbom_template.copy()
+        sbom1["metadata"] = {"component": metacomp1}
+        sbom2 = sbom_template.copy()
+        sbom2["metadata"] = {"component": metacomp2}
+
+        result = merge.merge([sbom1, sbom2])
+
+        self.assertNotEqual(
+            result["metadata"]["component"]["bom-ref"],
+            result["components"][0]["bom-ref"],
+        )
 
 
 class TestMergeComponents(unittest.TestCase):
@@ -565,6 +597,200 @@ class TestMergeVulnerabilities(unittest.TestCase):
         )
 
         self.assertEqual(actual_merged["vulnerabilities"], merged_vulnerabilities)
+
+
+class TestMergeSimilarComponents(unittest.TestCase):
+    """
+    Tests for the hierarchical component identity comparison used during merge.
+
+    Keys are prioritized in this order: PURL > SWID > CPE > name/group/version.
+    Comparison iterates through key types in that order and stops at the first
+    type that is present on BOTH components. The components are considered
+    identical when those two keys match, and different when they do not.
+    """
+
+    def setUp(self):
+        self.component = {
+            "type": "library",
+            "name": "Library A",
+            "version": "1.0.0",
+            "purl": "pkg:npm/libA@1.0.0",
+            "cpe": "cpe:2.3:a:example:libraryA:1.0.0:*:*:*:*:*:*:*",
+            "swid": {
+                "tagId": "library_A_1.0.0",
+                "name": "Library A",
+                "version": "1.0.0",
+            },
+        }
+        self.sbom1 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "metadata": {
+                "component": {
+                    "type": "application",
+                    "name": "foo",
+                    "version": "1.0.0",
+                }
+            },
+            "components": [copy.deepcopy(self.component)],
+            "dependencies": [],
+        }
+        self.sbom2 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "metadata": {
+                "component": {
+                    "bom-ref": "bar",
+                    "type": "application",
+                    "name": "bar",
+                    "version": "1.0.0",
+                }
+            },
+            "components": [self.component],
+            "dependencies": [],
+        }
+
+    def test_identical_components_are_dropped(self) -> None:
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertEqual(
+            result["components"],
+            [self.sbom1["components"][0], self.sbom2["metadata"]["component"]],
+        )
+
+    def test_comps_with_different_purl_considered_different(self) -> None:
+        self.component["purl"] = "pkg:npm/newpurl"
+        result = merge.merge([self.sbom1, self.sbom2])
+        self.assertIn(self.component, result["components"])
+
+    def test_comps_with_different_swid_considered_identical(self) -> None:
+        self.component["swid"] = {"tagId": "newtag", "name": "new name"}
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Same PURL wins over different SWID → component treated as identical → must be dropped.
+        self.assertNotIn(self.component, result["components"])
+
+    def test_comps_with_different_cpe_considered_identical(self) -> None:
+        self.component["cpe"] = "cpe:2.3:a:example:newcpe:1.0.0:*:*:*:*:*:*:*"
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Same PURL wins over different CPE → component treated as identical → must be dropped.
+        self.assertNotIn(self.component, result["components"])
+
+    def test_comps_with_different_name_considered_identical(self) -> None:
+        self.component["name"] = "new name"
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Same PURL wins over different name → component treated as identical → must be dropped.
+        self.assertNotIn(self.component, result["components"])
+
+    def test_comps_with_subset_of_keys_considered_identical(self) -> None:
+        # A set of tests where all possible combinations of PURL, SWID, and CPE are deleted
+        # from the sbom2 component before the merge. Name/version are always left behind.
+        # Even with a subset of keys, the shared remaining key still identifies the components
+        # as identical so the sbom2 component is dropped.
+        original_component = copy.deepcopy(self.component)
+        identifiers = ["cpe", "purl", "swid"]
+        for test_case in chain.from_iterable(
+            combinations(identifiers, r + 1) for r in range(len(identifiers))
+        ):
+            with self.subTest(missing_keys=test_case):
+                # Use fresh deep copies each iteration: merge mutates both input SBOMs
+                # (appends sbom2 metadata to sbom2 components, grows sbom1 components).
+                sbom1 = copy.deepcopy(self.sbom1)
+                partial_component = copy.deepcopy(original_component)
+                for identifier in test_case:
+                    del partial_component[identifier]
+                sbom2 = copy.deepcopy(self.sbom2)
+                sbom2["components"] = [partial_component]
+                result = merge.merge([sbom1, sbom2])
+                # The partial component shares at least one key with sbom1's component
+                # → treated as identical → must be dropped from the merged result.
+                self.assertNotIn(partial_component, result["components"])
+
+    # --- SWID-level priority (no PURL on either side) ---
+
+    def test_swid_decisive_when_purl_absent_from_both_same_swid(self) -> None:
+        # Without PURL on either component, SWID becomes the deciding key.
+        # Same SWID → components are identical and the duplicate is dropped.
+        del self.sbom1["components"][0]["purl"]
+        del self.component["purl"]
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Both components are now value-equal → the duplicate must appear exactly once.
+        self.assertEqual(result["components"].count(self.component), 1)
+
+    def test_swid_decisive_when_purl_absent_from_both_different_swid(self) -> None:
+        # Without PURL on either component, SWID is decisive.
+        # Different SWID → components are different, even when CPE and coordinates match.
+        del self.sbom1["components"][0]["purl"]
+        del self.component["purl"]
+        self.component["swid"] = {"tagId": "OTHER_tag", "name": "Library A", "version": "1.0.0"}
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Different SWID → treated as a distinct component → must be present in the result.
+        self.assertIn(self.component, result["components"])
+
+    def test_swid_beats_cpe_same_swid_different_cpe(self) -> None:
+        # SWID has higher priority than CPE.
+        # When neither component has PURL but both share the same SWID,
+        # a different CPE is irrelevant – the components are considered identical.
+        del self.sbom1["components"][0]["purl"]
+        del self.component["purl"]
+        self.component["cpe"] = "cpe:2.3:a:example:OTHER:1.0.0:*:*:*:*:*:*:*"
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Same SWID wins over different CPE → component treated as identical → must be dropped.
+        self.assertNotIn(self.component, result["components"])
+
+    # --- CPE-level priority (no PURL or SWID on either side) ---
+
+    def test_cpe_decisive_when_purl_and_swid_absent_from_both_same_cpe(self) -> None:
+        # Without PURL or SWID on either component, CPE becomes the deciding key.
+        # Same CPE → components are identical.
+        del self.sbom1["components"][0]["purl"]
+        del self.sbom1["components"][0]["swid"]
+        del self.component["purl"]
+        del self.component["swid"]
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Both components are now value-equal → the duplicate must appear exactly once.
+        self.assertEqual(result["components"].count(self.component), 1)
+
+    def test_cpe_decisive_when_purl_and_swid_absent_from_both_different_cpe(self) -> None:
+        # Without PURL or SWID on either component, CPE is decisive.
+        # Different CPE → components are different, even when name and version match.
+        del self.sbom1["components"][0]["purl"]
+        del self.sbom1["components"][0]["swid"]
+        del self.component["purl"]
+        del self.component["swid"]
+        self.component["cpe"] = "cpe:2.3:a:example:OTHER:1.0.0:*:*:*:*:*:*:*"
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Different CPE → treated as a distinct component → must be present in the result.
+        self.assertIn(self.component, result["components"])
+
+    # --- Coordinates-level priority (no safe keys on either side) ---
+
+    def test_coordinates_decisive_when_no_safe_keys_shared_same_coords(self) -> None:
+        # When no safe key (PURL, SWID, CPE) is present on both components,
+        # name/group/version (coordinates) are the final fallback.
+        # Same coordinates → components are identical.
+        del self.sbom1["components"][0]["purl"]
+        del self.sbom1["components"][0]["swid"]
+        del self.sbom1["components"][0]["cpe"]
+        del self.component["purl"]
+        del self.component["swid"]
+        del self.component["cpe"]
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Both components are now value-equal → the duplicate must appear exactly once.
+        self.assertEqual(result["components"].count(self.component), 1)
+
+    def test_coordinates_decisive_when_no_safe_keys_shared_different_coords(self) -> None:
+        # When no safe key is present, different coordinates → different components.
+        del self.sbom1["components"][0]["purl"]
+        del self.sbom1["components"][0]["swid"]
+        del self.sbom1["components"][0]["cpe"]
+        del self.component["purl"]
+        del self.component["swid"]
+        del self.component["cpe"]
+        self.component["version"] = "2.0.0"
+        result = merge.merge([self.sbom1, self.sbom2])
+        # Different version → treated as a distinct component → must be present in the result.
+        self.assertIn(self.component, result["components"])
 
 
 if __name__ == "__main__":

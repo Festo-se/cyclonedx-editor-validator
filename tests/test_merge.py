@@ -625,6 +625,47 @@ class TestMergeSboms(unittest.TestCase):
         self.assertTrue(logger_mock.warning.called)
         self._assert_sbom_valid_for_spec(merged)
 
+    def test_merge_tools_new_into_old_warns_on_component_metadata_loss(self) -> None:
+        original_sbom = self._load_reference_sbom("1.3")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "modern-tool",
+                    "publisher": "acme",
+                    "description": "tool description",
+                    "externalReferences": [
+                        {
+                            "type": "website",
+                            "url": "https://example.com/tool",
+                        }
+                    ],
+                }
+            ]
+        }
+
+        with patch("cdxev.merge.logger") as logger_mock:
+            merged = merge.merge_2_sboms(
+                copy.deepcopy(original_sbom),
+                copy.deepcopy(sbom_to_be_merged),
+            )
+
+        self.assertEqual(merged["metadata"]["tools"][0]["name"], "modern-tool")
+        self.assertNotIn("description", merged["metadata"]["tools"][0])
+        self.assertTrue(logger_mock.warning.called)
+        self.assertTrue(
+            any(
+                "drops component metadata fields" in str(call.args[0]).lower()
+                and "description" in str(call.args[0]).lower()
+                and "externalreferences" in str(call.args[0]).lower()
+                for call in logger_mock.warning.call_args_list
+            )
+        )
+        self._assert_sbom_valid_for_spec(merged)
+
     def test_merge_tools_dict_dedup_keeps_distinct_services(self) -> None:
         original_sbom = self._load_reference_sbom("1.7")
         original_sbom.setdefault("metadata", {})["tools"] = {
@@ -807,6 +848,49 @@ class TestMergeSboms(unittest.TestCase):
         self.assertTrue(any(tool.get("name") == "modern-tool" for tool in tools))
         self._assert_sbom_valid_for_spec(merged)
 
+    def test_merge_tools_new_into_new_without_governing_tools_uses_dict_format(self) -> None:
+        original_sbom = self._load_reference_sbom("1.6")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "modern-tool",
+                    "publisher": "acme",
+                    "version": "2.0.0",
+                }
+            ]
+        }
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        tools = merged["metadata"]["tools"]
+        self.assertIsInstance(tools, dict)
+        self.assertIn("components", tools)
+        self.assertEqual(tools["components"][0]["name"], "modern-tool")
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_absent_in_both_sboms_keeps_tools_absent(self) -> None:
+        original_sbom = self._load_reference_sbom("1.6")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {}).pop("tools", None)
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        self.assertIsNone(merge.merge_tools(None, None))
+        self.assertNotIn("tools", merged["metadata"])
+        self._assert_sbom_valid_for_spec(merged)
+
     def test_merge_tools_malformed_spec_version_warns_and_defaults_to_array(self) -> None:
         original_sbom = self._load_reference_sbom("1.6")
         # Simulate a malformed specVersion that will fail to parse
@@ -864,6 +948,67 @@ class TestMergeSboms(unittest.TestCase):
         self.assertTrue(
             logger_mock.warning.called, "Expected warning to be logged for missing specVersion"
         )
+
+    def test_merge_tools_collapses_components_with_normalized_identity_fields(self) -> None:
+        original_sbom = self._load_reference_sbom("1.7")
+        original_sbom.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": " Modern-Tool ",
+                    "publisher": " Acme ",
+                    "version": "2.0.0",
+                }
+            ]
+        }
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "modern-tool",
+                    "publisher": "acme",
+                    "version": "2.0.0",
+                }
+            ]
+        }
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        components = merged["metadata"]["tools"].get("components", [])
+        self.assertEqual(len(components), 1)
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_does_not_mutate_inputs(self) -> None:
+        governing_tools = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "governing-tool",
+                    "publisher": "acme",
+                    "version": "1.0.0",
+                }
+            ]
+        }
+        tools_to_be_merged = [
+            {
+                "name": "merged-tool",
+                "vendor": "contoso",
+                "version": "2.0.0",
+            }
+        ]
+        governing_snapshot = copy.deepcopy(governing_tools)
+        merged_snapshot = copy.deepcopy(tools_to_be_merged)
+
+        merged_tools = merge.merge_tools(governing_tools, tools_to_be_merged)
+
+        self.assertEqual(governing_tools, governing_snapshot)
+        self.assertEqual(tools_to_be_merged, merged_snapshot)
+        self.assertEqual(len(merged_tools["components"]), 2)
 
 
 class TestMergeSeveralSboms(unittest.TestCase):

@@ -158,8 +158,8 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
     Compares two tool objects for identity-based equality.
 
     Two tools are only treated as duplicates when both their identity key and their
-    full object contents match. This prevents data loss when two tools share the same
-    broad identity but differ in other fields.
+    full object contents match after normalizing identity fields. This prevents data
+    loss when two tools share the same broad identity but differ in other fields.
 
     Identity key fields: type (default 'application'), name, version, organization/
     provider.name/publisher/vendor, and bom-ref. Both the identity key and the full
@@ -169,7 +169,9 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
     - Missing type defaults to "application" to avoid duplicates introduced when
         converting pre-1.5 array tools into >=1.5 components.
     - Services can identify vendor via either organization or provider.name.
-    - Near-duplicates are intentionally preserved when non-normalized fields differ
+    - Case and surrounding whitespace are normalized for identity fields in both the
+        key comparison and the deep comparison.
+    - Near-duplicates are intentionally preserved when non-identity fields differ
         (for example provider metadata beyond provider.name).
     - Short-circuit evaluation: if identity keys differ, full object comparison is
         skipped for efficiency.
@@ -206,6 +208,14 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
         if isinstance(provider, dict) and set(provider.keys()) == {"name"}:
             normalized["organization"] = provider["name"]
             normalized.pop("provider", None)
+
+        for field in ("type", "name", "version", "publisher", "organization", "bom-ref"):
+            if field in normalized:
+                normalized[field] = _norm(normalized[field])
+
+        provider = normalized.get("provider")
+        if isinstance(provider, dict) and "name" in provider:
+            provider["name"] = _norm(provider["name"])
 
         return normalized
 
@@ -266,22 +276,38 @@ def _convert_tools_dict_to_array(tools_dict: dict) -> list:
     # Convert components
     for component in tools_dict.get("components", []):
         tool = {}
+        copied_component_keys = set()
         if "name" in component:
             tool["name"] = component["name"]
+            copied_component_keys.add("name")
         if "version" in component:
             tool["version"] = component["version"]
+            copied_component_keys.add("version")
         if "publisher" in component:
             tool["vendor"] = component["publisher"]
+            copied_component_keys.add("publisher")
         if "hashes" in component:
             tool["hashes"] = component["hashes"]
+            copied_component_keys.add("hashes")
         if "bom-ref" in component:
             tool["bom-ref"] = component["bom-ref"]
+            copied_component_keys.add("bom-ref")
         if component.get("type") and component["type"] != "application":
             logger.warning(
                 LogMessage(
                     "Potential loss of information",
                     "Converting metadata.tools.components to pre-1.5 metadata.tools array "
                     "drops component type information.",
+                )
+            )
+        dropped_component_keys = sorted(set(component) - copied_component_keys - {"type"})
+        if dropped_component_keys:
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    "Converting metadata.tools.components to pre-1.5 metadata.tools array "
+                    "drops component metadata fields that have no array equivalent: "
+                    f"{', '.join(dropped_component_keys)}.",
                 )
             )
         tools_array.append(tool)
@@ -579,7 +605,7 @@ def merge_2_sboms(
         # If original SBOM has no tools yet, choose default tools format based on
         # the original SBOM's version to ensure backward/forward compatibility.
         governing_tools: t.Union[list, dict, None] = original_tools
-        if governing_tools is None and tools_to_merge is not None:
+        if governing_tools is None:
             spec_version = SpecVersion.parse(str(original_sbom.get("specVersion", "")))
             if spec_version is None:
                 # specVersion parsing failed; default to array format but warn

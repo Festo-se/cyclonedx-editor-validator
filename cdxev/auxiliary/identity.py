@@ -186,7 +186,6 @@ class ComponentIdentity:
         return ComponentIdentity(cpe, purl, swid, coordinates)
 
 
-
 @dataclass(frozen=True, init=True)
 class VulnerabilityIdentity:
     id: str

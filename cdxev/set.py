@@ -58,10 +58,7 @@ class UpdateIdentity(ComponentIdentity):
         super().__init__(*keys)
 
     def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, ComponentIdentity)
-            or isinstance(other, UpdateIdentity)
-        ) and any(
+        return (isinstance(other, ComponentIdentity) or isinstance(other, UpdateIdentity)) and any(
             k in self._keys for k in other._keys
         )
 
@@ -89,9 +86,7 @@ class UpdateIdentity(ComponentIdentity):
     ) -> "Key":
         coordinates: Coordinates
         if version_range is not None:
-            vers = univers.version_range.VersionRange.from_string(
-                version_range
-            )  # type:ignore
+            vers = univers.version_range.VersionRange.from_string(version_range)  # type:ignore
             coordinates = CoordinatesWithVersionRange(name, group, None, vers)
         else:
             coordinates = Coordinates(name, group, version)
@@ -114,10 +109,7 @@ class RegexUpdateIdentity:
 
     def matches(self, component: dict) -> bool:
         value = component.get(self.field)
-        return (
-            isinstance(value, str)
-            and self.pattern.fullmatch(value) is not None
-        )
+        return isinstance(value, str) and self.pattern.fullmatch(value) is not None
 
     def __str__(self) -> str:
         return f"{self.field}[regex:{self.expression}]"
@@ -143,9 +135,7 @@ class CoordinatesWithVersionRange(Coordinates):
     def __eq__(self, other: object) -> bool:
         if t.TYPE_CHECKING:
             # univers guarantees that version_class is not None
-            assert (
-                self.version_range.version_class is not None
-            )  # nosec - only for type checker
+            assert self.version_range.version_class is not None  # nosec - only for type checker
 
         if isinstance(other, CoordinatesWithVersionRange):
             for field_ in fields(self):
@@ -155,28 +145,21 @@ class CoordinatesWithVersionRange(Coordinates):
 
         if isinstance(other, Coordinates):
             for field_ in fields(other):
-                if (
-                    field_.name != "version"
-                    and getattr(self, field_.name)
-                    != getattr(other, field_.name)
+                if field_.name != "version" and getattr(self, field_.name) != getattr(
+                    other, field_.name
                 ):
                     return False
 
             if other.version is not None:
                 try:
-                    if (
-                        self.version_range.version_class(other.version)
-                        in self.version_range
-                    ):
+                    if self.version_range.version_class(other.version) in self.version_range:
                         return True
                 except univers.versions.InvalidVersion:
                     possible_versions = []
                     for version_type in univers.versions.AVAILABLE_VERSIONS:
                         try:
                             if version_type.is_valid(other.version):
-                                possible_versions.append(
-                                    str(version_type.__name__)
-                                )
+                                possible_versions.append(str(version_type.__name__))
                         except univers.versions.nuget.InvalidNuGetVersion:
                             # Some validators (notably NuGet) can raise
                             # for malformed inputs while probing support.
@@ -185,9 +168,7 @@ class CoordinatesWithVersionRange(Coordinates):
                     version_is_of = " which is valid under the schemas: "
 
                     if not possible_versions:
-                        version_is_of = (
-                            "which versioning schema is not supported"
-                        )
+                        version_is_of = "which versioning schema is not supported"
                     else:
                         for version in possible_versions:
                             version_is_of += version + ", "
@@ -201,9 +182,8 @@ class CoordinatesWithVersionRange(Coordinates):
                             "different versioning schema. "
                             "The target has versioning schema"
                             f' "{self.version_range.version_class.__name__}"'
-                            f' this is incompatible with the '
-                            f'version "{other.version}"'
-                            + version_is_of,
+                            f" this is incompatible with the "
+                            f'version "{other.version}"' + version_is_of,
                         )
                     )
                     return False
@@ -212,11 +192,7 @@ class CoordinatesWithVersionRange(Coordinates):
 
     def __str__(self) -> str:
         group_str = (f"{self.group}/") if self.group is not None else ""
-        version_str = (
-            f"@{self.version_range}"
-            if self.version_range is not None
-            else ""
-        )
+        version_str = f"@{self.version_range}" if self.version_range is not None else ""
         return group_str + self.name + version_str
 
 
@@ -269,10 +245,7 @@ class CoordinatesRegexIdentity:
 
         if self.group_pattern is not None:
             comp_group = component.get("group")
-            if (
-                not isinstance(comp_group, str)
-                or not self.group_pattern.fullmatch(comp_group)
-            ):
+            if not isinstance(comp_group, str) or not self.group_pattern.fullmatch(comp_group):
                 return False
 
         if self.version is not None:
@@ -286,10 +259,7 @@ class CoordinatesRegexIdentity:
             if comp_version is None:
                 return False
             try:
-                if (
-                    self.version_range.version_class(comp_version)
-                    not in self.version_range
-                ):
+                if self.version_range.version_class(comp_version) not in self.version_range:
                     return False
             except univers.versions.InvalidVersion:
                 return False
@@ -297,11 +267,7 @@ class CoordinatesRegexIdentity:
         return True
 
     def __str__(self) -> str:
-        group_str = (
-            f"/{self.group_expression}"
-            if self.group_expression is not None
-            else ""
-        )
+        group_str = f"/{self.group_expression}" if self.group_expression is not None else ""
         if self.version is not None:
             ver_str = f"@{self.version}"
         elif self.version_range is not None:
@@ -343,9 +309,7 @@ def _should_overwrite(
         return True
 
     if ignore_existing:
-        logger.debug(
-            f'Not overwriting "{property}" on component "{component_id}"'
-        )
+        logger.debug(f'Not overwriting "{property}" on component "{component_id}"')
         return False
 
     if not sys.stdin.isatty():
@@ -364,8 +328,7 @@ def _should_overwrite(
             return True
 
         logger.debug(
-            f'Not overwriting "{property}" on component '
-            f'"{component_id}" due to user choice.'
+            f'Not overwriting "{property}" on component "{component_id}" due to user choice.'
         )
         return False
 
@@ -374,9 +337,7 @@ def _prompt_for_overwrite(
     property: str, component_id: ComponentIdentity
 ) -> bool:  # pragma: no cover
     print(
-        "The property "
-        f'"{property}" is already present on the component '
-        f'with id "{component_id}".'
+        f'The property "{property}" is already present on the component with id "{component_id}".'
     )
     while True:
         s = input("Overwrite? [Y/n]: ")
@@ -418,9 +379,7 @@ def _do_update(component: dict, update: dict, ctx: Context) -> None:
 
     for prop in update_set:
         if _should_update_id(prop):
-            original_id = original_id or ComponentIdentity.create(
-                component, True
-            )
+            original_id = original_id or ComponentIdentity.create(component, True)
 
         if _should_remap(prop):
             remap = True
@@ -488,8 +447,7 @@ def _extract_regex_str(value: t.Any, field: str) -> str:
     if not isinstance(expr, str):
         raise AppError(
             "Invalid set file",
-            "The update object identifier "
-            f'"{field}" has a regex expression that is not a string.',
+            f'The update object identifier "{field}" has a regex expression that is not a string.',
         )
     return expr
 
@@ -505,8 +463,7 @@ def _parse_simple_regex(
             if not isinstance(expr, str):
                 raise AppError(
                     "Invalid set file",
-                    f'The update object identifier "{alias}" '
-                    "must be a string.",
+                    f'The update object identifier "{alias}" must be a string.',
                 )
             matches.append((_REGEX_IDENTIFIER_ALIASES[alias], expr, alias))
 
@@ -521,8 +478,7 @@ def _parse_simple_regex(
     if len(matches) > 1 or len(update_id) > 1:
         raise AppError(
             "Invalid set file",
-            f"The update object with id {dict(update_id)} "
-            "has more than one id.",
+            f"The update object with id {dict(update_id)} has more than one id.",
         )
 
     target, expression, source = matches[0]
@@ -531,8 +487,7 @@ def _parse_simple_regex(
     except re.error as exc:
         raise AppError(
             "Invalid set file",
-            "The update object identifier "
-            f'"{source}" has an invalid regular expression: {exc}',
+            f'The update object identifier "{source}" has an invalid regular expression: {exc}',
         ) from exc
 
 
@@ -582,8 +537,7 @@ def _parse_coordinates_regex(
         else:
             raise AppError(
                 "Invalid set file",
-                "The update object identifier "
-                '"group" must be a string or {"regex": "..."}.',
+                'The update object identifier "group" must be a string or {"regex": "..."}.',
             )
 
     version: t.Optional[str] = None
@@ -610,14 +564,11 @@ def _parse_coordinates_regex(
         if not isinstance(vr, str):
             raise AppError(
                 "Invalid set file",
-                "The update object identifier "
-                '"version-range" must be a string.',
+                'The update object identifier "version-range" must be a string.',
             )
         try:
             from_string = univers.version_range.VersionRange.from_string
-            version_range_obj = from_string(
-                vr
-            )  # type: ignore[no-untyped-call]
+            version_range_obj = from_string(vr)  # type: ignore[no-untyped-call]
         except (ValueError, univers.versions.InvalidVersion) as exc:
             raise AppError(
                 "Invalid set file",
@@ -661,8 +612,7 @@ def _reject_unsupported_id_dicts(update_id: t.Mapping[str, t.Any]) -> None:
 
         raise AppError(
             "Invalid set file",
-            f'The update object identifier "{id_field}" '
-            "does not support regex.",
+            f'The update object identifier "{id_field}" does not support regex.',
         )
 
 
@@ -678,8 +628,7 @@ def _parse_regex_update_identity(
     if name_result is not None and simple_result is not None:
         raise AppError(
             "Invalid set file",
-            f"The update object with id {dict(update_id)} "
-            "has more than one id.",
+            f"The update object with id {dict(update_id)} has more than one id.",
         )
 
     if name_result is not None:
@@ -715,9 +664,7 @@ def _validate_update_list(
     ctx: Context,
 ) -> None:
     if len(updates) == 0:
-        logger.debug(
-            "No updates to perform. This is probably wrong but what do I know."
-        )
+        logger.debug("No updates to perform. This is probably wrong but what do I know.")
         return
 
     for upd in updates:
@@ -775,20 +722,15 @@ def _validate_update_list(
             if len(component_id) > 1:
                 raise AppError(
                     "Invalid set file",
-                    "The update object with id "
-                    f"{component_id} has more than one id.",
+                    f"The update object with id {component_id} has more than one id.",
                 )
 
         if "set" not in upd:
             raise AppError(
                 "Invalid set file",
-                "The update object with id "
-                f"{component_id} is missing the 'set' property.",
+                f"The update object with id {component_id} is missing the 'set' property.",
             )
-        if (
-            (protected := _get_protected(upd["set"]))
-            and not ctx.config.allow_protected
-        ):
+        if (protected := _get_protected(upd["set"])) and not ctx.config.allow_protected:
             raise AppError(
                 "Invalid set usage",
                 "The following properties are protected: "
@@ -837,18 +779,14 @@ def run(
             if not cfg.ignore_missing:
                 msg = LogMessage(
                     "Set not performed",
-                    "The component "
-                    f'"{update["id"]}" was not found and '
-                    "could not be updated.",
+                    f'The component "{update["id"]}" was not found and could not be updated.',
                 )
                 raise AppError(log_msg=msg)
             else:
                 logger.info(
                     LogMessage(
                         "Set not performed",
-                        "The component "
-                        f'"{update["id"]}" was not found '
-                        "and could not be updated.",
+                        f'The component "{update["id"]}" was not found and could not be updated.',
                     )
                 )
 

@@ -182,7 +182,9 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
         _norm(tool2.get("vendor", tool2.get("publisher", tool2.get("organization")))),
         _norm(tool2.get("bom-ref")),
     )
-    return key1 == key2
+    # If the coarse identity tuple matches, require deep object equality as
+    # a guard against over-matching tools that differ in other schema fields.
+    return key1 == key2 and tool1 == tool2
 
 
 def _convert_tools_array_to_dict(tools_array: list) -> dict:
@@ -194,10 +196,12 @@ def _convert_tools_array_to_dict(tools_array: list) -> dict:
     for tool in tools_array:
         # Convert old format tool to new format
         component = {
-            "type": "application",
-            "name": tool.get("name", ""),
-            "version": tool.get("version", ""),
+            "type": tool.get("type", "application"),
         }
+        if "name" in tool:
+            component["name"] = tool["name"]
+        if "version" in tool:
+            component["version"] = tool["version"]
         if "vendor" in tool:
             component["publisher"] = tool["vendor"]
         if "hashes" in tool:
@@ -206,7 +210,7 @@ def _convert_tools_array_to_dict(tools_array: list) -> dict:
             component["bom-ref"] = tool["bom-ref"]
         # Copy any other fields that might exist
         for key in tool:
-            if key not in ("name", "vendor", "version", "hashes", "bom-ref"):
+            if key not in ("type", "name", "vendor", "version", "hashes", "bom-ref"):
                 component[key] = tool[key]
         components.append(component)
 
@@ -221,38 +225,48 @@ def _convert_tools_dict_to_array(tools_dict: dict) -> list:
 
     # Convert components
     for component in tools_dict.get("components", []):
-        tool = {
-            "name": component.get("name", ""),
-            "version": component.get("version", ""),
-        }
+        tool = {}
+        if "name" in component:
+            tool["name"] = component["name"]
+        if "version" in component:
+            tool["version"] = component["version"]
         if "publisher" in component:
             tool["vendor"] = component["publisher"]
         if "hashes" in component:
             tool["hashes"] = component["hashes"]
         if "bom-ref" in component:
             tool["bom-ref"] = component["bom-ref"]
-        # Copy other fields
-        for key in component:
-            if key not in ("type", "name", "publisher", "version", "hashes", "bom-ref"):
-                tool[key] = component[key]
+        if component.get("type") and component["type"] != "application":
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    "Converting metadata.tools.components to pre-1.5 metadata.tools array "
+                    "drops component type information.",
+                )
+            )
         tools_array.append(tool)
 
     # Convert services (if present, add them as tools as well)
+    if tools_dict.get("services"):
+        logger.warning(
+            LogMessage(
+                "Potential loss of information",
+                "Converting metadata.tools.services to pre-1.5 metadata.tools array "
+                "drops the service/component distinction.",
+            )
+        )
     for service in tools_dict.get("services", []):
-        tool = {
-            "name": service.get("name", ""),
-            "version": service.get("version", ""),
-        }
+        tool = {}
+        if "name" in service:
+            tool["name"] = service["name"]
+        if "version" in service:
+            tool["version"] = service["version"]
         if "organization" in service:
             tool["vendor"] = service["organization"]
         if "hashes" in service:
             tool["hashes"] = service["hashes"]
         if "bom-ref" in service:
             tool["bom-ref"] = service["bom-ref"]
-        # Copy other fields
-        for key in service:
-            if key not in ("bom-ref", "name", "organization", "version", "hashes"):
-                tool[key] = service[key]
         tools_array.append(tool)
 
     return tools_array
@@ -285,8 +299,8 @@ def _merge_tools_dict(governing_tools: dict, tools_to_merge: dict) -> dict:
     governing_components = merged_tools.get("components")
     if governing_components is None:
         governing_components = []
-        if tools_to_merge.get("components"):
-            merged_tools["components"] = governing_components
+    if "components" in merged_tools or tools_to_merge.get("components"):
+        merged_tools["components"] = governing_components
     for component_to_merge in tools_to_merge.get("components", []):
         is_duplicate = any(
             _tools_are_equal(component_to_merge, existing_component)
@@ -299,8 +313,8 @@ def _merge_tools_dict(governing_tools: dict, tools_to_merge: dict) -> dict:
     governing_services = merged_tools.get("services")
     if governing_services is None:
         governing_services = []
-        if tools_to_merge.get("services"):
-            merged_tools["services"] = governing_services
+    if "services" in merged_tools or tools_to_merge.get("services"):
+        merged_tools["services"] = governing_services
     for service_to_merge in tools_to_merge.get("services", []):
         is_duplicate = any(
             _tools_are_equal(service_to_merge, existing_service)
@@ -502,7 +516,7 @@ def merge_2_sboms(
 
     original_tools = original_sbom.get("metadata", {}).get("tools", None)
     tools_to_merge = sbom_to_be_merged.get("metadata", {}).get("tools", None)
-    if original_tools is not None or tools_to_merge is not None:
+    if tools_to_merge is not None:
         # If original SBOM has no tools yet, choose default tools format based on
         # the original SBOM's version to ensure backward/forward compatibility.
         governing_tools: t.Union[list, dict, None] = original_tools

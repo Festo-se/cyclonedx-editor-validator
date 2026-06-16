@@ -375,6 +375,98 @@ class TestMergeSboms(unittest.TestCase):
         self.assertTrue(any(tool.get("name") == "sub-legacy-tool" for tool in tools))
         self._assert_sbom_valid_for_spec(merged)
 
+    def test_merge_tools_array_to_dict_does_not_insert_empty_version(self) -> None:
+        original_sbom = self._load_reference_sbom("1.7")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.3")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = [{"name": "legacy-tool"}]
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        tool = merged["metadata"]["tools"]["components"][0]
+        self.assertEqual(tool["name"], "legacy-tool")
+        self.assertNotIn("version", tool)
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_new_into_old_logs_lossy_service_downgrade(self) -> None:
+        original_sbom = self._load_reference_sbom("1.3")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "services": [{"name": "scanner-service", "organization": "acme"}]
+        }
+
+        with patch("cdxev.merge.logger") as logger_mock:
+            merged = merge.merge_2_sboms(
+                copy.deepcopy(original_sbom),
+                copy.deepcopy(sbom_to_be_merged),
+            )
+
+        self.assertIsInstance(merged["metadata"]["tools"], list)
+        self.assertTrue(logger_mock.warning.called)
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_new_into_old_logs_component_type_loss(self) -> None:
+        original_sbom = self._load_reference_sbom("1.3")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "framework",
+                    "name": "modern-tool",
+                    "publisher": "acme",
+                    "version": "2.0.0",
+                }
+            ]
+        }
+
+        with patch("cdxev.merge.logger") as logger_mock:
+            merged = merge.merge_2_sboms(
+                copy.deepcopy(original_sbom),
+                copy.deepcopy(sbom_to_be_merged),
+            )
+
+        self.assertFalse(any("type" in tool for tool in merged["metadata"]["tools"]))
+        self.assertTrue(logger_mock.warning.called)
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_dict_dedup_keeps_distinct_services(self) -> None:
+        original_sbom = self._load_reference_sbom("1.7")
+        original_sbom.setdefault("metadata", {})["tools"] = {
+            "services": [
+                {
+                    "name": "scanner-service",
+                    "provider": {"name": "acme"},
+                }
+            ]
+        }
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "services": [
+                {
+                    "name": "scanner-service",
+                    "provider": {"name": "contoso"},
+                }
+            ]
+        }
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        services = merged["metadata"]["tools"].get("services", [])
+        self.assertEqual(len(services), 2)
+        self._assert_sbom_valid_for_spec(merged)
+
 
 class TestMergeSeveralSboms(unittest.TestCase):
     def test_merge_3_sboms(self) -> None:

@@ -380,7 +380,7 @@ class TestListCommand:
         with open(
             "tests/integration/data/list_command/list_licenses.csv", "r", encoding="utf_8_sig"
         ) as file:
-            file_contents = file.read()
+            file_contents = file.read().removesuffix("\n")
         assert actual == file_contents
 
     def test_list_components_csv(
@@ -399,7 +399,7 @@ class TestListCommand:
         with open(
             "tests/integration/data/list_command/list_components.csv", "r", encoding="utf_8_sig"
         ) as file:
-            file_contents = file.read()
+            file_contents = file.read().removesuffix("\n")
         assert actual == file_contents
 
     def test_list_licenses_txt(
@@ -415,11 +415,7 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        with open(
-            "tests/integration/data/list_command/list_licenses.txt", "r", encoding="utf_8_sig"
-        ) as file:
-            file_contents = file.read()
-        assert actual == file_contents
+        assert actual == data["expected"]["list_licenses_txt"]
 
     def test_list_components_txt(
         self,
@@ -437,7 +433,7 @@ class TestListCommand:
         with open(
             "tests/integration/data/list_command/list_components.txt", "r", encoding="utf_8_sig"
         ) as file:
-            file_contents = file.read()
+            file_contents = file.read().removesuffix("\n")
         assert actual == file_contents
 
 

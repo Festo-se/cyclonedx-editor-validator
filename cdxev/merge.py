@@ -155,11 +155,16 @@ def merge_components(
 
 def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
     """
-    Compares two tool objects for equality with strict key matching.
+    Compares two tool objects for identity-based equality.
 
     This intentionally does not use ComponentIdentity equality because that logic
     is overlap-based and can over-match (e.g. tools sharing only broad attributes
     like type), which would drop valid tools during merge.
+
+    Notes:
+    - Missing type defaults to "application" to avoid duplicates introduced when
+        converting pre-1.5 array tools into >=1.5 components.
+    - Services can identify vendor via either organization or provider.name.
     """
 
     def _norm(value: t.Any) -> str:
@@ -167,24 +172,30 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
             return ""
         return str(value).strip().lower()
 
-    # Preserve important schema fields where present; missing fields normalize to empty strings.
+    def _organization_or_provider(tool: dict) -> t.Any:
+        if tool.get("organization") is not None:
+            return tool.get("organization")
+        provider = tool.get("provider")
+        if isinstance(provider, dict):
+            return provider.get("name")
+        return tool.get("publisher", tool.get("vendor"))
+
+    # Preserve important schema fields where present; missing values normalize to empty strings.
     key1 = (
-        _norm(tool1.get("type")),
+        _norm(tool1.get("type", "application")),
         _norm(tool1.get("name")),
         _norm(tool1.get("version")),
-        _norm(tool1.get("vendor", tool1.get("publisher", tool1.get("organization")))),
+        _norm(_organization_or_provider(tool1)),
         _norm(tool1.get("bom-ref")),
     )
     key2 = (
-        _norm(tool2.get("type")),
+        _norm(tool2.get("type", "application")),
         _norm(tool2.get("name")),
         _norm(tool2.get("version")),
-        _norm(tool2.get("vendor", tool2.get("publisher", tool2.get("organization")))),
+        _norm(_organization_or_provider(tool2)),
         _norm(tool2.get("bom-ref")),
     )
-    # If the coarse identity tuple matches, require deep object equality as
-    # a guard against over-matching tools that differ in other schema fields.
-    return key1 == key2 and tool1 == tool2
+    return key1 == key2
 
 
 def _convert_tools_array_to_dict(tools_array: list) -> dict:

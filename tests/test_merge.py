@@ -467,6 +467,120 @@ class TestMergeSboms(unittest.TestCase):
         self.assertEqual(len(services), 2)
         self._assert_sbom_valid_for_spec(merged)
 
+    def test_merge_tools_old_into_old_dedup_collapses_near_duplicate(self) -> None:
+        original_sbom = self._load_reference_sbom("1.3")
+        original_sbom.setdefault("metadata", {})["tools"] = [
+            {
+                "name": "legacy-tool",
+                "vendor": "acme",
+                "version": "1.0.0",
+            }
+        ]
+
+        sbom_to_be_merged = self._load_reference_sbom("1.3")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = [
+            {
+                "name": "legacy-tool",
+                "vendor": "acme",
+                "version": "1.0.0",
+                "description": "same identity, extra metadata",
+            }
+        ]
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        tools = merged["metadata"]["tools"]
+        self.assertEqual(len(tools), 1)
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_new_into_new_dedup_collapses_near_duplicate_component(self) -> None:
+        original_sbom = self._load_reference_sbom("1.7")
+        original_sbom.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "modern-tool",
+                    "publisher": "acme",
+                    "version": "2.0.0",
+                }
+            ]
+        }
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "modern-tool",
+                    "publisher": "acme",
+                    "version": "2.0.0",
+                    "description": "same identity, extra metadata",
+                }
+            ]
+        }
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        components = merged["metadata"]["tools"].get("components", [])
+        self.assertEqual(len(components), 1)
+        self._assert_sbom_valid_for_spec(merged)
+
+    def test_merge_tools_old_into_new_dedup_handles_type_default(self) -> None:
+        governing_tools = {
+            "components": [
+                {
+                    "name": "legacy-tool",
+                    "publisher": "acme",
+                    "version": "1.0.0",
+                }
+            ]
+        }
+        tools_to_be_merged = [
+            {
+                "name": "legacy-tool",
+                "vendor": "acme",
+                "version": "1.0.0",
+            }
+        ]
+
+        merged_tools = merge.merge_tools(governing_tools, tools_to_be_merged)
+
+        self.assertIsInstance(merged_tools, dict)
+        components = merged_tools.get("components", [])
+        self.assertEqual(len(components), 1)
+
+    def test_merge_tools_new_into_old_without_governing_tools_uses_old_format(self) -> None:
+        original_sbom = self._load_reference_sbom("1.3")
+        original_sbom.setdefault("metadata", {}).pop("tools", None)
+
+        sbom_to_be_merged = self._load_reference_sbom("1.7")
+        sbom_to_be_merged.setdefault("metadata", {})["tools"] = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "modern-tool",
+                    "publisher": "acme",
+                    "version": "2.0.0",
+                }
+            ]
+        }
+
+        merged = merge.merge_2_sboms(
+            copy.deepcopy(original_sbom),
+            copy.deepcopy(sbom_to_be_merged),
+        )
+
+        tools = merged["metadata"]["tools"]
+        self.assertIsInstance(tools, list)
+        self.assertTrue(any(tool.get("name") == "modern-tool" for tool in tools))
+        self._assert_sbom_valid_for_spec(merged)
+
 
 class TestMergeSeveralSboms(unittest.TestCase):
     def test_merge_3_sboms(self) -> None:

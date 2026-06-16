@@ -255,7 +255,10 @@ class CoordinatesWithVersionRange(Coordinates):
                             if version_type.is_valid(other.version):
                                 possible_versions.append(str(version_type.__name__))
                         except univers.versions.nuget.InvalidNuGetVersion:
-                            pass
+                            # Some schema validators (notably NuGet) can raise for
+                            # malformed inputs while probing support; ignore and keep
+                            # checking the remaining version schemas.
+                            continue
                     version_is_of = " which is valid under the schemas: "
 
                     if not possible_versions:

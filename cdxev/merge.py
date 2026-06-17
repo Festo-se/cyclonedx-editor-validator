@@ -7,6 +7,7 @@ import typing as t
 
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.auxiliary.sbom_functions import (
+    add_merged_metadata_component_to_dependencies,
     collect_affects_of_vulnerabilities,
     extract_components,
     extract_new_affects,
@@ -107,7 +108,11 @@ def merge_components(
     list_of_merged_components: List with the uniquely merged components of the submitted sboms
     """
     list_of_merged_components: t.List[dict] = governing_sbom.get("components", [])
-    list_of_added_components = sbom_to_be_merged.get("components", [])
+    list_of_added_components = list(sbom_to_be_merged.get("components", []))
+
+    component_from_metadata = sbom_to_be_merged.get("metadata", {}).get("component", {})
+    if component_from_metadata:
+        list_of_added_components.append(component_from_metadata)
 
     present_component_identities: dict[ComponentIdentity, dict] = {}
     for component in extract_components(governing_sbom.get("components", [])):
@@ -235,9 +240,6 @@ def merge_2_sboms(
         )
 
     merged_sbom = original_sbom
-    component_from_metadata = sbom_to_be_merged.get("metadata", {}).get("component", {})
-    components_of_sbom_to_be_merged = sbom_to_be_merged.get("components", [])
-    components_of_sbom_to_be_merged.append(component_from_metadata)
     list_of_original_dependencies = original_sbom.get("dependencies", [])
     list_of_new_dependencies = sbom_to_be_merged.get("dependencies", [])
     list_of_original_vulnerabilities = original_sbom.get("vulnerabilities", [])
@@ -266,7 +268,7 @@ def merge_2_sboms(
         )
         merged_sbom["vulnerabilities"] = list_of_merged_vulnerabilities
 
-    if original_sbom.get("components", []) and sbom_to_be_merged.get("components", []):
+    if list_of_merged_components:
         merged_sbom["components"] = list_of_merged_components
 
     if original_sbom.get("dependencies", []) and sbom_to_be_merged.get("dependencies", []):
@@ -277,6 +279,9 @@ def merge_2_sboms(
             merged_sbom.get("compositions", []),
             sbom_to_be_merged.get("compositions", []),
         )
+
+    if merged_sbom.get("metadata", {}).get("component", {}) and merged_sbom.get("components", []):
+        add_merged_metadata_component_to_dependencies(merged_sbom, sbom_to_be_merged)
 
     return merged_sbom
 

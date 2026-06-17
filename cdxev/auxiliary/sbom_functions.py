@@ -171,6 +171,22 @@ def get_bom_refs_from_dependencies(dependencies: Sequence[dict]) -> list[str]:
     return list_of_bom_refs
 
 
+def get_bom_refs_from_dependencies_dependson(dependencies: Sequence[dict]) -> list[str]:
+    """
+    Function that gets all entries from the dependsOn lists in the dependencies.
+
+    Input:
+    dependencies: List with dict of dependencies
+
+    Output:
+    bom_refs: List of Strings, containing entries from all dependsOn fields
+    """
+    list_of_bom_refs = []
+    for dependency in dependencies:
+        list_of_bom_refs += dependency.get("dependsOn", [])
+    return list_of_bom_refs
+
+
 def extract_components(list_of_components: Sequence[dict]) -> Sequence[dict]:
     extracted_components = []
     for component in list_of_components:
@@ -721,3 +737,29 @@ def merge_affects_versions(original_affects: list[dict], new_affects: list[dict]
                     original_affect_versions.append(version)
         if not ref_is_in:
             original_affects.append(affect)
+
+
+def add_merged_metadata_component_to_dependencies(merged_sbom: dict, added_sbom: dict) -> None:
+    merged_sbom_ref = merged_sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")
+    added_sbom_ref = added_sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")
+
+    if not merged_sbom_ref or not added_sbom_ref:
+        return
+
+    if merged_sbom_ref == added_sbom_ref:
+        return
+
+    dependencies = merged_sbom.get("dependencies", [])
+    if merged_sbom_ref not in get_bom_refs_from_dependencies(dependencies):
+        product_dependency = {"ref": merged_sbom_ref, "dependsOn": [added_sbom_ref]}
+        if dependencies:
+            dependencies.append(product_dependency)
+        else:
+            merged_sbom["dependencies"] = [product_dependency]
+        return
+
+    product_dependency = get_dependency_by_ref(merged_sbom_ref, dependencies)
+    first_level_dependson = product_dependency.get("dependsOn", [])
+
+    if added_sbom_ref not in get_bom_refs_from_dependencies_dependson(dependencies):
+        first_level_dependson.append(added_sbom_ref)

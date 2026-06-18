@@ -380,7 +380,7 @@ class TestListCommand:
         with open(
             "tests/integration/data/list_command/list_licenses.csv", "r", encoding="utf_8_sig"
         ) as file:
-            file_contents = file.read().removesuffix("\n")
+            file_contents = file.read()
         assert actual == file_contents
 
     def test_list_components_csv(
@@ -399,7 +399,7 @@ class TestListCommand:
         with open(
             "tests/integration/data/list_command/list_components.csv", "r", encoding="utf_8_sig"
         ) as file:
-            file_contents = file.read().removesuffix("\n")
+            file_contents = file.read()
         assert actual == file_contents
 
     def test_list_licenses_txt(
@@ -433,7 +433,7 @@ class TestListCommand:
         with open(
             "tests/integration/data/list_command/list_components.txt", "r", encoding="utf_8_sig"
         ) as file:
-            file_contents = file.read().removesuffix("\n")
+            file_contents = file.read()
         assert actual == file_contents
 
 

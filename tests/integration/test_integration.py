@@ -415,7 +415,11 @@ class TestListCommand:
         assert exit_code == Status.OK
 
         # Verify that output matches what is expected
-        assert actual == data["expected"]["list_licenses_txt"]
+        with open(
+            "tests/integration/data/list_command/list_licenses.txt", "r", encoding="utf_8_sig"
+        ) as file:
+            file_contents = file.read()
+        assert actual == file_contents
 
     def test_list_components_txt(
         self,

@@ -39,20 +39,6 @@ class TestMergeSboms(unittest.TestCase):
         sbom["specVersion"] = spec_version
         return sbom
 
-    def _assert_sbom_valid_for_spec(self, sbom: dict) -> None:
-        with patch("cdxev.validator.validate.logger"):
-            errors = validate_sbom(
-                sbom=sbom,
-                input_format="json",
-                file=Path("bom.json"),
-                report_format="stdout",
-                report_path=Path("."),
-                schema_type="custom",
-                filename_regex=".*",
-                schema_path=None,
-            )
-        self.assertEqual(errors, 0)
-
     def test_no_vulnerabilities(self) -> None:
         sbom1 = helper.load_governing_program()
         sbom2 = helper.load_sub_program()
@@ -246,6 +232,33 @@ class TestMergeSboms(unittest.TestCase):
             [{"ref": "app", "dependsOn": ["existing"]}],
         )
 
+
+class TestMergeTools(unittest.TestCase):
+    def _load_reference_sbom(self, spec_version: str) -> dict:
+        with open(
+            "tests/auxiliary/test_validate_sboms/"
+            "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json",
+            "r",
+            encoding="utf_8_sig",
+        ) as f:
+            sbom = json.load(f)
+        sbom["specVersion"] = spec_version
+        return sbom
+
+    def _assert_sbom_valid_for_spec(self, sbom: dict) -> None:
+        with patch("cdxev.validator.validate.logger"):
+            errors = validate_sbom(
+                sbom=sbom,
+                input_format="json",
+                file=Path("bom.json"),
+                report_format="stdout",
+                report_path=Path("."),
+                schema_type="custom",
+                filename_regex=".*",
+                schema_path=None,
+            )
+        self.assertEqual(errors, 0)
+
     def test_merge_tools_old_into_new_with_schema_validation(self) -> None:
         original_sbom = self._load_reference_sbom("1.7")
         original_sbom.setdefault("metadata", {}).pop("tools", None)
@@ -299,6 +312,8 @@ class TestMergeSboms(unittest.TestCase):
         self.assertIsInstance(tools, list)
         self.assertTrue(any(tool.get("name") == "modern-tool" for tool in tools))
         self.assertTrue(any(tool.get("name") == "scanner-service" for tool in tools))
+        self.assertTrue(any(tool.get("vendor") == "acme" for tool in tools))
+        self.assertTrue(any(tool.get("version") == "2.0.0" for tool in tools))
         self._assert_sbom_valid_for_spec(merged)
 
     def test_merge_tools_new_into_new_with_components_and_services(self) -> None:

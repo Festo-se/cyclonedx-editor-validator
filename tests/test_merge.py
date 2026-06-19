@@ -1586,6 +1586,136 @@ class TestMergeTools(unittest.TestCase):
         }
         self.assertEqual(refs, {"tool-a-ref", "tool-b-ref"})
 
+    def test_merge_tools_returns_existing_when_other_side_none(self) -> None:
+        governing = [{"name": "tool-a", "vendor": "acme"}]
+        merged_with_none_incoming = merge.merge_tools(governing, None)
+        merged_with_none_governing = merge.merge_tools(None, governing)
+
+        self.assertEqual(merged_with_none_incoming, governing)
+        self.assertEqual(merged_with_none_governing, governing)
+
+    def test_collect_all_bom_refs_handles_mixed_structures(self) -> None:
+        sbom = self._minimal_sbom()
+        sbom["metadata"]["component"] = {
+            "type": "application",
+            "name": "meta",
+            "version": "1.0.0",
+            "bom-ref": "meta-ref",
+        }
+        sbom["components"] = [
+            {
+                "type": "library",
+                "name": "root",
+                "version": "1.0.0",
+                "bom-ref": "comp-ref",
+            }
+        ]
+        sbom["services"] = [
+            {
+                "name": "root-service",
+                "bom-ref": "service-ref",
+                "services": [{"name": "nested-service", "bom-ref": "nested-service-ref"}],
+            },
+            "invalid-service-entry",
+        ]
+        sbom["metadata"]["tools"] = {
+            "components": "not-a-list",
+            "services": [
+                {
+                    "name": "tool-service",
+                    "bom-ref": "tool-service-ref",
+                }
+            ],
+        }
+        sbom["dependencies"] = [
+            {
+                "ref": "dep-ref",
+                "dependsOn": ["dep-child-ref", None],
+            },
+            "invalid-dependency-entry",
+        ]
+        sbom["compositions"] = [
+            {
+                "aggregate": "complete",
+                "assemblies": ["assembly-ref", None],
+            },
+            "invalid-composition-entry",
+        ]
+        sbom["vulnerabilities"] = [
+            {
+                "id": "CVE-0000-1000",
+                "affects": [
+                    {
+                        "ref": "affects-ref",
+                    },
+                    "invalid-affect-entry",
+                ],
+            },
+            "invalid-vulnerability-entry",
+        ]
+
+        refs_without_tools = merge._collect_all_bom_refs(sbom, include_tools=False)
+        refs_with_tools = merge._collect_all_bom_refs(sbom, include_tools=True)
+
+        self.assertIn("meta-ref", refs_with_tools)
+        self.assertIn("nested-service-ref", refs_with_tools)
+        self.assertIn("dep-child-ref", refs_with_tools)
+        self.assertIn("affects-ref", refs_with_tools)
+        self.assertIn("tool-service-ref", refs_with_tools)
+        self.assertNotIn("tool-service-ref", refs_without_tools)
+
+    def test_apply_bom_ref_rename_map_updates_supported_sections(self) -> None:
+        sbom = self._minimal_sbom()
+        sbom["metadata"]["component"] = {
+            "type": "application",
+            "name": "meta",
+            "version": "1.0.0",
+            "bom-ref": "old-ref",
+        }
+        sbom["components"] = [
+            {
+                "type": "library",
+                "name": "root",
+                "version": "1.0.0",
+                "bom-ref": "old-ref",
+            }
+        ]
+        sbom["services"] = [{"name": "svc", "bom-ref": "old-ref"}]
+        sbom["metadata"]["tools"] = {
+            "components": [{"type": "application", "name": "tool", "bom-ref": "old-ref"}],
+        }
+        sbom["dependencies"] = [{"ref": None, "dependsOn": ["old-ref", None]}]
+        sbom["compositions"] = [{"aggregate": "complete", "assemblies": ["old-ref", None]}]
+        sbom["vulnerabilities"] = [{"id": "CVE-0000-1001", "affects": [{"ref": "old-ref"}]}]
+
+        merge._apply_bom_ref_rename_map(sbom, {"old-ref": "new-ref"})
+        merge._apply_bom_ref_rename_map(sbom, {})
+
+        self.assertEqual(sbom["metadata"]["component"]["bom-ref"], "new-ref")
+        self.assertEqual(sbom["components"][0]["bom-ref"], "new-ref")
+        self.assertEqual(sbom["services"][0]["bom-ref"], "new-ref")
+        self.assertEqual(sbom["metadata"]["tools"]["components"][0]["bom-ref"], "new-ref")
+        self.assertEqual(sbom["dependencies"][0]["dependsOn"][0], "new-ref")
+        self.assertIsNone(sbom["dependencies"][0]["ref"])
+        self.assertEqual(sbom["compositions"][0]["assemblies"][0], "new-ref")
+        self.assertEqual(sbom["vulnerabilities"][0]["affects"][0]["ref"], "new-ref")
+
+    def test_normalize_incoming_tools_bom_refs_early_return_paths(self) -> None:
+        governing_sbom = self._minimal_sbom()
+
+        incoming_with_non_object_tools = self._minimal_sbom()
+        incoming_with_non_object_tools["metadata"]["tools"] = []
+        merge._normalize_incoming_tools_bom_refs(governing_sbom, incoming_with_non_object_tools)
+        self.assertEqual(incoming_with_non_object_tools["metadata"]["tools"], [])
+
+        incoming_with_empty_entries = self._minimal_sbom()
+        incoming_with_empty_entries["metadata"]["tools"] = {"components": "not-a-list"}
+        merge._normalize_incoming_tools_bom_refs(governing_sbom, incoming_with_empty_entries)
+        self.assertEqual(
+            incoming_with_empty_entries["metadata"]["tools"],
+            {"components": "not-a-list"},
+        )
+
 
 class TestMergeSeveralSboms(unittest.TestCase):
     def _load_reference_sbom(self, spec_version: str) -> dict:

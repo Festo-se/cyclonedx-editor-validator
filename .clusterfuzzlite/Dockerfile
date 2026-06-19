@@ -4,6 +4,12 @@
 # compile_python_fuzzer helper.
 FROM gcr.io/oss-fuzz-base/base-builder-python
 
+# PyICU (a transitive dependency) is a C extension that needs the ICU
+# development libraries and pkg-config to build its wheel.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends pkg-config libicu-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 # Copy the whole repository into $SRC so build.sh can install it.
 COPY . $SRC/cyclonedx-editor-validator
 

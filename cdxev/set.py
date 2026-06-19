@@ -160,7 +160,18 @@ class UpdateIdentity(ComponentIdentity):
     ) -> "Key":
         coordinates: Coordinates
         if version_range is not None:
-            vers = univers.version_range.VersionRange.from_string(version_range)  # type:ignore
+            try:
+                vers = univers.version_range.VersionRange.from_string(
+                    version_range  # type:ignore
+                )
+            except Exception as exc:
+                # univers raises a variety of unrelated exception types for malformed
+                # version ranges (InvalidVersion, InvalidNuGetVersion, InvalidVersionRange,
+                # ValueError, ...). Convert any of them into a clean AppError.
+                raise AppError(
+                    "Invalid set file",
+                    f"An update object has an invalid version-range '{version_range}': {exc}",
+                ) from exc
             coordinates = CoordinatesWithVersionRange(name, group, None, vers)
         else:
             coordinates = Coordinates(name, group, version)

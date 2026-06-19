@@ -40,9 +40,9 @@ def extract_license_strings_from_licenses(licenses: list[License]) -> list[str]:
 
 
 def extract_metadata_license_information(metadata: BomMetaData) -> dict[str, Any]:
+    software_information: dict[str, Any] = {}
     if metadata.component is not None:
         metadata_component = metadata.component
-        software_information: dict[str, Any] = {}
         if metadata_component.name is not None:
             software_information["name"] = metadata_component.name
 

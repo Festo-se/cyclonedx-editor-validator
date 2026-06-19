@@ -1,6 +1,8 @@
 import json
 import unittest
 
+from cyclonedx.model.bom import BomMetaData
+
 import cdxev.list_command as lc
 from cdxev.auxiliary.sbom_functions import deserialize
 
@@ -136,3 +138,11 @@ class TestListCommand(unittest.TestCase):
                 found = True
 
             self.assertTrue(found)
+
+    def test_extract_metadata_license_information_no_component(self) -> None:
+        # Regression test: metadata without a component must return an empty dict
+        # instead of raising UnboundLocalError.
+        metadata = BomMetaData()
+        metadata.component = None
+        result = lc.extract_metadata_license_information(metadata)
+        self.assertEqual(result, {})

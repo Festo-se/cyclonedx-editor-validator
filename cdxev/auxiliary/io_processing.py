@@ -147,11 +147,7 @@ def write_list(
     else:
         destination = create_destination_path(destination, sbom, create_list_file_filename)
         file = destination.open("w", encoding="utf_8")
-
-    # Keep list output formatting stable across commands and platforms.
-    # Existing fixtures and downstream tooling expect exactly one trailing newline.
-    output = list_file.rstrip("\n") + "\n"
-    file.write(output)
+    file.write(list_file)
 
 
 def add_output_argument(parser: argparse.ArgumentParser) -> None:

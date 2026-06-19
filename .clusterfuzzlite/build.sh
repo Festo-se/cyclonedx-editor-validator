@@ -10,13 +10,22 @@ pip3 install --no-cache-dir .
 # The command-level fuzzers import the shared `_sbom_builder` helper that lives
 # next to them. Put that directory on PYTHONPATH so both runtime imports and the
 # PyInstaller analysis performed by compile_python_fuzzer can resolve it.
-FUZZ_DIR="$SRC/cyclonedx-editor-validator/tests/fuzz"
+REPO_DIR="$SRC/cyclonedx-editor-validator"
+FUZZ_DIR="$REPO_DIR/tests/fuzz"
 export PYTHONPATH="$FUZZ_DIR:${PYTHONPATH:-}"
+
+# cdxev loads several data files at runtime via importlib.resources. PyInstaller
+# only bundles Python modules, so these JSON resources must be added explicitly,
+# preserving their package directory layout so importlib.resources can find them.
+DATA_ARGS=(
+  "--add-data=$REPO_DIR/cdxev/amend/license_name_spdx_id_map.json:cdxev/amend"
+  "--add-data=$REPO_DIR/cdxev/auxiliary/schema:cdxev/auxiliary/schema"
+)
 
 # Compile each fuzz target. compile_python_fuzzer packages the target together
 # with its dependencies using PyInstaller and wires up Atheris coverage.
 # `_sbom_builder` is added as a hidden import so PyInstaller bundles it even
 # though it's only imported dynamically after a sys.path tweak.
 for fuzzer in "$FUZZ_DIR/"fuzz_*.py; do
-  compile_python_fuzzer "$fuzzer" --hidden-import=_sbom_builder
+  compile_python_fuzzer "$fuzzer" --hidden-import=_sbom_builder "${DATA_ARGS[@]}"
 done

@@ -19,6 +19,7 @@ from cdxev.auxiliary.sbom_functions import (
     make_bom_refs_unique,
     merge_affects_versions,
     unify_bom_refs,
+    walk_components,
 )
 from cdxev.log import LogMessage
 
@@ -419,53 +420,261 @@ def _merge_tools_dict(governing_tools: dict, tools_to_merge: dict) -> dict:
             if not is_duplicate:
                 governing_services.append(copy.deepcopy(service_to_merge))
 
-    _make_merged_tool_bom_refs_unique(merged_tools)
-
     return merged_tools
 
 
-def _make_merged_tool_bom_refs_unique(merged_tools: dict) -> None:
-    """
-    Ensure bom-ref uniqueness across metadata.tools components/services in-place.
-    Keeps first occurrence and deterministically renames subsequent collisions.
-    """
+def _iter_services_recursive(services: list[dict]) -> t.Iterator[dict]:
+    for service in services:
+        if isinstance(service, dict):
+            yield service
+            nested_services = service.get("services", [])
+            if isinstance(nested_services, list):
+                yield from _iter_services_recursive(nested_services)
 
-    entries: list[tuple[str, int, dict]] = []
+
+def _iter_tool_entries(tools: dict) -> t.Iterator[tuple[str, int, dict]]:
     for key in ("components", "services"):
-        for idx, entry in enumerate(merged_tools.get(key, [])):
+        entries = tools.get(key, [])
+        if not isinstance(entries, list):
+            continue
+        for idx, entry in enumerate(entries):
             if isinstance(entry, dict):
-                entries.append((key, idx, entry))
+                yield key, idx, entry
 
-    used_refs: set[str] = set()
+
+def _collect_all_bom_refs(sbom: dict, include_tools: bool = True) -> set[str]:
+    refs: set[str] = set()
+
+    def _add(ref_value: t.Any) -> None:
+        if ref_value is None:
+            return
+        reference = str(ref_value)
+        if reference:
+            refs.add(reference)
+
+    _collect_entity_refs(sbom, _add, include_tools=include_tools)
+    _collect_relationship_refs(sbom, _add)
+
+    return refs
+
+
+def _collect_entity_refs(
+    sbom: dict,
+    add_ref: t.Callable[[t.Any], None],
+    include_tools: bool = True,
+) -> None:
+    metadata_component = sbom.get("metadata", {}).get("component", {})
+    if isinstance(metadata_component, dict):
+        add_ref(metadata_component.get("bom-ref"))
+
+    for component in extract_components(sbom.get("components", [])):
+        if isinstance(component, dict):
+            add_ref(component.get("bom-ref"))
+
+    for service in _iter_services_recursive(sbom.get("services", [])):
+        add_ref(service.get("bom-ref"))
+
+    if include_tools:
+        tools = sbom.get("metadata", {}).get("tools")
+        if isinstance(tools, dict):
+            for _key, _idx, entry in _iter_tool_entries(tools):
+                add_ref(entry.get("bom-ref"))
+
+
+def _collect_relationship_refs(sbom: dict, add_ref: t.Callable[[t.Any], None]) -> None:
+    for dependency in sbom.get("dependencies", []):
+        if not isinstance(dependency, dict):
+            continue
+        add_ref(dependency.get("ref"))
+        depends_on = dependency.get("dependsOn", [])
+        if isinstance(depends_on, list):
+            for reference in depends_on:
+                add_ref(reference)
+
+    for composition in sbom.get("compositions", []):
+        if not isinstance(composition, dict):
+            continue
+        assemblies = composition.get("assemblies", [])
+        if isinstance(assemblies, list):
+            for reference in assemblies:
+                add_ref(reference)
+
+    for vulnerability in sbom.get("vulnerabilities", []):
+        if not isinstance(vulnerability, dict):
+            continue
+        for affected in vulnerability.get("affects", []):
+            if isinstance(affected, dict):
+                add_ref(affected.get("ref"))
+
+
+def _build_component_identity_ref_map(*sboms: dict) -> dict[ComponentIdentity, str]:
+    identity_map: dict[ComponentIdentity, str] = {}
+
+    def _register(component: dict) -> None:
+        reference = component.get("bom-ref")
+        if reference is None:
+            return
+        reference_str = str(reference)
+        if not reference_str:
+            return
+        identity = ComponentIdentity.create(component, allow_unsafe=True)
+        if len(identity) == 0:
+            return
+        identity_map.setdefault(identity, reference_str)
+
+    for sbom in sboms:
+        metadata_component = sbom.get("metadata", {}).get("component")
+        if isinstance(metadata_component, dict):
+            _register(metadata_component)
+
+        walk_components({"components": sbom.get("components", [])}, _register, skip_meta=True)
+
+    return identity_map
+
+
+def _apply_bom_ref_rename_map(sbom: dict, rename_map: dict[str, str]) -> None:
+    if not rename_map:
+        return
+
+    def _rename_ref_value(ref_value: t.Any) -> t.Any:
+        if ref_value is None:
+            return ref_value
+        ref_str = str(ref_value)
+        return rename_map.get(ref_str, ref_value)
+
+    _apply_rename_to_components(sbom, _rename_ref_value)
+    _apply_rename_to_services(sbom, _rename_ref_value)
+    _apply_rename_to_tools(sbom, _rename_ref_value)
+    _apply_rename_to_dependencies(sbom, _rename_ref_value)
+    _apply_rename_to_compositions(sbom, _rename_ref_value)
+    _apply_rename_to_vulnerabilities(sbom, _rename_ref_value)
+
+
+def _apply_rename_to_components(
+    sbom: dict,
+    rename_ref: t.Callable[[t.Any], t.Any],
+) -> None:
+    def _rename_component(component: dict) -> None:
+        if "bom-ref" in component:
+            component["bom-ref"] = rename_ref(component.get("bom-ref"))
+
+    walk_components(sbom, _rename_component)
+
+
+def _apply_rename_to_services(
+    sbom: dict,
+    rename_ref: t.Callable[[t.Any], t.Any],
+) -> None:
+    for service in _iter_services_recursive(sbom.get("services", [])):
+        if "bom-ref" in service:
+            service["bom-ref"] = rename_ref(service.get("bom-ref"))
+
+
+def _apply_rename_to_tools(
+    sbom: dict,
+    rename_ref: t.Callable[[t.Any], t.Any],
+) -> None:
+    tools = sbom.get("metadata", {}).get("tools")
+    if isinstance(tools, dict):
+        for _key, _idx, entry in _iter_tool_entries(tools):
+            if "bom-ref" in entry:
+                entry["bom-ref"] = rename_ref(entry.get("bom-ref"))
+
+
+def _apply_rename_to_dependencies(
+    sbom: dict,
+    rename_ref: t.Callable[[t.Any], t.Any],
+) -> None:
+    for dependency in sbom.get("dependencies", []):
+        if not isinstance(dependency, dict):
+            continue
+        if "ref" in dependency:
+            dependency["ref"] = rename_ref(dependency.get("ref"))
+        depends_on = dependency.get("dependsOn", [])
+        if isinstance(depends_on, list):
+            dependency["dependsOn"] = [rename_ref(reference) for reference in depends_on]
+
+
+def _apply_rename_to_compositions(
+    sbom: dict,
+    rename_ref: t.Callable[[t.Any], t.Any],
+) -> None:
+    for composition in sbom.get("compositions", []):
+        if not isinstance(composition, dict):
+            continue
+        assemblies = composition.get("assemblies", [])
+        if isinstance(assemblies, list):
+            composition["assemblies"] = [rename_ref(reference) for reference in assemblies]
+
+
+def _apply_rename_to_vulnerabilities(
+    sbom: dict,
+    rename_ref: t.Callable[[t.Any], t.Any],
+) -> None:
+    for vulnerability in sbom.get("vulnerabilities", []):
+        if not isinstance(vulnerability, dict):
+            continue
+        for affected in vulnerability.get("affects", []):
+            if isinstance(affected, dict) and "ref" in affected:
+                affected["ref"] = rename_ref(affected.get("ref"))
+
+
+def _normalize_incoming_tools_bom_refs(governing_sbom: dict, incoming_sbom: dict) -> None:
+    tools = incoming_sbom.get("metadata", {}).get("tools")
+    if not isinstance(tools, dict):
+        return
+
+    entries = list(_iter_tool_entries(tools))
+    if not entries:
+        return
+
+    refs_in_use = _collect_all_bom_refs(governing_sbom)
+    refs_in_use |= _collect_all_bom_refs(incoming_sbom, include_tools=False)
+
+    component_identity_refs = _build_component_identity_ref_map(governing_sbom, incoming_sbom)
     rename_counters: dict[str, int] = {}
+    rename_map: dict[str, str] = {}
+
     for key, idx, entry in entries:
         bom_ref = entry.get("bom-ref")
         if bom_ref is None:
             continue
-        bom_ref_str = str(bom_ref)
-        if not bom_ref_str:
-            continue
-        if bom_ref_str not in used_refs:
-            used_refs.add(bom_ref_str)
+        old_ref = str(bom_ref)
+        if not old_ref:
             continue
 
-        suffix = rename_counters.get(bom_ref_str, 1)
-        candidate = f"{bom_ref_str}-tool-{suffix}"
-        while candidate in used_refs:
-            suffix += 1
-            candidate = f"{bom_ref_str}-tool-{suffix}"
-        rename_counters[bom_ref_str] = suffix + 1
-
-        entry["bom-ref"] = candidate
-        used_refs.add(candidate)
-        logger.warning(
-            LogMessage(
-                "Potential loss of information",
-                "Duplicate metadata.tools bom-ref detected while merging; "
-                f"renamed {key}[{idx}] bom-ref from '{bom_ref_str}' to '{candidate}' "
-                "to preserve uniqueness.",
-            )
+        identity = ComponentIdentity.create(entry, allow_unsafe=True)
+        existing_component_ref = (
+            component_identity_refs.get(identity) if len(identity) > 0 else None
         )
+
+        if existing_component_ref is not None:
+            assigned_ref = existing_component_ref
+        elif old_ref not in refs_in_use:
+            assigned_ref = old_ref
+        else:
+            suffix = rename_counters.get(old_ref, 1)
+            assigned_ref = f"{old_ref}-tool-{suffix}"
+            while assigned_ref in refs_in_use:
+                suffix += 1
+                assigned_ref = f"{old_ref}-tool-{suffix}"
+            rename_counters[old_ref] = suffix + 1
+
+        entry["bom-ref"] = assigned_ref
+        refs_in_use.add(assigned_ref)
+
+        if assigned_ref != old_ref:
+            rename_map.setdefault(old_ref, assigned_ref)
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    "Conflicting metadata.tools bom-ref detected while merging; "
+                    f"renamed {key}[{idx}] bom-ref from '{old_ref}' to '{assigned_ref}' "
+                    "to preserve global SBOM bom-ref uniqueness.",
+                )
+            )
+
+    _apply_bom_ref_rename_map(incoming_sbom, rename_map)
 
 
 def merge_tools(
@@ -617,6 +826,8 @@ def merge_2_sboms(
     """
     # before used make_bom_refs_unique() and unify_bom_refs must be run on the input
 
+    _normalize_incoming_tools_bom_refs(original_sbom, sbom_to_be_merged)
+
     if vulnerability_identities is None:
         vulnerability_identities = {}
     if (
@@ -633,6 +844,15 @@ def merge_2_sboms(
     list_of_new_dependencies = sbom_to_be_merged.get("dependencies", [])
     list_of_original_vulnerabilities = original_sbom.get("vulnerabilities", [])
     list_of_new_vulnerabilities = sbom_to_be_merged.get("vulnerabilities", [])
+
+    # Tool bom-ref normalization can rewrite vulnerability.affects refs.
+    # Keep the identity registry aligned with the current vulnerability objects.
+    for vulnerability in list_of_original_vulnerabilities + list_of_new_vulnerabilities:
+        vulnerability_key = json.dumps(vulnerability, sort_keys=True)
+        if vulnerability_key not in vulnerability_identities:
+            vulnerability_identities[vulnerability_key] = VulnerabilityIdentity.from_vulnerability(
+                vulnerability
+            )
 
     list_of_merged_components = merge_components(
         original_sbom, sbom_to_be_merged, hierarchical=hierarchical

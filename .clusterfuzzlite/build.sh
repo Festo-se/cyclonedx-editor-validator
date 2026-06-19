@@ -20,6 +20,7 @@ export PYTHONPATH="$FUZZ_DIR:${PYTHONPATH:-}"
 DATA_ARGS=(
   "--add-data=$REPO_DIR/cdxev/amend/license_name_spdx_id_map.json:cdxev/amend"
   "--add-data=$REPO_DIR/cdxev/auxiliary/schema:cdxev/auxiliary/schema"
+  "--copy-metadata=cyclonedx-editor-validator"
 )
 
 # Compile each fuzz target. compile_python_fuzzer packages the target together

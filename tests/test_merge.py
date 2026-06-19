@@ -259,14 +259,6 @@ class TestMergeTools(unittest.TestCase):
             )
         self.assertEqual(errors, 0)
 
-    def _minimal_sbom(self) -> dict:
-        return {
-            "$schema": "http://cyclonedx.org/schema/bom-1.7.schema.json",
-            "bomFormat": "CycloneDX",
-            "specVersion": "1.7",
-            "metadata": {},
-        }
-
     def test_merge_tools_old_into_new_with_schema_validation(self) -> None:
         original_sbom = self._load_reference_sbom("1.7")
         original_sbom.setdefault("metadata", {}).pop("tools", None)
@@ -1283,438 +1275,390 @@ class TestMergeTools(unittest.TestCase):
         self.assertIn("components", merged_tools)
         self.assertEqual(len(merged_tools["components"]), 2)
 
-    def test_tool_bom_ref_collision_with_component_ref_is_renamed(self) -> None:
-        original_sbom = self._minimal_sbom()
-        original_sbom["components"] = [
-            {
-                "bom-ref": "shared-ref",
-                "type": "library",
-                "name": "governing-component",
+
+class TestMergeToolsBomRefUniqueness(unittest.TestCase):
+    def _make_sbom(
+        self,
+        *,
+        metadata_component: dict | None = None,
+        components: list[dict] | None = None,
+        tools: dict | list | None = None,
+        dependencies: list[dict] | None = None,
+        compositions: list[dict] | None = None,
+        vulnerabilities: list[dict] | None = None,
+        spec_version: str = "1.6",
+    ) -> dict:
+        sbom: dict = {
+            "$schema": f"http://cyclonedx.org/schema/bom-{spec_version}.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": spec_version,
+            "metadata": {},
+            "components": components or [],
+        }
+
+        if metadata_component is not None:
+            sbom["metadata"]["component"] = metadata_component
+        if tools is not None:
+            sbom["metadata"]["tools"] = tools
+        if dependencies is not None:
+            sbom["dependencies"] = dependencies
+        if compositions is not None:
+            sbom["compositions"] = compositions
+        if vulnerabilities is not None:
+            sbom["vulnerabilities"] = vulnerabilities
+
+        return sbom
+
+    def _collect_all_entity_refs(self, sbom: dict) -> list[str]:
+        refs: list[str] = []
+
+        def _add_ref(component: dict) -> None:
+            ref = component.get("bom-ref")
+            if isinstance(ref, str) and ref:
+                refs.append(ref)
+
+        metadata_component = sbom.get("metadata", {}).get("component")
+        if isinstance(metadata_component, dict):
+            _add_ref(metadata_component)
+
+        for component in sbom.get("components", []):
+            if not isinstance(component, dict):
+                continue
+            _add_ref(component)
+            nested = component.get("components", [])
+            if isinstance(nested, list):
+                for subcomponent in merge.extract_components(nested):
+                    if isinstance(subcomponent, dict):
+                        _add_ref(subcomponent)
+
+        tools = sbom.get("metadata", {}).get("tools")
+        if isinstance(tools, dict):
+            for key in ("components", "services"):
+                values = tools.get(key, [])
+                if not isinstance(values, list):
+                    continue
+                for value in values:
+                    if isinstance(value, dict):
+                        _add_ref(value)
+
+        return refs
+
+    def test_tool_ref_collides_with_component_ref_is_made_unique(self) -> None:
+        sbom_1 = self._make_sbom(
+            components=[
+                {
+                    "bom-ref": "shared-ref",
+                    "type": "library",
+                    "name": "component-a",
+                    "version": "1.0.0",
+                }
+            ]
+        )
+        sbom_2 = self._make_sbom(
+            tools={
+                "components": [
+                    {
+                        "bom-ref": "shared-ref",
+                        "type": "application",
+                        "name": "tool-a",
+                        "version": "1.0.0",
+                    }
+                ]
+            }
+        )
+
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)])
+
+        refs = self._collect_all_entity_refs(merged)
+        self.assertEqual(len(refs), len(set(refs)))
+        self.assertEqual(merged["components"][0]["bom-ref"], "shared-ref")
+
+    def test_tool_ref_collides_with_metadata_component_ref_is_made_unique(self) -> None:
+        sbom_1 = self._make_sbom(
+            metadata_component={
+                "bom-ref": "meta-ref",
+                "type": "application",
+                "name": "app-a",
                 "version": "1.0.0",
             }
-        ]
+        )
+        sbom_2 = self._make_sbom(
+            tools={
+                "components": [
+                    {
+                        "bom-ref": "meta-ref",
+                        "type": "application",
+                        "name": "tool-a",
+                        "version": "1.0.0",
+                    }
+                ]
+            }
+        )
 
-        sbom_to_be_merged = self._minimal_sbom()
-        sbom_to_be_merged["metadata"]["tools"] = {
-            "components": [
-                {
-                    "type": "application",
-                    "name": "incoming-tool",
-                    "version": "1.0.0",
-                    "bom-ref": "shared-ref",
-                }
-            ]
-        }
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)])
 
-        merged = merge.merge([original_sbom, sbom_to_be_merged])
-
-        merged_component_ref = merged["components"][0]["bom-ref"]
-        incoming_tool_ref = merged["metadata"]["tools"]["components"][0]["bom-ref"]
-        self.assertEqual(merged_component_ref, "shared-ref")
-        self.assertNotEqual(incoming_tool_ref, "shared-ref")
-
-    def test_tool_bom_ref_collision_with_metadata_component_ref_is_renamed(self) -> None:
-        original_sbom = self._minimal_sbom()
-        original_sbom["metadata"]["component"] = {
-            "bom-ref": "meta-ref",
-            "type": "application",
-            "name": "governing-app",
-            "version": "1.0.0",
-        }
-
-        sbom_to_be_merged = self._minimal_sbom()
-        sbom_to_be_merged["metadata"]["tools"] = {
-            "components": [
-                {
-                    "type": "application",
-                    "name": "incoming-tool",
-                    "version": "1.0.0",
-                    "bom-ref": "meta-ref",
-                }
-            ]
-        }
-
-        merged = merge.merge([original_sbom, sbom_to_be_merged])
-
-        incoming_tool_ref = merged["metadata"]["tools"]["components"][0]["bom-ref"]
+        refs = self._collect_all_entity_refs(merged)
+        self.assertEqual(len(refs), len(set(refs)))
         self.assertEqual(merged["metadata"]["component"]["bom-ref"], "meta-ref")
-        self.assertNotEqual(incoming_tool_ref, "meta-ref")
 
-    def test_tool_bom_ref_collision_with_nested_component_ref_is_renamed(self) -> None:
-        original_sbom = self._minimal_sbom()
-        original_sbom["components"] = [
-            {
-                "bom-ref": "root-comp",
-                "type": "application",
-                "name": "root",
-                "version": "1.0.0",
+    def test_tool_ref_collides_with_nested_component_ref_is_made_unique(self) -> None:
+        sbom_1 = self._make_sbom(
+            components=[
+                {
+                    "bom-ref": "root-ref",
+                    "type": "application",
+                    "name": "root",
+                    "version": "1.0.0",
+                    "components": [
+                        {
+                            "bom-ref": "nested-ref",
+                            "type": "library",
+                            "name": "nested",
+                            "version": "1.0.0",
+                        }
+                    ],
+                }
+            ]
+        )
+        sbom_2 = self._make_sbom(
+            tools={
                 "components": [
                     {
                         "bom-ref": "nested-ref",
-                        "type": "library",
-                        "name": "nested",
+                        "type": "application",
+                        "name": "tool-a",
                         "version": "1.0.0",
                     }
-                ],
+                ]
             }
-        ]
+        )
 
-        sbom_to_be_merged = self._minimal_sbom()
-        sbom_to_be_merged["metadata"]["tools"] = {
-            "components": [
-                {
-                    "type": "application",
-                    "name": "incoming-tool",
-                    "version": "1.0.0",
-                    "bom-ref": "nested-ref",
-                }
-            ]
-        }
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)])
 
-        merged = merge.merge([original_sbom, sbom_to_be_merged])
+        refs = self._collect_all_entity_refs(merged)
+        self.assertEqual(len(refs), len(set(refs)))
+        self.assertEqual(merged["components"][0]["components"][0]["bom-ref"], "nested-ref")
 
-        incoming_tool_ref = merged["metadata"]["tools"]["components"][0]["bom-ref"]
-        nested_component_ref = merged["components"][0]["components"][0]["bom-ref"]
-        self.assertEqual(nested_component_ref, "nested-ref")
-        self.assertNotEqual(incoming_tool_ref, "nested-ref")
-
-    def test_tool_ref_rename_updates_dependencies_and_vulnerability_affects(self) -> None:
-        original_sbom = self._minimal_sbom()
-        original_sbom["components"] = [
-            {
-                "bom-ref": "shared-ref",
-                "type": "library",
-                "name": "governing-component",
-                "version": "1.0.0",
-            }
-        ]
-        original_sbom["dependencies"] = [{"ref": "shared-ref", "dependsOn": []}]
-
-        sbom_to_be_merged = self._minimal_sbom()
-        sbom_to_be_merged["metadata"]["tools"] = {
-            "components": [
-                {
-                    "type": "application",
-                    "name": "incoming-tool",
-                    "version": "1.0.0",
-                    "bom-ref": "shared-ref",
-                }
-            ]
-        }
-        sbom_to_be_merged["dependencies"] = [{"ref": "incoming-root", "dependsOn": ["shared-ref"]}]
-        sbom_to_be_merged["vulnerabilities"] = [
-            {
-                "id": "CVE-0000-0001",
-                "affects": [
+    def test_renamed_ref_is_updated_in_dependencies_and_vulnerabilities(self) -> None:
+        # This test forces renaming of a regular component ref by colliding it
+        # with a tool ref; dependencies/affects then must follow the new component ref.
+        sbom_1 = self._make_sbom(
+            tools={
+                "components": [
                     {
-                        "ref": "shared-ref",
-                        "versions": [{"version": "1.0.0", "status": "affected"}],
+                        "bom-ref": "shared-ref",
+                        "type": "application",
+                        "name": "tool-a",
+                        "version": "1.0.0",
                     }
-                ],
-            }
-        ]
-
-        merged = merge.merge([original_sbom, sbom_to_be_merged])
-
-        incoming_tool_ref = merged["metadata"]["tools"]["components"][0]["bom-ref"]
-        self.assertNotEqual(incoming_tool_ref, "shared-ref")
-
-        self.assertTrue(
-            any(
-                dependency.get("ref") == "shared-ref"
-                for dependency in merged.get("dependencies", [])
-            )
+                ]
+            },
+            dependencies=[{"ref": "tool-root", "dependsOn": []}],
         )
-        incoming_dependency = next(
-            dependency
-            for dependency in merged.get("dependencies", [])
-            if dependency.get("ref") == "incoming-root"
+        sbom_2 = self._make_sbom(
+            components=[
+                {
+                    "bom-ref": "shared-ref",
+                    "type": "library",
+                    "name": "component-a",
+                    "version": "1.0.0",
+                }
+            ],
+            dependencies=[{"ref": "root", "dependsOn": ["shared-ref"]}],
+            vulnerabilities=[
+                {
+                    "id": "CVE-0000-0100",
+                    "affects": [{"ref": "shared-ref"}],
+                }
+            ],
         )
-        self.assertIn(incoming_tool_ref, incoming_dependency.get("dependsOn", []))
-        self.assertNotIn("shared-ref", incoming_dependency.get("dependsOn", []))
 
-        affected_refs = [
-            affected.get("ref")
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)])
+
+        component_ref = merged["components"][0]["bom-ref"]
+        self.assertNotEqual(component_ref, "shared-ref")
+
+        dependency = merged["dependencies"][0]
+        self.assertIn(component_ref, dependency.get("dependsOn", []))
+        self.assertNotIn("shared-ref", dependency.get("dependsOn", []))
+
+        affects_refs = [
+            affect.get("ref")
             for vulnerability in merged.get("vulnerabilities", [])
-            for affected in vulnerability.get("affects", [])
+            for affect in vulnerability.get("affects", [])
         ]
-        self.assertIn(incoming_tool_ref, affected_refs)
-        self.assertNotIn("shared-ref", affected_refs)
+        self.assertIn(component_ref, affects_refs)
+        self.assertNotIn("shared-ref", affects_refs)
 
-    def test_multiple_tools_with_same_bom_ref_become_globally_unique(self) -> None:
-        sbom_1 = self._minimal_sbom()
-        sbom_1["metadata"]["tools"] = {
-            "components": [
-                {
-                    "type": "application",
-                    "name": "tool-1",
-                    "version": "1.0.0",
-                    "bom-ref": "dup-ref",
-                }
-            ]
-        }
+    def test_multiple_tools_across_inputs_sharing_one_ref_all_unique(self) -> None:
+        sbom_1 = self._make_sbom(
+            tools={
+                "components": [
+                    {
+                        "bom-ref": "tool-ref",
+                        "type": "application",
+                        "name": "tool-a",
+                        "version": "1.0.0",
+                    }
+                ]
+            }
+        )
+        sbom_2 = self._make_sbom(
+            tools={
+                "components": [
+                    {
+                        "bom-ref": "tool-ref",
+                        "type": "application",
+                        "name": "tool-b",
+                        "version": "1.0.0",
+                    }
+                ]
+            }
+        )
+        sbom_3 = self._make_sbom(
+            tools={
+                "components": [
+                    {
+                        "bom-ref": "tool-ref",
+                        "type": "application",
+                        "name": "tool-c",
+                        "version": "1.0.0",
+                    }
+                ]
+            }
+        )
 
-        sbom_2 = self._minimal_sbom()
-        sbom_2["metadata"]["tools"] = {
-            "components": [
-                {
-                    "type": "application",
-                    "name": "tool-2",
-                    "version": "1.0.0",
-                    "bom-ref": "dup-ref",
-                }
-            ]
-        }
-
-        sbom_3 = self._minimal_sbom()
-        sbom_3["metadata"]["tools"] = {
-            "components": [
-                {
-                    "type": "application",
-                    "name": "tool-3",
-                    "version": "1.0.0",
-                    "bom-ref": "dup-ref",
-                }
-            ]
-        }
-
-        merged = merge.merge([sbom_1, sbom_2, sbom_3])
-        refs = [
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2), copy.deepcopy(sbom_3)])
+        tool_refs = [
             component.get("bom-ref")
             for component in merged.get("metadata", {}).get("tools", {}).get("components", [])
         ]
 
-        self.assertEqual(len(refs), 3)
-        self.assertEqual(len(set(refs)), 3)
+        self.assertEqual(len(tool_refs), 3)
+        self.assertEqual(len(set(tool_refs)), 3)
 
-    def test_tool_and_component_same_identity_share_same_bom_ref(self) -> None:
-        original_sbom = self._minimal_sbom()
-        original_sbom["components"] = [
-            {
-                "bom-ref": "shared-id-ref",
-                "type": "application",
-                "name": "shared-thing",
-                "version": "1.0.0",
-            }
-        ]
-
-        sbom_to_be_merged = self._minimal_sbom()
-        sbom_to_be_merged["metadata"]["tools"] = {
-            "components": [
+    def test_shared_identity_tool_and_component_converge_to_same_ref(self) -> None:
+        sbom_1 = self._make_sbom(
+            components=[
                 {
+                    "bom-ref": "component-ref",
                     "type": "application",
-                    "name": "shared-thing",
+                    "name": "same-identity",
                     "version": "1.0.0",
-                    "bom-ref": "shared-id-ref",
                 }
             ]
-        }
-
-        merged = merge.merge_2_sboms(original_sbom, sbom_to_be_merged)
-
-        component_matches = [
-            component
-            for component in merged.get("components", [])
-            if component.get("name") == "shared-thing" and component.get("version") == "1.0.0"
-        ]
-        tool = merged.get("metadata", {}).get("tools", {}).get("components", [])[0]
-
-        self.assertEqual(len(component_matches), 1)
-        self.assertEqual(tool.get("bom-ref"), component_matches[0].get("bom-ref"))
-        self.assertEqual(tool.get("bom-ref"), "shared-id-ref")
-
-    def test_tool_and_component_different_identity_with_same_ref_are_split(self) -> None:
-        original_sbom = self._minimal_sbom()
-        original_sbom["components"] = [
-            {
-                "bom-ref": "shared-ref",
-                "type": "application",
-                "name": "component-a",
-                "version": "1.0.0",
+        )
+        sbom_2 = self._make_sbom(
+            tools={
+                "components": [
+                    {
+                        "bom-ref": "tool-ref",
+                        "type": "application",
+                        "name": "same-identity",
+                        "version": "1.0.0",
+                    }
+                ]
             }
-        ]
+        )
 
-        sbom_to_be_merged = self._minimal_sbom()
-        sbom_to_be_merged["metadata"]["tools"] = {
-            "components": [
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)])
+
+        component_ref = merged["components"][0]["bom-ref"]
+        tool_ref = merged["metadata"]["tools"]["components"][0]["bom-ref"]
+        self.assertEqual(component_ref, tool_ref)
+        self.assertNotIn(tool_ref, {"component-ref", "tool-ref"} - {component_ref})
+
+    def test_same_ref_different_identity_tool_and_component_are_split(self) -> None:
+        sbom_1 = self._make_sbom(
+            components=[
                 {
-                    "type": "application",
-                    "name": "component-b",
-                    "version": "1.0.0",
                     "bom-ref": "shared-ref",
-                }
-            ]
-        }
-
-        merged = merge.merge_2_sboms(original_sbom, sbom_to_be_merged)
-
-        tool_ref = merged.get("metadata", {}).get("tools", {}).get("components", [])[0]["bom-ref"]
-        component_ref = merged.get("components", [])[0]["bom-ref"]
-        self.assertEqual(component_ref, "shared-ref")
-        self.assertNotEqual(tool_ref, component_ref)
-
-    def test_unique_tool_bom_refs_are_not_renamed(self) -> None:
-        original_sbom = self._minimal_sbom()
-        original_sbom["metadata"]["tools"] = {
-            "components": [
-                {
                     "type": "application",
-                    "name": "tool-a",
+                    "name": "component-a",
                     "version": "1.0.0",
-                    "bom-ref": "tool-a-ref",
                 }
             ]
-        }
+        )
+        sbom_2 = self._make_sbom(
+            tools={
+                "components": [
+                    {
+                        "bom-ref": "shared-ref",
+                        "type": "application",
+                        "name": "component-b",
+                        "version": "1.0.0",
+                    }
+                ]
+            }
+        )
 
-        sbom_to_be_merged = self._minimal_sbom()
-        sbom_to_be_merged["metadata"]["tools"] = {
-            "components": [
-                {
-                    "type": "application",
-                    "name": "tool-b",
-                    "version": "1.0.0",
-                    "bom-ref": "tool-b-ref",
-                }
-            ]
-        }
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)])
 
-        merged = merge.merge_2_sboms(original_sbom, sbom_to_be_merged)
+        component_ref = merged["components"][0]["bom-ref"]
+        tool_ref = merged["metadata"]["tools"]["components"][0]["bom-ref"]
+        self.assertNotEqual(component_ref, tool_ref)
 
+    def test_no_collision_leaves_tool_refs_unchanged(self) -> None:
+        sbom_1 = self._make_sbom(
+            tools={
+                "components": [
+                    {
+                        "bom-ref": "tool-ref-a",
+                        "type": "application",
+                        "name": "tool-a",
+                        "version": "1.0.0",
+                    }
+                ]
+            }
+        )
+        sbom_2 = self._make_sbom(
+            tools={
+                "components": [
+                    {
+                        "bom-ref": "tool-ref-b",
+                        "type": "application",
+                        "name": "tool-b",
+                        "version": "1.0.0",
+                    }
+                ]
+            }
+        )
+
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)])
         refs = {
             component.get("bom-ref")
             for component in merged.get("metadata", {}).get("tools", {}).get("components", [])
         }
-        self.assertEqual(refs, {"tool-a-ref", "tool-b-ref"})
+        self.assertEqual(refs, {"tool-ref-a", "tool-ref-b"})
 
-    def test_merge_tools_returns_existing_when_other_side_none(self) -> None:
-        governing = [{"name": "tool-a", "vendor": "acme"}]
-        merged_with_none_incoming = merge.merge_tools(governing, None)
-        merged_with_none_governing = merge.merge_tools(None, governing)
-
-        self.assertEqual(merged_with_none_incoming, governing)
-        self.assertEqual(merged_with_none_governing, governing)
-
-    def test_collect_all_bom_refs_handles_mixed_structures(self) -> None:
-        sbom = self._minimal_sbom()
-        sbom["metadata"]["component"] = {
-            "type": "application",
-            "name": "meta",
-            "version": "1.0.0",
-            "bom-ref": "meta-ref",
-        }
-        sbom["components"] = [
-            {
-                "type": "library",
-                "name": "root",
-                "version": "1.0.0",
-                "bom-ref": "comp-ref",
-            }
-        ]
-        sbom["services"] = [
-            {
-                "name": "root-service",
-                "bom-ref": "service-ref",
-                "services": [{"name": "nested-service", "bom-ref": "nested-service-ref"}],
-            },
-            "invalid-service-entry",
-        ]
-        sbom["metadata"]["tools"] = {
-            "components": "not-a-list",
-            "services": [
+    def test_legacy_array_tools_without_bom_refs_are_unaffected(self) -> None:
+        sbom_1 = self._make_sbom(
+            tools=[
                 {
-                    "name": "tool-service",
-                    "bom-ref": "tool-service-ref",
+                    "name": "legacy-tool-a",
+                    "vendor": "acme",
+                    "version": "1.0.0",
                 }
             ],
-        }
-        sbom["dependencies"] = [
-            {
-                "ref": "dep-ref",
-                "dependsOn": ["dep-child-ref", None],
-            },
-            "invalid-dependency-entry",
-        ]
-        sbom["compositions"] = [
-            {
-                "aggregate": "complete",
-                "assemblies": ["assembly-ref", None],
-            },
-            "invalid-composition-entry",
-        ]
-        sbom["vulnerabilities"] = [
-            {
-                "id": "CVE-0000-1000",
-                "affects": [
-                    {
-                        "ref": "affects-ref",
-                    },
-                    "invalid-affect-entry",
-                ],
-            },
-            "invalid-vulnerability-entry",
-        ]
-
-        refs_without_tools = merge._collect_all_bom_refs(sbom, include_tools=False)
-        refs_with_tools = merge._collect_all_bom_refs(sbom, include_tools=True)
-
-        self.assertIn("meta-ref", refs_with_tools)
-        self.assertIn("nested-service-ref", refs_with_tools)
-        self.assertIn("dep-child-ref", refs_with_tools)
-        self.assertIn("affects-ref", refs_with_tools)
-        self.assertIn("tool-service-ref", refs_with_tools)
-        self.assertNotIn("tool-service-ref", refs_without_tools)
-
-    def test_apply_bom_ref_rename_map_updates_supported_sections(self) -> None:
-        sbom = self._minimal_sbom()
-        sbom["metadata"]["component"] = {
-            "type": "application",
-            "name": "meta",
-            "version": "1.0.0",
-            "bom-ref": "old-ref",
-        }
-        sbom["components"] = [
-            {
-                "type": "library",
-                "name": "root",
-                "version": "1.0.0",
-                "bom-ref": "old-ref",
-            }
-        ]
-        sbom["services"] = [{"name": "svc", "bom-ref": "old-ref"}]
-        sbom["metadata"]["tools"] = {
-            "components": [{"type": "application", "name": "tool", "bom-ref": "old-ref"}],
-        }
-        sbom["dependencies"] = [{"ref": None, "dependsOn": ["old-ref", None]}]
-        sbom["compositions"] = [{"aggregate": "complete", "assemblies": ["old-ref", None]}]
-        sbom["vulnerabilities"] = [{"id": "CVE-0000-1001", "affects": [{"ref": "old-ref"}]}]
-
-        merge._apply_bom_ref_rename_map(sbom, {"old-ref": "new-ref"})
-        merge._apply_bom_ref_rename_map(sbom, {})
-
-        self.assertEqual(sbom["metadata"]["component"]["bom-ref"], "new-ref")
-        self.assertEqual(sbom["components"][0]["bom-ref"], "new-ref")
-        self.assertEqual(sbom["services"][0]["bom-ref"], "new-ref")
-        self.assertEqual(sbom["metadata"]["tools"]["components"][0]["bom-ref"], "new-ref")
-        self.assertEqual(sbom["dependencies"][0]["dependsOn"][0], "new-ref")
-        self.assertIsNone(sbom["dependencies"][0]["ref"])
-        self.assertEqual(sbom["compositions"][0]["assemblies"][0], "new-ref")
-        self.assertEqual(sbom["vulnerabilities"][0]["affects"][0]["ref"], "new-ref")
-
-    def test_normalize_incoming_tools_bom_refs_early_return_paths(self) -> None:
-        governing_sbom = self._minimal_sbom()
-
-        incoming_with_non_object_tools = self._minimal_sbom()
-        incoming_with_non_object_tools["metadata"]["tools"] = []
-        merge._normalize_incoming_tools_bom_refs(governing_sbom, incoming_with_non_object_tools)
-        self.assertEqual(incoming_with_non_object_tools["metadata"]["tools"], [])
-
-        incoming_with_empty_entries = self._minimal_sbom()
-        incoming_with_empty_entries["metadata"]["tools"] = {"components": "not-a-list"}
-        merge._normalize_incoming_tools_bom_refs(governing_sbom, incoming_with_empty_entries)
-        self.assertEqual(
-            incoming_with_empty_entries["metadata"]["tools"],
-            {"components": "not-a-list"},
+            spec_version="1.4",
         )
+        sbom_2 = self._make_sbom(
+            tools=[
+                {
+                    "name": "legacy-tool-b",
+                    "vendor": "contoso",
+                    "version": "2.0.0",
+                }
+            ],
+            spec_version="1.4",
+        )
+
+        merged = merge.merge([copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)])
+
+        self.assertIsInstance(merged.get("metadata", {}).get("tools"), list)
+        names = [tool.get("name") for tool in merged["metadata"]["tools"]]
+        self.assertIn("legacy-tool-a", names)
+        self.assertIn("legacy-tool-b", names)
 
 
 class TestMergeSeveralSboms(unittest.TestCase):

@@ -692,7 +692,9 @@ def get_identities_for_vulnerabilities(
 
                     new_len_aliases = len(aliases)
 
-                identities[vulnerability_string] = VulnerabilityIdentity(aliases[0], aliases)
+                identities[vulnerability_string] = VulnerabilityIdentity(
+                    aliases[0] if aliases else "", aliases
+                )
 
     return identities
 

@@ -1251,6 +1251,46 @@ class TestVersionRange(unittest.TestCase):
         )
         self.assertRaises(cdxev.error.AppError, cdxev.set._validate_update_list, updates, cfg)
 
+    def test_invalid_version_range_raises_error(self) -> None:
+        # Malformed version ranges make univers raise a variety of unrelated exception
+        # types (e.g. InvalidNuGetVersion, InvalidVersionRange, InvalidVersion). All of
+        # them must be normalized into a ValueError by from_coordinates and surfaced as a
+        # clean AppError when validating an update list, instead of escaping uncaught.
+        invalid_ranges = [
+            "vers:nuget/--------------------m---",
+            "vers:npm/not-a-version",
+            "vers:pypi/@@@",
+            "vers:gem/###",
+            "not-a-version-range",
+            "vers:generic/",
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+        for version_range in invalid_ranges:
+            with self.subTest(version_range=version_range):
+                self.assertRaises(
+                    ValueError,
+                    cdxev.set.UpdateIdentity.from_coordinates,
+                    name="pkg",
+                    version_range=version_range,
+                )
+                updates = [
+                    {
+                        "id": {"name": "pkg", "version-range": version_range},
+                        "set": {"copyright": "ACME Inc."},
+                    }
+                ]
+                self.assertRaises(
+                    cdxev.error.AppError,
+                    cdxev.set._validate_update_list,
+                    updates,
+                    cfg,
+                )
+
     def test_version_range(self) -> None:
         component_base = {
             "name": "some name",

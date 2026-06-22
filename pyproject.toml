@@ -161,3 +161,5 @@ max-complexity = 20
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/*" = ["S101"]
+# Atheris fuzz harnesses require the entry point to be named `TestOneInput`.
+"**/tests/fuzz/*" = ["S101", "N802"]

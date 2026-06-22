@@ -47,7 +47,8 @@ def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
         list_str += "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             vul_id = vulnerability.get("id", "-")
-            vul_ref_id = vulnerability.get("references", [{"id": "-"}])[0].get("id", "-")
+            references = vulnerability.get("references") or [{"id": "-"}]
+            vul_ref_id = references[0].get("id", "-")
             # write cwe string
             cwes = vulnerability.get("cwes", [])
             cwe_str = ""
@@ -95,12 +96,8 @@ def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
     elif schema == "lightweight":
         list_str += "ID|RefID\n"
         for vulnerability in input_file.get("vulnerabilities", []):
-            list_str += (
-                vulnerability.get("id", "-")
-                + "|"
-                + vulnerability.get("references", [{"id": "-"}])[0].get("id", "-")
-                + "\n"
-            )
+            references = vulnerability.get("references") or [{"id": "-"}]
+            list_str += vulnerability.get("id", "-") + "|" + references[0].get("id", "-") + "\n"
 
     return list_str
 

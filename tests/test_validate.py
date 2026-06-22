@@ -1320,3 +1320,9 @@ class TestValidateFilename(unittest.TestCase):
             with self.subTest(filename=filename):
                 result = validate_filename(filename, "", self.sbom, "custom")
                 self.assertIsInstance(result, str)
+
+    def test_invalid_regex_raises_apperror(self) -> None:
+        for regex in ["(unterminated", "[", "*invalid"]:
+            with self.subTest(regex=regex):
+                with self.assertRaises(AppError):
+                    validate_filename("bom.json", regex, self.sbom, "default")

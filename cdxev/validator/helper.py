@@ -114,7 +114,15 @@ def validate_filename(
         else:
             regex = "^(bom\\.json|.+\\.cdx\\.json)$"
 
-    if re.fullmatch(regex, filename) is None:
+    try:
+        matches = re.fullmatch(regex, filename) is not None
+    except re.error as exc:
+        raise AppError(
+            "Invalid filename pattern",
+            f"The provided filename pattern is not a valid regular expression: {exc}",
+        ) from exc
+
+    if not matches:
         return "filename doesn't match regular expression " + regex
     else:
         return False

@@ -2228,6 +2228,16 @@ class TestMergeVulnerabilities(unittest.TestCase):
 
         self.assertEqual(actual_merged["vulnerabilities"], merged_vulnerabilities)
 
+    def test_get_identities_for_vulnerabilities_no_id_no_references(self) -> None:
+        # Regression test: a vulnerability with neither an "id" nor "references"
+        # yields an empty alias list and must not raise IndexError.
+        vulnerabilities = [{"affects": [{"ref": "product-a"}]}]
+        identities = merge.get_identities_for_vulnerabilities(vulnerabilities)
+        self.assertEqual(len(identities), 1)
+        identity = next(iter(identities.values()))
+        self.assertEqual(identity.id, "")
+        self.assertEqual(identity.aliases, [])
+
 
 class TestMergeSimilarComponents(unittest.TestCase):
     """

@@ -25,31 +25,9 @@ from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
 
-
-PATH_STYLE_SEPARATORS = (
-    "/",
-    "|",
-    ";",
-    ".",
-    "::",
-    "->",
-    "\\",
-    "-",
-    "_",
-    "~",
-    "://",
-    "?",
-    "@",
-    "%",
-    "$",
-    "^",
-    "&",
-    "*",
-    "+",
-    "=",
-    "<",
-    ">",
-)
+# Possible to use different identifiers, but might to false classification
+# e.g. - app and app-logger
+PATH_STYLE_BOM_REF_SEPARATOR = "/"
 
 
 def _capture_path_style_bom_refs(
@@ -60,14 +38,11 @@ def _capture_path_style_bom_refs(
     def _walk(component: dict, parent: t.Optional[dict] = None) -> None:
         component_ref = component.get("bom-ref", "")
         parent_ref = parent.get("bom-ref", "") if parent else ""
-        separator = ""
-        if parent_ref:
-            for candidate_separator in PATH_STYLE_SEPARATORS:
-                if component_ref.startswith(parent_ref + candidate_separator):
-                    separator = candidate_separator
-                    break
-        follows_parent = bool(separator)
-        segment = component_ref[len(parent_ref) + len(separator) :] if follows_parent else ""
+        follows_parent = bool(
+            parent_ref and component_ref.startswith(parent_ref + PATH_STYLE_BOM_REF_SEPARATOR)
+        )
+        separator = PATH_STYLE_BOM_REF_SEPARATOR if follows_parent else ""
+        segment = component_ref[len(parent_ref) + 1 :] if follows_parent else ""
 
         path_style_bom_refs[id(component)] = {
             "follows_parent": follows_parent,
@@ -146,11 +121,14 @@ def _rebase_hierarchical_subtree_bom_refs(
         original_ref = path_info.get("original_ref", old_ref)
 
         if path_info.get("follows_parent"):
-            separator = path_info.get("separator", "/")
+            separator = path_info.get(
+                "separator",
+                PATH_STYLE_BOM_REF_SEPARATOR,
+            )
             next_parent_ref = parent_ref + separator + path_info["segment"]
         elif rebase_root and path_info.get("has_path_style_child") and original_ref:
             # Rebase the relocated subtree root too so the merged path stays absolute.
-            next_parent_ref = parent_ref + "/" + original_ref
+            next_parent_ref = parent_ref + PATH_STYLE_BOM_REF_SEPARATOR + original_ref
         else:
             return
 

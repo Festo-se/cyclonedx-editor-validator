@@ -58,6 +58,7 @@ If you want to add additional operations to the amend command, do it like this:
 import importlib.resources
 import json
 import logging
+import re
 import typing as t
 import uuid
 from pathlib import Path
@@ -66,10 +67,13 @@ import charset_normalizer
 
 from cdxev.amend.license import foreach_license, license_has_id, license_has_text
 from cdxev.auxiliary.identity import ComponentIdentity
+from cdxev.auxiliary.sbom_functions import replace_bom_ref_in_sbom
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
+
+HIERARCHICAL_BOM_REF_SEPARATOR = "/"
 
 
 def default(cls: type["Operation"]) -> type["Operation"]:
@@ -482,3 +486,79 @@ class DeleteAmbiguousLicenses(Operation):
 
     def handle_component(self, component: dict) -> None:
         self._filter_licenses(component)
+
+
+class HierarchicalBomRefs(Operation):
+    """
+    Rewrites bom-refs into a hierarchical parent/child path scheme.
+
+    For every component, sets its bom-ref to '<parent-ref>/<leaf>' reflecting its position in
+    the component tree (e.g. root 'compA', child 'compA/subcompA'). All references to changed
+    bom-refs (dependencies, compositions, vulnerabilities, metadata.component) are updated.
+    This operation OVERWRITES existing bom-refs, including deliberate UUIDs or PURLs, so it is
+    not run by default and must be selected explicitly.
+    """
+
+    _assigned_refs: set[str]
+
+    def prepare(self, sbom: dict) -> None:
+        self._assigned_refs = set()
+
+        metadata_component = sbom.get("metadata", {}).get("component")
+        metadata_ref: t.Optional[str] = None
+        if isinstance(metadata_component, dict):
+            metadata_ref = self._rewrite_component_tree(sbom, metadata_component, None)
+
+        # If a metadata component exists, we rebase top-level components onto that root.
+        for component in sbom.get("components", []):
+            self._rewrite_component_tree(sbom, component, metadata_ref)
+
+    def _rewrite_component_tree(
+        self,
+        sbom: dict,
+        component: dict,
+        parent_ref: t.Optional[str],
+    ) -> str:
+        leaf = self._leaf_from_component(component)
+        desired_ref = self._join_ref(parent_ref, leaf)
+        new_ref = self._ensure_unique_ref(desired_ref)
+        old_ref = component.get("bom-ref", "")
+
+        if old_ref and old_ref != new_ref:
+            replace_bom_ref_in_sbom(sbom, old_ref, new_ref)
+        component["bom-ref"] = new_ref
+
+        self._assigned_refs.add(new_ref)
+
+        for child in component.get("components", []):
+            self._rewrite_component_tree(sbom, child, new_ref)
+
+        return new_ref
+
+    def _join_ref(self, parent_ref: t.Optional[str], leaf: str) -> str:
+        if parent_ref:
+            return parent_ref + HIERARCHICAL_BOM_REF_SEPARATOR + leaf
+        return leaf
+
+    def _leaf_from_component(self, component: dict) -> str:
+        name = component.get("name", "")
+        if isinstance(name, str) and name.strip():
+            return self._sanitize_ref_segment(name)
+
+        old_ref = component.get("bom-ref", "")
+        if isinstance(old_ref, str) and old_ref:
+            return self._sanitize_ref_segment(old_ref)
+
+        return str(uuid.uuid4())
+
+    def _sanitize_ref_segment(self, value: str) -> str:
+        return re.sub(r"[/\s]", "_", value)
+
+    def _ensure_unique_ref(self, desired_ref: str) -> str:
+        new_ref = desired_ref
+        index = 1
+        while new_ref in self._assigned_refs:
+            new_ref = f"{desired_ref}-{index}"
+            index += 1
+
+        return new_ref

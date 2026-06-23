@@ -13,6 +13,7 @@ from cdxev.amend.operations import (
     Compositions,
     DefaultAuthor,
     DeleteAmbiguousLicenses,
+    HierarchicalBomRefs,
     InferSupplier,
     LicenseNameToId,
     Operation,
@@ -282,6 +283,46 @@ def flat_walk_components(operation: Operation, components: t.Sequence[dict[str, 
         operation.handle_component(c)
 
 
+def _iter_components(components: t.Sequence[dict]) -> t.Iterator[dict]:
+    for component in components:
+        yield component
+        yield from _iter_components(component.get("components", []))
+
+
+def _collect_known_bom_refs(sbom: dict) -> set[str]:
+    refs = {
+        component["bom-ref"]
+        for component in _iter_components(sbom.get("components", []))
+        if component.get("bom-ref", "")
+    }
+    metadata_component = sbom.get("metadata", {}).get("component", {})
+    metadata_ref = metadata_component.get("bom-ref", "")
+    if metadata_ref:
+        refs.add(metadata_ref)
+    return refs
+
+
+def _assert_no_dangling_refs(sbom: dict) -> None:
+    known_refs = _collect_known_bom_refs(sbom)
+
+    for dependency in sbom.get("dependencies", []):
+        reference = dependency.get("ref", "")
+        if reference:
+            assert reference in known_refs, f"Dangling dependency ref: {reference}"
+        for depends_on_ref in dependency.get("dependsOn", []):
+            assert depends_on_ref in known_refs, f"Dangling dependsOn ref: {depends_on_ref}"
+
+    for composition in sbom.get("compositions", []):
+        for assembly_ref in composition.get("assemblies", []):
+            assert assembly_ref in known_refs, f"Dangling composition assembly ref: {assembly_ref}"
+
+    for vulnerability in sbom.get("vulnerabilities", []):
+        for affected in vulnerability.get("affects", []):
+            affected_ref = affected.get("ref", "")
+            if affected_ref:
+                assert affected_ref in known_refs, f"Dangling vulnerability ref: {affected_ref}"
+
+
 class AddLicenseTextTestCase(AmendTestCase):
     def setUp(self) -> None:
         super().setUp()
@@ -458,6 +499,164 @@ class DeleteAmbiguousLicensesTestCase(AmendTestCase):
 
         self.operation.handle_component(self.component)
         self.assertDictEqual(self.component, expected)
+
+
+class HierarchicalBomRefsTestCase(unittest.TestCase):
+    def test_multilevel_nesting(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "name": "app",
+                    "components": [{"name": "lib", "components": [{"name": "core"}]}],
+                }
+            ]
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        root = sbom["components"][0]
+        child = root["components"][0]
+        grandchild = child["components"][0]
+        self.assertEqual("app", root["bom-ref"])
+        self.assertEqual("app/lib", child["bom-ref"])
+        self.assertEqual("app/lib/core", grandchild["bom-ref"])
+
+    def test_metadata_component_as_root(self) -> None:
+        sbom = {
+            "metadata": {"component": {"name": "product"}},
+            "components": [{"name": "app", "components": [{"name": "lib"}]}],
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        self.assertEqual("product", sbom["metadata"]["component"]["bom-ref"])
+        self.assertEqual("product/app", sbom["components"][0]["bom-ref"])
+        self.assertEqual("product/app/lib", sbom["components"][0]["components"][0]["bom-ref"])
+
+    def test_reference_rewriting(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "name": "app",
+                    "bom-ref": "pkg:npm/app@1.0",
+                    "components": [{"name": "lib", "bom-ref": "urn:uuid:sub-lib"}],
+                }
+            ],
+            "dependencies": [
+                {"ref": "urn:uuid:sub-lib", "dependsOn": ["pkg:npm/app@1.0"]},
+            ],
+            "compositions": [
+                {
+                    "aggregate": "complete",
+                    "assemblies": ["urn:uuid:sub-lib", "pkg:npm/app@1.0"],
+                }
+            ],
+            "vulnerabilities": [{"id": "CVE-1", "affects": [{"ref": "urn:uuid:sub-lib"}]}],
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        self.assertEqual("app", sbom["components"][0]["bom-ref"])
+        self.assertEqual("app/lib", sbom["components"][0]["components"][0]["bom-ref"])
+        self.assertEqual("app/lib", sbom["dependencies"][0]["ref"])
+        self.assertEqual(["app"], sbom["dependencies"][0]["dependsOn"])
+        self.assertEqual(
+            ["app/lib", "app"],
+            sbom["compositions"][0]["assemblies"],
+        )
+        self.assertEqual("app/lib", sbom["vulnerabilities"][0]["affects"][0]["ref"])
+        _assert_no_dangling_refs(sbom)
+
+    def test_sibling_name_collision(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "name": "app",
+                    "components": [{"name": "utils"}, {"name": "utils"}],
+                }
+            ]
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        child_refs = [child["bom-ref"] for child in sbom["components"][0]["components"]]
+        self.assertEqual(["app/utils", "app/utils-1"], child_refs)
+        _assert_no_dangling_refs(sbom)
+
+    def test_component_without_name_uses_fallback_leaf(self) -> None:
+        sbom = {"components": [{"bom-ref": "old/ref with space"}, {}]}
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        first_ref = sbom["components"][0]["bom-ref"]
+        second_ref = sbom["components"][1]["bom-ref"]
+        self.assertEqual("old_ref_with_space", first_ref)
+        self.assertNotEqual("", second_ref)
+        self.assertFalse(second_ref.endswith("/"))
+        self.assertNotEqual(first_ref, second_ref)
+
+    def test_existing_purl_or_uuid_refs_are_overwritten(self) -> None:
+        sbom = {
+            "components": [
+                {"name": "app", "bom-ref": "pkg:npm/foo@1.0"},
+                {"name": "worker", "bom-ref": "550e8400-e29b-41d4-a716-446655440000"},
+            ],
+            "dependencies": [
+                {"ref": "pkg:npm/foo@1.0", "dependsOn": ["550e8400-e29b-41d4-a716-446655440000"]}
+            ],
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        self.assertEqual("app", sbom["components"][0]["bom-ref"])
+        self.assertEqual("worker", sbom["components"][1]["bom-ref"])
+        self.assertEqual("app", sbom["dependencies"][0]["ref"])
+        self.assertEqual(["worker"], sbom["dependencies"][0]["dependsOn"])
+        _assert_no_dangling_refs(sbom)
+
+    def test_sanitization_of_name(self) -> None:
+        sbom = {"components": [{"name": "My App/Core"}]}
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        self.assertEqual("My_App_Core", sbom["components"][0]["bom-ref"])
+
+    def test_idempotence(self) -> None:
+        sbom = {
+            "components": [
+                {"name": "app", "components": [{"name": "lib"}]},
+            ]
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+        first_run_refs = [
+            component["bom-ref"]
+            for component in _iter_components(sbom["components"])
+        ]
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+        second_run_refs = [
+            component["bom-ref"]
+            for component in _iter_components(sbom["components"])
+        ]
+
+        self.assertSequenceEqual(first_run_refs, second_run_refs)
+        self.assertNotIn("app/app/lib", second_run_refs)
+
+    def test_flat_sbom(self) -> None:
+        sbom = {"components": [{"name": "app"}, {"name": "lib"}]}
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        self.assertEqual("app", sbom["components"][0]["bom-ref"])
+        self.assertEqual("lib", sbom["components"][1]["bom-ref"])
+
+    def test_operation_is_not_default(self) -> None:
+        sbom = {"components": [{"name": "app", "bom-ref": "custom/ref"}]}
+
+        run_amend(sbom)
+
+        self.assertEqual("custom/ref", sbom["components"][0]["bom-ref"])
 
 
 if __name__ == "__main__":

@@ -2426,6 +2426,37 @@ class TestMergeComponents(unittest.TestCase):
         self.assertEqual(_find_component(merged, "G/app/logger")["name"], "logger")
         _assert_no_dangling_refs(merged)
 
+    def test_hierarchical_rebases_root_with_path_children_when_root_not_path_child(
+        self,
+    ) -> None:
+        # Root "root" is not a path child of parent "G", but it has slash-path children.
+        # This must exercise rebase_root + has_path_style_child and set the exact new root ref.
+        governing = _build_sbom([_build_component("G", "G")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "root",
+                            "root",
+                            children=[_build_component("leaf", "root/leaf")],
+                        )
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)],
+            hierarchical=True,
+        )
+
+        self.assertEqual(_find_component(merged, "G/root")["name"], "root")
+        self.assertEqual(_find_component(merged, "G/root/leaf")["name"], "leaf")
+        _assert_no_dangling_refs(merged)
+
 
 class TestMergeCompositions(unittest.TestCase):
     def test_only_first_sbom_contains_compositions(self) -> None:

@@ -46,3 +46,11 @@ repos:
     rev: 0.11.23
     hooks:
       - id: uv-lock
+      - id: uv-export
+        name: Sync ClusterFuzzLite requirements.txt from uv.lock
+        args:
+          - "--frozen"
+          - "--no-default-groups"
+          - "--no-emit-project"
+          - "--output-file=.clusterfuzzlite/requirements.txt"
+        files: ^(uv\.lock|pyproject\.toml)$

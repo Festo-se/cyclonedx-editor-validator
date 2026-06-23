@@ -2310,6 +2310,122 @@ class TestMergeComponents(unittest.TestCase):
         self.assertEqual(parent["components"][0]["bom-ref"], "root")
         self.assertEqual(parent["components"][0]["components"][0]["bom-ref"], "root/leaf")
 
+    def test_hierarchical_leaves_hyphenated_sibling_ref_unchanged(self) -> None:
+        # Hyphenated name like "app-logger" must NOT be misclassified as child of "app".
+        governing = _build_sbom([_build_component("app", "app")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "app",
+                    "app",
+                    children=[_build_component("logger", "app-logger")],
+                )
+            ]
+        )
+
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
+
+        # After hierarchical merge, app-logger must remain app-logger (not rebased to something).
+        self.assertEqual(_find_component(merged, "app-logger")["name"], "logger")
+        _assert_no_dangling_refs(merged)
+
+    def test_hierarchical_leaves_dotted_and_underscored_sibling_refs_unchanged(self) -> None:
+        # Dotted, underscored, and @ names must NOT be misclassified as path children.
+        governing = _build_sbom([_build_component("app", "app")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "app",
+                    "app",
+                    children=[
+                        _build_component("core", "app.core"),
+                        _build_component("util", "app_util"),
+                        _build_component("scoped", "app@2"),
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
+
+        # All non-path refs unchanged.
+        self.assertEqual(_find_component(merged, "app.core")["name"], "core")
+        self.assertEqual(_find_component(merged, "app_util")["name"], "util")
+        self.assertEqual(_find_component(merged, "app@2")["name"], "scoped")
+        _assert_no_dangling_refs(merged)
+
+    def test_hierarchical_non_path_child_links_unchanged(self) -> None:
+        # A relocated app-logger child referenced in dependencies, compositions, vulnerabilities.
+        governing = _build_sbom(
+            [_build_component("app", "app")],
+            dependencies=[{"ref": "app", "dependsOn": []}],
+            compositions=[],
+        )
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "app",
+                    "app",
+                    children=[_build_component("logger", "app-logger")],
+                )
+            ],
+            dependencies=[
+                {"ref": "app", "dependsOn": ["app-logger"]},
+                {"ref": "app-logger", "dependsOn": []},
+            ],
+            compositions=[{"aggregate": "complete", "assemblies": ["app-logger"]}],
+            vulnerabilities=[{"id": "CVE-0000-0002", "affects": [{"ref": "app-logger"}]}],
+        )
+
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
+
+        # app-logger bom-ref unchanged.
+        self.assertEqual(_find_component(merged, "app-logger")["name"], "logger")
+        # All cross-references still point to app-logger (no rewrite).
+        self.assertIn("app-logger", merged["dependencies"][0]["dependsOn"])
+        self.assertIn("app-logger", merged["compositions"][0]["assemblies"])
+        self.assertEqual(
+            merged["vulnerabilities"][0]["affects"][0]["ref"],
+            "app-logger",
+        )
+        _assert_no_dangling_refs(merged)
+
+    def test_hierarchical_slash_path_child_still_rebases(self) -> None:
+        # Genuine "/" path child MUST rebase correctly (prove /fix did not break legitimate paths).
+        governing = _build_sbom([_build_component("G", "G")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "app",
+                            "app",
+                            children=[
+                                _build_component("logger", "app/logger"),
+                            ],
+                        )
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
+
+        # Genuine "/" path must rebase to G/app and G/app/logger.
+        self.assertEqual(_find_component(merged, "G/app")["name"], "app")
+        self.assertEqual(_find_component(merged, "G/app/logger")["name"], "logger")
+        _assert_no_dangling_refs(merged)
+
 
 class TestMergeCompositions(unittest.TestCase):
     def test_only_first_sbom_contains_compositions(self) -> None:

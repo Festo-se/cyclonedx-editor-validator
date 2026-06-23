@@ -1929,7 +1929,7 @@ class TestMergeSeveralSboms(unittest.TestCase):
             "vulnerabilities": [
                 {
                     "id": "CVE-STATE",
-                    "analysis": {"state": "affected"},
+                    "analysis": {"state": "exploitable"},
                     "affects": [{"ref": "state-2", "versions": [{"status": "affected"}]}],
                 }
             ],

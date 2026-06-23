@@ -145,7 +145,6 @@ def _rebase_hierarchical_subtree_bom_refs(
         old_ref = component.get("bom-ref", "")
         original_ref = path_info.get("original_ref", old_ref)
 
-        next_parent_ref = old_ref
         if path_info.get("follows_parent"):
             separator = path_info.get("separator", "/")
             next_parent_ref = parent_ref + separator + path_info["segment"]

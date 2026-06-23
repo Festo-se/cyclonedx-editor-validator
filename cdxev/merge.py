@@ -18,6 +18,7 @@ from cdxev.auxiliary.sbom_functions import (
     get_identities_for_vulnerabilities,
     make_bom_refs_unique,
     merge_affects_versions,
+    replace_bom_ref_in_sbom,
     unify_bom_refs,
 )
 from cdxev.log import LogMessage
@@ -25,10 +26,160 @@ from cdxev.log import LogMessage
 logger = logging.getLogger(__name__)
 
 
+PATH_STYLE_SEPARATORS = (
+    "/",
+    "|",
+    ";",
+    ".",
+    "::",
+    "->",
+    "\\",
+    "-",
+    "_",
+    "~",
+    "://",
+    "?",
+    "@",
+    "%",
+    "$",
+    "^",
+    "&",
+    "*",
+    "+",
+    "=",
+    "<",
+    ">",
+)
+
+
+def _capture_path_style_bom_refs(
+    sboms: t.Sequence[dict],
+) -> dict[int, dict[str, t.Any]]:
+    path_style_bom_refs: dict[int, dict[str, t.Any]] = {}
+
+    def _walk(component: dict, parent: t.Optional[dict] = None) -> None:
+        component_ref = component.get("bom-ref", "")
+        parent_ref = parent.get("bom-ref", "") if parent else ""
+        separator = ""
+        if parent_ref:
+            for candidate_separator in PATH_STYLE_SEPARATORS:
+                if component_ref.startswith(parent_ref + candidate_separator):
+                    separator = candidate_separator
+                    break
+        follows_parent = bool(separator)
+        segment = component_ref[len(parent_ref) + len(separator) :] if follows_parent else ""
+
+        path_style_bom_refs[id(component)] = {
+            "follows_parent": follows_parent,
+            "separator": separator,
+            "segment": segment,
+            "original_ref": component_ref,
+            "has_path_style_child": False,
+        }
+
+        for child in component.get("components", []):
+            _walk(child, component)
+            if path_style_bom_refs[id(child)]["follows_parent"]:
+                path_style_bom_refs[id(component)]["has_path_style_child"] = True
+
+    for sbom in sboms:
+        metadata_component = sbom.get("metadata", {}).get("component", {})
+        if metadata_component:
+            _walk(metadata_component)
+        for component in sbom.get("components", []):
+            _walk(component)
+
+    return path_style_bom_refs
+
+
+def _collect_bom_refs(sbom: dict) -> set[str]:
+    bom_refs = {
+        component.get("bom-ref", "")
+        for component in extract_components(sbom.get("components", []))
+        if component.get("bom-ref", "")
+    }
+
+    metadata_component = sbom.get("metadata", {}).get("component", {})
+    metadata_ref = metadata_component.get("bom-ref", "")
+    if metadata_ref:
+        bom_refs.add(metadata_ref)
+
+    return bom_refs
+
+
+def _ensure_unique_bom_ref(
+    candidate: str,
+    existing_bom_refs: set[str],
+    old_ref: str,
+) -> str:
+    unique_candidate = candidate
+    index = 1
+    while unique_candidate in existing_bom_refs and unique_candidate != old_ref:
+        unique_candidate = candidate + "-" + str(index)
+        index += 1
+    return unique_candidate
+
+
+def _rebase_hierarchical_subtree_bom_refs(
+    governing_sbom: dict,
+    merged_sbom: dict,
+    new_parent: dict,
+    relocated_roots: t.Sequence[dict],
+    path_style_bom_refs: dict[int, dict[str, t.Any]],
+    existing_bom_refs: set[str],
+) -> None:
+    new_parent_ref = new_parent.get("bom-ref", "")
+    new_parent_original_ref = path_style_bom_refs.get(id(new_parent), {}).get(
+        "original_ref",
+        new_parent_ref,
+    )
+    if not new_parent_ref or not new_parent_original_ref:
+        return
+
+    def _recurse(
+        component: dict,
+        parent_ref: str,
+        rebase_root: bool = False,
+    ) -> None:
+        path_info = path_style_bom_refs.get(id(component), {})
+        old_ref = component.get("bom-ref", "")
+        original_ref = path_info.get("original_ref", old_ref)
+
+        next_parent_ref = old_ref
+        if path_info.get("follows_parent"):
+            separator = path_info.get("separator", "/")
+            next_parent_ref = parent_ref + separator + path_info["segment"]
+        elif rebase_root and path_info.get("has_path_style_child") and original_ref:
+            # Rebase the relocated subtree root too so the merged path stays absolute.
+            next_parent_ref = parent_ref + "/" + original_ref
+        else:
+            return
+
+        next_parent_ref = _ensure_unique_bom_ref(
+            next_parent_ref,
+            existing_bom_refs,
+            old_ref,
+        )
+        if old_ref != next_parent_ref:
+            existing_bom_refs.discard(old_ref)
+            existing_bom_refs.add(next_parent_ref)
+            replace_bom_ref_in_sbom({"components": [component]}, old_ref, next_parent_ref)
+            replace_bom_ref_in_sbom(governing_sbom, old_ref, next_parent_ref)
+            replace_bom_ref_in_sbom(merged_sbom, old_ref, next_parent_ref)
+        else:
+            existing_bom_refs.add(next_parent_ref)
+
+        for child in component.get("components", []):
+            _recurse(child, next_parent_ref)
+
+    for root in relocated_roots:
+        _recurse(root, new_parent_ref, rebase_root=True)
+
+
 def filter_component(
     present_components: list[ComponentIdentity],
     components_to_add: list,
-    add_to_existing: dict,
+    add_to_existing: dict[ComponentIdentity, list[dict]],
 ) -> list[dict]:
     """
     Function that goes through a list of components and their nested sub components
@@ -90,7 +241,10 @@ def filter_component(
 
 
 def merge_components(
-    governing_sbom: dict, sbom_to_be_merged: dict, hierarchical: bool = False
+    governing_sbom: dict,
+    sbom_to_be_merged: dict,
+    hierarchical: bool = False,
+    path_style_bom_refs: t.Optional[dict[int, dict[str, t.Any]]] = None,
 ) -> t.List[dict]:
     """
     Function that gets two lists of components and merges them unique into one.
@@ -129,7 +283,7 @@ def merge_components(
             ComponentIdentity.create(governing_sbom_metadata_component, allow_unsafe=True)
         ] = governing_sbom_metadata_component
 
-    add_to_existing: dict[ComponentIdentity, dict] = {}
+    add_to_existing: dict[ComponentIdentity, list[dict]] = {}
     list_present_component_identities = list(present_component_identities.keys())
     list_of_filtered_components = filter_component(
         list_present_component_identities,
@@ -140,7 +294,19 @@ def merge_components(
     list_of_merged_components += list_of_filtered_components
 
     if hierarchical:
+        existing_bom_refs = _collect_bom_refs(governing_sbom) | _collect_bom_refs(
+            sbom_to_be_merged
+        )
         for key in add_to_existing.keys():
+            if path_style_bom_refs is not None:
+                _rebase_hierarchical_subtree_bom_refs(
+                    governing_sbom,
+                    sbom_to_be_merged,
+                    present_component_identities[key],
+                    add_to_existing[key],
+                    path_style_bom_refs,
+                    existing_bom_refs,
+                )
             list_of_subcomponents = (
                 present_component_identities[key].get("components", []) + add_to_existing[key]
             )
@@ -557,6 +723,7 @@ def merge_2_sboms(
     sbom_to_be_merged: dict,
     hierarchical: bool = False,
     vulnerability_identities: t.Optional[dict[str, VulnerabilityIdentity]] = None,
+    path_style_bom_refs: t.Optional[dict[int, dict[str, t.Any]]] = None,
 ) -> dict:
     """
     Function that merges two SBOMs.
@@ -591,7 +758,10 @@ def merge_2_sboms(
     list_of_new_vulnerabilities = sbom_to_be_merged.get("vulnerabilities", [])
 
     list_of_merged_components = merge_components(
-        original_sbom, sbom_to_be_merged, hierarchical=hierarchical
+        original_sbom,
+        sbom_to_be_merged,
+        hierarchical=hierarchical,
+        path_style_bom_refs=path_style_bom_refs,
     )
 
     merged_dependencies = merge_dependency_lists(
@@ -673,6 +843,8 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     0
 
     """
+    path_style_bom_refs = _capture_path_style_bom_refs(sboms)
+
     # make the bom-refs unique and synchronize them across all SBOMs
     make_bom_refs_unique(sboms)
     unify_bom_refs(sboms)
@@ -690,6 +862,7 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
             sboms[k],
             vulnerability_identities=identities,
             hierarchical=hierarchical,
+            path_style_bom_refs=path_style_bom_refs,
         )
     return merged_sbom
 

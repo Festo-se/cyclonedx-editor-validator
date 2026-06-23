@@ -9,11 +9,100 @@ from unittest.mock import patch
 
 from cdxev import merge
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
-from cdxev.auxiliary.sbom_functions import add_merged_metadata_component_to_dependencies
+from cdxev.auxiliary.sbom_functions import (
+    add_merged_metadata_component_to_dependencies,
+    extract_components,
+)
 from cdxev.validator.validate import validate_sbom
 from tests.auxiliary import helper as helper
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
+
+
+def _build_component(
+    name: str,
+    bom_ref: str = "",
+    *,
+    version: str = "1.0.0",
+    children: list[dict] | None = None,
+) -> dict:
+    component = {
+        "type": "library",
+        "name": name,
+        "version": version,
+    }
+    if bom_ref:
+        component["bom-ref"] = bom_ref
+    if children is not None:
+        component["components"] = children
+    return component
+
+
+def _build_sbom(
+    components: list[dict],
+    *,
+    metadata_component: dict | None = None,
+    dependencies: list[dict] | None = None,
+    compositions: list[dict] | None = None,
+    vulnerabilities: list[dict] | None = None,
+) -> dict:
+    sbom = {
+        "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.6",
+        "components": components,
+    }
+    if metadata_component is not None:
+        sbom["metadata"] = {"component": metadata_component}
+    if dependencies is not None:
+        sbom["dependencies"] = dependencies
+    if compositions is not None:
+        sbom["compositions"] = compositions
+    if vulnerabilities is not None:
+        sbom["vulnerabilities"] = vulnerabilities
+    return sbom
+
+
+def _collect_component_refs(sbom: dict) -> set[str]:
+    refs = {
+        component["bom-ref"]
+        for component in extract_components(sbom.get("components", []))
+        if component.get("bom-ref", "")
+    }
+    metadata_component = sbom.get("metadata", {}).get("component", {})
+    metadata_ref = metadata_component.get("bom-ref", "")
+    if metadata_ref:
+        refs.add(metadata_ref)
+    return refs
+
+
+def _assert_no_dangling_refs(sbom: dict) -> None:
+    refs = _collect_component_refs(sbom)
+
+    for dependency in sbom.get("dependencies", []):
+        if dependency.get("ref", "") not in refs:
+            raise AssertionError(f"Dangling dependency ref: {dependency}")
+        for dependency_ref in dependency.get("dependsOn", []):
+            if dependency_ref not in refs:
+                raise AssertionError(f"Dangling dependsOn ref: {dependency_ref}")
+
+    for composition in sbom.get("compositions", []):
+        for assembly_ref in composition.get("assemblies", []):
+            if assembly_ref not in refs:
+                raise AssertionError(f"Dangling composition ref: {assembly_ref}")
+
+    for vulnerability in sbom.get("vulnerabilities", []):
+        for affected in vulnerability.get("affects", []):
+            affected_ref = affected.get("ref", "")
+            if affected_ref not in refs:
+                raise AssertionError(f"Dangling vulnerability ref: {affected_ref}")
+
+
+def _find_component(sbom: dict, bom_ref: str) -> dict:
+    for component in extract_components(sbom.get("components", [])):
+        if component.get("bom-ref", "") == bom_ref:
+            return component
+    raise AssertionError(f"Component {bom_ref} not found")
 
 
 class TestCompareSboms(unittest.TestCase):
@@ -1888,6 +1977,328 @@ class TestMergeComponents(unittest.TestCase):
         expected_components = helper.load_sections_for_test_sbom()["hierarchical_expected"]
 
         self.assertEqual(merged_components, expected_components)
+
+    def test_hierarchical_single_level_preserves_refs_and_updates_links(self) -> None:
+        governing = _build_sbom(
+            [_build_component("compA", "compA")],
+            dependencies=[{"ref": "compA", "dependsOn": []}],
+            compositions=[],
+        )
+        incoming_child = _build_component("subcompA", "compA/subcompA")
+        incoming = _build_sbom(
+            [_build_component("compA", "compA", children=[incoming_child])],
+            dependencies=[
+                {"ref": "compA", "dependsOn": ["compA/subcompA"]},
+                {"ref": "compA/subcompA", "dependsOn": []},
+            ],
+            compositions=[
+                {"aggregate": "complete", "assemblies": ["compA/subcompA"]}
+            ],
+            vulnerabilities=[
+                {"id": "CVE-0000-0001", "affects": [{"ref": "compA/subcompA"}]}
+            ],
+        )
+
+        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+
+        comp_a = _find_component(merged, "compA")
+        self.assertEqual(comp_a["components"][0]["bom-ref"], "compA/subcompA")
+        self.assertEqual(merged["dependencies"][0]["dependsOn"], ["compA/subcompA"])
+        self.assertEqual(merged["compositions"][0]["assemblies"], ["compA/subcompA"])
+        self.assertEqual(
+            merged["vulnerabilities"][0]["affects"][0]["ref"],
+            "compA/subcompA",
+        )
+        _assert_no_dangling_refs(merged)
+
+    def test_hierarchical_rebases_full_path_style_subtree(self) -> None:
+        governing = _build_sbom([_build_component("G", "G")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "root",
+                            "root",
+                            children=[
+                                _build_component(
+                                    "mid",
+                                    "root/mid",
+                                    children=[
+                                        _build_component("leaf", "root/mid/leaf")
+                                    ],
+                                )
+                            ],
+                        )
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+
+        self.assertEqual(_find_component(merged, "G/root")["name"], "root")
+        self.assertEqual(_find_component(merged, "G/root/mid")["name"], "mid")
+        self.assertEqual(_find_component(merged, "G/root/mid/leaf")["name"], "leaf")
+        _assert_no_dangling_refs(merged)
+
+    def test_hierarchical_leaves_non_path_style_refs_unchanged(self) -> None:
+        governing = _build_sbom([_build_component("G", "G")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component("pkg-child", "pkg:npm/foo@1.0"),
+                        _build_component("uuid-child", "3f2a9c2b-4d5e-4f6a-8b7c-123456789abc"),
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+
+        self.assertEqual(_find_component(merged, "pkg:npm/foo@1.0")["name"], "pkg-child")
+        self.assertEqual(
+            _find_component(merged, "3f2a9c2b-4d5e-4f6a-8b7c-123456789abc")["name"],
+            "uuid-child",
+        )
+
+    def test_hierarchical_mixed_subtree_rebases_only_path_style_branch(self) -> None:
+        governing = _build_sbom([_build_component("G", "G")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "root",
+                            "root",
+                            children=[_build_component("leaf", "root/leaf")],
+                        ),
+                        _build_component("pkg-child", "pkg:npm/foo@1.0"),
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+
+        self.assertEqual(_find_component(merged, "G/root")["name"], "root")
+        self.assertEqual(_find_component(merged, "G/root/leaf")["name"], "leaf")
+        self.assertEqual(_find_component(merged, "pkg:npm/foo@1.0")["name"], "pkg-child")
+
+    def test_hierarchical_broken_link_stops_contiguous_rebasing(self) -> None:
+        governing = _build_sbom([_build_component("G", "G")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "compA",
+                            "compA",
+                            children=[
+                                _build_component(
+                                    "sub",
+                                    "compA/sub",
+                                    children=[
+                                        _build_component(
+                                            "leaf",
+                                            "frobnicate/leaf",
+                                            children=[
+                                                _build_component(
+                                                    "deep",
+                                                    "frobnicate/leaf/deeper",
+                                                )
+                                            ],
+                                        )
+                                    ],
+                                )
+                            ],
+                        )
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+
+        self.assertEqual(_find_component(merged, "G/compA")["name"], "compA")
+        self.assertEqual(_find_component(merged, "G/compA/sub")["name"], "sub")
+        self.assertEqual(_find_component(merged, "frobnicate/leaf")["name"], "leaf")
+        self.assertEqual(
+            _find_component(merged, "frobnicate/leaf/deeper")["name"],
+            "deep",
+        )
+
+    def test_hierarchical_detects_paths_before_uniquification(self) -> None:
+        governing = _build_sbom([_build_component("G", "G")])
+        colliding = _build_sbom([_build_component("collision", "compA")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "compA",
+                            "compA",
+                            children=[_build_component("sub", "compA/sub")],
+                        )
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(colliding), copy.deepcopy(incoming)],
+            hierarchical=True,
+        )
+
+        self.assertEqual(_find_component(merged, "G/compA")["name"], "compA")
+        self.assertEqual(_find_component(merged, "G/compA/sub")["name"], "sub")
+
+    def test_hierarchical_rebased_collision_gets_incrementing_suffixes(self) -> None:
+        governing = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[_build_component("existing-root", "G/root")],
+                )
+            ]
+        )
+        incoming_1 = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "root-one",
+                            "root",
+                            children=[_build_component("leaf-one", "root/leaf")],
+                        )
+                    ],
+                )
+            ]
+        )
+        incoming_2 = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "root-two",
+                            "root",
+                            children=[_build_component("leaf-two", "root/leaf2")],
+                        )
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge(
+            [
+                copy.deepcopy(governing),
+                copy.deepcopy(incoming_1),
+                copy.deepcopy(incoming_2),
+            ],
+            hierarchical=True,
+        )
+
+        self.assertEqual(_find_component(merged, "G/root")["name"], "existing-root")
+        self.assertEqual(_find_component(merged, "G/root-1")["name"], "root-one")
+        self.assertEqual(_find_component(merged, "G/root-1/leaf")["name"], "leaf-one")
+        self.assertEqual(_find_component(merged, "G/root-2")["name"], "root-two")
+        self.assertEqual(_find_component(merged, "G/root-2/leaf2")["name"], "leaf-two")
+        _assert_no_dangling_refs(merged)
+
+    def test_hierarchical_merge_is_idempotent_for_rebased_refs(self) -> None:
+        governing = _build_sbom([_build_component("G", "G")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "root",
+                            "root",
+                            children=[_build_component("leaf", "root/leaf")],
+                        )
+                    ],
+                )
+            ]
+        )
+
+        merged_once = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)],
+            hierarchical=True,
+        )
+        merged_snapshot = copy.deepcopy(merged_once)
+
+        merged_twice = merge.merge(
+            [merged_once, copy.deepcopy(incoming)],
+            hierarchical=True,
+        )
+
+        self.assertEqual(merged_twice, merged_snapshot)
+        self.assertFalse(any(ref.startswith("G/G/") for ref in _collect_component_refs(merged_twice)))
+
+    def test_non_hierarchical_merge_leaves_refs_unchanged(self) -> None:
+        governing = _build_sbom([_build_component("G", "G")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    "G",
+                    children=[
+                        _build_component(
+                            "root",
+                            "root",
+                            children=[_build_component("leaf", "root/leaf")],
+                        )
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=False)
+
+        self.assertEqual(_find_component(merged, "root")["name"], "root")
+        self.assertEqual(_find_component(merged, "root/leaf")["name"], "leaf")
+        self.assertNotIn("G/root", _collect_component_refs(merged))
+
+    def test_hierarchical_parent_without_bom_ref_leaves_children_unchanged(self) -> None:
+        governing = _build_sbom([_build_component("G")])
+        incoming = _build_sbom(
+            [
+                _build_component(
+                    "G",
+                    children=[
+                        _build_component(
+                            "root",
+                            "root",
+                            children=[_build_component("leaf", "root/leaf")],
+                        )
+                    ],
+                )
+            ]
+        )
+
+        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+
+        parent = next(component for component in merged["components"] if component["name"] == "G")
+        self.assertEqual(parent["components"][0]["bom-ref"], "root")
+        self.assertEqual(parent["components"][0]["components"][0]["bom-ref"], "root/leaf")
 
 
 class TestMergeCompositions(unittest.TestCase):

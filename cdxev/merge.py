@@ -6,9 +6,9 @@ import typing as t
 
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.auxiliary.sbom_functions import (
-    _affects_key_for,
     CycloneDXVersion,
     SpecVersion,
+    _affects_key_for,
     add_merged_metadata_component_to_dependencies,
     collect_affects_of_vulnerabilities,
     extract_components,

@@ -1951,8 +1951,9 @@ class TestMergeSeveralSboms(unittest.TestCase):
 
         self.assertEqual(len(vulnerabilities), 3)
         refs_by_state = {
-            vulnerability.get("analysis", {}).get("state", ""):
-            {affected.get("ref") for affected in vulnerability.get("affects", [])}
+            vulnerability.get("analysis", {}).get("state", ""): {
+                affected.get("ref") for affected in vulnerability.get("affects", [])
+            }
             for vulnerability in vulnerabilities
         }
         self.assertDictEqual(

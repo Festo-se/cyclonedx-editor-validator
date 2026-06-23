@@ -3,9 +3,18 @@
 # Build script for ClusterFuzzLite. Installs the package and compiles every
 # fuzz_*.py target found under tests/fuzz into a self-contained fuzzer.
 
-# Install the project (and its runtime dependencies) into the fuzzing image so
-# the fuzz targets can import cdxev.
-pip3 install --no-cache-dir .
+# Install the project and its runtime dependencies into the fuzzing image so the
+# fuzz targets can import cdxev. Dependencies are installed from a hash-pinned
+# requirements file (generated from uv.lock) so the build is reproducible and
+# satisfies Scorecard's pinned-dependencies check. Regenerate it with:
+#   uv export --frozen --no-default-groups --no-emit-project \
+#     --format requirements-txt -o .clusterfuzzlite/requirements.txt
+pip3 install --no-cache-dir --require-hashes -r .clusterfuzzlite/requirements.txt
+
+# Install cdxev itself from the local checkout without re-resolving dependencies
+# (they are already pinned above). An editable install keeps the package pinned
+# to local source, which Scorecard recognizes as a pinned dependency.
+pip3 install --no-cache-dir --no-deps -e .
 
 # The command-level fuzzers import the shared `_sbom_builder` helper that lives
 # next to them. Put that directory on PYTHONPATH so both runtime imports and the

@@ -6,6 +6,7 @@ import typing as t
 
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.auxiliary.sbom_functions import (
+    _affects_key_for,
     CycloneDXVersion,
     SpecVersion,
     add_merged_metadata_component_to_dependencies,
@@ -843,7 +844,12 @@ def merge_vulnerabilities(
                     # ranges must be checked as a whole
 
                     new_affects = extract_new_affects(
-                        collected_affects[id_object_original_vulnerability.string()],
+                        collected_affects[
+                            _affects_key_for(
+                                id_object_original_vulnerability,
+                                original_vulnerability,
+                            )
+                        ],
                         new_vulnerability.get("affects", []),
                         original_vulnerability.get("id", ""),
                         keep_version_overlap=True,
@@ -873,7 +879,12 @@ def merge_vulnerabilities(
             # is equal to one with the entry "<=3.0.0" but for this the ranges must be checked
             # as a whole
             new_affects = extract_new_affects(
-                collected_affects[id_object_original_vulnerability.string()],
+                collected_affects[
+                    _affects_key_for(
+                        id_object_original_vulnerability,
+                        original_vulnerability,
+                    )
+                ],
                 new_vulnerability.get("affects", []),
                 original_vulnerability.get("id", ""),
                 different_analysis=True,

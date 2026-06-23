@@ -479,10 +479,12 @@ def collect_affects_of_vulnerabilities(
     collected_affects: dict[str, list[dict]] = {}
     if list_of_original_vulnerabilities:
         for n in range(len(list_of_original_vulnerabilities)):
-            # use json string of vulnerability in case the vulnerability does not contain any id
+            # Key by identity string for id/alias vulnerabilities, and by vulnerability JSON only
+            # when that identity string is empty to avoid collisions for distinct empty-id entries.
             id = get_identity_for_vulnerability(list_of_original_vulnerabilities[n], identities)
+            affects_key = _affects_key_for(id, list_of_original_vulnerabilities[n])
             affects = deepcopy(list_of_original_vulnerabilities[n].get("affects", []))
-            if id.string() not in collected_affects.keys():
+            if affects_key not in collected_affects.keys():
                 for k in range(n + 1, len(list_of_original_vulnerabilities)):
                     new_id = get_identity_for_vulnerability(
                         list_of_original_vulnerabilities[k], identities
@@ -491,8 +493,21 @@ def collect_affects_of_vulnerabilities(
                     if id == new_id:
                         affects += list_of_original_vulnerabilities[k].get("affects", [])
 
-                collected_affects[id.string()] = affects
+                collected_affects[affects_key] = affects
     return collected_affects
+
+
+def _affects_key_for(identity: VulnerabilityIdentity, vulnerability: dict) -> str:
+    """Stable key for collected affects entries.
+
+    Vulnerabilities with id/alias information are keyed by identity string so related
+    vulnerability objects share one affects bucket. Empty-id vulnerabilities would all have an
+    empty identity string, so they are keyed by their JSON representation to avoid collisions.
+    """
+    key = identity.string()
+    if key:
+        return key
+    return json.dumps(vulnerability, sort_keys=True)
 
 
 def get_identity_for_vulnerability(
@@ -506,6 +521,8 @@ def get_identity_for_vulnerability(
     get_identities_for_vulnerabilities(). If no direct key is found (for example,
     after vulnerabilities were merged and their affects lists changed), it falls
     back to alias-based identity matching and caches the result.
+    The alias fallback is O(n) over identities per cache miss, and misses can recur as affects
+    mutate across successive merges because the cache key is the current vulnerability JSON.
     """
     vulnerability_string = json.dumps(vulnerability, sort_keys=True)
     identity = identities.get(vulnerability_string)

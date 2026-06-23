@@ -277,9 +277,15 @@ class VulnerabilityIdentity:
             raise TypeError(f"Can not compare {type(other)} with VulnerabilityIdentity")
         return self.one_of_ids_is_in(other.aliases)
 
+    def __hash__(self) -> int:
+        # __eq__ is hierarchical and non-transitive: two identities may compare equal via
+        # different shared aliases, so no alias-derived hash can satisfy the contract
+        # "equal objects have equal hashes."
+        # A constant hash keeps dict/set semantics correct, though operations degrade to O(n).
+        return 0
+
     def __str__(self) -> str:
-        if id not in self.aliases:  # type: ignore[comparison-overlap]
-            string = self.id
+        string = self.id or (self.aliases[0] if self.aliases else "")
         for ref in self.aliases:
             if ref not in string:
                 string += "_|_" + ref

@@ -1,0 +1,41 @@
+# Runs longer, continuous fuzzing on a schedule and on pushes to main. The
+# discovered corpus is stored in the GitHub Actions cache and reused by the PR
+# workflow. Crashes are reported as GitHub issues.
+# Docs: https://google.github.io/clusterfuzzlite/running-clusterfuzzlite/github-actions/
+name: ClusterFuzzLite batch fuzzing
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - 'cdxev/**'
+      - 'tests/fuzz/**'
+      - '.clusterfuzzlite/**'
+
+permissions: read-all
+
+jobs:
+  BatchFuzzing:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer:
+          - address
+    steps:
+      - name: Build Fuzzers (${{ matrix.sanitizer }})
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@884713a6c30a92e5e8544c39945cd7cb630abcd1 # v1
+        with:
+          language: python
+          sanitizer: ${{ matrix.sanitizer }}
+      - name: Run Fuzzers (${{ matrix.sanitizer }})
+        id: run
+        uses: google/clusterfuzzlite/actions/run_fuzzers@884713a6c30a92e5e8544c39945cd7cb630abcd1 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fuzz-seconds: 1800
+          mode: 'batch'
+          sanitizer: ${{ matrix.sanitizer }}

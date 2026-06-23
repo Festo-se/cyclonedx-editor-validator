@@ -96,6 +96,23 @@ class TestVulnerabilityFunctions(unittest.TestCase):
         result = vex.get_list_of_ids(file, "default")
         self.assertEqual(result, expected_output)
 
+    def test_get_list_of_ids_default_empty_references(self):
+        # Regression test: a present-but-empty "references" list must not raise
+        # IndexError and should fall back to "-" for the RefID.
+        file = {"vulnerabilities": [{"id": "CVE-1", "references": []}]}
+        result = vex.get_list_of_ids(file, "default")
+        self.assertEqual(
+            result,
+            "ID|RefID|CWEs|CVSS-Severity|Status|Published|Updated|Description\n"
+            "CVE-1|-|-|-|-|-|-|-\n",
+        )
+
+    def test_get_list_of_ids_lightweight_empty_references(self):
+        # Regression test for the empty "references" list in the lightweight schema.
+        file = {"vulnerabilities": [{"id": "CVE-1", "references": []}]}
+        result = vex.get_list_of_ids(file, "lightweight")
+        self.assertEqual(result, "ID|RefID\nCVE-1|-\n")
+
     def test_get_list_of_ids_default_missing_description(self):
         file = load_file("vex.json")
         expected_output = self.helper_list_output()

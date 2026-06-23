@@ -7,6 +7,9 @@ import typing as t
 
 from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
 from cdxev.auxiliary.sbom_functions import (
+    CycloneDXVersion,
+    SpecVersion,
+    add_merged_metadata_component_to_dependencies,
     collect_affects_of_vulnerabilities,
     extract_components,
     extract_new_affects,
@@ -107,7 +110,11 @@ def merge_components(
     list_of_merged_components: List with the uniquely merged components of the submitted sboms
     """
     list_of_merged_components: t.List[dict] = governing_sbom.get("components", [])
-    list_of_added_components = sbom_to_be_merged.get("components", [])
+    list_of_added_components = list(sbom_to_be_merged.get("components", []))
+
+    component_from_metadata = sbom_to_be_merged.get("metadata", {}).get("component", {})
+    if component_from_metadata:
+        list_of_added_components.append(component_from_metadata)
 
     present_component_identities: dict[ComponentIdentity, dict] = {}
     for component in extract_components(governing_sbom.get("components", [])):
@@ -144,6 +151,347 @@ def merge_components(
                 list_of_merged_components.append(new_component)
 
     return list_of_merged_components
+
+
+def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
+    """
+    Compares two tool objects for identity-based equality.
+
+    Two tools are only treated as duplicates when both their identity key and their
+    full object contents match after normalizing identity fields. This prevents data
+    loss when two tools share the same broad identity but differ in other fields.
+
+    Identity key fields: type (default 'application'), name, version, organization/
+    provider.name/publisher/vendor, and bom-ref. Both the identity key and the full
+    normalized object must match for tools to be considered duplicates.
+
+    Notes:
+    - Missing type defaults to "application" to avoid duplicates introduced when
+        converting pre-1.5 array tools into >=1.5 components.
+    - Services can identify vendor via either organization or provider.name.
+    - Case and surrounding whitespace are normalized for identity fields in both the
+        key comparison and the deep comparison.
+    - Near-duplicates are intentionally preserved when non-identity fields differ
+        (for example provider metadata beyond provider.name).
+    - Short-circuit evaluation: if identity keys differ, full object comparison is
+        skipped for efficiency.
+    """
+
+    def _norm(value: t.Any) -> str:
+        if value is None:
+            return ""
+        return str(value).strip().lower()
+
+    def _organization_or_provider(tool: dict) -> t.Any:
+        # Vendor/organization field priority: organization (services in 1.5+) >
+        # provider.name (services with provider object) > publisher (components in
+        # 1.5+) > vendor (legacy array tools and old components).
+        if tool.get("organization") is not None:
+            return tool.get("organization")
+        provider = tool.get("provider")
+        if isinstance(provider, dict):
+            return provider.get("name")
+        return tool.get("publisher", tool.get("vendor"))
+
+    def _normalize_for_compare(tool: dict) -> dict:
+        normalized = copy.deepcopy(tool)
+
+        if normalized.get("type") is None:
+            normalized["type"] = "application"
+
+        if "vendor" in normalized and "publisher" not in normalized:
+            normalized["publisher"] = normalized.pop("vendor")
+        else:
+            normalized.pop("vendor", None)
+
+        provider = normalized.get("provider")
+        if isinstance(provider, dict) and set(provider.keys()) == {"name"}:
+            normalized["organization"] = provider["name"]
+            normalized.pop("provider", None)
+
+        for field in ("type", "name", "version", "publisher", "organization", "bom-ref"):
+            if field in normalized:
+                normalized[field] = _norm(normalized[field])
+
+        provider = normalized.get("provider")
+        if isinstance(provider, dict) and "name" in provider:
+            provider["name"] = _norm(provider["name"])
+
+        return normalized
+
+    # Preserve important schema fields where present; missing values normalize to empty strings.
+    key1 = (
+        _norm(tool1.get("type", "application")),
+        _norm(tool1.get("name")),
+        _norm(tool1.get("version")),
+        _norm(_organization_or_provider(tool1)),
+        _norm(tool1.get("bom-ref")),
+    )
+    key2 = (
+        _norm(tool2.get("type", "application")),
+        _norm(tool2.get("name")),
+        _norm(tool2.get("version")),
+        _norm(_organization_or_provider(tool2)),
+        _norm(tool2.get("bom-ref")),
+    )
+    return key1 == key2 and _normalize_for_compare(tool1) == _normalize_for_compare(tool2)
+
+
+def _convert_tools_array_to_dict(tools_array: list) -> dict:
+    """
+    Converts tools from old format (array) to new format (dict with components/services).
+    Array entries are converted to component objects.
+    """
+    components = []
+    for tool in tools_array:
+        name = tool.get("name")
+        if name is None or not str(name).strip():
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    "Converting legacy metadata.tools array to CycloneDX >=1.5 object format "
+                    "skips a tool entry without a usable name because tool components require "
+                    "both type and name.",
+                )
+            )
+            continue
+
+        # Convert old format tool to new format
+        component = {
+            "type": tool.get("type", "application"),
+        }
+        component["name"] = name
+        if "version" in tool:
+            component["version"] = tool["version"]
+        if "vendor" in tool:
+            component["publisher"] = tool["vendor"]
+        if "hashes" in tool:
+            component["hashes"] = tool["hashes"]
+        if "bom-ref" in tool:
+            component["bom-ref"] = tool["bom-ref"]
+        # Copy any other fields that might exist
+        for key in tool:
+            if key not in ("type", "name", "vendor", "version", "hashes", "bom-ref"):
+                component[key] = tool[key]
+        components.append(component)
+
+    return {"components": components}
+
+
+def _convert_tools_dict_to_array(tools_dict: dict) -> list:
+    """
+    Converts tools from new format (dict with components/services) to old format (array).
+    """
+    tools_array = []
+
+    # Convert components
+    for component in tools_dict.get("components", []):
+        tool = {}
+        copied_component_keys = set()
+        if "name" in component:
+            tool["name"] = component["name"]
+            copied_component_keys.add("name")
+        if "version" in component:
+            tool["version"] = component["version"]
+            copied_component_keys.add("version")
+        if "publisher" in component:
+            tool["vendor"] = component["publisher"]
+            copied_component_keys.add("publisher")
+        if "hashes" in component:
+            tool["hashes"] = component["hashes"]
+            copied_component_keys.add("hashes")
+        if "externalReferences" in component:
+            tool["externalReferences"] = component["externalReferences"]
+            copied_component_keys.add("externalReferences")
+        if component.get("type") and component["type"] != "application":
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    "Converting metadata.tools.components to pre-1.5 metadata.tools array "
+                    "drops component type information.",
+                )
+            )
+        dropped_component_keys = sorted(set(component) - copied_component_keys - {"type"})
+        if dropped_component_keys:
+            logger.warning(
+                LogMessage(
+                    "Potential loss of information",
+                    "Converting metadata.tools.components to pre-1.5 metadata.tools array "
+                    "drops component metadata fields that have no array equivalent: "
+                    f"{', '.join(dropped_component_keys)}.",
+                )
+            )
+        tools_array.append(tool)
+
+    # Convert services (if present, add them as tools as well)
+    if tools_dict.get("services"):
+        logger.warning(
+            LogMessage(
+                "Potential loss of information",
+                "Converting metadata.tools.services to pre-1.5 metadata.tools array "
+                "drops the service/component distinction.",
+            )
+        )
+    for service in tools_dict.get("services", []):
+        tool = {}
+        if "name" in service:
+            tool["name"] = service["name"]
+        if "version" in service:
+            tool["version"] = service["version"]
+        if "organization" in service:
+            tool["vendor"] = service["organization"]
+        else:
+            provider = service.get("provider")
+            if isinstance(provider, dict) and provider.get("name"):
+                tool["vendor"] = provider["name"]
+                if set(provider.keys()) - {"name"}:
+                    logger.warning(
+                        LogMessage(
+                            "Potential loss of information",
+                            "Converting metadata.tools.services provider data to pre-1.5 "
+                            "metadata.tools array keeps only provider.name as vendor and "
+                            "drops additional provider fields.",
+                        )
+                    )
+            elif provider:
+                logger.warning(
+                    LogMessage(
+                        "Potential loss of information",
+                        "Converting metadata.tools.services to pre-1.5 metadata.tools array "
+                        "dropped provider information that has no usable provider.name.",
+                    )
+                )
+        if "hashes" in service:
+            tool["hashes"] = service["hashes"]
+        if "externalReferences" in service:
+            tool["externalReferences"] = service["externalReferences"]
+        tools_array.append(tool)
+
+    return tools_array
+
+
+def _merge_tools_array(governing_tools: list, tools_to_merge: list) -> list:
+    """
+    Merges two tool arrays (old format), avoiding duplicates.
+    """
+    merged_tools = copy.deepcopy(governing_tools)
+
+    for tool_to_merge in tools_to_merge:
+        # Use explicit equality check - don't use sets
+        is_duplicate = any(
+            _tools_are_equal(tool_to_merge, existing_tool) for existing_tool in merged_tools
+        )
+        if not is_duplicate:
+            merged_tools.append(copy.deepcopy(tool_to_merge))
+
+    return merged_tools
+
+
+def _merge_tools_dict(governing_tools: dict, tools_to_merge: dict) -> dict:
+    """
+    Merges two tool dicts (new format with components/services), avoiding duplicates.
+    """
+    merged_tools = copy.deepcopy(governing_tools)
+
+    # Merge components. Only add the key to merged_tools if either the governing
+    # tools or the incoming tools have components.
+    if "components" in merged_tools or tools_to_merge.get("components"):
+        governing_components = merged_tools.get("components", [])
+        merged_tools["components"] = governing_components
+        for component_to_merge in tools_to_merge.get("components", []):
+            is_duplicate = any(
+                _tools_are_equal(component_to_merge, existing_component)
+                for existing_component in governing_components
+            )
+            if not is_duplicate:
+                governing_components.append(copy.deepcopy(component_to_merge))
+
+    # Merge services. Only add the key to merged_tools if either the governing
+    # tools or the incoming tools have services.
+    if "services" in merged_tools or tools_to_merge.get("services"):
+        governing_services = merged_tools.get("services", [])
+        merged_tools["services"] = governing_services
+        for service_to_merge in tools_to_merge.get("services", []):
+            is_duplicate = any(
+                _tools_are_equal(service_to_merge, existing_service)
+                for existing_service in governing_services
+            )
+            if not is_duplicate:
+                governing_services.append(copy.deepcopy(service_to_merge))
+
+    return merged_tools
+
+
+def merge_tools(
+    governing_tools: t.Union[list, dict, None],
+    tools_to_be_merged: t.Union[list, dict, None],
+    target_format: t.Optional[str] = None,
+) -> t.Union[list, dict, None]:
+    """
+    Merges tools from two SBOMs, adapting to the format of the governing SBOM.
+
+    In CycloneDX < 1.5, tools is an array of objects with fields like name, vendor, version.
+    In CycloneDX >= 1.5, tools is an object with 'components' and 'services' fields.
+
+    This function:
+    1. Determines the format from governing_tools
+    2. Converts tools_to_be_merged to match that format
+    3. Merges them, avoiding duplicates based on tool identity
+
+    Args:
+        governing_tools: Tools from the governing SBOM (array or dict or None)
+        tools_to_be_merged: Tools from the SBOM to be merged (array or dict or None)
+
+    Returns:
+        Merged tools in the format of governing_tools, or None if both are None/empty
+    """
+    # Handle missing values. Empty dict/list are valid tool containers and must
+    # not be treated like absent values.
+    if governing_tools is None and tools_to_be_merged is None:
+        return governing_tools
+
+    if tools_to_be_merged is None:
+        return governing_tools
+
+    if governing_tools is None:
+        return tools_to_be_merged
+
+    resolved_target_format = target_format
+    if resolved_target_format is None:
+        resolved_target_format = "object" if isinstance(governing_tools, dict) else "array"
+
+    # Determine format from target format and narrow types
+    if resolved_target_format == "object":
+        governing_tools_dict: dict
+        if isinstance(governing_tools, list):
+            governing_tools_dict = _convert_tools_array_to_dict(governing_tools)
+        else:
+            governing_tools_dict = copy.deepcopy(governing_tools)
+
+        # Governing is dict format, convert tools_to_be_merged to dict if needed
+        converted_tools_dict: dict
+        if isinstance(tools_to_be_merged, list):
+            converted_tools_dict = _convert_tools_array_to_dict(tools_to_be_merged)
+        else:
+            converted_tools_dict = copy.deepcopy(tools_to_be_merged)
+
+        # Merge into governing_tools (dict format)
+        return _merge_tools_dict(governing_tools_dict, converted_tools_dict)
+
+    governing_tools_list: list
+    if isinstance(governing_tools, dict):
+        governing_tools_list = _convert_tools_dict_to_array(governing_tools)
+    else:
+        governing_tools_list = copy.deepcopy(governing_tools)
+
+    converted_tools_list: list
+    if isinstance(tools_to_be_merged, dict):
+        converted_tools_list = _convert_tools_dict_to_array(tools_to_be_merged)
+    else:
+        converted_tools_list = copy.deepcopy(tools_to_be_merged)
+
+    # Merge into governing_tools (array format)
+    return _merge_tools_array(governing_tools_list, converted_tools_list)
 
 
 def merge_dependency(depedency_original: dict, dependency_new: dict) -> dict[str, t.Any]:
@@ -221,7 +569,9 @@ def merge_2_sboms(
         merged_sbom: sbom, with sbom_to_be_merged merged in original_sbom
 
     """
-    # before used make_bom_refs_unique() and unify_bom_refs must be run on the input
+    # Ensure direct merge_2_sboms calls maintain globally unique and unified refs.
+    make_bom_refs_unique([original_sbom, sbom_to_be_merged])
+    unify_bom_refs([original_sbom, sbom_to_be_merged])
 
     if vulnerability_identities is None:
         vulnerability_identities = {}
@@ -235,9 +585,6 @@ def merge_2_sboms(
         )
 
     merged_sbom = original_sbom
-    component_from_metadata = sbom_to_be_merged.get("metadata", {}).get("component", {})
-    components_of_sbom_to_be_merged = sbom_to_be_merged.get("components", [])
-    components_of_sbom_to_be_merged.append(component_from_metadata)
     list_of_original_dependencies = original_sbom.get("dependencies", [])
     list_of_new_dependencies = sbom_to_be_merged.get("dependencies", [])
     list_of_original_vulnerabilities = original_sbom.get("vulnerabilities", [])
@@ -266,7 +613,7 @@ def merge_2_sboms(
         )
         merged_sbom["vulnerabilities"] = list_of_merged_vulnerabilities
 
-    if original_sbom.get("components", []) and sbom_to_be_merged.get("components", []):
+    if list_of_merged_components:
         merged_sbom["components"] = list_of_merged_components
 
     if original_sbom.get("dependencies", []) and sbom_to_be_merged.get("dependencies", []):
@@ -278,6 +625,39 @@ def merge_2_sboms(
             sbom_to_be_merged.get("compositions", []),
         )
 
+    if merged_sbom.get("metadata", {}).get("component", {}) and merged_sbom.get("components", []):
+        add_merged_metadata_component_to_dependencies(merged_sbom, sbom_to_be_merged)
+
+    spec_version = SpecVersion.parse(str(original_sbom.get("specVersion", "")))
+    target_tools_format = "array"
+    if spec_version is None:
+        # specVersion parsing failed; default to array format but warn
+        # since output may not match the declared specVersion
+        logger.warning(
+            LogMessage(
+                "Parsing error",
+                f"Cannot parse specVersion '{original_sbom.get('specVersion', '')}'; "
+                "defaulting tools format to array. Output may not be schema-valid "
+                "for the declared version.",
+            )
+        )
+    elif spec_version >= CycloneDXVersion.V1_5:
+        target_tools_format = "object"
+
+    original_tools = original_sbom.get("metadata", {}).get("tools", None)
+    tools_to_merge = sbom_to_be_merged.get("metadata", {}).get("tools", None)
+    if tools_to_merge is not None:
+        governing_tools: t.Union[list, dict, None] = original_tools
+        if governing_tools is None:
+            governing_tools = {} if target_tools_format == "object" else []
+
+        merged_tools = merge_tools(
+            governing_tools,
+            tools_to_merge,
+            target_format=target_tools_format,
+        )
+        if merged_tools is not None:
+            merged_sbom.setdefault("metadata", {})["tools"] = merged_tools
     return merged_sbom
 
 

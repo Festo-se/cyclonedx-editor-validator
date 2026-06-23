@@ -31,6 +31,12 @@
       "components": [
         {
           "type": "application",
+          "name": "some-tool",
+          "version": "3.0.0",
+          "publisher": "Company SE"
+        },
+        {
+          "type": "application",
           "name": "cyclonedx-editor-validator",
           "publisher": "Festo SE & Co. KG",
           "version": "0"
@@ -705,7 +711,8 @@
       "ref": "governing_program",
       "dependsOn": [
         "sub_program",
-        "gp_first_component-copy"
+        "gp_first_component-copy",
+        "pkg:npm/test-app@1.0.0"
       ]
     },
     {

@@ -817,5 +817,26 @@ class TestVulnerabilities(unittest.TestCase):
         )
 
 
+class TestDependencyFunctions(unittest.TestCase):
+    def test_add_merged_metadata_component_to_dependencies(self) -> None:
+        merged_sbom = {
+            "metadata": {"component": {"bom-ref": "metadata_component"}},
+            "dependencies": [{"ref": "metadata_component", "dependsOn": ["component_1"]}],
+        }
+        added_sbom = {"metadata": {"component": {"bom-ref": "metadata_component_added"}}}
+
+        sbf.add_merged_metadata_component_to_dependencies(merged_sbom, added_sbom)
+
+        self.assertEqual(
+            merged_sbom["dependencies"],
+            [
+                {
+                    "ref": "metadata_component",
+                    "dependsOn": ["component_1", "metadata_component_added"],
+                }
+            ],
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

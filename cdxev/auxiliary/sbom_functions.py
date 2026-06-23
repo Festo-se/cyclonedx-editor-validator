@@ -171,6 +171,22 @@ def get_bom_refs_from_dependencies(dependencies: Sequence[dict]) -> list[str]:
     return list_of_bom_refs
 
 
+def get_bom_refs_from_dependencies_dependson(dependencies: Sequence[dict]) -> list[str]:
+    """
+    Function that gets all entries from the dependsOn lists in the dependencies.
+
+    Input:
+    dependencies: List with dict of dependencies
+
+    Output:
+    bom_refs: List of Strings, containing entries from all dependsOn fields
+    """
+    list_of_bom_refs = []
+    for dependency in dependencies:
+        list_of_bom_refs += dependency.get("dependsOn", [])
+    return list_of_bom_refs
+
+
 def extract_components(list_of_components: Sequence[dict]) -> Sequence[dict]:
     extracted_components = []
     for component in list_of_components:
@@ -180,6 +196,35 @@ def extract_components(list_of_components: Sequence[dict]) -> Sequence[dict]:
             extracted_components.append(component)
             extracted_components += extract_components(component.get("components", []))
     return extracted_components
+
+
+def get_tool_entries_with_bom_ref(sbom: dict) -> list[dict]:
+    """Return metadata.tools component/service dicts with a non-empty bom-ref.
+
+    Tolerates missing/None tools, legacy pre-1.5 array tools, and >=1.5 object
+    tools with components/services lists.
+    """
+
+    tools = sbom.get("metadata", {}).get("tools")
+    if not isinstance(tools, dict):
+        return []
+
+    entries: list[dict] = []
+    for key in ("components", "services"):
+        values = tools.get(key, [])
+        if not isinstance(values, list):
+            continue
+        for value in values:
+            if not isinstance(value, dict):
+                continue
+            bom_ref = value.get("bom-ref")
+            if bom_ref is None:
+                continue
+            bom_ref_str = str(bom_ref)
+            if bom_ref_str:
+                entries.append(value)
+
+    return entries
 
 
 def get_dependency_by_ref(reference: str, list_of_dependencies: Sequence[dict]) -> dict:
@@ -244,15 +289,22 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
 
     if list_of_sboms:
         retained_components = get_ref_components_mapping(
-            list_of_sboms[0].get("components", [])
+            list(extract_components(list_of_sboms[0].get("components", [])))
             + [list_of_sboms[0].get("metadata", {}).get("component", {})]
+            + get_tool_entries_with_bom_ref(list_of_sboms[0])
         )
 
         for k in range(1, len(list_of_sboms)):
             subsequent_sbom = list_of_sboms[k]
+            tool_refs_in_subsequent = {
+                str(entry.get("bom-ref"))
+                for entry in get_tool_entries_with_bom_ref(subsequent_sbom)
+                if entry.get("bom-ref") is not None and str(entry.get("bom-ref"))
+            }
             new_components = get_ref_components_mapping(
-                subsequent_sbom.get("components", [])
+                list(extract_components(subsequent_sbom.get("components", [])))
                 + [subsequent_sbom.get("metadata", {}).get("component", {})]
+                + get_tool_entries_with_bom_ref(subsequent_sbom)
             )
 
             for reference in new_components.keys():
@@ -265,14 +317,21 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
                     and new_components[reference] not in assigned_bom_refs.keys()
                     # the component did not receive a new bom-ref already
                 ):
-                    new_bom_ref = str(new_components[reference])
                     index = 1
+                    if reference in tool_refs_in_subsequent:
+                        new_bom_ref = f"{reference}-tool-{index}"
+                    else:
+                        new_bom_ref = str(new_components[reference])
                     while (
                         new_bom_ref in retained_components.keys()
                         or new_bom_ref in new_components.keys()
                     ):
-                        new_bom_ref = str(new_components[reference]) + "-" + str(index)
-                        index += 1
+                        if reference in tool_refs_in_subsequent:
+                            index += 1
+                            new_bom_ref = f"{reference}-tool-{index}"
+                        else:
+                            new_bom_ref = str(new_components[reference]) + "-" + str(index)
+                            index += 1
 
                     replace_bom_ref_in_sbom(subsequent_sbom, reference, new_bom_ref)
                     retained_components[new_bom_ref] = new_components[reference]
@@ -304,12 +363,14 @@ def unify_bom_refs(list_of_sboms: Sequence[dict]) -> None:
         primary_components = extract_components(
             primary_sbom.get("components", [])
             + [primary_sbom.get("metadata", {}).get("component", {})]
+            + get_tool_entries_with_bom_ref(primary_sbom)
         )
         for k in range(n + 1, len(list_of_sboms)):
             secondary_sbom = list_of_sboms[k]
             new_components = extract_components(
                 secondary_sbom.get("components", [])
                 + [secondary_sbom.get("metadata", {}).get("component", {})]
+                + get_tool_entries_with_bom_ref(secondary_sbom)
             )
             for new_component in new_components:
                 for primary_component in primary_components:
@@ -328,6 +389,21 @@ def replace_ref_in_components(components: list[dict], reference: str, new_refere
     for component in components:
         if component.get("bom-ref", "") == reference:
             component["bom-ref"] = new_reference
+
+
+def replace_ref_in_tools(tools: Any, reference: str, new_reference: str) -> None:
+    if not isinstance(tools, dict):
+        return
+
+    for key in ("components", "services"):
+        entries = tools.get(key, [])
+        if not isinstance(entries, list):
+            continue
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            if entry.get("bom-ref", "") == reference:
+                entry["bom-ref"] = new_reference
 
 
 def replace_ref_in_dependencies(
@@ -386,6 +462,7 @@ def replace_bom_ref_in_sbom(sbom: dict, reference: str, new_reference: str) -> N
         reference,
         new_reference,
     )
+    replace_ref_in_tools(sbom.get("metadata", {}).get("tools"), reference, new_reference)
     replace_ref_in_dependencies(sbom.get("dependencies", []), reference, new_reference)
     replace_ref_in_compositions(sbom.get("compositions", []), reference, new_reference)
     replace_ref_in_vulnerabilities(
@@ -676,7 +753,9 @@ def get_identities_for_vulnerabilities(
 
                     new_len_aliases = len(aliases)
 
-                identities[vulnerability_string] = VulnerabilityIdentity(aliases[0], aliases)
+                identities[vulnerability_string] = VulnerabilityIdentity(
+                    aliases[0] if aliases else "", aliases
+                )
 
     return identities
 
@@ -721,3 +800,29 @@ def merge_affects_versions(original_affects: list[dict], new_affects: list[dict]
                     original_affect_versions.append(version)
         if not ref_is_in:
             original_affects.append(affect)
+
+
+def add_merged_metadata_component_to_dependencies(merged_sbom: dict, added_sbom: dict) -> None:
+    merged_sbom_ref = merged_sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")
+    added_sbom_ref = added_sbom.get("metadata", {}).get("component", {}).get("bom-ref", "")
+
+    if not merged_sbom_ref or not added_sbom_ref:
+        return
+
+    if merged_sbom_ref == added_sbom_ref:
+        return
+
+    dependencies = merged_sbom.get("dependencies", [])
+    if merged_sbom_ref not in get_bom_refs_from_dependencies(dependencies):
+        product_dependency = {"ref": merged_sbom_ref, "dependsOn": [added_sbom_ref]}
+        if dependencies:
+            dependencies.append(product_dependency)
+        else:
+            merged_sbom["dependencies"] = [product_dependency]
+        return
+
+    product_dependency = get_dependency_by_ref(merged_sbom_ref, dependencies)
+    first_level_dependson = product_dependency.get("dependsOn", [])
+
+    if added_sbom_ref not in get_bom_refs_from_dependencies_dependson(dependencies):
+        first_level_dependson.append(added_sbom_ref)

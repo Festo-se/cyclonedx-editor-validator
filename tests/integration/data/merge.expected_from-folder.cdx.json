@@ -31,6 +31,12 @@
       "components": [
         {
           "type": "application",
+          "name": "some-tool",
+          "version": "3.0.0",
+          "publisher": "Company SE"
+        },
+        {
+          "type": "application",
           "name": "cyclonedx-editor-validator",
           "publisher": "Festo SE & Co. KG",
           "version": "0"

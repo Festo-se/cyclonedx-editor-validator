@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import copy
-import json
 import logging
 import typing as t
 
@@ -16,6 +15,7 @@ from cdxev.auxiliary.sbom_functions import (
     get_bom_refs_from_dependencies,
     get_dependency_by_ref,
     get_identities_for_vulnerabilities,
+    get_identity_for_vulnerability,
     make_bom_refs_unique,
     merge_affects_versions,
     unify_bom_refs,
@@ -786,11 +786,13 @@ def merge_vulnerabilities(
     for original_vulnerability in list_of_original_vulnerabilities:
         is_in = False
         same_affects_state = False
-        id_str_original_vulnerability = json.dumps(original_vulnerability, sort_keys=True)
-        id_object_original_vulnerability = vulnerability_identities[id_str_original_vulnerability]
+        id_object_original_vulnerability = get_identity_for_vulnerability(
+            original_vulnerability, vulnerability_identities
+        )
         for new_vulnerability in list_of_new_vulnerabilities:
-            id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
-            id_object_new_vulnerability = vulnerability_identities[id_str_new_vulnerability]
+            id_object_new_vulnerability = get_identity_for_vulnerability(
+                new_vulnerability, vulnerability_identities
+            )
             if id_object_new_vulnerability == id_object_original_vulnerability:
                 is_in = True
                 if original_vulnerability.get("analysis", {}).get(
@@ -810,16 +812,16 @@ def merge_vulnerabilities(
         # all provided vulnerabilities are analysed during intitialization and a registry with
         # the respective references is created, the vulnerabilities are then mapped according to
         # this registry
-        id_str_new_vulnerability = json.dumps(new_vulnerability, sort_keys=True)
-        id_object_new_vulnerability = vulnerability_identities[id_str_new_vulnerability]
+        id_object_new_vulnerability = get_identity_for_vulnerability(
+            new_vulnerability, vulnerability_identities
+        )
 
         # The loop is over the original vulnerabilities and not the merged ones to avoid
         # data losses in the case of duplicate entries in new_vulnerabilities
         for original_vulnerability in list_of_original_vulnerabilities:
-            id_str_original_vulnerability = json.dumps(original_vulnerability, sort_keys=True)
-            id_object_original_vulnerability = vulnerability_identities[
-                id_str_original_vulnerability
-            ]
+            id_object_original_vulnerability = get_identity_for_vulnerability(
+                original_vulnerability, vulnerability_identities
+            )
             # objects describe the same vulnerability
             if id_object_new_vulnerability == id_object_original_vulnerability:
                 is_in = True

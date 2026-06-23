@@ -1662,6 +1662,68 @@ class TestMergeToolsBomRefUniqueness(unittest.TestCase):
 
 
 class TestMergeSeveralSboms(unittest.TestCase):
+    def test_merge_3_sboms_vulnerability_identity_after_intermediate_merge(self) -> None:
+        sbom_1 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-7158",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [
+                        {
+                            "ref": "vtep_application",
+                            "versions": [{"status": "unaffected", "version": "1.10.0"}],
+                        }
+                    ],
+                }
+            ],
+        }
+
+        sbom_2 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-7158",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [
+                        {
+                            "ref": "vtep_bootloader",
+                            "versions": [{"status": "unaffected", "version": "5.1.0"}],
+                        }
+                    ],
+                }
+            ],
+        }
+
+        sbom_3 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-7158",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [
+                        {
+                            "ref": "vtep_bootselector",
+                            "versions": [{"status": "unaffected", "version": "1.0.0"}],
+                        }
+                    ],
+                }
+            ],
+        }
+
+        merged_bom = merge.merge([sbom_1, sbom_2, sbom_3])
+        vulnerabilities = merged_bom.get("vulnerabilities", [])
+
+        self.assertEqual(len(vulnerabilities), 1)
+        refs = {affected.get("ref") for affected in vulnerabilities[0].get("affects", [])}
+        self.assertSetEqual(
+            refs,
+            {"vtep_application", "vtep_bootloader", "vtep_bootselector"},
+        )
+
     def _load_reference_sbom(self, spec_version: str) -> dict:
         with open(
             "tests/auxiliary/test_validate_sboms/"

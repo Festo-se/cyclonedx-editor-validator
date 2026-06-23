@@ -480,19 +480,48 @@ def collect_affects_of_vulnerabilities(
     if list_of_original_vulnerabilities:
         for n in range(len(list_of_original_vulnerabilities)):
             # use json string of vulnerability in case the vulnerability does not contain any id
-            id = identities[json.dumps(list_of_original_vulnerabilities[n], sort_keys=True)]
+            id = get_identity_for_vulnerability(list_of_original_vulnerabilities[n], identities)
             affects = deepcopy(list_of_original_vulnerabilities[n].get("affects", []))
             if id.string() not in collected_affects.keys():
                 for k in range(n + 1, len(list_of_original_vulnerabilities)):
-                    new_id = identities[
-                        json.dumps(list_of_original_vulnerabilities[k], sort_keys=True)
-                    ]
+                    new_id = get_identity_for_vulnerability(
+                        list_of_original_vulnerabilities[k], identities
+                    )
 
                     if id == new_id:
                         affects += list_of_original_vulnerabilities[k].get("affects", [])
 
                 collected_affects[id.string()] = affects
     return collected_affects
+
+
+def get_identity_for_vulnerability(
+    vulnerability: dict,
+    identities: dict[str, VulnerabilityIdentity],
+) -> VulnerabilityIdentity:
+    """
+    Return a vulnerability identity for the given vulnerability object.
+
+    The lookup first tries the JSON-serialized vulnerability key used by
+    get_identities_for_vulnerabilities(). If no direct key is found (for example,
+    after vulnerabilities were merged and their affects lists changed), it falls
+    back to alias-based identity matching and caches the result.
+    """
+    vulnerability_string = json.dumps(vulnerability, sort_keys=True)
+    identity = identities.get(vulnerability_string)
+    if identity is not None:
+        return identity
+
+    aliases = VulnerabilityIdentity.get_ids_from_vulnerability(vulnerability)
+    for identity in identities.values():
+        if identity.one_of_ids_is_in(aliases):
+            identities[vulnerability_string] = identity
+            return identity
+
+    # No matching identity exists yet (e.g. empty IDs); create and cache one.
+    created_identity = VulnerabilityIdentity(aliases[0] if aliases else "", aliases)
+    identities[vulnerability_string] = created_identity
+    return created_identity
 
 
 def compare_version_range(first_range: str, second_range: str) -> bool:

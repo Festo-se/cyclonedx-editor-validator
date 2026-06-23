@@ -1991,15 +1991,13 @@ class TestMergeComponents(unittest.TestCase):
                 {"ref": "compA", "dependsOn": ["compA/subcompA"]},
                 {"ref": "compA/subcompA", "dependsOn": []},
             ],
-            compositions=[
-                {"aggregate": "complete", "assemblies": ["compA/subcompA"]}
-            ],
-            vulnerabilities=[
-                {"id": "CVE-0000-0001", "affects": [{"ref": "compA/subcompA"}]}
-            ],
+            compositions=[{"aggregate": "complete", "assemblies": ["compA/subcompA"]}],
+            vulnerabilities=[{"id": "CVE-0000-0001", "affects": [{"ref": "compA/subcompA"}]}],
         )
 
-        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
 
         comp_a = _find_component(merged, "compA")
         self.assertEqual(comp_a["components"][0]["bom-ref"], "compA/subcompA")
@@ -2026,9 +2024,7 @@ class TestMergeComponents(unittest.TestCase):
                                 _build_component(
                                     "mid",
                                     "root/mid",
-                                    children=[
-                                        _build_component("leaf", "root/mid/leaf")
-                                    ],
+                                    children=[_build_component("leaf", "root/mid/leaf")],
                                 )
                             ],
                         )
@@ -2037,7 +2033,9 @@ class TestMergeComponents(unittest.TestCase):
             ]
         )
 
-        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
 
         self.assertEqual(_find_component(merged, "G/root")["name"], "root")
         self.assertEqual(_find_component(merged, "G/root/mid")["name"], "mid")
@@ -2059,7 +2057,9 @@ class TestMergeComponents(unittest.TestCase):
             ]
         )
 
-        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
 
         self.assertEqual(_find_component(merged, "pkg:npm/foo@1.0")["name"], "pkg-child")
         self.assertEqual(
@@ -2086,7 +2086,9 @@ class TestMergeComponents(unittest.TestCase):
             ]
         )
 
-        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
 
         self.assertEqual(_find_component(merged, "G/root")["name"], "root")
         self.assertEqual(_find_component(merged, "G/root/leaf")["name"], "leaf")
@@ -2127,7 +2129,9 @@ class TestMergeComponents(unittest.TestCase):
             ]
         )
 
-        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
 
         self.assertEqual(_find_component(merged, "G/compA")["name"], "compA")
         self.assertEqual(_find_component(merged, "G/compA/sub")["name"], "sub")
@@ -2251,7 +2255,9 @@ class TestMergeComponents(unittest.TestCase):
         )
 
         self.assertEqual(merged_twice, merged_snapshot)
-        self.assertFalse(any(ref.startswith("G/G/") for ref in _collect_component_refs(merged_twice)))
+        self.assertFalse(
+            any(ref.startswith("G/G/") for ref in _collect_component_refs(merged_twice))
+        )
 
     def test_non_hierarchical_merge_leaves_refs_unchanged(self) -> None:
         governing = _build_sbom([_build_component("G", "G")])
@@ -2271,7 +2277,9 @@ class TestMergeComponents(unittest.TestCase):
             ]
         )
 
-        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=False)
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=False
+        )
 
         self.assertEqual(_find_component(merged, "root")["name"], "root")
         self.assertEqual(_find_component(merged, "root/leaf")["name"], "leaf")
@@ -2294,7 +2302,9 @@ class TestMergeComponents(unittest.TestCase):
             ]
         )
 
-        merged = merge.merge([copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True)
+        merged = merge.merge(
+            [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
+        )
 
         parent = next(component for component in merged["components"] if component["name"] == "G")
         self.assertEqual(parent["components"][0]["bom-ref"], "root")

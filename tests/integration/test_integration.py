@@ -761,9 +761,11 @@ class TestSet:
         "use_only",
         [
             ["name", "purl", "key", "value"],
+            ["name-pattern", "purl", "key", "value"],
             ["name", "swid", "key", "value"],
             ["purl", "swid", "key", "value"],
             ["name", "cpe", "key", "value"],
+            ["group-pattern", "key", "value"],
             ["version", "group", "key", "value"],
             ["name", "version", "version-range", "key", "value"],
             ["key", "value"],
@@ -782,6 +784,8 @@ class TestSet:
             "version": "1.0.0",
             "version-range": "vers:generic/>1.0.0",
             "group": "acme",
+            "name-pattern": "comp.*",
+            "group-pattern": "org\\..*",
             "purl": "pkg:test/comp@1.0.0",
             "swid": "foo",
             "cpe": "cpe:2.3:a:acme:comp:*:*:*:*:*:*:*:*",
@@ -909,6 +913,28 @@ class TestSet:
 
         assert exit_code == Status.OK
         assert stderr.find('"COORDINATES[comp]" was not found') >= 0
+
+    def test_regex_target_via_command_line(
+        self,
+        input_file: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "set",
+            str(input_file),
+            "--purl-pattern",
+            "pkg:npm/test-app@1\\.0\\.0",
+            "--key",
+            "author",
+            "--value",
+            '"Regex Author"',
+            "--force",
+        )
+        exit_code, actual, _ = run_main(capsys, "json")
+
+        assert exit_code == Status.OK
+        assert actual["metadata"]["component"]["author"] == "Regex Author"
 
     def test_allow_protected(
         self,

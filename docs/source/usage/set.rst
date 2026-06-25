@@ -18,7 +18,12 @@ set
 Target components
 -----------------
 
-The *target component* can be identified through any of the identifiable properties defined by CycloneDX, specifically: *cpe*, *purl*, *swid* or the combination of *name*, *group* and/or *version* (collectively called *coordinates*).
+The *target component* can be identified through any of the identifiable properties defined by CycloneDX, specifically: *cpe*, *purl*, *swid* or the combination of *name*, *group* and/or *version* (collectively called *coordinates*). Each identifier can be matched either exactly or—for *cpe*, *purl*, and *name*—using regular expressions.
+
+Only a single identifier may be specified for any given update (with the exception of *name*, *group*, and *version*/*version-range* which are only valid together).
+
+Exact matching
+~~~~~~~~~~~~~~
 
 If *coordinates* are used to identify the target, they must match the component fully. In other words, if **only** *name* is given, it will **only match** components with that name which do **not** contain *version* or *group* fields.
 
@@ -29,6 +34,7 @@ The version range has the format::
     vers:<versioning-scheme>/<version-constraint>|<version-constraint>|...
 
 beginning with the ``vers`` identifier. Following this the versioning scheme is specified, in the case of semantic versioning this would be ``semver`` or ``generic``. Following this a list of constraints divided by an ``|`` can be provided, to specify which versions are in scope.
+
 A few examples:
 
 To target all versions higher than and not including 2.0.0 the version range to provide would be::
@@ -47,30 +53,22 @@ To target all versions higher than and not including 2.0.0 that are also smaller
 
     vers:generic/>2.0.0|<=4.5.0|5.0.0
 
-Note that instead of specific version constraints it is possible to provide a wildcard *\** to allow all versions. So to target all versions the provided version range would be::
+To target all versions the provided version range would be::
 
     vers:generic/*
 
 Further information on the supported versions can be found here `univers documentation <https://pypi.org/project/univers/>`_.
 
-Regex target matching
----------------------
+Regular expression matching
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Regex matching can be used for *name*, *purl* and *cpe* identifiers.
-It is opt-in per identifier and is never applied implicitly.
+Regular expressions can be used as an alternative to exact matching for *cpe*, *purl*, and *name* identifiers. Regex matching is opt-in per identifier and is never applied implicitly.
 
-**purl and cpe** support single-field regex and cannot be combined with other identifiers.
+**On the command-line**, use one of these options:
 
-**name** supports regex and can additionally be combined with:
-
-- an exact or regex *group* filter
-- an exact *version* or a *version-range*
-
-On the command-line, use one of:
-
-- ``--name-pattern`` — can also be combined with ``--group``, ``--group-pattern``, ``--version`` or ``--version-range``
-- ``--purl-pattern``
-- ``--cpe-pattern``
+- ``--name-pattern`` — for *name* matching. Can additionally be combined with ``--group``, ``--group-pattern``, ``--version`` or ``--version-range``
+- ``--purl-pattern`` — for *purl* matching
+- ``--cpe-pattern`` — for *cpe* matching
 
 Examples::
 
@@ -83,7 +81,7 @@ Examples::
         --version-range vers:generic/<3.0.0 \
         --key copyright --value '"ACME Inc."' --force
 
-When using ``--from-file``, regex can be specified explicitly in either of these forms::
+**When using ``--from-file``**, regex can be specified in either of these forms::
 
     {
         "id": {"namePattern": "web-.*"},
@@ -97,7 +95,7 @@ or::
         "set": {"author": "Team A"}
     }
 
-Group and version companions can be added to any name regex form::
+For *name* regex, you can add *group* and *version*/*version-range* companions to narrow the results::
 
     {
         "id": {
@@ -108,18 +106,14 @@ Group and version companions can be added to any name regex form::
         "set": {"copyright": "ACME Inc."}
     }
 
-A literal group string can be used instead of a regex::
+A literal (non-regex) value can be used for *group*, *version*, or *version-range* alongside a regex *name*::
 
     {
         "id": {"namePattern": "web-.*", "group": "org.acme", "version": "2.1.0"},
         "set": {"copyright": "ACME Inc."}
     }
 
-Regex evaluation uses full-match semantics. Anchors (``^`` and ``$``) are not required.
-Regex target matching traverses all components, including ``metadata.component`` when present.
-Identifier fields that do not support regex (for example, *swid*) are rejected as invalid input.
-A *group* regex is only valid in combination with a name regex.
-Existing non-regex identifiers remain exact-match and are unchanged for backward compatibility.
+Regex evaluation uses full-match semantics—anchors (``^`` and ``$``) are not required. Traversal includes all components, including ``metadata.component`` when present.
 
 If the target component isn't found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the ``--ignore-missing`` flag.
 
@@ -183,14 +177,12 @@ When passing the targets, names and values in a file, the file must conform to t
         {
             "id": {
                 # Could be any one of the identifying properties in CycloneDX.
-                # Multiple identifiers are not allowed (with the special exception of name,
-                # group and version/version-range which are only valid together)
+                # Multiple identifiers are not allowed (except name, group, and version/version-range,
+                # which are only valid together).
                 "cpe": "CPE of target component goes here"
-                # Regex is opt-in; supported for cpe, purl and name (see Regex section):
-                # "cpePattern": "cpe:/a:example:.*"
-                # "name": {"regex": "my-component.*"}
-                # name regex additionally allows group and version companions:
-                # "namePattern": "web-.*", "group": {"regex": "org\\..*"}, "version-range": "vers:generic/*"
+                # For regex matching, use namePattern, purl-pattern, or cpePattern,
+                # or the longer form: {"name": {"regex": "..."}}, {"purl": {"regex": "..."}}
+                # See "Target components" section above for complete regex details.
             },
             "set": {
                 # Sets a simple property

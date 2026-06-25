@@ -661,6 +661,26 @@ def create_set_parser(
         help="Name of target component. Can be combined with group and version.",
     )
     identifiers.add_argument(
+        "--name-pattern",
+        metavar="<regex>",
+        help="Regex for target component name.",
+    )
+    identifiers.add_argument(
+        "--group-pattern",
+        metavar="<regex>",
+        help=("Regex for target component group. Only valid in combination with --name-pattern."),
+    )
+    identifiers.add_argument(
+        "--cpe-pattern",
+        metavar="<regex>",
+        help="Regex for target component CPE.",
+    )
+    identifiers.add_argument(
+        "--purl-pattern",
+        metavar="<regex>",
+        help="Regex for target component PURL.",
+    )
+    identifiers.add_argument(
         "--group",
         metavar="<group>",
         help="Group of target component. If specified, name must also be specified.",
@@ -885,18 +905,115 @@ def invoke_merge(args: argparse.Namespace) -> int:
     return Status.OK
 
 
-# noinspection PyTypeChecker,PyUnboundLocalVariable
-def invoke_set(args: argparse.Namespace) -> int:
-    def has_target() -> bool:
-        return (
-            args.swid is not None
-            or args.cpe is not None
-            or args.purl is not None
-            or args.name is not None
+def _set_has_target(args: argparse.Namespace) -> bool:
+    return (
+        args.swid is not None
+        or args.cpe is not None
+        or args.purl is not None
+        or args.name is not None
+        or args.name_pattern is not None
+        or args.cpe_pattern is not None
+        or args.purl_pattern is not None
+    )
+
+
+def _build_name_pattern_id(
+    args: argparse.Namespace,
+    pattern: str,
+    group_pattern: t.Optional[str],
+) -> dict[str, t.Any]:
+    if args.group and group_pattern:
+        usage_error("--group and --group-pattern cannot be combined.", args.parser)
+
+    update_id: dict[str, t.Any] = {"namePattern": pattern}
+    if args.group is not None:
+        update_id["group"] = args.group
+    if group_pattern is not None:
+        update_id["group"] = {"regex": group_pattern}
+    if args.version is not None:
+        update_id["version"] = args.version
+    if args.version_range is not None:
+        update_id["version-range"] = args.version_range
+    return update_id
+
+
+def _build_key_id(target_key: Key, update_id: dict[str, t.Any]) -> None:
+    if target_key.type is KeyType.CPE:
+        update_id["cpe"] = target_key.key
+    elif target_key.type is KeyType.PURL:
+        update_id["purl"] = target_key.key
+    elif target_key.type is KeyType.SWID:
+        update_id["swid"] = target_key.key
+    elif target_key.type is KeyType.COORDINATES:
+        update_id["name"] = target_key.key.name
+        if target_key.key.group is not None:
+            update_id["group"] = target_key.key.group
+        if target_key.key.version is not None:
+            update_id["version"] = target_key.key.version
+        if (
+            isinstance(target_key.key, cdxev.set.CoordinatesWithVersionRange)
+            and target_key.key.version_range is not None
+        ):
+            update_id["version-range"] = str(target_key.key.version_range)
+
+
+def _set_target_update_id(args: argparse.Namespace) -> dict[str, t.Any]:
+    if args.name is not None:
+        try:
+            coordinates = cdxev.set.UpdateIdentity.from_coordinates(
+                name=args.name,
+                version=args.version,
+                group=args.group,
+                version_range=args.version_range,
+            )
+        except ValueError as exc:
+            usage_error(str(exc))
+    else:
+        coordinates = None
+
+    group_pattern = args.group_pattern
+    if group_pattern is not None and not args.name_pattern:
+        usage_error("--group-pattern requires --name-pattern.", args.parser)
+
+    if (args.cpe_pattern or args.purl_pattern) and (
+        args.name or args.group or group_pattern or args.version or args.version_range
+    ):
+        usage_error(
+            "--cpe-pattern and --purl-pattern cannot be combined with "
+            "--name, --group, --group-pattern, --version or --version-range.",
+            args.parser,
         )
 
+    possible_targets = [
+        ("swid", args.swid),
+        ("purl", args.purl),
+        ("cpe", args.cpe),
+        ("coordinates", coordinates),
+        ("namePattern", args.name_pattern),
+        ("cpePattern", args.cpe_pattern),
+        ("purlPattern", args.purl_pattern),
+    ]
+    actual_targets = [(kind, target) for (kind, target) in possible_targets if target is not None]
+    if len(actual_targets) > 1:
+        usage_error("Cannot specify more than one <target>.", args.parser)
+
+    target_kind, target = actual_targets[0]
+    update_id: dict[str, t.Any] = {}
+    if target_kind == "namePattern":
+        update_id = _build_name_pattern_id(args, target, group_pattern)
+    elif target_kind in {"cpePattern", "purlPattern"}:
+        update_id[target_kind] = target
+    else:
+        _build_key_id(t.cast(Key, target), update_id)
+
+    return update_id
+
+
+# noinspection PyTypeChecker,PyUnboundLocalVariable
+def invoke_set(args: argparse.Namespace) -> int:
+
     if args.from_file is None:
-        if not has_target():
+        if not _set_has_target(args):
             usage_error(
                 "<target> is required, unless the --from-file option is used.",
                 args.parser,
@@ -909,29 +1026,6 @@ def invoke_set(args: argparse.Namespace) -> int:
                 args.parser,
             )
 
-        if args.name is not None:
-            try:
-                coordinates = cdxev.set.UpdateIdentity.from_coordinates(
-                    name=args.name,
-                    version=args.version,
-                    group=args.group,
-                    version_range=args.version_range,
-                )
-            except ValueError as exc:
-                usage_error(str(exc))
-        else:
-            coordinates = None
-        possible_targets = [
-            args.swid,
-            args.purl,
-            args.cpe,
-            coordinates,
-        ]
-        actual_targets = [x for x in possible_targets if x is not None]
-        if len(actual_targets) > 1:
-            usage_error("Cannot specify more than one <target>.", args.parser)
-
-        target: Key = actual_targets[0]
         try:
             value = json.loads(args.value)
         except json.JSONDecodeError:
@@ -941,27 +1035,10 @@ def invoke_set(args: argparse.Namespace) -> int:
                 args.parser,
             )
 
-        updates = [{"id": {}, "set": {args.key: value}}]
-        if target.type is KeyType.CPE:
-            updates[0]["id"]["cpe"] = target.key
-        elif target.type is KeyType.PURL:
-            updates[0]["id"]["purl"] = target.key
-        elif target.type is KeyType.SWID:
-            updates[0]["id"]["swid"] = target.key
-        elif target.type is KeyType.COORDINATES:
-            updates[0]["id"]["name"] = target.key.name
-            if target.key.group is not None:
-                updates[0]["id"]["group"] = target.key.group
-            if target.key.version is not None:
-                updates[0]["id"]["version"] = target.key.version
-            if (
-                isinstance(target.key, cdxev.set.CoordinatesWithVersionRange)
-                and target.key.version_range is not None
-            ):
-                updates[0]["id"]["version-range"] = str(target.key.version_range)
+        updates = [{"id": _set_target_update_id(args), "set": {args.key: value}}]
 
     else:
-        if has_target() or args.key is not None or args.value is not None:
+        if _set_has_target(args) or args.key is not None or args.value is not None:
             usage_error(
                 "--from-file cannot be combined with <target>, --key or --value.",
                 args.parser,

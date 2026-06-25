@@ -57,9 +57,7 @@ class OperationDocumenter(autodoc.MethodDocumenter):
     content_indent = ""
 
     @classmethod
-    def can_document_member(
-        cls, member: Any, membername: str, isattr: bool, parent: Any
-    ) -> bool:
+    def can_document_member(cls, member: Any, membername: str, isattr: bool, parent: Any) -> bool:
         return False
 
     # do not add a header to the docstring

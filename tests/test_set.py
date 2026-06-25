@@ -549,6 +549,653 @@ class SetTestCase(unittest.TestCase):
             cfg,
         )
 
+    def test_set_regex_name_pattern_alias(self) -> None:
+        updates = [
+            {
+                "id": {"namePattern": "dep[A-C]"},
+                "set": {"author": "regex author"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["author"], "regex author")
+        self.assertEqual(self.sbom_fixture["components"][1]["author"], "regex author")
+        self.assertEqual(self.sbom_fixture["components"][2]["author"], "regex author")
+
+    def test_set_regex_name_object(self) -> None:
+        updates = [
+            {
+                "id": {"name": {"regex": "x-ray"}},
+                "set": {"author": "regex target"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(
+            self.sbom_fixture["components"][1]["components"][1]["author"], "regex target"
+        )
+
+    def test_set_regex_cpe_object(self) -> None:
+        self.sbom_fixture["components"][0]["cpe"] = "cpe:/a:example:depA:4.0.2"
+
+        updates = [
+            {
+                "id": {"cpe": {"regex": "cpe:/a:example:depA:.*"}},
+                "set": {"author": "regex cpe author"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["author"], "regex cpe author")
+
+    def test_set_regex_cpe_pattern_alias(self) -> None:
+        self.sbom_fixture["components"][0]["cpe"] = "cpe:/a:example:depA:4.0.2"
+
+        updates = [
+            {
+                "id": {"cpePattern": "cpe:/a:example:depA:.*"},
+                "set": {"author": "regex cpe alias"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["author"], "regex cpe alias")
+
+    def test_set_regex_purl_object(self) -> None:
+        updates = [
+            {
+                "id": {"purl": {"regex": "pkg:npm/test-app@.*"}},
+                "set": {"author": "regex purl author"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["metadata"]["component"]["author"], "regex purl author")
+
+    def test_set_regex_purl_pattern_alias(self) -> None:
+        updates = [
+            {
+                "id": {"purlPattern": "pkg:npm/test-app@.*"},
+                "set": {"author": "regex purl alias"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["metadata"]["component"]["author"], "regex purl alias")
+
+    def test_set_exact_cpe_not_interpreted_as_regex(self) -> None:
+        # Keep exact matching behavior intact for backward compatibility.
+        self.sbom_fixture["components"][0]["cpe"] = "cpe:/a:example:depA:4.0.2"
+
+        updates = [
+            {
+                "id": {"cpe": "cpe:/a:example:depA:.*"},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
+
+    def test_set_exact_purl_not_interpreted_as_regex(self) -> None:
+        # Keep exact matching behavior intact for backward compatibility.
+        updates = [
+            {
+                "id": {"purl": "pkg:npm/test-app@.*"},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
+
+    def test_set_regex_requires_explicit_opt_in(self) -> None:
+        updates = [
+            {
+                "id": {"name": "dep.*"},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
+
+    def test_set_regex_uses_full_match(self) -> None:
+        updates = [
+            {
+                "id": {"name": {"regex": "dep"}},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        self.assertRaises(cdxev.error.AppError, cdxev.set.run, self.sbom_fixture, updates, cfg)
+
+    def test_set_regex_unsupported_identifier_field_raises(self) -> None:
+        updates = [
+            {
+                "id": {"swid": {"regex": "x"}},
+                "set": {"author": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("does not support regex", ctx.exception.details.description)
+
+    def test_set_regex_name_with_exact_version(self) -> None:
+        # depA version=4.0.2, depB version=1.2.3 — only depA should match
+        updates = [
+            {
+                "id": {"namePattern": "dep[A-C]", "version": "4.0.2"},
+                "set": {"copyright": "version matched"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["copyright"], "version matched")
+        # depB already has a copyright; it must not have been overwritten
+        self.assertEqual(self.sbom_fixture["components"][1]["copyright"], "Some Vendor Inc.")
+        self.assertNotIn("copyright", self.sbom_fixture["components"][2])
+
+    def test_set_regex_name_with_exact_group(self) -> None:
+        # Only depA has group "com.company.unit"
+        updates = [
+            {
+                "id": {
+                    "name": {"regex": "dep."},
+                    "group": "com.company.unit",
+                },
+                "set": {"copyright": "group matched"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertEqual(self.sbom_fixture["components"][0]["copyright"], "group matched")
+        # depB already has a copyright; it must not have been overwritten
+        self.assertEqual(self.sbom_fixture["components"][1]["copyright"], "Some Vendor Inc.")
+
+    def test_set_regex_name_with_group_regex(self) -> None:
+        # gravity and x-ray both belong to group "physics"
+        updates = [
+            {
+                "id": {
+                    "namePattern": ".*",
+                    "group": {"regex": "phys.*"},
+                },
+                "set": {"copyright": "group regex matched"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        gravity = self.sbom_fixture["components"][1]["components"][0]
+        x_ray = self.sbom_fixture["components"][1]["components"][1]
+        self.assertEqual(gravity["copyright"], "group regex matched")
+        self.assertEqual(x_ray["copyright"], "group regex matched")
+        # depA / depB / depC top-level should not be affected
+        self.assertNotIn("copyright", self.sbom_fixture["components"][0])
+
+    def test_set_regex_group_without_name_raises(self) -> None:
+        updates = [
+            {
+                "id": {"group": {"regex": "phys.*"}},
+                "set": {"copyright": "should not match"},
+            }
+        ]
+
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("only in combination with", ctx.exception.details.description)
+
+    def test_set_regex_name_marker_requires_regex_key(self) -> None:
+        updates = [
+            {
+                "id": {"name": {"not-regex": "dep.*"}},
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("must be a string or an object", ctx.exception.details.description)
+
+    def test_set_regex_name_marker_single_property_only(self) -> None:
+        updates = [
+            {
+                "id": {"name": {"regex": "dep.*", "x": "y"}},
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("may only contain the property", ctx.exception.details.description)
+
+    def test_set_regex_name_marker_value_must_be_string(self) -> None:
+        updates = [
+            {
+                "id": {"name": {"regex": 123}},
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("regex expression that is not a string", ctx.exception.details.description)
+
+    def test_set_regex_cpe_pattern_must_be_string(self) -> None:
+        updates = [
+            {
+                "id": {"cpePattern": 7},
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn('"cpePattern" must be a string', ctx.exception.details.description)
+
+    def test_set_regex_name_pattern_must_be_string(self) -> None:
+        updates = [
+            {
+                "id": {"namePattern": 7},
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn('"namePattern" must be a string', ctx.exception.details.description)
+
+    def test_set_regex_name_rejects_unexpected_identifier_companion(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "namePattern": "dep.*",
+                    "purl": "pkg:npm/test-app@1.0.0",
+                },
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn(
+            "may only be combined with group, version or version-range",
+            ctx.exception.details.description,
+        )
+
+    def test_set_regex_name_group_must_be_string_or_regex(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "namePattern": "dep.*",
+                    "group": 11,
+                },
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn(
+            '"group" must be a string or {"regex": "..."}', ctx.exception.details.description
+        )
+
+    def test_set_regex_name_version_must_be_string(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "namePattern": "dep.*",
+                    "version": 22,
+                },
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn('"version" must be a string', ctx.exception.details.description)
+
+    def test_set_regex_name_version_range_must_be_string(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "namePattern": "dep.*",
+                    "version-range": 22,
+                },
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn('"version-range" must be a string', ctx.exception.details.description)
+
+    def test_set_regex_name_invalid_version_range_raises(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "namePattern": "dep.*",
+                    "version-range": "not-a-version-range",
+                },
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("invalid version-range", ctx.exception.details.description)
+
+    def test_set_regex_name_invalid_pattern_raises(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "namePattern": "(dep.*",
+                },
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("invalid regular expression", ctx.exception.details.description)
+
+    def test_set_regex_name_and_cpe_pattern_conflict_raises(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "namePattern": "dep.*",
+                    "cpePattern": "cpe:/a:example:.*",
+                },
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn(
+            "may only be combined with group, version or version-range",
+            ctx.exception.details.description,
+        )
+
+    def test_parse_coordinates_regex_rejects_version_and_version_range(self) -> None:
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set._parse_coordinates_regex(
+                {
+                    "namePattern": "dep.*",
+                    "version": "1.0.0",
+                    "version-range": "vers:generic/*",
+                }
+            )
+
+        self.assertIn(
+            "contains a 'version' and 'version-range'",
+            ctx.exception.details.description,
+        )
+
+    def test_set_regex_simple_pattern_with_extra_identifier_raises(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "cpePattern": "cpe:/a:example:.*",
+                    "version": "1.0.0",
+                },
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("has more than one id", ctx.exception.details.description)
+
+    def test_set_regex_simple_pattern_invalid_expression_raises(self) -> None:
+        updates = [
+            {
+                "id": {
+                    "cpePattern": "(invalid",
+                },
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("invalid regular expression", ctx.exception.details.description)
+
+    def test_set_regex_alias_keys_ignored_in_unsupported_dict_helper(self) -> None:
+        # Direct helper coverage: alias keys are skipped during unsupported-dict checks.
+        cdxev.set._reject_unsupported_id_dicts({"cpePattern": {"regex": "ok"}})
+
+    def test_set_invalid_identifier_mapping_raises(self) -> None:
+        updates = [
+            {
+                "id": {"swid": 123},
+                "set": {"author": "nope"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            True,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        with self.assertRaises(cdxev.error.AppError) as ctx:
+            cdxev.set.run(self.sbom_fixture, updates, cfg)
+
+        self.assertIn("invalid identifier", ctx.exception.details.description)
+
 
 class TestVersionRange(unittest.TestCase):
     def setUp(self) -> None:
@@ -886,3 +1533,87 @@ class TestVersionRange(unittest.TestCase):
         self.assertEqual(self.sbom_fixture["components"][3]["supplier"], {"name": "New supplier"})
         self.assertEqual(self.sbom_fixture["components"][4]["supplier"], {"name": "New supplier"})
         self.assertEqual(self.sbom_fixture["components"][5]["supplier"], {"name": "New supplier"})
+
+    def test_set_regex_name_with_version_range(self) -> None:
+        # Build a dedicated fixture so this test does not depend on external files.
+        sbom: dict[str, t.Any] = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "version": 1,
+            "components": [
+                {
+                    "type": "library",
+                    "name": "web-framework",
+                    "group": "org.acme",
+                    "version": "2.1.0",
+                    "bom-ref": "wf-2.1.0",
+                },
+                {
+                    "type": "library",
+                    "name": "web-framework",
+                    "group": "org.acme",
+                    "version": "3.0.0",
+                    "bom-ref": "wf-3.0.0",
+                },
+                {
+                    "type": "library",
+                    "name": "api-framework",
+                    "group": "org.acme",
+                    "version": "2.5.0",
+                    "bom-ref": "api-2.5.0",
+                },
+                {
+                    "type": "application",
+                    "name": "container",
+                    "version": "1.0.0",
+                    "bom-ref": "container-1.0.0",
+                    "components": [
+                        {
+                            "type": "library",
+                            "name": "web-framework",
+                            "group": "org.acme",
+                            "version": "2.9.9",
+                            "bom-ref": "wf-2.9.9",
+                        },
+                        {
+                            "type": "library",
+                            "name": "web-framework",
+                            "group": "org.acme",
+                            "version": "4.0.0",
+                            "bom-ref": "wf-4.0.0",
+                        },
+                    ],
+                },
+            ],
+        }
+
+        updates = [
+            {
+                "id": {
+                    "name": {"regex": "web-framework"},
+                    "group": {"regex": "org\\.acme"},
+                    "version-range": "vers:pypi/<3.0.0",
+                },
+                "set": {"copyright": "range matched"},
+            }
+        ]
+        cfg = cdxev.set.SetConfig(
+            False,
+            False,
+            [pathlib.Path("tests/auxiliary/test_set_sboms/test.cdx.json")],
+            None,
+        )
+
+        cdxev.set.run(sbom, updates, cfg)
+
+        # Positive matches (top-level + nested) in range.
+        self.assertEqual(sbom["components"][0].get("copyright"), "range matched")
+        self.assertEqual(
+            sbom["components"][3]["components"][0].get("copyright"),
+            "range matched",
+        )
+
+        # Negative cases: boundary/out-of-range version and non-matching name.
+        self.assertNotIn("copyright", sbom["components"][1])
+        self.assertNotIn("copyright", sbom["components"][2])
+        self.assertNotIn("copyright", sbom["components"][3]["components"][1])

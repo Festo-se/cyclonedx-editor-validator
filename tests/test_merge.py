@@ -1662,6 +1662,309 @@ class TestMergeToolsBomRefUniqueness(unittest.TestCase):
 
 
 class TestMergeSeveralSboms(unittest.TestCase):
+    def test_merge_3_sboms_vulnerability_identity_after_intermediate_merge(self) -> None:
+        sbom_1 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-7158",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [
+                        {
+                            "ref": "vtep_application",
+                            "versions": [{"status": "unaffected", "version": "1.10.0"}],
+                        }
+                    ],
+                }
+            ],
+        }
+
+        sbom_2 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-7158",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [
+                        {
+                            "ref": "vtep_bootloader",
+                            "versions": [{"status": "unaffected", "version": "5.1.0"}],
+                        }
+                    ],
+                }
+            ],
+        }
+
+        sbom_3 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-7158",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [
+                        {
+                            "ref": "vtep_bootselector",
+                            "versions": [{"status": "unaffected", "version": "1.0.0"}],
+                        }
+                    ],
+                }
+            ],
+        }
+
+        merged_bom = merge.merge([sbom_1, sbom_2, sbom_3])
+        vulnerabilities = merged_bom.get("vulnerabilities", [])
+
+        self.assertEqual(len(vulnerabilities), 1)
+        refs = {affected.get("ref") for affected in vulnerabilities[0].get("affects", [])}
+        self.assertSetEqual(
+            refs,
+            {"vtep_application", "vtep_bootloader", "vtep_bootselector"},
+        )
+
+    def test_merge_3_sboms_alias_only_match(self) -> None:
+        sbom_1 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-A",
+                    "references": [{"id": "GHSA-shared"}],
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-a", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_2 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-B",
+                    "references": [{"id": "GHSA-shared"}],
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-b", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_3 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-C",
+                    "references": [{"id": "GHSA-shared"}],
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-c", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+
+        merged_bom = merge.merge([sbom_1, sbom_2, sbom_3])
+        vulnerabilities = merged_bom.get("vulnerabilities", [])
+
+        self.assertEqual(len(vulnerabilities), 1)
+        refs = {affected.get("ref") for affected in vulnerabilities[0].get("affects", [])}
+        self.assertSetEqual(refs, {"comp-a", "comp-b", "comp-c"})
+
+    def test_merge_3_sboms_distinct_vulns_not_over_merged(self) -> None:
+        sbom_1 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-1",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-1", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_2 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-2", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_3 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-3",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-3", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+
+        merged_bom = merge.merge([sbom_1, sbom_2, sbom_3])
+        vulnerabilities = merged_bom.get("vulnerabilities", [])
+
+        self.assertEqual(len(vulnerabilities), 3)
+        refs = {
+            affected.get("ref")
+            for vulnerability in vulnerabilities
+            for affected in vulnerability.get("affects", [])
+        }
+        self.assertSetEqual(refs, {"comp-1", "comp-2", "comp-3"})
+
+    def test_merge_3_sboms_empty_id_vulns_preserve_affects(self) -> None:
+        sbom_1 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "empty-1", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_2 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "empty-2", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_3 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "empty-3", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+
+        merged_bom = merge.merge([sbom_1, sbom_2, sbom_3])
+        vulnerabilities = merged_bom.get("vulnerabilities", [])
+
+        self.assertEqual(len(vulnerabilities), 3)
+        refs = {
+            affected.get("ref")
+            for vulnerability in vulnerabilities
+            for affected in vulnerability.get("affects", [])
+        }
+        self.assertSetEqual(refs, {"empty-1", "empty-2", "empty-3"})
+
+    def test_merge_4_sboms_intermediate_mutation(self) -> None:
+        sbom_1 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-1111",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-1", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_2 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-1111",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-2", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_3 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-1111",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-3", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_4 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2023-1111",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "comp-4", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+
+        merged_bom = merge.merge([sbom_1, sbom_2, sbom_3, sbom_4])
+        vulnerabilities = merged_bom.get("vulnerabilities", [])
+
+        self.assertEqual(len(vulnerabilities), 1)
+        refs = {affected.get("ref") for affected in vulnerabilities[0].get("affects", [])}
+        self.assertSetEqual(refs, {"comp-1", "comp-2", "comp-3", "comp-4"})
+
+    def test_merge_3_sboms_differing_analysis_state(self) -> None:
+        sbom_1 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-STATE",
+                    "analysis": {"state": "not_affected"},
+                    "affects": [{"ref": "state-1", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_2 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-STATE",
+                    "analysis": {"state": "false_positive"},
+                    "affects": [{"ref": "state-2", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+        sbom_3 = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "vulnerabilities": [
+                {
+                    "id": "CVE-STATE",
+                    "analysis": {"state": "exploitable"},
+                    "affects": [{"ref": "state-3", "versions": [{"status": "affected"}]}],
+                }
+            ],
+        }
+
+        merged_bom = merge.merge([sbom_1, sbom_2, sbom_3])
+        vulnerabilities = merged_bom.get("vulnerabilities", [])
+
+        self.assertEqual(len(vulnerabilities), 3)
+        refs_by_state = {
+            vulnerability.get("analysis", {}).get("state", ""): {
+                affected.get("ref") for affected in vulnerability.get("affects", [])
+            }
+            for vulnerability in vulnerabilities
+        }
+        self.assertDictEqual(
+            refs_by_state,
+            {
+                "not_affected": {"state-1"},
+                "false_positive": {"state-2"},
+                "exploitable": {"state-3"},
+            },
+        )
+
     def _load_reference_sbom(self, spec_version: str) -> dict:
         with open(
             "tests/auxiliary/test_validate_sboms/"

@@ -2761,6 +2761,26 @@ class TestMergeComponents(unittest.TestCase):
         _assert_no_dangling_refs(merged)
 
 
+class TestMergeDependencies(unittest.TestCase):
+    def test_only_first_sbom_contains_dependencies(self) -> None:
+        governing_program = helper.load_governing_program()
+        sub_program = helper.load_sub_program()
+        sub_program.pop("dependencies")
+        merged_sbom = merge.merge([governing_program, sub_program])
+        goal_sbom = helper.load_governing_program_merged_sub_program()
+        goal_sbom["dependencies"] = governing_program["dependencies"]
+        self.assertTrue(helper.compare_sboms(merged_sbom, goal_sbom))
+
+    def test_only_second_sbom_contains_dependencies(self) -> None:
+        governing_program = helper.load_governing_program()
+        governing_program.pop("dependencies")
+        sub_program = helper.load_sub_program()
+        merged_sbom = merge.merge([governing_program, sub_program])
+        goal_sbom = helper.load_governing_program_merged_sub_program()
+        goal_sbom["dependencies"] = sub_program["dependencies"]
+        self.assertTrue(helper.compare_sboms(merged_sbom, goal_sbom))
+
+
 class TestMergeCompositions(unittest.TestCase):
     def test_only_first_sbom_contains_compositions(self) -> None:
         governing_program = helper.load_governing_program()

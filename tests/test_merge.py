@@ -2287,15 +2287,15 @@ class TestMergeComponents(unittest.TestCase):
             dependencies=[{"ref": "compA", "dependsOn": []}],
             compositions=[],
         )
-        incoming_child = _build_component("subcompA", "compA/subcompA")
+        incoming_child = _build_component("subcompA", "foo/bar")
         incoming = _build_sbom(
-            [_build_component("compA", "compA", children=[incoming_child])],
+            [_build_component("compA", "foo", children=[incoming_child])],
             dependencies=[
-                {"ref": "compA", "dependsOn": ["compA/subcompA"]},
-                {"ref": "compA/subcompA", "dependsOn": []},
+                {"ref": "foo", "dependsOn": ["foo/bar"]},
+                {"ref": "foo/bar", "dependsOn": []},
             ],
-            compositions=[{"aggregate": "complete", "assemblies": ["compA/subcompA"]}],
-            vulnerabilities=[{"id": "CVE-0000-0001", "affects": [{"ref": "compA/subcompA"}]}],
+            compositions=[{"aggregate": "complete", "assemblies": ["foo/bar"]}],
+            vulnerabilities=[{"id": "CVE-0000-0001", "affects": [{"ref": "foo/bar"}]}],
         )
 
         merged = merge.merge(
@@ -2303,12 +2303,12 @@ class TestMergeComponents(unittest.TestCase):
         )
 
         comp_a = _find_component(merged, "compA")
-        self.assertEqual(comp_a["components"][0]["bom-ref"], "compA/subcompA")
-        self.assertEqual(merged["dependencies"][0]["dependsOn"], ["compA/subcompA"])
-        self.assertEqual(merged["compositions"][0]["assemblies"], ["compA/subcompA"])
+        self.assertEqual(comp_a["components"][0]["bom-ref"], "compA/bar")
+        self.assertEqual(merged["dependencies"][0]["dependsOn"], ["compA/bar"])
+        self.assertEqual(merged["compositions"][0]["assemblies"], ["compA/bar"])
         self.assertEqual(
             merged["vulnerabilities"][0]["affects"][0]["ref"],
-            "compA/subcompA",
+            "compA/bar",
         )
         _assert_no_dangling_refs(merged)
 

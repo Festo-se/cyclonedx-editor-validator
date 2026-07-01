@@ -2623,7 +2623,9 @@ class TestMergeComponents(unittest.TestCase):
         self.assertTrue(parent_ref, "Parent should have a generated bom-ref")
         # Children refs are rebased with the parent's generated ref
         self.assertEqual(parent["components"][0]["bom-ref"], parent_ref + "/root")
-        self.assertEqual(parent["components"][0]["components"][0]["bom-ref"], parent_ref + "/root/leaf")
+        self.assertEqual(
+            parent["components"][0]["components"][0]["bom-ref"], parent_ref + "/root/leaf"
+        )
 
     def test_hierarchical_rebases_hyphenated_sibling_ref(self) -> None:
         # With simplification, all relocated children get rebased, even non-path-like names.
@@ -2788,9 +2790,7 @@ class TestMergeComponents(unittest.TestCase):
                                 _build_component(
                                     "subcomp",
                                     "uuid-child-2",
-                                    children=[
-                                        _build_component("deep", "uuid-leaf-3")
-                                    ],
+                                    children=[_build_component("deep", "uuid-leaf-3")],
                                 )
                             ],
                         )

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>set &mdash; CycloneDX Editor Validator Tool 0.31.2 documentation</title>
+  <title>set &mdash; CycloneDX Editor Validator Tool 0.32.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=45bf195d"></script>
+      <script src="../_static/documentation_options.js?v=4440c9c5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -60,7 +60,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#create_parser-target">target</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#target-components">Target components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#target-components">Target components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#exact-matching">Exact matching</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#regular-expression-matching">Regular expression matching</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#protected-fields">Protected fields</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#values">Values</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#conflicts">Conflicts</a></li>
@@ -171,6 +175,18 @@
 <dt><kbd>--name</kbd></dt>
 <dd><p>Name of target component. Can be combined with group and version.</p>
 </dd>
+<dt><kbd>--name-pattern</kbd></dt>
+<dd><p>Regex for target component name.</p>
+</dd>
+<dt><kbd>--group-pattern</kbd></dt>
+<dd><p>Regex for target component group. Only valid in combination with --name-pattern.</p>
+</dd>
+<dt><kbd>--cpe-pattern</kbd></dt>
+<dd><p>Regex for target component CPE.</p>
+</dd>
+<dt><kbd>--purl-pattern</kbd></dt>
+<dd><p>Regex for target component PURL.</p>
+</dd>
 <dt><kbd>--group</kbd></dt>
 <dd><p>Group of target component. If specified, name must also be specified.</p>
 </dd>
@@ -184,15 +200,18 @@
 </section>
 <section id="target-components">
 <h2>Target components<a class="headerlink" href="#target-components" title="Link to this heading"></a></h2>
-<p>The <em>target component</em> can be identified through any of the identifiable properties defined by CycloneDX, specifically: <em>cpe</em>, <em>purl</em>, <em>swid</em> or the combination of <em>name</em>, <em>group</em> and/or <em>version</em> (collectively called <em>coordinates</em>).</p>
+<p>The <em>target component</em> can be identified through any of the identifiable properties defined by CycloneDX, specifically: <em>cpe</em>, <em>purl</em>, <em>swid</em> or the combination of <em>name</em>, <em>group</em> and/or <em>version</em> (collectively called <em>coordinates</em>). Each identifier can be matched either exactly or—for <em>cpe</em>, <em>purl</em>, and <em>name</em>—using regular expressions.</p>
+<p>Only a single identifier may be specified for any given update (with the exception of <em>name</em>, <em>group</em>, and <em>version</em>/<em>version-range</em> which are only valid together).</p>
+<section id="exact-matching">
+<h3>Exact matching<a class="headerlink" href="#exact-matching" title="Link to this heading"></a></h3>
 <p>If <em>coordinates</em> are used to identify the target, they must match the component fully. In other words, if <strong>only</strong> <em>name</em> is given, it will <strong>only match</strong> components with that name which do <strong>not</strong> contain <em>version</em> or <em>group</em> fields.</p>
 <p>In <em>coordinates</em> it is also possible to provide a range of versions using the <em>version-range</em> parameter instead of <em>version</em> following the <a class="reference external" href="https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst">PURL specification</a> as referenced by <a class="reference external" href="https://cyclonedx.org/docs/1.6/json/#vulnerabilities_items_affects_items_versions_items_range">CycloneDX</a>.</p>
 <p>The version range has the format:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="o">&lt;</span><span class="n">versioning</span><span class="o">-</span><span class="n">scheme</span><span class="o">&gt;/&lt;</span><span class="n">version</span><span class="o">-</span><span class="n">constraint</span><span class="o">&gt;|&lt;</span><span class="n">version</span><span class="o">-</span><span class="n">constraint</span><span class="o">&gt;|...</span>
 </pre></div>
 </div>
-<p>beginning with the <code class="docutils literal notranslate"><span class="pre">vers</span></code> identifier. Following this the versioning scheme is specified, in the case of semantic versioning this would be <code class="docutils literal notranslate"><span class="pre">semver</span></code> or <code class="docutils literal notranslate"><span class="pre">generic</span></code>. Following this a list of constraints divided by an <code class="docutils literal notranslate"><span class="pre">|</span></code> can be provided, to specify which versions are in scope.
-A few examples:</p>
+<p>beginning with the <code class="docutils literal notranslate"><span class="pre">vers</span></code> identifier. Following this the versioning scheme is specified, in the case of semantic versioning this would be <code class="docutils literal notranslate"><span class="pre">semver</span></code> or <code class="docutils literal notranslate"><span class="pre">generic</span></code>. Following this a list of constraints divided by an <code class="docutils literal notranslate"><span class="pre">|</span></code> can be provided, to specify which versions are in scope.</p>
+<p>A few examples:</p>
 <p>To target all versions higher than and not including 2.0.0 the version range to provide would be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/&gt;</span><span class="mf">2.0.0</span>
 </pre></div>
@@ -205,16 +224,71 @@ A few examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/&gt;</span><span class="mf">2.0.0</span><span class="o">|!=</span><span class="mf">4.1.1</span><span class="o">|&lt;=</span><span class="mf">4.5.0</span>
 </pre></div>
 </div>
-<p>To target all versions to target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 as well as the additional version 5.0.0 the version range to provide would be:</p>
+<p>To target all versions higher than and not including 2.0.0 that are also smaller than and including 4.5.0 as well as the additional version 5.0.0 the version range to provide would be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/&gt;</span><span class="mf">2.0.0</span><span class="o">|&lt;=</span><span class="mf">4.5.0</span><span class="o">|</span><span class="mf">5.0.0</span>
 </pre></div>
 </div>
-<p>Note that instead of specific version constraints it is possible to provide a wildcard <em>*</em> to allow all versions. So to target all versions the provided version range would be:</p>
+<p>To target all versions the provided version range would be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/*</span>
 </pre></div>
 </div>
 <p>Further information on the supported versions can be found here <a class="reference external" href="https://pypi.org/project/univers/">univers documentation</a>.</p>
+</section>
+<section id="regular-expression-matching">
+<h3>Regular expression matching<a class="headerlink" href="#regular-expression-matching" title="Link to this heading"></a></h3>
+<p>Regular expressions can be used as an alternative to exact matching for <em>cpe</em>, <em>purl</em>, and <em>name</em> identifiers. Regex matching is opt-in per identifier and is never applied implicitly.</p>
+<p><strong>On the command-line</strong>, use one of these options:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--name-pattern</span></code> — for <em>name</em> matching. Can additionally be combined with <code class="docutils literal notranslate"><span class="pre">--group</span></code>, <code class="docutils literal notranslate"><span class="pre">--group-pattern</span></code>, <code class="docutils literal notranslate"><span class="pre">--version</span></code> or <code class="docutils literal notranslate"><span class="pre">--version-range</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--purl-pattern</span></code> — for <em>purl</em> matching</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--cpe-pattern</span></code> — for <em>cpe</em> matching</p></li>
+</ul>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># All components whose name starts with &quot;web&quot;</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">set</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">name</span><span class="o">-</span><span class="n">pattern</span> <span class="s1">&#39;web.*&#39;</span> <span class="o">--</span><span class="n">key</span> <span class="n">author</span> <span class="o">--</span><span class="n">value</span> <span class="s1">&#39;&quot;Team A&quot;&#39;</span> <span class="o">--</span><span class="n">force</span>
+
+<span class="c1"># Only components in a group matching a regex, filtered by version range</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">set</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">name</span><span class="o">-</span><span class="n">pattern</span> <span class="s1">&#39;web-framework&#39;</span> \
+    <span class="o">--</span><span class="n">group</span><span class="o">-</span><span class="n">pattern</span> <span class="s1">&#39;org\..*&#39;</span> \
+    <span class="o">--</span><span class="n">version</span><span class="o">-</span><span class="nb">range</span> <span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/&lt;</span><span class="mf">3.0.0</span> \
+    <span class="o">--</span><span class="n">key</span> <span class="n">copyright</span> <span class="o">--</span><span class="n">value</span> <span class="s1">&#39;&quot;ACME Inc.&quot;&#39;</span> <span class="o">--</span><span class="n">force</span>
+</pre></div>
+</div>
+<p><strong>When using ``--from-file``</strong>, regex can be specified in either of these forms:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;namePattern&quot;</span><span class="p">:</span> <span class="s2">&quot;web-.*&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;Team A&quot;</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;web-.*&quot;</span><span class="p">}},</span>
+    <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;Team A&quot;</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For <em>name</em> regex, you can add <em>group</em> and <em>version</em>/<em>version-range</em> companions to narrow the results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;web-.*&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;org</span><span class="se">\\</span><span class="s2">..*&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;version-range&quot;</span><span class="p">:</span> <span class="s2">&quot;vers:generic/&lt;3.0.0&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;ACME Inc.&quot;</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A literal (non-regex) value can be used for <em>group</em>, <em>version</em>, or <em>version-range</em> alongside a regex <em>name</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;namePattern&quot;</span><span class="p">:</span> <span class="s2">&quot;web-.*&quot;</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;2.1.0&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;ACME Inc.&quot;</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Regex evaluation uses full-match semantics—anchors (<code class="docutils literal notranslate"><span class="pre">^</span></code> and <code class="docutils literal notranslate"><span class="pre">$</span></code>) are not required. Traversal includes all components, including <code class="docutils literal notranslate"><span class="pre">metadata.component</span></code> when present.</p>
 <p>If the target component isn’t found in the SBOM, the program aborts with an error by default. This error can be downgraded to a warning using the <code class="docutils literal notranslate"><span class="pre">--ignore-missing</span></code> flag.</p>
+</section>
 </section>
 <section id="protected-fields">
 <h2>Protected fields<a class="headerlink" href="#protected-fields" title="Link to this heading"></a></h2>
@@ -268,16 +342,19 @@ cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span
     <span class="p">{</span>
         <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="c1"># Could be any one of the identifying properties in CycloneDX.</span>
-            <span class="c1"># Multiple identifiers are not allowed (with the special exception of name,</span>
-            <span class="c1"># group and version/version-range which are only valid together)</span>
+            <span class="c1"># Multiple identifiers are not allowed (except name, group, and version/version-range,</span>
+            <span class="c1"># which are only valid together).</span>
             <span class="s2">&quot;cpe&quot;</span><span class="p">:</span> <span class="s2">&quot;CPE of target component goes here&quot;</span>
+            <span class="c1"># For regex matching, use namePattern, purl-pattern, or cpePattern,</span>
+            <span class="c1"># or the longer form: {&quot;name&quot;: {&quot;regex&quot;: &quot;...&quot;}}, {&quot;purl&quot;: {&quot;regex&quot;: &quot;...&quot;}}</span>
+            <span class="c1"># See &quot;Target components&quot; section above for complete regex details.</span>
         <span class="p">},</span>
         <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="c1"># Sets a simple property</span>
             <span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;2022 Acme Inc&quot;</span><span class="p">,</span>
             <span class="c1"># Deletes a property</span>
             <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
-            <span class="c1"># Sets an array array-valued property. If the property already exists on the target,</span>
+            <span class="c1"># Sets an array-valued property. If the property already exists on the target,</span>
             <span class="c1"># the new value will be appended to the existing one.</span>
             <span class="s2">&quot;licenses&quot;</span><span class="p">:</span> <span class="p">[</span>
                 <span class="p">{</span>

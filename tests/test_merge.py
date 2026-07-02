@@ -2345,8 +2345,8 @@ class TestMergeComponents(unittest.TestCase):
         self.assertEqual(_find_component(merged, "G/root/mid/leaf")["name"], "leaf")
         _assert_no_dangling_refs(merged)
 
-    def test_hierarchical_leaves_non_path_style_refs_unchanged(self) -> None:
-        """Non-path-like refs get last segment extracted and prepended with parent/."""
+    def test_hierarchical_rebases_non_path_style_refs(self) -> None:
+        """Non-path-like refs (PURLs, UUIDs) get full ref prepended with parent/."""
         governing = _build_sbom([_build_component("G", "G")])
         incoming = _build_sbom(
             [
@@ -2365,8 +2365,8 @@ class TestMergeComponents(unittest.TestCase):
             [copy.deepcopy(governing), copy.deepcopy(incoming)], hierarchical=True
         )
 
-        # Last segment extraction: "pkg:npm/foo@1.0" -> "foo@1.0", "uuid..." -> "uuid..."
-        self.assertEqual(_find_component(merged, "G/foo@1.0")["name"], "pkg-child")
+        # Full ref prepending: "pkg:npm/foo@1.0" -> "G/pkg:npm/foo@1.0", "uuid..." -> "G/uuid..."
+        self.assertEqual(_find_component(merged, "G/pkg:npm/foo@1.0")["name"], "pkg-child")
         self.assertEqual(
             _find_component(merged, "G/3f2a9c2b-4d5e-4f6a-8b7c-123456789abc")["name"],
             "uuid-child",
@@ -2398,8 +2398,8 @@ class TestMergeComponents(unittest.TestCase):
 
         self.assertEqual(_find_component(merged, "G/root")["name"], "root")
         self.assertEqual(_find_component(merged, "G/root/leaf")["name"], "leaf")
-        # Package ref with "/" -> last segment extracted: "pkg:npm/foo@1.0" -> "foo@1.0"
-        self.assertEqual(_find_component(merged, "G/foo@1.0")["name"], "pkg-child")
+        # Non-hierarchical refs with "/" preserve their full identity when rebased.
+        self.assertEqual(_find_component(merged, "G/pkg:npm/foo@1.0")["name"], "pkg-child")
 
     def test_hierarchical_rebases_even_with_broken_path_patterns(self) -> None:
         """With simplification, rebasing continues even with path pattern breaks."""
@@ -2444,9 +2444,12 @@ class TestMergeComponents(unittest.TestCase):
         # Even though "frobnicate/leaf" breaks the parent pattern, it still gets rebased.
         self.assertEqual(_find_component(merged, "G/compA")["name"], "compA")
         self.assertEqual(_find_component(merged, "G/compA/sub")["name"], "sub")
-        self.assertEqual(_find_component(merged, "G/compA/sub/leaf")["name"], "leaf")
         self.assertEqual(
-            _find_component(merged, "G/compA/sub/leaf/deeper")["name"],
+            _find_component(merged, "G/compA/sub/frobnicate/leaf")["name"],
+            "leaf",
+        )
+        self.assertEqual(
+            _find_component(merged, "G/compA/sub/frobnicate/leaf/deeper")["name"],
             "deep",
         )
         _assert_no_dangling_refs(merged)

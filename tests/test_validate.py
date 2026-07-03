@@ -1381,6 +1381,20 @@ class TestValidateFilename(unittest.TestCase):
         self.assertIn("Error:", result)
         self.assertIn("20220217T101458", result)
 
+    def test_custom_schema_no_hash_extra_token_has_specific_hint(self) -> None:
+        self.sbom["metadata"]["component"].pop("hashes", None)
+
+        result = validate_filename(
+            "Acme_Application_9.1.1_garbage_20220217T101458.cdx.json",
+            "",
+            self.sbom,
+            "custom",
+        )
+
+        self.assertIsInstance(result, str)
+        self.assertIn("Error:", result)
+        self.assertIn("timestamp mismatch", result)
+
     def test_invalid_regex_raises_apperror(self) -> None:
         for regex in ["(unterminated", "[", "*invalid"]:
             with self.subTest(regex=regex):

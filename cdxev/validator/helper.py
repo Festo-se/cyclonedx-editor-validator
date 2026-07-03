@@ -17,6 +17,22 @@ from cdxev.error import AppError
 logger = logging.getLogger(__name__)
 
 
+def _append_timestamp_mismatch_hint(hints: list[str], expected_timestamp: t.Optional[str]) -> None:
+    if expected_timestamp is not None:
+        hints.append(
+            "timestamp mismatch: "
+            f"expected '{expected_timestamp}' (derived from metadata.timestamp, UTC)"
+        )
+    else:
+        hints.append("timestamp mismatch: expected format YYYYMMDDTHHMMSS")
+
+
+def _ensure_fallback_hint(hints: list[str]) -> list[str]:
+    if not hints:
+        hints.append("filename does not match the expected pattern")
+    return hints
+
+
 def _custom_filename_mismatch_hints(filename: str, sbom: dict) -> list[str]:
     hints: list[str] = []
 
@@ -72,15 +88,8 @@ def _custom_filename_mismatch_hints(filename: str, sbom: dict) -> list[str]:
 
     if not expected_hashes:
         if len(suffix) != 1 or not _is_timestamp_match(suffix[0]):
-            if len(suffix) >= 1 and not _is_timestamp_match(suffix[-1]):
-                if expected_timestamp is not None:
-                    hints.append(
-                        "timestamp mismatch: "
-                        f"expected '{expected_timestamp}' (derived from metadata.timestamp, UTC)"
-                    )
-                else:
-                    hints.append("timestamp mismatch: expected format YYYYMMDDTHHMMSS")
-        return hints
+            _append_timestamp_mismatch_hint(hints, expected_timestamp)
+        return _ensure_fallback_hint(hints)
 
     if len(suffix) == 1:
         token = suffix[0]
@@ -97,15 +106,9 @@ def _custom_filename_mismatch_hints(filename: str, sbom: dict) -> list[str]:
         hints.append(f"hash mismatch: expected one of {', '.join(expected_hashes)}")
 
     if not _is_timestamp_match(timestamp_token):
-        if expected_timestamp is not None:
-            hints.append(
-                "timestamp mismatch: "
-                f"expected '{expected_timestamp}' (derived from metadata.timestamp, UTC)"
-            )
-        else:
-            hints.append("timestamp mismatch: expected format YYYYMMDDTHHMMSS")
+        _append_timestamp_mismatch_hint(hints, expected_timestamp)
 
-    return hints
+    return _ensure_fallback_hint(hints)
 
 
 def _sanitize_expected_filename_part(value: str, default_if_empty: str) -> str:
@@ -232,11 +235,10 @@ def validate_filename(
             hints = _custom_filename_mismatch_hints(filename, sbom)
             hints_msg = ""
             if hints:
-                hints_msg = " Error: " + "; ".join(hints) + "."
+                hints_msg = "Error: " + "; ".join(hints) + "."
             return (
                 "filename doesn't match expected SBOM filenames. "
-                f"Allowed filenames for this SBOM: {variants_msg}. "
-                f"{hints_msg}"
+                f"Allowed filenames for this SBOM: {variants_msg}. " + hints_msg
             )
         return "filename doesn't match regular expression " + regex
     else:

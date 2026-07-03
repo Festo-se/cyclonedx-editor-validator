@@ -1321,6 +1321,66 @@ class TestValidateFilename(unittest.TestCase):
                 result = validate_filename(filename, "", self.sbom, "custom")
                 self.assertIsInstance(result, str)
 
+    def test_invalid_with_custom_schema_shows_allowed_filenames(self) -> None:
+        result = validate_filename("wrong_name.cdx.json", "", self.sbom, "custom")
+
+        self.assertIsInstance(result, str)
+        self.assertIn("Allowed filenames for this SBOM:", result)
+        self.assertIn("bom.json", result)
+        self.assertIn("Acme_Application_9.1.1_20220217T101458.cdx.json", result)
+
+    def test_custom_schema_name_mismatch_hint(self) -> None:
+        result = validate_filename(
+            "Wrong_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json",
+            "",
+            self.sbom,
+            "custom",
+        )
+
+        self.assertIsInstance(result, str)
+        self.assertIn("name mismatch", result)
+        self.assertIn("Error:", result)
+        self.assertNotIn("timestamp mismatch", result)
+
+    def test_custom_schema_version_mismatch_hint(self) -> None:
+        result = validate_filename(
+            "Acme_Application_9.1.2_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json",
+            "",
+            self.sbom,
+            "custom",
+        )
+
+        self.assertIsInstance(result, str)
+        self.assertIn("version mismatch", result)
+        self.assertIn("Error:", result)
+        self.assertNotIn("timestamp mismatch", result)
+
+    def test_custom_schema_hash_mismatch_hint(self) -> None:
+        result = validate_filename(
+            "Acme_Application_9.1.1_badbadbad_20220217T101458.cdx.json",
+            "",
+            self.sbom,
+            "custom",
+        )
+
+        self.assertIsInstance(result, str)
+        self.assertIn("hash mismatch", result)
+        self.assertIn("Error:", result)
+        self.assertNotIn("timestamp mismatch", result)
+
+    def test_custom_schema_timestamp_mismatch_hint(self) -> None:
+        result = validate_filename(
+            "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101459.cdx.json",
+            "",
+            self.sbom,
+            "custom",
+        )
+
+        self.assertIsInstance(result, str)
+        self.assertIn("timestamp mismatch", result)
+        self.assertIn("Error:", result)
+        self.assertIn("20220217T101458", result)
+
     def test_invalid_regex_raises_apperror(self) -> None:
         for regex in ["(unterminated", "[", "*invalid"]:
             with self.subTest(regex=regex):

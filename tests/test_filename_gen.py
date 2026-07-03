@@ -163,3 +163,20 @@ class FilenameGeneratorTestCase(unittest.TestCase):
 
         pattern = fn.generate_validation_pattern(self.sbom)
         self.assertIsNone(re.fullmatch(pattern, filename))
+
+    def test_generate_allowed_filename_variants(self):
+        variants, timestamp = fn.generate_allowed_filename_variants(self.sbom)
+
+        self.assertEqual("20000101T123045", timestamp)
+        self.assertIn("bom.json", variants)
+        self.assertIn("Test_1.0_20000101T123045.cdx.json", variants)
+        self.assertIn("Test_1.0_abcdefg.cdx.json", variants)
+        self.assertIn("Test_1.0_abcdefg_20000101T123045.cdx.json", variants)
+
+    def test_generate_allowed_filename_variants_without_parsable_timestamp(self):
+        self.sbom["metadata"]["timestamp"] = "foo"
+
+        variants, timestamp = fn.generate_allowed_filename_variants(self.sbom)
+
+        self.assertEqual("[YYYYMMDDTHHMMSS]", timestamp)
+        self.assertIn("Test_1.0_[YYYYMMDDTHHMMSS].cdx.json", variants)

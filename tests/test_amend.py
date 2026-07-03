@@ -75,6 +75,12 @@ class CompositionsTestCase(AmendTestCase):
             self.sbom_fixture["metadata"]["component"]["bom-ref"]
             in self.sbom_fixture["compositions"][0]["assemblies"]
         )
+        self.assertEqual(
+            self.sbom_fixture["compositions"][0]["assemblies"].count(
+                self.sbom_fixture["metadata"]["component"]["bom-ref"]
+            ),
+            1,
+        )
 
     def test_meta_component_missing(self) -> None:
         del self.sbom_fixture["metadata"]["component"]
@@ -101,6 +107,27 @@ class CompositionsTestCase(AmendTestCase):
             self.sbom_fixture["compositions"][0]["assemblies"],
             ["com.company.unit/depA@4.0.2", "some-vendor/depB@1.2.3", "depC@3.2.1"],
         )
+
+    def test_duplicate_component_bom_refs_are_unique_in_assemblies(self) -> None:
+        self.operation.prepare(self.sbom_fixture)
+        duplicate_ref = "dup-ref"
+        self.operation.handle_component({"bom-ref": duplicate_ref})
+        self.operation.handle_component({"bom-ref": duplicate_ref})
+
+        self.assertEqual(
+            self.sbom_fixture["compositions"][0]["assemblies"],
+            [duplicate_ref],
+        )
+
+    def test_run_amend_keeps_assemblies_unique_when_metadata_ref_repeats(self) -> None:
+        repeated_ref = self.sbom_fixture["metadata"]["component"]["bom-ref"]
+        self.sbom_fixture["compositions"][2]["aggregate"] = "unknown"
+        self.sbom_fixture["components"].append({"bom-ref": repeated_ref})
+
+        run_amend(self.sbom_fixture, selected=[Compositions])
+
+        assemblies = self.sbom_fixture["compositions"][0]["assemblies"]
+        self.assertEqual(assemblies.count(repeated_ref), 1)
 
 
 class DefaultAuthorTestCase(AmendTestCase):

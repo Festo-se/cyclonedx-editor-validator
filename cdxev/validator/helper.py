@@ -87,8 +87,14 @@ def _custom_filename_mismatch_hints(filename: str, sbom: dict) -> list[str]:
         return bool(timestamp_regex.fullmatch(value))
 
     if not expected_hashes:
-        if len(suffix) != 1 or not _is_timestamp_match(suffix[0]):
-            _append_timestamp_mismatch_hint(hints, expected_timestamp)
+        if len(suffix) == 1 and _is_timestamp_match(suffix[0]):
+            return hints
+
+        if len(suffix) > 1 and _is_timestamp_match(suffix[-1]):
+            hints.append("unexpected filename segment: no hash is expected for this SBOM")
+            return _ensure_fallback_hint(hints)
+
+        _append_timestamp_mismatch_hint(hints, expected_timestamp)
         return _ensure_fallback_hint(hints)
 
     if len(suffix) == 1:

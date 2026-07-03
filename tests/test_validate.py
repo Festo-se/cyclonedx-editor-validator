@@ -1383,6 +1383,7 @@ class TestValidateFilename(unittest.TestCase):
 
     def test_custom_schema_no_hash_extra_token_has_specific_hint(self) -> None:
         self.sbom["metadata"]["component"].pop("hashes", None)
+        self.sbom["metadata"].pop("timestamp", None)
 
         result = validate_filename(
             "Acme_Application_9.1.1_garbage_20220217T101458.cdx.json",
@@ -1393,7 +1394,7 @@ class TestValidateFilename(unittest.TestCase):
 
         self.assertIsInstance(result, str)
         self.assertIn("Error:", result)
-        self.assertIn("timestamp mismatch", result)
+        self.assertIn("unexpected filename segment: no hash is expected for this SBOM", result)
 
     def test_invalid_regex_raises_apperror(self) -> None:
         for regex in ["(unterminated", "[", "*invalid"]:

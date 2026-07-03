@@ -10,6 +10,8 @@ from dateutil.parser import isoparse
 
 logger = logging.getLogger(__name__)
 
+_TIMESTAMP_PLACEHOLDER = "[YYYYMMDDTHHMMSS]"
+
 
 def generate_filename(sbom: dict) -> str:
     """
@@ -127,9 +129,9 @@ def generate_allowed_filename_variants(sbom: dict) -> t.Tuple[t.List[str], str]:
         try:
             timestamp_token = _timestamp_to_utc_str(isoparse(timestamp))
         except (TypeError, ValueError):
-            timestamp_token = "[YYYYMMDDTHHMMSS]"
+            timestamp_token = _TIMESTAMP_PLACEHOLDER
     else:
-        timestamp_token = "[YYYYMMDDTHHMMSS]"
+        timestamp_token = _TIMESTAMP_PLACEHOLDER
 
     hashes = [
         h.get("content")

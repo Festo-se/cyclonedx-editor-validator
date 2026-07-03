@@ -8,6 +8,7 @@ from importlib import resources
 from pathlib import Path
 
 from cdxev.auxiliary.filename_gen import (
+    _TIMESTAMP_PLACEHOLDER,
     generate_allowed_filename_variants,
     generate_validation_pattern,
 )
@@ -32,14 +33,14 @@ def _custom_filename_mismatch_hints(filename: str, sbom: dict) -> list[str]:
     expected_version = _sanitize_expected_filename_part(expected_version, default_if_empty="")
 
     expected_hashes = [
-        h.get("content")
+        str(h.get("content"))
         for h in metadata_component.get("hashes", [])
         if isinstance(h, dict) and h.get("content")
     ]
 
     _, expected_timestamp_token = generate_allowed_filename_variants(sbom)
     expected_timestamp: t.Optional[str]
-    if expected_timestamp_token == "[YYYYMMDDTHHMMSS]":
+    if expected_timestamp_token == _TIMESTAMP_PLACEHOLDER:
         expected_timestamp = None
     else:
         expected_timestamp = expected_timestamp_token
@@ -86,20 +87,14 @@ def _custom_filename_mismatch_hints(filename: str, sbom: dict) -> list[str]:
         if _is_timestamp_match(token):
             return hints
         if token not in expected_hashes:
-            hints.append(
-                "hash mismatch: "
-                f"expected one of {', '.join(expected_hashes)}"
-            )
+            hints.append(f"hash mismatch: expected one of {', '.join(expected_hashes)}")
         return hints
 
     hash_token = suffix[0]
     timestamp_token = suffix[1]
 
     if hash_token not in expected_hashes:
-        hints.append(
-            "hash mismatch: "
-            f"expected one of {', '.join(expected_hashes)}"
-        )
+        hints.append(f"hash mismatch: expected one of {', '.join(expected_hashes)}")
 
     if not _is_timestamp_match(timestamp_token):
         if expected_timestamp is not None:

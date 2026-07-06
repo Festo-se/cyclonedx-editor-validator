@@ -184,7 +184,7 @@ class Compositions(Operation):
                 if comp["aggregate"] == self.__metacomp_aggregate
             )
             assemblies = composition.setdefault("assemblies", [])
-            assemblies.append(metacomp)
+            self.__append_unique_assembly(assemblies, metacomp)
         except StopIteration:
             composition = {
                 "aggregate": self.__metacomp_aggregate,
@@ -200,7 +200,12 @@ class Compositions(Operation):
 
     def __add_to_assemblies(self, bom_ref: str) -> None:
         logger.debug("Added %s to compositions.", bom_ref)
-        self.__unknown_assemblies.append(bom_ref)
+        self.__append_unique_assembly(self.__unknown_assemblies, bom_ref)
+
+    @staticmethod
+    def __append_unique_assembly(assemblies: list, bom_ref: str) -> None:
+        if bom_ref not in assemblies:
+            assemblies.append(bom_ref)
 
 
 @default

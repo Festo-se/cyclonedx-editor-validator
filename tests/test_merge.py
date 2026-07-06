@@ -3,8 +3,10 @@
 import copy
 import json
 import unittest
+from collections import Counter
 from itertools import chain, combinations
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 from cdxev import merge
@@ -61,6 +63,24 @@ def _build_sbom(
     if vulnerabilities is not None:
         sbom["vulnerabilities"] = vulnerabilities
     return sbom
+
+
+def _collect_all_refs(sbom: dict) -> list[str]:
+    def _recurse(d: Any) -> list[str]:
+        result = []
+        match d:
+            case dict():
+                for k, v in d.items():
+                    if k == "bom-ref":
+                        result.append(v)
+                    else:
+                        result.extend(_recurse(v))
+            case list():
+                for v in d:
+                    result.extend(_recurse(v))
+        return result
+
+    return _recurse(sbom)
 
 
 def _collect_component_refs(sbom: dict) -> set[str]:
@@ -2280,6 +2300,38 @@ class TestMergeComponents(unittest.TestCase):
         expected_components = helper.load_sections_for_test_sbom()["hierarchical_expected"]
 
         self.assertEqual(merged_components, expected_components)
+
+    def test_merge_deduplicated_bomrefs(self) -> None:
+        sbom_1 = helper.load_dict_from_json("duplicate_bomrefs_variant_1.json")
+        sbom_2 = helper.load_dict_from_json("duplicate_bomrefs_variant_2.json")
+
+        merged = merge.merge((sbom_1, sbom_2), hierarchical=False)
+        refs_merged = _collect_all_refs(merged)
+
+        # Find duplicate bom-refs in merge result
+        counter = Counter(refs_merged)
+        duplicates = [ref for ref, count in counter.items() if count > 1]
+
+        self.assertEqual(
+            [],
+            duplicates,
+        )
+
+    def test_merge_hierarchical_deduplicated_bomrefs(self) -> None:
+        sbom_1 = helper.load_dict_from_json("duplicate_bomrefs_variant_1.json")
+        sbom_2 = helper.load_dict_from_json("duplicate_bomrefs_variant_2.json")
+
+        merged = merge.merge((sbom_1, sbom_2), hierarchical=True)
+        refs_merged = _collect_all_refs(merged)
+
+        # Find duplicate bom-refs in merge result
+        counter = Counter(refs_merged)
+        duplicates = [ref for ref, count in counter.items() if count > 1]
+
+        self.assertEqual(
+            [],
+            duplicates,
+        )
 
     def test_hierarchical_single_level_preserves_refs_and_updates_links(self) -> None:
         governing = _build_sbom(

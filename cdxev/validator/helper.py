@@ -7,10 +7,120 @@ import typing as t
 from importlib import resources
 from pathlib import Path
 
-from cdxev.auxiliary.filename_gen import generate_validation_pattern
+from cdxev.auxiliary.filename_gen import (
+    _TIMESTAMP_PLACEHOLDER,
+    generate_allowed_filename_variants,
+    generate_validation_pattern,
+)
 from cdxev.error import AppError
 
 logger = logging.getLogger(__name__)
+
+
+def _append_timestamp_mismatch_hint(hints: list[str], expected_timestamp: t.Optional[str]) -> None:
+    if expected_timestamp is not None:
+        hints.append(
+            "timestamp mismatch: "
+            f"expected '{expected_timestamp}' (derived from metadata.timestamp, UTC)"
+        )
+    else:
+        hints.append("timestamp mismatch: expected format YYYYMMDDTHHMMSS")
+
+
+def _ensure_fallback_hint(hints: list[str]) -> list[str]:
+    if not hints:
+        hints.append("filename does not match the expected pattern")
+    return hints
+
+
+def _custom_filename_mismatch_hints(filename: str, sbom: dict) -> list[str]:
+    hints: list[str] = []
+
+    if not filename.endswith(".cdx.json"):
+        return hints
+
+    basename = filename[: -len(".cdx.json")]
+    metadata_component = sbom.get("metadata", {}).get("component", {})
+
+    expected_name = metadata_component.get("name", "unknown")
+    expected_name = _sanitize_expected_filename_part(expected_name, default_if_empty="unknown")
+
+    expected_version = metadata_component.get("version", "")
+    expected_version = _sanitize_expected_filename_part(expected_version, default_if_empty="")
+
+    expected_hashes = [
+        str(h.get("content"))
+        for h in metadata_component.get("hashes", [])
+        if isinstance(h, dict) and h.get("content")
+    ]
+
+    _, expected_timestamp_token = generate_allowed_filename_variants(sbom)
+    expected_timestamp: t.Optional[str]
+    if expected_timestamp_token == _TIMESTAMP_PLACEHOLDER:
+        expected_timestamp = None
+    else:
+        expected_timestamp = expected_timestamp_token
+
+    name_prefix = f"{expected_name}_"
+    if not basename.startswith(name_prefix):
+        hints.append(f"name mismatch: expected '{expected_name}'")
+        return hints
+
+    remainder = basename[len(name_prefix) :]
+
+    if expected_version:
+        version_prefix = f"{expected_version}_"
+        if not remainder.startswith(version_prefix):
+            hints.append(f"version mismatch: expected '{expected_version}'")
+            return hints
+        remainder = remainder[len(version_prefix) :]
+
+    if not remainder:
+        return hints
+
+    suffix = remainder.split("_")
+    timestamp_regex = re.compile(r"^[0-9]{8}T[0-9]{6}$")
+
+    def _is_timestamp_match(value: str) -> bool:
+        if expected_timestamp is not None:
+            return value == expected_timestamp
+        return bool(timestamp_regex.fullmatch(value))
+
+    if not expected_hashes:
+        if len(suffix) == 1 and _is_timestamp_match(suffix[0]):
+            return hints
+
+        if len(suffix) > 1 and _is_timestamp_match(suffix[-1]):
+            hints.append("unexpected filename segment: no hash is expected for this SBOM")
+            return _ensure_fallback_hint(hints)
+
+        _append_timestamp_mismatch_hint(hints, expected_timestamp)
+        return _ensure_fallback_hint(hints)
+
+    if len(suffix) == 1:
+        token = suffix[0]
+        if _is_timestamp_match(token):
+            return hints
+        if token not in expected_hashes:
+            hints.append(f"hash mismatch: expected one of {', '.join(expected_hashes)}")
+        return hints
+
+    hash_token = suffix[0]
+    timestamp_token = suffix[1]
+
+    if hash_token not in expected_hashes:
+        hints.append(f"hash mismatch: expected one of {', '.join(expected_hashes)}")
+
+    if not _is_timestamp_match(timestamp_token):
+        _append_timestamp_mismatch_hint(hints, expected_timestamp)
+
+    return _ensure_fallback_hint(hints)
+
+
+def _sanitize_expected_filename_part(value: str, default_if_empty: str) -> str:
+    value = value or ""
+    value = "".join(c for c in value if (c.isalnum() or c in r" .-_"))
+    return value or default_if_empty
 
 
 def open_schema(
@@ -108,9 +218,11 @@ def validate_filename(
     sbom: dict,
     schema_type: t.Optional[str],
 ) -> t.Union[t.Literal[False], str]:
+    using_default_custom_pattern = False
     if not regex:
         if schema_type == "custom":
             regex = generate_validation_pattern(sbom)
+            using_default_custom_pattern = True
         else:
             regex = "^(bom\\.json|.+\\.cdx\\.json)$"
 
@@ -123,6 +235,17 @@ def validate_filename(
         ) from exc
 
     if not matches:
+        if using_default_custom_pattern:
+            variants, _ = generate_allowed_filename_variants(sbom)
+            variants_msg = ", ".join(variants)
+            hints = _custom_filename_mismatch_hints(filename, sbom)
+            hints_msg = ""
+            if hints:
+                hints_msg = "Error: " + "; ".join(hints) + "."
+            return (
+                "filename doesn't match expected SBOM filenames. "
+                f"Allowed filenames for this SBOM: {variants_msg}. " + hints_msg
+            )
         return "filename doesn't match regular expression " + regex
     else:
         return False

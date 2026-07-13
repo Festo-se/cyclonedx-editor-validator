@@ -10,6 +10,8 @@ from dateutil.parser import isoparse
 
 logger = logging.getLogger(__name__)
 
+_TIMESTAMP_PLACEHOLDER = "[YYYYMMDDTHHMMSS]"
+
 
 def generate_filename(sbom: dict) -> str:
     """
@@ -98,6 +100,52 @@ def generate_validation_pattern(sbom: dict) -> str:
     regex += "\\.cdx\\.json"
 
     return regex
+
+
+def generate_allowed_filename_variants(sbom: dict) -> t.Tuple[t.List[str], str]:
+    """
+    Returns concrete filename variants expected by custom-schema validation.
+
+    :param dict sbom: The SBOM whose filename variants to generate.
+
+    :return: A tuple containing:
+        * a list of allowed filename variants
+        * the expected timestamp token (UTC or placeholder)
+    """
+    variants = ["bom.json"]
+
+    name = sbom.get("metadata", {}).get("component", {}).get("name", "unknown")
+    name = _sanitize(name)
+    version = sbom.get("metadata", {}).get("component", {}).get("version", "")
+    version = _sanitize(version)
+
+    prefix_parts = [name]
+    if version:
+        prefix_parts.append(version)
+    prefix = "_".join(prefix_parts)
+
+    timestamp = sbom.get("metadata", {}).get("timestamp")
+    if timestamp:
+        try:
+            timestamp_token = _timestamp_to_utc_str(isoparse(timestamp))
+        except (TypeError, ValueError):
+            timestamp_token = _TIMESTAMP_PLACEHOLDER
+    else:
+        timestamp_token = _TIMESTAMP_PLACEHOLDER
+
+    hashes = [
+        h.get("content")
+        for h in sbom.get("metadata", {}).get("component", {}).get("hashes", [])
+        if isinstance(h, dict) and h.get("content")
+    ]
+
+    variants.append(f"{prefix}_{timestamp_token}.cdx.json")
+
+    for hash_content in hashes:
+        variants.append(f"{prefix}_{hash_content}.cdx.json")
+        variants.append(f"{prefix}_{hash_content}_{timestamp_token}.cdx.json")
+
+    return variants, timestamp_token
 
 
 def _timestamp_to_utc_str(timestamp: datetime) -> str:

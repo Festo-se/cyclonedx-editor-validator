@@ -14,7 +14,7 @@ from cyclonedx.model.component import Component
 from univers import nuget
 from univers.version_range import VersionRange
 
-from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
+from cdxev.auxiliary.identity import ComponentIdentity, Key, VulnerabilityIdentity
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 
@@ -117,7 +117,7 @@ def compare_components(first_component: dict, second_component: dict) -> bool:
         else:
             return False
     if first_component.get("swid", "") and second_component.get("swid", ""):
-        if first_component.get("swid", "1").lower() == second_component.get("swid", "2").lower():
+        if _swid_equals(first_component.get("swid"), second_component.get("swid")):
             is_equal = True
         else:
             return False
@@ -136,6 +136,18 @@ def compare_components(first_component: dict, second_component: dict) -> bool:
             ):  # use this instead of the first if?
                 is_equal = False
     return is_equal
+
+
+def _swid_equals(first_swid: Any, second_swid: Any) -> bool:
+    """Compare SWID values using identity semantics with a permissive fallback.
+
+    SWID comparison in the identity layer supports mapping and JSON-string forms. For malformed
+    or non-standard values, preserve historic behavior via case-insensitive string comparison.
+    """
+    try:
+        return Key.from_swid(first_swid) == Key.from_swid(second_swid)
+    except (TypeError, ValueError, KeyError, json.JSONDecodeError):
+        return str(first_swid).lower() == str(second_swid).lower()
 
 
 def get_component_by_ref(ref: str, list_of_components: Sequence[dict]) -> dict:

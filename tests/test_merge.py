@@ -2660,6 +2660,65 @@ class TestMergeSimilarComponents(unittest.TestCase):
         # Both components are now value-equal → the duplicate must appear exactly once.
         self.assertEqual(result["components"].count(self.component), 1)
 
+    def test_merge_with_minimal_swid_object_does_not_crash(self) -> None:
+        # Regression: SWID objects may only contain tagId. This must not raise in identity
+        # comparisons during merge.
+        sbom1 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.5",
+            "metadata": {
+                "component": {
+                    "bom-ref": "aaaaaaaa-0000-0000-0000-000000000002",
+                    "type": "container",
+                    "name": "image-a",
+                    "version": "1.0.0",
+                }
+            },
+            "components": [
+                {
+                    "bom-ref": "aaaaaaaa-0000-0000-0000-000000000003",
+                    "type": "operating-system",
+                    "name": "alpine",
+                    "version": "3.23.3",
+                    "swid": {"tagId": "alpine"},
+                }
+            ],
+            "dependencies": [],
+        }
+
+        sbom2 = {
+            "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.5",
+            "metadata": {
+                "component": {
+                    "bom-ref": "bbbbbbbb-0000-0000-0000-000000000002",
+                    "type": "container",
+                    "name": "image-b",
+                    "version": "1.0.0",
+                }
+            },
+            "components": [
+                {
+                    "bom-ref": "bbbbbbbb-0000-0000-0000-000000000003",
+                    "type": "operating-system",
+                    "name": "alpine",
+                    "version": "3.23.3",
+                    "swid": {"tagId": "alpine"},
+                }
+            ],
+            "dependencies": [],
+        }
+
+        result = merge.merge([sbom1, sbom2])
+        alpine_components = [
+            c
+            for c in result.get("components", [])
+            if c.get("type") == "operating-system" and c.get("name") == "alpine"
+        ]
+        self.assertEqual(len(alpine_components), 1)
+
     def test_swid_decisive_when_purl_absent_from_both_different_swid(self) -> None:
         # Without PURL on either component, SWID is decisive.
         # Different SWID → components are different, even when CPE and coordinates match.

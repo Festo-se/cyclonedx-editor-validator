@@ -108,6 +108,26 @@ class IdentityTestCase(unittest.TestCase):
             "SWID[tagId: %s]" % self.sample_swid["tagId"],
         )
 
+    def test_swid_equality_with_missing_name(self) -> None:
+        left = Key.from_swid({"tagId": "alpine"})
+        right = Key.from_swid({"tagId": "alpine"})
+        self.assertEqual(left, right)
+
+    def test_swid_inequality_when_name_present_on_one_side(self) -> None:
+        left = Key.from_swid({"tagId": "alpine"})
+        right = Key.from_swid({"tagId": "alpine", "name": "alpine"})
+        self.assertNotEqual(left, right)
+
+    def test_swid_inequality_when_version_present_on_one_side(self) -> None:
+        left = Key.from_swid({"tagId": "alpine", "name": "alpine"})
+        right = Key.from_swid({"tagId": "alpine", "name": "alpine", "version": "3.23.3"})
+        self.assertNotEqual(left, right)
+
+    def test_swid_inequality_without_tagid(self) -> None:
+        left = Key.from_swid({"name": "alpine"})
+        right = Key.from_swid({"name": "alpine"})
+        self.assertNotEqual(left, right)
+
     def test_cpe_creation(self) -> None:
         key = Key.from_cpe(self.sample_cpe)
 

@@ -5,11 +5,13 @@ import json
 import typing as t
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from cdxev.amend.command import run as run_amend
 from cdxev.amend.operations import (
     AddBomRef,
     AddLicenseText,
+    CleanupSelfReferences,
     Compositions,
     DefaultAuthor,
     DeleteAmbiguousLicenses,
@@ -404,6 +406,28 @@ class AddLicenseTextTestCase(AmendTestCase):
         with self.assertRaises(AppError):
             operation.prepare(self.sbom_fixture)
 
+    def test_find_text_returns_none_for_unknown_license(self):
+        self.assertIsNone(self.operation._find_text("does-not-exist"))
+
+    def test_find_text_raises_if_encoding_cannot_be_detected(self):
+        with patch("cdxev.amend.operations.charset_normalizer.from_path") as mocked:
+            mocked.return_value.best.return_value = None
+            with self.assertRaises(ValueError):
+                self.operation._find_text("license_name")
+
+    def test_handle_metadata_adds_license_text(self):
+        metadata = {
+            "component": {
+                "name": "meta",
+                "licenses": [{"license": {"name": "license_name"}}],
+            }
+        }
+        self.operation.handle_metadata(metadata)
+        self.assertEqual(
+            "The text describing a license.",
+            metadata["component"]["licenses"][0]["license"]["text"]["content"],
+        )
+
 
 class DeleteAmbiguousLicensesTestCase(AmendTestCase):
     def setUp(self):
@@ -485,6 +509,519 @@ class DeleteAmbiguousLicensesTestCase(AmendTestCase):
 
         self.operation.handle_component(self.component)
         self.assertDictEqual(self.component, expected)
+
+    def test_dont_delete_name_with_url(self):
+        self.component["licenses"] = [
+            {"license": {"name": "Some license", "url": "https://example.org/license"}},
+        ]
+        expected = copy.deepcopy(self.component)
+
+        self.operation.handle_component(self.component)
+        self.assertDictEqual(self.component, expected)
+
+    def test_handle_metadata_filters_metadata_component_licenses(self):
+        metadata = {
+            "component": {
+                "licenses": [
+                    {"license": {"name": "Some license"}},
+                    {"license": {"id": "MIT"}},
+                ]
+            }
+        }
+        self.operation.handle_metadata(metadata)
+        self.assertEqual([{"license": {"id": "MIT"}}], metadata["component"]["licenses"])
+
+
+class CleanupSelfReferencesTestCase(AmendTestCase):
+    def setUp(self):
+        super().setUp()
+        self.operation = CleanupSelfReferences()
+
+    def test_remove_duplicate_metadata_component_and_fix_references(self):
+        self.sbom_fixture["metadata"]["component"] = {
+            "type": "application",
+            "name": "test-app",
+            "version": "1.0.0",
+            "purl": "pkg:npm/test-app@1.0.0",
+            "bom-ref": "meta-ref",
+            "licenses": [{"license": {"id": "MIT"}}],
+        }
+        self.sbom_fixture["components"] = [
+            {
+                "type": "application",
+                "name": "test-app",
+                "version": "1.0.0",
+                "purl": "pkg:npm/test-app@1.0.0",
+                "bom-ref": "legacy-ref",
+                "externalReferences": [{"type": "website", "url": "https://example.org"}],
+            },
+            {
+                "type": "library",
+                "name": "depA",
+                "version": "1.0.0",
+                "bom-ref": "dep-a",
+            },
+        ]
+        self.sbom_fixture["dependencies"] = [
+            {"ref": "legacy-ref", "dependsOn": ["dep-a", "legacy-ref", "dep-a"]},
+            {"ref": "meta-ref", "dependsOn": ["legacy-ref", "dangling-ref"]},
+            {"ref": "dep-a", "dependsOn": ["legacy-ref"]},
+            {"ref": "dangling-ref", "dependsOn": ["meta-ref"]},
+        ]
+        self.sbom_fixture["compositions"] = [
+            {
+                "aggregate": "complete",
+                "assemblies": ["legacy-ref", "meta-ref", "legacy-ref", "dangling-ref"],
+            }
+        ]
+        self.sbom_fixture["vulnerabilities"] = [
+            {
+                "id": "CVE-2024-0001",
+                "affects": [
+                    {"ref": "legacy-ref", "versions": [{"version": "1.0.0"}]},
+                    {"ref": "legacy-ref", "versions": [{"version": "2.0.0"}]},
+                    {"ref": "dep-a"},
+                    {"ref": "dangling-ref"},
+                ],
+            }
+        ]
+
+        self.operation.prepare(self.sbom_fixture)
+
+        self.assertFalse(
+            any(
+                component.get("bom-ref") == "legacy-ref"
+                for component in self.sbom_fixture["components"]
+            )
+        )
+        metadata_component = self.sbom_fixture["metadata"]["component"]
+        self.assertEqual("meta-ref", metadata_component["bom-ref"])
+        self.assertEqual("application", metadata_component["type"])
+        self.assertIn(
+            {"type": "website", "url": "https://example.org"},
+            metadata_component["externalReferences"],
+        )
+
+        self.assertEqual(
+            [
+                {"ref": "meta-ref", "dependsOn": ["dep-a", "dangling-ref"]},
+                {"ref": "dep-a", "dependsOn": ["meta-ref"]},
+                {"ref": "dangling-ref", "dependsOn": ["meta-ref"]},
+            ],
+            self.sbom_fixture["dependencies"],
+        )
+        self.assertEqual(
+            [
+                {
+                    "aggregate": "complete",
+                    "assemblies": ["meta-ref", "dangling-ref"],
+                }
+            ],
+            self.sbom_fixture["compositions"],
+        )
+        self.assertEqual(
+            [
+                {
+                    "ref": "meta-ref",
+                    "versions": [{"version": "1.0.0"}, {"version": "2.0.0"}],
+                },
+                {"ref": "dep-a"},
+                {"ref": "dangling-ref"},
+            ],
+            self.sbom_fixture["vulnerabilities"][0]["affects"],
+        )
+
+    def test_keep_component_with_conflicting_strong_identity(self):
+        self.sbom_fixture["metadata"]["component"] = {
+            "type": "application",
+            "name": "test-app",
+            "version": "1.0.0",
+            "purl": "pkg:npm/test-app@1.0.0",
+            "bom-ref": "meta-ref",
+        }
+        conflicting_component = {
+            "type": "application",
+            "name": "test-app",
+            "version": "1.0.0",
+            "purl": "pkg:npm/test-app@2.0.0",
+            "bom-ref": "other-ref",
+        }
+        self.sbom_fixture["components"] = [conflicting_component]
+
+        self.operation.prepare(self.sbom_fixture)
+
+        self.assertEqual([conflicting_component], self.sbom_fixture["components"])
+
+    def test_no_duplicate_component_leaves_sbom_unchanged(self):
+        original = copy.deepcopy(self.sbom_fixture)
+
+        self.operation.prepare(self.sbom_fixture)
+
+        self.assertEqual(original, self.sbom_fixture)
+
+    def test_nested_duplicate_is_removed(self):
+        self.sbom_fixture["metadata"]["component"] = {
+            "type": "application",
+            "name": "root-app",
+            "version": "1.0.0",
+            "purl": "pkg:npm/root-app@1.0.0",
+            "bom-ref": "meta-ref",
+        }
+        self.sbom_fixture["components"] = [
+            {
+                "type": "library",
+                "name": "wrapper",
+                "version": "1.0.0",
+                "bom-ref": "wrapper-ref",
+                "components": [
+                    {
+                        "type": "application",
+                        "name": "root-app",
+                        "version": "1.0.0",
+                        "purl": "pkg:npm/root-app@1.0.0",
+                        "bom-ref": "legacy-ref",
+                        "licenses": [{"license": {"id": "MIT"}}],
+                    }
+                ],
+            }
+        ]
+        self.sbom_fixture["dependencies"] = [
+            {"ref": "wrapper-ref", "dependsOn": ["legacy-ref"]},
+            {"ref": "legacy-ref", "dependsOn": []},
+        ]
+
+        self.operation.prepare(self.sbom_fixture)
+
+        nested = self.sbom_fixture["components"][0]["components"]
+        self.assertEqual([], nested)
+        self.assertEqual(
+            [
+                {"ref": "wrapper-ref", "dependsOn": ["meta-ref"]},
+                {"ref": "meta-ref", "dependsOn": []},
+            ],
+            self.sbom_fixture["dependencies"],
+        )
+        self.assertEqual(
+            [{"license": {"id": "MIT"}}],
+            self.sbom_fixture["metadata"]["component"]["licenses"],
+        )
+
+    def test_missing_metadata_component_noop(self):
+        del self.sbom_fixture["metadata"]["component"]
+        original = copy.deepcopy(self.sbom_fixture)
+
+        self.operation.prepare(self.sbom_fixture)
+
+        self.assertEqual(original, self.sbom_fixture)
+
+    def test_missing_metadata_bom_ref_is_generated_and_used(self):
+        self.sbom_fixture["metadata"]["component"] = {
+            "type": "application",
+            "name": "root-app",
+            "version": "1.0.0",
+            "purl": "pkg:npm/root-app@1.0.0",
+        }
+        self.sbom_fixture["components"] = [
+            {
+                "type": "application",
+                "name": "root-app",
+                "version": "1.0.0",
+                "purl": "pkg:npm/root-app@1.0.0",
+                "bom-ref": "legacy-ref",
+            },
+            {
+                "type": "library",
+                "name": "depA",
+                "version": "1.0.0",
+                "bom-ref": "dep-a",
+            },
+        ]
+        self.sbom_fixture["dependencies"] = [
+            {"ref": "dep-a", "dependsOn": ["legacy-ref"]},
+        ]
+
+        self.operation.prepare(self.sbom_fixture)
+
+        metadata_ref = self.sbom_fixture["metadata"]["component"].get("bom-ref")
+        self.assertIsInstance(metadata_ref, str)
+        self.assertNotEqual("", metadata_ref)
+        self.assertEqual(
+            [{"ref": "dep-a", "dependsOn": [metadata_ref]}],
+            self.sbom_fixture["dependencies"],
+        )
+
+    def test_keeps_non_empty_metadata_scalar_values(self):
+        self.sbom_fixture["metadata"]["component"] = {
+            "type": "application",
+            "name": "root-app",
+            "version": "1.0.0",
+            "purl": "pkg:npm/root-app@1.0.0",
+            "bom-ref": "meta-ref",
+            "publisher": "Preferred Publisher",
+        }
+        self.sbom_fixture["components"] = [
+            {
+                "type": "application",
+                "name": "root-app",
+                "version": "1.0.0",
+                "purl": "pkg:npm/root-app@1.0.0",
+                "bom-ref": "legacy-ref",
+                "publisher": "Legacy Publisher",
+            }
+        ]
+
+        self.operation.prepare(self.sbom_fixture)
+
+        self.assertEqual(
+            "Preferred Publisher",
+            self.sbom_fixture["metadata"]["component"]["publisher"],
+        )
+
+    def test_handles_malformed_dependency_composition_and_vulnerability_sections(self):
+        self.sbom_fixture["metadata"]["component"] = {
+            "type": "application",
+            "name": "root-app",
+            "version": "1.0.0",
+            "purl": "pkg:npm/root-app@1.0.0",
+            "bom-ref": "meta-ref",
+        }
+        self.sbom_fixture["components"] = [
+            {
+                "type": "application",
+                "name": "root-app",
+                "version": "1.0.0",
+                "purl": "pkg:npm/root-app@1.0.0",
+                "bom-ref": "legacy-ref",
+            }
+        ]
+        self.sbom_fixture["dependencies"] = [
+            {"ref": "legacy-ref", "dependsOn": "invalid"},
+            {"ref": "meta-ref", "dependsOn": [1, "legacy-ref", "meta-ref"]},
+            {"ref": 12, "dependsOn": ["legacy-ref"]},
+        ]
+        self.sbom_fixture["compositions"] = [
+            {"aggregate": "unknown", "assemblies": "invalid"},
+            {"aggregate": "incomplete", "assemblies": ["legacy-ref", 3, "meta-ref"]},
+        ]
+        self.sbom_fixture["vulnerabilities"] = [
+            {
+                "id": "CVE-2024-0002",
+                "affects": "invalid",
+            },
+            {
+                "id": "CVE-2024-0003",
+                "affects": [
+                    {"ref": "legacy-ref", "versions": [{"version": "1.0.0"}]},
+                    {"ref": "legacy-ref", "versions": [{"version": "2.0.0"}]},
+                    {"ref": "unknown"},
+                    {"ref": 123},
+                ],
+            },
+        ]
+
+        self.operation.prepare(self.sbom_fixture)
+
+        self.assertEqual(
+            [
+                {"ref": "meta-ref", "dependsOn": "invalid"},
+                {"ref": "meta-ref", "dependsOn": [1]},
+                {"ref": 12, "dependsOn": ["meta-ref"]},
+            ],
+            self.sbom_fixture["dependencies"],
+        )
+        self.assertEqual(
+            "invalid",
+            self.sbom_fixture["compositions"][0]["assemblies"],
+        )
+        self.assertEqual(
+            ["meta-ref", 3],
+            self.sbom_fixture["compositions"][1]["assemblies"],
+        )
+        self.assertEqual(
+            [
+                {
+                    "ref": "meta-ref",
+                    "versions": [{"version": "1.0.0"}, {"version": "2.0.0"}],
+                },
+                {"ref": "unknown"},
+                {"ref": 123},
+            ],
+            self.sbom_fixture["vulnerabilities"][1]["affects"],
+        )
+
+    def test_preserve_orphaned_and_invalid_refs(self):
+        self.sbom_fixture["metadata"]["component"] = {
+            "type": "application",
+            "name": "root-app",
+            "version": "1.0.0",
+            "purl": "pkg:npm/root-app@1.0.0",
+            "bom-ref": "meta-ref",
+        }
+        self.sbom_fixture["components"] = [
+            {
+                "type": "application",
+                "name": "root-app",
+                "version": "1.0.0",
+                "purl": "pkg:npm/root-app@1.0.0",
+                "bom-ref": "legacy-ref",
+            },
+            {
+                "type": "library",
+                "name": "depA",
+                "version": "1.0.0",
+                "bom-ref": "dep-a",
+            },
+        ]
+        self.sbom_fixture["dependencies"] = [
+            {"ref": "legacy-ref", "dependsOn": ["legacy-ref", "dep-a", "orphan-ref"]},
+            {"ref": "dep-a", "dependsOn": ["legacy-ref", "orphan-ref"]},
+            {"ref": "orphan-ref", "dependsOn": ["legacy-ref"]},
+            {"ref": 7, "dependsOn": ["legacy-ref"]},
+        ]
+        self.sbom_fixture["compositions"] = [
+            {"aggregate": "complete", "assemblies": ["legacy-ref", "orphan-ref"]}
+        ]
+        self.sbom_fixture["vulnerabilities"] = [
+            {
+                "id": "CVE-2024-1234",
+                "affects": [{"ref": "legacy-ref"}, {"ref": "orphan-ref"}, {"ref": 12}],
+            }
+        ]
+
+        self.operation.prepare(self.sbom_fixture)
+
+        self.assertEqual(
+            [
+                {"ref": "meta-ref", "dependsOn": ["dep-a", "orphan-ref"]},
+                {"ref": "dep-a", "dependsOn": ["meta-ref", "orphan-ref"]},
+                {"ref": "orphan-ref", "dependsOn": ["meta-ref"]},
+                {"ref": 7, "dependsOn": ["meta-ref"]},
+            ],
+            self.sbom_fixture["dependencies"],
+        )
+        self.assertEqual(
+            [{"aggregate": "complete", "assemblies": ["meta-ref", "orphan-ref"]}],
+            self.sbom_fixture["compositions"],
+        )
+        self.assertEqual(
+            [
+                {
+                    "id": "CVE-2024-1234",
+                    "affects": [{"ref": "meta-ref"}, {"ref": "orphan-ref"}, {"ref": 12}],
+                }
+            ],
+            self.sbom_fixture["vulnerabilities"],
+        )
+
+    def test_private_helpers_cover_edge_branches(self):
+        op = self.operation
+
+        self.assertEqual("x", op._normalize_value(" X "))
+        self.assertEqual('{"a": 1}', op._normalize_value({"a": 1}))
+        self.assertEqual([1], op._normalize_value([1]))
+
+        self.assertTrue(op._is_empty(None))
+        self.assertTrue(op._is_empty([]))
+        self.assertFalse(op._is_empty(0))
+        self.assertEqual("7", op._item_key(7))
+
+        self.assertFalse(op._is_duplicate_of_metadata({}, {}))
+
+        target = {"nested": {"x": ""}, "arr": [{"k": 1}], "publisher": "", "keep": "yes"}
+        source = {
+            "nested": {"x": "v"},
+            "arr": [{"k": 1}, {"k": 2}],
+            "publisher": "pub",
+            "keep": "no",
+        }
+        op._merge_component_data(target, source)
+        self.assertEqual("v", target["nested"]["x"])
+        self.assertEqual([{"k": 1}, {"k": 2}], target["arr"])
+        self.assertEqual("pub", target["publisher"])
+        self.assertEqual("yes", target["keep"])
+
+    def test_replace_helpers_short_circuit_and_targeted_cleanup(self):
+        op = self.operation
+
+        sbom_dependencies: dict[str, t.Any] = {"dependencies": []}
+        op._replace_ref_in_dependencies(sbom_dependencies, "same", "same")
+        self.assertEqual([], sbom_dependencies["dependencies"])
+
+        sbom_dependencies = {
+            "dependencies": [
+                {"ref": "a", "dependsOn": ["legacy", "legacy", "b"]},
+            ]
+        }
+        op._replace_ref_in_dependencies(sbom_dependencies, "legacy", "meta")
+        self.assertEqual(
+            [{"ref": "a", "dependsOn": ["meta", "b"]}],
+            sbom_dependencies["dependencies"],
+        )
+
+        sbom_dependencies = {"dependencies": {"ref": "x"}}
+        op._replace_ref_in_dependencies(sbom_dependencies, "legacy", "meta")
+        self.assertEqual({"ref": "x"}, sbom_dependencies["dependencies"])
+
+        sbom_compositions: dict[str, t.Any] = {"compositions": []}
+        op._replace_ref_in_compositions(sbom_compositions, "same", "same")
+        self.assertEqual([], sbom_compositions["compositions"])
+
+        sbom_compositions = {"compositions": {"assemblies": ["legacy"]}}
+        op._replace_ref_in_compositions(sbom_compositions, "legacy", "meta")
+        self.assertEqual({"assemblies": ["legacy"]}, sbom_compositions["compositions"])
+
+        sbom_vuln: dict[str, t.Any] = {"vulnerabilities": []}
+        op._replace_ref_in_vulnerabilities(sbom_vuln, "same", "same")
+        self.assertEqual([], sbom_vuln["vulnerabilities"])
+
+        sbom_vuln = {
+            "vulnerabilities": [
+                {"affects": [{"ref": "other"}]},
+                {"affects": "invalid"},
+            ]
+        }
+        op._replace_ref_in_vulnerabilities(sbom_vuln, "legacy", "meta")
+        self.assertEqual(
+            [{"affects": [{"ref": "other"}]}, {"affects": "invalid"}],
+            sbom_vuln["vulnerabilities"],
+        )
+
+    def test_merge_helpers_branch_coverage(self):
+        op = self.operation
+
+        affects: list[t.Any] = [
+            {"ref": "meta"},
+            {"ref": "meta", "versions": [{"version": "1.0.0"}]},
+            {"ref": "other"},
+        ]
+        op._merge_affects_for_ref(affects, "meta")
+        self.assertEqual(
+            [
+                {"ref": "meta", "versions": [{"version": "1.0.0"}]},
+                {"ref": "other"},
+            ],
+            affects,
+        )
+
+        sbom: dict[str, t.Any] = {"dependencies": {"ref": "x"}}
+        op._merge_dependencies_for_ref(sbom, "x")
+        self.assertEqual({"ref": "x"}, sbom["dependencies"])
+
+        sbom = {
+            "dependencies": [
+                {"ref": "meta", "dependsOn": ["meta", "a"]},
+                {"ref": "meta", "dependsOn": ["b"]},
+                {"ref": "other", "dependsOn": ["meta"]},
+            ]
+        }
+        op._merge_dependencies_for_ref(sbom, "meta")
+        self.assertEqual(
+            [
+                {"ref": "meta", "dependsOn": ["a", "b"]},
+                {"ref": "other", "dependsOn": ["meta"]},
+            ],
+            sbom["dependencies"],
+        )
 
 
 if __name__ == "__main__":

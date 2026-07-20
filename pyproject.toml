@@ -42,7 +42,7 @@ dev = [
     "toml==0.10.2",
     "typing-extensions==4.16.0",
     "pre-commit==4.6.0",
-    "ruff==0.15.21",
+    "ruff==0.15.22",
 ]
 docs = [
     "sphinx-argparse==0.5.2",

@@ -3,7 +3,7 @@ list
 ============
 
 .. argparse::
-    :filename: ./cdxev/__main__.py
+    :filename: ../../cdxev/__main__.py
     :func: create_parser
     :prog: cdx-ev
     :path: list

@@ -179,6 +179,20 @@ class TestComponentFunctions(unittest.TestCase):
 
 
 class TestCompareComponents(unittest.TestCase):
+    def test_equal_swid_structured(self) -> None:
+        first = {
+            "name": "Name1",
+            "version": "1.0",
+            "swid": {"tagId": "tag-1", "name": "comp", "version": "1.2.3"},
+        }
+        second = {
+            "name": "Other",
+            "version": "9.9",
+            "swid": '{"tagId": "tag-1", "name": "comp", "version": "1.2.3"}',
+        }
+
+        self.assertTrue(sbf.compare_components(first, second))
+
     def test_equal(self) -> None:
         self.assertTrue(
             sbf.compare_components(
@@ -291,6 +305,20 @@ class TestCompareComponents(unittest.TestCase):
         )
 
     def test_unequal(self) -> None:
+        self.assertFalse(
+            sbf.compare_components(
+                {
+                    "name": "Name1",
+                    "version": "1.0",
+                    "swid": {"tagId": "tag-1", "name": "comp", "version": "1.2.3"},
+                },
+                {
+                    "name": "Name1",
+                    "version": "1.0",
+                    "swid": {"tagId": "tag-2", "name": "comp", "version": "1.2.3"},
+                },
+            )
+        )
         self.assertFalse(
             sbf.compare_components(
                 {

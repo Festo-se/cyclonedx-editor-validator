@@ -41,7 +41,7 @@ dev = [
     "coverage==7.15.2",
     "toml==0.10.2",
     "typing-extensions==4.16.0",
-    "pre-commit==4.6.0",
+    "pre-commit==4.6.1",
     "ruff==0.16.0",
 ]
 docs = [

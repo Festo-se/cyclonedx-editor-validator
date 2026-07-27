@@ -202,7 +202,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
                 {
                     "name": "Name1",
@@ -210,7 +210,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
             )
         )
@@ -222,7 +222,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
                 {
                     "name": "Name2",
@@ -230,7 +230,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group2",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
             )
         )
@@ -241,21 +241,21 @@ class TestCompareComponents(unittest.TestCase):
                     "version": "1.0",
                     "group": "group1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
                 {
                     "name": "Name2",
                     "version": "2.0",
                     "group": "group2",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
             )
         )
         self.assertTrue(
             sbf.compare_components(
-                {"name": "Name1", "version": "1.0", "group": "group1", "swid": "swid1"},
-                {"name": "Name2", "version": "2.0", "group": "group2", "swid": "swid1"},
+                {"name": "Name1", "version": "1.0", "group": "group1", "swid": {"tagId": "swid1"}},
+                {"name": "Name2", "version": "2.0", "group": "group2", "swid": {"tagId": "swid1"}},
             )
         )
         self.assertTrue(
@@ -266,7 +266,7 @@ class TestCompareComponents(unittest.TestCase):
                     "version": "1.0",
                     "group": "group1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
             )
         )
@@ -278,7 +278,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
                 {
                     "name": "Name1",
@@ -286,7 +286,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
             )
         )
@@ -298,7 +298,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
                 {"name": "Name1", "version": "1.0", "group": "group1", "cpe": "cpe1"},
             )
@@ -327,7 +327,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
                 {
                     "name": "Name1",
@@ -335,7 +335,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl2",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
             )
         )
@@ -347,7 +347,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
                 {
                     "name": "Name1",
@@ -355,7 +355,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid2",
+                    "swid": {"tagId": "swid2"},
                 },
             )
         )
@@ -367,7 +367,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe2",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
                 {
                     "name": "Name1",
@@ -375,7 +375,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
             )
         )
@@ -386,7 +386,7 @@ class TestCompareComponents(unittest.TestCase):
                     "version": "2.0",
                     "group": "group1",
                     "cpe": "cpe2",
-                    "swid": "swid1",
+                    "swid": {"tagId": "swid1"},
                 },
                 {"name": "Name1", "version": "1.0", "group": "group1", "purl": "purl1"},
             )

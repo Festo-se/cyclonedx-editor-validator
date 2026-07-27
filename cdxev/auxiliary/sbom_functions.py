@@ -117,7 +117,9 @@ def compare_components(first_component: dict, second_component: dict) -> bool:
         else:
             return False
     if first_component.get("swid", "") and second_component.get("swid", ""):
-        if _swid_equals(first_component.get("swid"), second_component.get("swid")):
+        if Key.from_swid(first_component["swid"]) == Key.from_swid(
+            second_component["swid"]
+        ):
             is_equal = True
         else:
             return False
@@ -137,17 +139,6 @@ def compare_components(first_component: dict, second_component: dict) -> bool:
                 is_equal = False
     return is_equal
 
-
-def _swid_equals(first_swid: Any, second_swid: Any) -> bool:
-    """Compare SWID values using identity semantics with a permissive fallback.
-
-    SWID comparison in the identity layer supports mapping and JSON-string forms. For malformed
-    or non-standard values, preserve historic behavior via case-insensitive string comparison.
-    """
-    try:
-        return Key.from_swid(first_swid) == Key.from_swid(second_swid)
-    except (TypeError, ValueError, KeyError, json.JSONDecodeError):
-        return str(first_swid).lower() == str(second_swid).lower()
 
 
 def get_component_by_ref(ref: str, list_of_components: Sequence[dict]) -> dict:

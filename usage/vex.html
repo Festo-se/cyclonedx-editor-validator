@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>vex &mdash; CycloneDX Editor Validator Tool 0.32.2 documentation</title>
+  <title>vex &mdash; CycloneDX Editor Validator Tool 0.33.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d7c0c7b6"></script>
+      <script src="../_static/documentation_options.js?v=3595839c"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,8 +49,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-global-options">Global options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cdx-ev-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cdx-ev-commands">Commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
 <li class="toctree-l2"><a class="reference internal" href="init-sbom.html">init-sbom</a></li>
@@ -59,25 +59,25 @@
 <li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
 <li class="toctree-l2"><a class="reference internal" href="validate.html">validate</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">vex</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cdx-ev-vex-positional-arguments">Positional Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#list">list</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdx-ev-vex-list-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdx-ev-vex-list-named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#trim">trim</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdx-ev-vex-trim-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdx-ev-vex-trim-named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#search">search</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdx-ev-vex-search-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdx-ev-vex-search-named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#extract">extract</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdx-ev-vex-extract-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cdx-ev-vex-extract-named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
@@ -128,11 +128,11 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">search</span></code>: returns a file with a specific vulnerability.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">extract</span></code>: extract all vulnerabilities from an SBOM file to a VEX file.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">{</span><span class="nb">list</span><span class="p">,</span><span class="n">search</span><span class="p">,</span><span class="n">trim</span><span class="p">,</span><span class="n">extract</span><span class="p">}</span> <span class="o">...</span>
+<div class="highlight-default notranslate" id="cdx-ev-vex"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">{</span><span class="nb">list</span><span class="p">,</span><span class="n">search</span><span class="p">,</span><span class="n">trim</span><span class="p">,</span><span class="n">extract</span><span class="p">}</span> <span class="o">...</span>
 </pre></div>
 </div>
-<section id="create_parser-positional-arguments">
-<h2>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h2>
+<section id="cdx-ev-vex-positional-arguments">
+<span id="create_parser-positional-arguments"></span><h2>Positional Arguments<a class="headerlink" href="#cdx-ev-vex-positional-arguments" title="Link to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>sub_command</kbd></dt>
 <dd><p>Possible choices: list, search, trim, extract</p>
@@ -161,21 +161,21 @@
 </li>
 </ul>
 <p>The output can be a text file or a CSV (default) file.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="nb">list</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">schema</span> <span class="p">{</span><span class="n">default</span><span class="p">,</span><span class="n">lightweight</span><span class="p">}]</span>
+<div class="highlight-default notranslate" id="cdx-ev-vex-list"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="nb">list</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">schema</span> <span class="p">{</span><span class="n">default</span><span class="p">,</span><span class="n">lightweight</span><span class="p">}]</span>
                        <span class="p">[</span><span class="o">--</span><span class="nb">format</span> <span class="p">{</span><span class="n">txt</span><span class="p">,</span><span class="n">csv</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
                        <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<section id="create_parser-positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h3>
+<section id="cdx-ev-vex-list-positional-arguments">
+<span id="create_parser-positional-arguments"></span><h3>Positional Arguments<a class="headerlink" href="#cdx-ev-vex-list-positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>&lt;input&gt;</kbd></dt>
 <dd><p>Path to the SBOM file.</p>
 </dd>
 </dl>
 </section>
-<section id="create_parser-named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h3>
+<section id="cdx-ev-vex-list-named-arguments">
+<span id="create_parser-named-arguments"></span><h3>Named Arguments<a class="headerlink" href="#cdx-ev-vex-list-named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>--schema</kbd></dt>
 <dd><p>Possible choices: default, lightweight</p>
@@ -201,20 +201,20 @@
 <section id="trim">
 <h2>trim<a class="headerlink" href="#trim" title="Link to this heading"></a></h2>
 <p>This subcommand returns a JSON file which contains only filtered vulnerabilities. The vulnerabilities can be filtered by any key-value pair.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">trim</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">key</span> <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">value</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
+<div class="highlight-default notranslate" id="cdx-ev-vex-trim"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">trim</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">key</span> <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">value</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
                        <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<section id="create_parser-positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h3>
+<section id="cdx-ev-vex-trim-positional-arguments">
+<span id="create_parser-positional-arguments"></span><h3>Positional Arguments<a class="headerlink" href="#cdx-ev-vex-trim-positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>&lt;input&gt;</kbd></dt>
 <dd><p>Path to the SBOM file.</p>
 </dd>
 </dl>
 </section>
-<section id="create_parser-named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h3>
+<section id="cdx-ev-vex-trim-named-arguments">
+<span id="create_parser-named-arguments"></span><h3>Named Arguments<a class="headerlink" href="#cdx-ev-vex-trim-named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>--key</kbd></dt>
 <dd><p>Specifies the key by which the filtering should be done.</p>
@@ -236,11 +236,11 @@
 <section id="search">
 <h2>search<a class="headerlink" href="#search" title="Link to this heading"></a></h2>
 <p>This subcommand searches a file for a specific vulnerability based on its ID. The command returns a JSON file.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">search</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">vul_id</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate" id="cdx-ev-vex-search"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">search</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">vul_id</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<section id="create_parser-positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h3>
+<section id="cdx-ev-vex-search-positional-arguments">
+<span id="create_parser-positional-arguments"></span><h3>Positional Arguments<a class="headerlink" href="#cdx-ev-vex-search-positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>&lt;input&gt;</kbd></dt>
 <dd><p>Path to the SBOM file.</p>
@@ -250,8 +250,8 @@
 </dd>
 </dl>
 </section>
-<section id="create_parser-named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h3>
+<section id="cdx-ev-vex-search-named-arguments">
+<span id="create_parser-named-arguments"></span><h3>Named Arguments<a class="headerlink" href="#cdx-ev-vex-search-named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>--output, -o</kbd></dt>
 <dd><p>The path to where the output should be written. If this is a file, output is written there. If it’s a directory, output is written to a file with an auto-generated name inside that directory. If it’s not specified, output is written to stdout.</p>
@@ -267,19 +267,19 @@
 <section id="extract">
 <h2>extract<a class="headerlink" href="#extract" title="Link to this heading"></a></h2>
 <p>This subcommand extracts all vulnerabilities from an SBOM file and returns it as a VEX file in JSON format.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">extract</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate" id="cdx-ev-vex-extract"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">vex</span> <span class="n">extract</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<section id="create_parser-positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h3>
+<section id="cdx-ev-vex-extract-positional-arguments">
+<span id="create_parser-positional-arguments"></span><h3>Positional Arguments<a class="headerlink" href="#cdx-ev-vex-extract-positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>&lt;input&gt;</kbd></dt>
 <dd><p>Path to the SBOM file.</p>
 </dd>
 </dl>
 </section>
-<section id="create_parser-named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h3>
+<section id="cdx-ev-vex-extract-named-arguments">
+<span id="create_parser-named-arguments"></span><h3>Named Arguments<a class="headerlink" href="#cdx-ev-vex-extract-named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>--output, -o</kbd></dt>
 <dd><p>The path to where the output should be written. If this is a file, output is written there. If it’s a directory, output is written to a file with an auto-generated name inside that directory. If it’s not specified, output is written to stdout.</p>

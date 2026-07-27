@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usage &mdash; CycloneDX Editor Validator Tool 0.32.2 documentation</title>
+  <title>Usage &mdash; CycloneDX Editor Validator Tool 0.33.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d7c0c7b6"></script>
+      <script src="../_static/documentation_options.js?v=3595839c"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -50,8 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#create_parser-global-options">Global options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#create_parser-commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cdx-ev-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cdx-ev-commands">Commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
 <li class="toctree-l2"><a class="reference internal" href="init-sbom.html">init-sbom</a></li>
@@ -100,11 +100,11 @@
 <h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
 <p><p>This tool performs various actions on CycloneDX SBOMs. The action is determined by the &lt;command&gt; argument.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="p">[</span><span class="o">--</span><span class="n">quiet</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">help</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">command</span><span class="o">&gt;</span> <span class="o">...</span>
+<div class="highlight-default notranslate" id="cdx-ev"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="p">[</span><span class="o">--</span><span class="n">quiet</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">help</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">command</span><span class="o">&gt;</span> <span class="o">...</span>
 </pre></div>
 </div>
-<section id="create_parser-global-options">
-<h2>Global options<a class="headerlink" href="#create_parser-global-options" title="Link to this heading"></a></h2>
+<section id="cdx-ev-global-options">
+<span id="create_parser-global-options"></span><h2>Global options<a class="headerlink" href="#cdx-ev-global-options" title="Link to this heading"></a></h2>
 <p>These options must be specified BEFORE &lt;command&gt;.</p>
 <dl class="option-list">
 <dt><kbd>--quiet, -q</kbd></dt>
@@ -120,8 +120,8 @@
 </dd>
 </dl>
 </section>
-<section id="create_parser-commands">
-<h2>Commands<a class="headerlink" href="#create_parser-commands" title="Link to this heading"></a></h2>
+<section id="cdx-ev-commands">
+<span id="create_parser-commands"></span><h2>Commands<a class="headerlink" href="#cdx-ev-commands" title="Link to this heading"></a></h2>
 <p>Determines the action to perform on the SBOM. Each command might have more options. To get help on command options, use cdx-ev &lt;command&gt; --help.</p>
 <dl class="option-list">
 <dt><kbd>&lt;command&gt;</kbd></dt>

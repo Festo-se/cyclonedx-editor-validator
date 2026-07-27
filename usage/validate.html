@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>validate &mdash; CycloneDX Editor Validator Tool 0.32.2 documentation</title>
+  <title>validate &mdash; CycloneDX Editor Validator Tool 0.33.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d7c0c7b6"></script>
+      <script src="../_static/documentation_options.js?v=3595839c"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,8 +49,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-global-options">Global options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cdx-ev-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cdx-ev-commands">Commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
 <li class="toctree-l2"><a class="reference internal" href="init-sbom.html">init-sbom</a></li>
@@ -58,8 +58,8 @@
 <li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="set.html">set</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">validate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cdx-ev-validate-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cdx-ev-validate-named-arguments">Named Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#schema-selection">Schema selection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#validation-of-filename">Validation of filename</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#output">Output</a></li>
@@ -106,7 +106,7 @@
   <section id="validate">
 <h1>validate<a class="headerlink" href="#validate" title="Link to this heading"></a></h1>
 <p>Validates an SBOM against a JSON schema.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">validate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+<div class="highlight-default notranslate" id="cdx-ev-validate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">validate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
                        <span class="p">[</span><span class="o">--</span><span class="n">schema</span><span class="o">-</span><span class="nb">type</span> <span class="p">{</span><span class="n">default</span><span class="p">,</span><span class="n">strict</span><span class="p">,</span><span class="n">custom</span><span class="p">}</span> <span class="o">|</span> <span class="o">--</span><span class="n">schema</span><span class="o">-</span><span class="n">path</span> <span class="o">&lt;</span><span class="n">schema</span><span class="o">-</span><span class="n">path</span><span class="o">&gt;</span><span class="p">]</span>
                        <span class="p">[</span><span class="o">--</span><span class="n">filename</span><span class="o">-</span><span class="n">pattern</span> <span class="n">FILENAME_PATTERN</span> <span class="o">|</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">filename</span><span class="o">-</span><span class="n">validation</span><span class="p">]</span>
                        <span class="p">[</span><span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="nb">format</span> <span class="p">{</span><span class="n">warnings</span><span class="o">-</span><span class="n">ng</span><span class="p">,</span><span class="n">gitlab</span><span class="o">-</span><span class="n">code</span><span class="o">-</span><span class="n">quality</span><span class="p">}]</span>
@@ -114,16 +114,16 @@
                        <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<section id="create_parser-positional-arguments">
-<h2>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h2>
+<section id="cdx-ev-validate-positional-arguments">
+<span id="create_parser-positional-arguments"></span><h2>Positional Arguments<a class="headerlink" href="#cdx-ev-validate-positional-arguments" title="Link to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>&lt;input&gt;</kbd></dt>
 <dd><p>Path to the SBOM file.</p>
 </dd>
 </dl>
 </section>
-<section id="create_parser-named-arguments">
-<h2>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h2>
+<section id="cdx-ev-validate-named-arguments">
+<span id="create_parser-named-arguments"></span><h2>Named Arguments<a class="headerlink" href="#cdx-ev-validate-named-arguments" title="Link to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>--schema-type</kbd></dt>
 <dd><p>Possible choices: default, strict, custom</p>

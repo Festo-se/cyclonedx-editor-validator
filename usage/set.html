@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>set &mdash; CycloneDX Editor Validator Tool 0.32.2 documentation</title>
+  <title>set &mdash; CycloneDX Editor Validator Tool 0.33.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d7c0c7b6"></script>
+      <script src="../_static/documentation_options.js?v=3595839c"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,17 +49,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-global-options">Global options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cdx-ev-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cdx-ev-commands">Commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
 <li class="toctree-l2"><a class="reference internal" href="init-sbom.html">init-sbom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="list.html">list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="merge.html">merge</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">set</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#create_parser-target">target</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cdx-ev-set-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cdx-ev-set-named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cdx-ev-set-target">target</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#target-components">Target components</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#exact-matching">Exact matching</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#regular-expression-matching">Regular expression matching</a></li>
@@ -115,19 +115,19 @@
 <p>This command sets properties on specified components to specified values. If a component in an SBOM is missing a particular property or the property is present but has a wrong value, this command can be used to modify just the affected properties without changing the rest of the SBOM.</p>
 <p>For this command to work, three bits of information must be provided by the user: The <em>target</em> component(s) to modify as well as the <em>name</em> and <em>new value</em> of each property to set on the target component.</p>
 <p>This data can either be passed directly on the command-line — in this case only a single update can be performed per invocation — or in a JSON file — this allows performing an unlimited number of updates in a single invocation.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">set</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">force</span><span class="p">]</span> <span class="p">(</span><span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">file</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span> <span class="o">|</span> <span class="o">&lt;</span><span class="n">target</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">key</span> <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">value</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate" id="cdx-ev-set"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">set</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">force</span><span class="p">]</span> <span class="p">(</span><span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">file</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span> <span class="o">|</span> <span class="o">&lt;</span><span class="n">target</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">key</span> <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">value</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<section id="create_parser-positional-arguments">
-<h2>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h2>
+<section id="cdx-ev-set-positional-arguments">
+<span id="create_parser-positional-arguments"></span><h2>Positional Arguments<a class="headerlink" href="#cdx-ev-set-positional-arguments" title="Link to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>&lt;input&gt;</kbd></dt>
 <dd><p>Path to the SBOM file.</p>
 </dd>
 </dl>
 </section>
-<section id="create_parser-named-arguments">
-<h2>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h2>
+<section id="cdx-ev-set-named-arguments">
+<span id="create_parser-named-arguments"></span><h2>Named Arguments<a class="headerlink" href="#cdx-ev-set-named-arguments" title="Link to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>--output, -o</kbd></dt>
 <dd><p>The path to where the output should be written. If this is a file, output is written there. If it’s a directory, output is written to a file with an auto-generated name inside that directory. If it’s not specified, output is written to stdout.</p>
@@ -159,8 +159,8 @@
 </dd>
 </dl>
 </section>
-<section id="create_parser-target">
-<h2>target<a class="headerlink" href="#create_parser-target" title="Link to this heading"></a></h2>
+<section id="cdx-ev-set-target">
+<span id="create_parser-target"></span><h2>target<a class="headerlink" href="#cdx-ev-set-target" title="Link to this heading"></a></h2>
 <p>Identifies the target component. If the --from-file option is not used, exactly one of these options must be specified. --name, --version and --group act together to identify a component. If the --from-file option is used, none of these options may be present.</p>
 <dl class="option-list">
 <dt><kbd>--cpe</kbd></dt>

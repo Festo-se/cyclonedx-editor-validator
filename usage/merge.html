@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>merge &mdash; CycloneDX Editor Validator Tool 0.32.2 documentation</title>
+  <title>merge &mdash; CycloneDX Editor Validator Tool 0.33.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d7c0c7b6"></script>
+      <script src="../_static/documentation_options.js?v=3595839c"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -50,15 +50,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../index.html">CycloneDX Editor Validator Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First Steps</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-global-options">Global options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="index.html#create_parser-commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cdx-ev-global-options">Global options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cdx-ev-commands">Commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="amend.html">amend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build-public.html">build-public</a></li>
 <li class="toctree-l2"><a class="reference internal" href="init-sbom.html">init-sbom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="list.html">list</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">merge</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#create_parser-positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#create_parser-named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cdx-ev-merge-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cdx-ev-merge-named-arguments">Named Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#details">Details</a></li>
 </ul>
 </li>
@@ -107,21 +107,21 @@
 <p>Merges two or more CycloneDX input files into one. Inputs can either be specified directly as positional arguments on the command-line or using the <code class="docutils literal notranslate"><span class="pre">--from-folder</span></code> option. Files specified as arguments are merged in the order they are given, files in the folder are merged in alphabetical order (see note below).</p>
 <p>If both positional arguments and the <code class="docutils literal notranslate"><span class="pre">--from-folder</span></code> option are used, then the position arguments are merged first, followed by the files in the folder. The command will not merge the same file twice, if it is specified on the command-line and also part of the folder.</p>
 <p>When using the <code class="docutils literal notranslate"><span class="pre">--from-folder</span></code> option, the program looks for files matching either of the <a class="reference external" href="https://cyclonedx.org/specification/overview/#recognized-file-patterns">recommended CycloneDX naming schemes</a>: <code class="docutils literal notranslate"><span class="pre">bom.json</span></code> or <code class="docutils literal notranslate"><span class="pre">*.cdx.json</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">merge</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">folder</span> <span class="o">&lt;</span><span class="n">from</span><span class="o">-</span><span class="n">folder</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hierarchical</span><span class="p">]</span>
+<div class="highlight-default notranslate" id="cdx-ev-merge"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">merge</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">folder</span> <span class="o">&lt;</span><span class="n">from</span><span class="o">-</span><span class="n">folder</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hierarchical</span><span class="p">]</span>
                     <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
                     <span class="p">[</span><span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="create_parser-positional-arguments">
-<h2>Positional Arguments<a class="headerlink" href="#create_parser-positional-arguments" title="Link to this heading"></a></h2>
+<section id="cdx-ev-merge-positional-arguments">
+<span id="create_parser-positional-arguments"></span><h2>Positional Arguments<a class="headerlink" href="#cdx-ev-merge-positional-arguments" title="Link to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>&lt;input&gt;</kbd></dt>
 <dd><p>Paths to SBOM files to merge. You must specify at least two paths.</p>
 </dd>
 </dl>
 </section>
-<section id="create_parser-named-arguments">
-<h2>Named Arguments<a class="headerlink" href="#create_parser-named-arguments" title="Link to this heading"></a></h2>
+<section id="cdx-ev-merge-named-arguments">
+<span id="create_parser-named-arguments"></span><h2>Named Arguments<a class="headerlink" href="#cdx-ev-merge-named-arguments" title="Link to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>--from-folder</kbd></dt>
 <dd><p>Path to a folder with SBOMs to be merged.</p>

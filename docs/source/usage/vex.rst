@@ -3,7 +3,7 @@ vex
 ============
 
 .. argparse::
-    :filename: ./cdxev/__main__.py
+    :filename: ../../cdxev/__main__.py
     :func: create_parser
     :prog: cdx-ev
     :path: vex
@@ -19,7 +19,7 @@ vex
 list
 -------------
 .. argparse::
-    :filename: ./cdxev/__main__.py
+    :filename: ../../cdxev/__main__.py
     :func: create_parser
     :prog: cdx-ev
     :path: vex list
@@ -52,7 +52,7 @@ Example::
 trim
 -------------
 .. argparse::
-    :filename: ./cdxev/__main__.py
+    :filename: ../../cdxev/__main__.py
     :func: create_parser
     :prog: cdx-ev
     :path: vex trim
@@ -68,7 +68,7 @@ Example::
 search
 -------------
 .. argparse::
-    :filename: ./cdxev/__main__.py
+    :filename: ../../cdxev/__main__.py
     :func: create_parser
     :prog: cdx-ev
     :path: vex search
@@ -84,7 +84,7 @@ Example::
 extract
 -------------
 .. argparse::
-    :filename: ./cdxev/__main__.py
+    :filename: ../../cdxev/__main__.py
     :func: create_parser
     :prog: cdx-ev
     :path: vex extract

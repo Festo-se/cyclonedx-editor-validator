@@ -107,22 +107,16 @@ def compare_components(first_component: dict, second_component: dict) -> bool:
     """
     is_equal = False
     if first_component.get("purl", "") and second_component.get("purl", ""):
-        if first_component.get("purl", "1").lower() == second_component.get("purl", "2").lower():
-            is_equal = True
-        else:
-            return False
+        return first_component.get("purl", "1").lower() == second_component.get("purl", "2").lower()
+
     if first_component.get("cpe", "") and second_component.get("cpe", ""):
-        if first_component.get("cpe", "1").lower() == second_component.get("cpe", "2").lower():
-            is_equal = True
-        else:
-            return False
+        return first_component.get("cpe", "1").lower() == second_component.get("cpe", "2").lower()
+
     if first_component.get("swid", "") and second_component.get("swid", ""):
-        if Key.from_swid(first_component["swid"]) == Key.from_swid(
+        return Key.from_swid(first_component["swid"]) == Key.from_swid(
             second_component["swid"]
-        ):
-            is_equal = True
-        else:
-            return False
+        )
+
     if (
         first_component.get("name", "notfound1").lower()
         == second_component.get("name", "notfound2").lower()

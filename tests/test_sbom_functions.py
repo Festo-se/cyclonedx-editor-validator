@@ -193,6 +193,110 @@ class TestCompareComponents(unittest.TestCase):
 
         self.assertTrue(sbf.compare_components(first, second))
 
+    def test_hierarchical_comparison_covers_all_branches(self) -> None:
+        cases = [
+            (
+                "purl match wins over lower-priority differences",
+                {
+                    "name": "Name1",
+                    "version": "1.0",
+                    "group": "group1",
+                    "purl": "pkg:pypi/example@1.0.0",
+                    "cpe": "cpe:/a:vendor:first:1.0",
+                    "swid": {"tagId": "tag-first"},
+                },
+                {
+                    "name": "DifferentName",
+                    "version": "9.9",
+                    "group": "group2",
+                    "purl": "pkg:pypi/example@1.0.0",
+                    "cpe": "cpe:/a:vendor:second:2.0",
+                    "swid": {"tagId": "tag-second"},
+                },
+                True,
+            ),
+            (
+                "purl mismatch fails before lower-priority matches",
+                {"name": "Name1", "version": "1.0", "purl": "pkg:pypi/example@1.0.0"},
+                {"name": "Name1", "version": "1.0", "purl": "pkg:pypi/example@2.0.0"},
+                False,
+            ),
+            (
+                "cpe match wins when purl is absent",
+                {
+                    "name": "Name1",
+                    "version": "1.0",
+                    "group": "group1",
+                    "cpe": "cpe:/a:vendor:product:1.0",
+                    "swid": {"tagId": "tag-first"},
+                },
+                {
+                    "name": "DifferentName",
+                    "version": "9.9",
+                    "group": "group2",
+                    "cpe": "cpe:/a:vendor:product:1.0",
+                    "swid": {"tagId": "tag-second"},
+                },
+                True,
+            ),
+            (
+                "cpe mismatch fails when purl is absent",
+                {"name": "Name1", "version": "1.0", "cpe": "cpe:/a:vendor:product:1.0"},
+                {"name": "Name1", "version": "1.0", "cpe": "cpe:/a:vendor:product:2.0"},
+                False,
+            ),
+            (
+                "swid match wins when purl and cpe are absent",
+                {
+                    "name": "Name1",
+                    "version": "1.0",
+                    "group": "group1",
+                    "swid": {"tagId": "tag-1", "name": "comp", "version": "1.2.3"},
+                },
+                {
+                    "name": "DifferentName",
+                    "version": "9.9",
+                    "group": "group2",
+                    "swid": '{"tagId": "tag-1", "name": "comp", "version": "1.2.3"}',
+                },
+                True,
+            ),
+            (
+                "swid mismatch fails when purl and cpe are absent",
+                {"name": "Name1", "version": "1.0", "swid": {"tagId": "tag-1"}},
+                {"name": "Name1", "version": "1.0", "swid": {"tagId": "tag-2"}},
+                False,
+            ),
+            (
+                "name and version match when no identifiers exist",
+                {"name": "Name1", "version": "1.0", "group": "group1"},
+                {"name": "Name1", "version": "1.0", "group": "group1"},
+                True,
+            ),
+            (
+                "group match keeps a name/version match true",
+                {"name": "Name1", "version": "1.0", "group": "group1"},
+                {"name": "Name1", "version": "1.0", "group": "group1"},
+                True,
+            ),
+            (
+                "group mismatch turns a name/version match false",
+                {"name": "Name1", "version": "1.0", "group": "group1"},
+                {"name": "Name1", "version": "1.0", "group": "group2"},
+                False,
+            ),
+            (
+                "name/version mismatch fails when no identifiers exist",
+                {"name": "Name1", "version": "1.0"},
+                {"name": "Name2", "version": "1.0"},
+                False,
+            ),
+        ]
+
+        for description, first, second, expected in cases:
+            with self.subTest(description=description):
+                self.assertEqual(sbf.compare_components(first, second), expected)
+
     def test_equal(self) -> None:
         self.assertTrue(
             sbf.compare_components(
@@ -345,7 +449,6 @@ class TestCompareComponents(unittest.TestCase):
                     "name": "Name1",
                     "version": "1.0",
                     "group": "group1",
-                    "purl": "purl1",
                     "cpe": "cpe1",
                     "swid": {"tagId": "swid1"},
                 },
@@ -353,9 +456,8 @@ class TestCompareComponents(unittest.TestCase):
                     "name": "Name1",
                     "version": "1.0",
                     "group": "group1",
-                    "purl": "purl1",
-                    "cpe": "cpe1",
-                    "swid": {"tagId": "swid2"},
+                    "cpe": "cpe2",
+                    "swid": {"tagId": "swid1"},
                 },
             )
         )
@@ -365,17 +467,13 @@ class TestCompareComponents(unittest.TestCase):
                     "name": "Name1",
                     "version": "1.0",
                     "group": "group1",
-                    "purl": "purl1",
-                    "cpe": "cpe2",
                     "swid": {"tagId": "swid1"},
                 },
                 {
                     "name": "Name1",
                     "version": "1.0",
                     "group": "group1",
-                    "purl": "purl1",
-                    "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid2"},
                 },
             )
         )

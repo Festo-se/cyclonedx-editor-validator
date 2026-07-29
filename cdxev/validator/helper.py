@@ -7,7 +7,6 @@ import typing as t
 from importlib import resources
 from pathlib import Path
 
-from cdxev.auxiliary.filename_gen import generate_validation_pattern
 from cdxev.error import AppError
 
 logger = logging.getLogger(__name__)
@@ -109,10 +108,7 @@ def validate_filename(
     schema_type: t.Optional[str],
 ) -> t.Union[t.Literal[False], str]:
     if not regex:
-        if schema_type == "custom":
-            regex = generate_validation_pattern(sbom)
-        else:
-            regex = "^(bom\\.json|.+\\.cdx\\.json)$"
+        regex = "^(bom\\.json|.+\\.cdx\\.json)$"
 
     try:
         matches = re.fullmatch(regex, filename) is not None

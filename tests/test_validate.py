@@ -106,7 +106,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(results, True)
             sbom["metadata"]["timestamp"] = "2022-02-17T10:14:59Z"
             issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("name", issues), True)
+            self.assertEqual(issues, ["no issue"])
 
     def test_metadata_authors_missing(self) -> None:
         for spec_version in list_of_spec_versions:

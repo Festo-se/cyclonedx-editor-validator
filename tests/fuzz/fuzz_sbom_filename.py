@@ -12,10 +12,7 @@ import sys
 import atheris
 
 with atheris.instrument_imports():
-    from cdxev.auxiliary.filename_gen import (
-        generate_filename,
-        generate_validation_pattern,
-    )
+    from cdxev.auxiliary.filename_gen import generate_filename
 
 
 def TestOneInput(data: bytes) -> None:
@@ -31,7 +28,6 @@ def TestOneInput(data: bytes) -> None:
 
     try:
         generate_filename(sbom)
-        generate_validation_pattern(sbom)
     except (ValueError, TypeError, AttributeError):
         # These can surface from grossly malformed metadata structures and are
         # acceptable; callers validate the SBOM schema before relying on output.

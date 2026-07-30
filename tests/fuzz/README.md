@@ -14,7 +14,7 @@ These fall into two groups: focused parser targets and end-to-end command target
 | Target | What it exercises |
 | --- | --- |
 | [fuzz_version_range.py](fuzz_version_range.py) | `version_is_in_version_range` → `univers` range/version parsing of untrusted `version-range` strings (highest-value surface) |
-| [fuzz_sbom_filename.py](fuzz_sbom_filename.py) | JSON ingestion + `generate_filename` / `generate_validation_pattern`, incl. `dateutil` timestamp parsing |
+| [fuzz_sbom_filename.py](fuzz_sbom_filename.py) | JSON ingestion + `generate_filename`, incl. `dateutil` timestamp parsing |
 | [fuzz_identity.py](fuzz_identity.py) | `ComponentIdentity.create` – purl/cpe/swid/coordinates key extraction and the non-transitive eq/hash logic |
 | [fuzz_spec_version.py](fuzz_spec_version.py) | `SpecVersion.parse` – CycloneDX `specVersion` string parsing (lightweight smoke target) |
 

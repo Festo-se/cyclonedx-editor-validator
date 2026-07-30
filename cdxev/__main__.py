@@ -522,8 +522,8 @@ def create_validation_parser(
     group.add_argument(
         "--filename-pattern",
         help=(
-            "Regex for validation of filename. If not specified, a default regex depending on "
-            "the schema is applied. To disable filename validation altogether, use "
+            "Regex for validation of filename. If not specified, only 'bom.json' and "
+            "'*.cdx.json' filenames are accepted. To disable filename validation altogether, use "
             "--no-filename-validation."
         ),
         default="",

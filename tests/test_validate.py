@@ -106,7 +106,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(results, True)
             sbom["metadata"]["timestamp"] = "2022-02-17T10:14:59Z"
             issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("name", issues), True)
+            self.assertEqual(issues, ["no issue"])
 
     def test_metadata_authors_missing(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -1286,51 +1286,24 @@ class TestInternalMetaData(unittest.TestCase):
 
 
 class TestValidateFilename(unittest.TestCase):
-    def setUp(self) -> None:
-        self.sbom = get_test_sbom()
-
-    def test_valid_with_default_schema(self) -> None:
+    def test_valid_with_implicit_pattern(self) -> None:
         for filename in ["bom.json", "random.cdx.json", "-.cdx.json"]:
             with self.subTest(filename=filename):
-                result = validate_filename(filename, "", self.sbom, "default")
+                result = validate_filename(filename, "")
                 self.assertFalse(result)
 
-    def test_invalid_with_default_schema(self) -> None:
+    def test_invalid_with_implicit_pattern(self) -> None:
         for filename in ["bomjson", "bom.jso", "random.bom.json", ".cdx.json"]:
             with self.subTest(filename=filename):
-                result = validate_filename(filename, "", self.sbom, "default")
+                result = validate_filename(filename, "")
                 self.assertIsInstance(result, str)
 
-    def test_valid_with_custom_schema(self) -> None:
-        for filename in [
-            "bom.json",
-            "Acme_Application_9.1.1_20220217T101458.cdx.json",
-            "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345.cdx.json",
-            "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json",
-        ]:
-            with self.subTest(filename=filename):
-                result = validate_filename(filename, "", self.sbom, "custom")
-                self.assertFalse(result)
-
-    def test_invalid_with_custom_schema(self) -> None:
-        for filename in [
-            "bomjson",
-            "bom.jso",
-            "random.bom.json",
-            ".cdx.json",
-            "Acme_Application_20220217T101458.cdx.json",
-            "unknown_9.1.1_ec7781220ec7781220ec778122012345.cdx.json",
-            "Acme_Application_9.1.1.cdx.json",
-            "Acme_Application.cdx.json",
-            "Acme_Application_9.1.1_20220217T101458.json",
-            "Acme_Application_9.1.1_20220217T101458.cdx",
-        ]:
-            with self.subTest(filename=filename):
-                result = validate_filename(filename, "", self.sbom, "custom")
-                self.assertIsInstance(result, str)
+    def test_explicit_pattern_overrides_implicit_pattern(self) -> None:
+        result = validate_filename("custom-name.json", r"custom-name\.json")
+        self.assertFalse(result)
 
     def test_invalid_regex_raises_apperror(self) -> None:
         for regex in ["(unterminated", "[", "*invalid"]:
             with self.subTest(regex=regex):
                 with self.assertRaises(AppError):
-                    validate_filename("bom.json", regex, self.sbom, "default")
+                    validate_filename("bom.json", regex)

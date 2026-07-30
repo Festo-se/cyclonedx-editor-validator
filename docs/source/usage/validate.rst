@@ -46,16 +46,7 @@ The tool, by default, also validates the filename of the SBOM. Which filenames a
     * The filename must be a full match, regex anchors (^ and $) are not required.
     * Regex patterns often include special characters. Pay attention to escaping rules for your shell to ensure proper results.
 
-* In all other cases, the acceptable filenames depend on the selected schema:
-
-    * When using the stock CycloneDX schema (``--schema-type default`` or no option at all) or when using your own schema (``--schema-path`` option), the validator accepts the two patterns recommended by the `CycloneDX specification <https://cyclonedx.org/specification/overview/#recognized-file-patterns>`_: ``bom.json`` or ``*.cdx.json``.
-    * When validating against the built-in custom schema (``--schema-type custom``), filenames must match one of these patterns: ``bom.json`` or ``<name>_<version>_<hash>|<timestamp>|<hash>_<timestamp>.cdx.json``. See below for explanations of the placeholders.
-
-``<name>`` and ``<version>`` correspond to the respective fields in ``metadata.component`` in the SBOM.
-
-``<timestamp>`` corresponds to ``metadata.timestamp`` and ``<hash>`` means any value in ``metadata.component.hashes[].content``.
-
-Either ``<timestamp>`` or ``<hash>`` must be present. If both are specified, ``<hash>`` must come first.
+* In all other cases, the validator accepts the two patterns recommended by the `CycloneDX specification <https://cyclonedx.org/specification/overview/#recognized-file-patterns>`_: ``bom.json`` or ``*.cdx.json``. This applies to every schema type.
 
 Output
 ------

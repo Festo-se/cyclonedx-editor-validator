@@ -66,7 +66,7 @@ def validate_sbom(  # noqa: C901
 
         if filename_regex is not None:
             # Filename should be validated
-            filename_error = validate_filename(file.name, filename_regex, sbom, schema_type)
+            filename_error = validate_filename(file.name, filename_regex)
             if filename_error:
                 if filename_regex == "" and schema_type != "custom":
                     # Implicit validation against CycloneDX recommendations is only a warning

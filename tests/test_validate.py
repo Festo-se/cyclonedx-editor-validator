@@ -1286,29 +1286,24 @@ class TestInternalMetaData(unittest.TestCase):
 
 
 class TestValidateFilename(unittest.TestCase):
-    def setUp(self) -> None:
-        self.sbom = get_test_sbom()
-
     def test_valid_with_implicit_pattern(self) -> None:
-        for schema_type in ["default", "strict", "custom"]:
-            for filename in ["bom.json", "random.cdx.json", "-.cdx.json"]:
-                with self.subTest(schema_type=schema_type, filename=filename):
-                    result = validate_filename(filename, "", self.sbom, schema_type)
-                    self.assertFalse(result)
+        for filename in ["bom.json", "random.cdx.json", "-.cdx.json"]:
+            with self.subTest(filename=filename):
+                result = validate_filename(filename, "")
+                self.assertFalse(result)
 
     def test_invalid_with_implicit_pattern(self) -> None:
-        for schema_type in ["default", "strict", "custom"]:
-            for filename in ["bomjson", "bom.jso", "random.bom.json", ".cdx.json"]:
-                with self.subTest(schema_type=schema_type, filename=filename):
-                    result = validate_filename(filename, "", self.sbom, schema_type)
-                    self.assertIsInstance(result, str)
+        for filename in ["bomjson", "bom.jso", "random.bom.json", ".cdx.json"]:
+            with self.subTest(filename=filename):
+                result = validate_filename(filename, "")
+                self.assertIsInstance(result, str)
 
     def test_explicit_pattern_overrides_implicit_pattern(self) -> None:
-        result = validate_filename("custom-name.json", r"custom-name\.json", self.sbom, "custom")
+        result = validate_filename("custom-name.json", r"custom-name\.json")
         self.assertFalse(result)
 
     def test_invalid_regex_raises_apperror(self) -> None:
         for regex in ["(unterminated", "[", "*invalid"]:
             with self.subTest(regex=regex):
                 with self.assertRaises(AppError):
-                    validate_filename("bom.json", regex, self.sbom, "default")
+                    validate_filename("bom.json", regex)

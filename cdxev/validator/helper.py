@@ -104,8 +104,6 @@ def load_bundled_schema(filename: str) -> dict:
 def validate_filename(
     filename: str,
     regex: str,
-    sbom: dict,
-    schema_type: t.Optional[str],
 ) -> t.Union[t.Literal[False], str]:
     if not regex:
         regex = "^(bom\\.json|.+\\.cdx\\.json)$"

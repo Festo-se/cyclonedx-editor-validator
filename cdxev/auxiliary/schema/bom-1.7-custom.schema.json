@@ -1108,6 +1108,10 @@
             "Acme Inc"
           ]
         },
+        "patentAssertions": {
+          "$ref": "#/definitions/patentAssertions",
+          "title": "Component Patent(s)"
+        },
         "cpe": {
           "type": "string",
           "title": "Common Platform Enumeration (CPE)",
@@ -6757,6 +6761,83 @@
           "$ref": "#/definitions/signature",
           "title": "Signature",
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        }
+      }
+    },
+    "patentAssertions": {
+      "type": "array",
+      "title": "Patent Assertions",
+      "description": "A list of assertions made regarding patents associated with this component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
+      "items": {
+        "type": "object",
+        "title": "Patent Assertion",
+        "description": "An assertion linking a patent or patent family to this component or service.",
+        "required": [
+          "assertionType",
+          "asserter"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "bom-ref": {
+            "$ref": "#/definitions/refType",
+            "title": "BOM Reference",
+            "description": "A reference to the patent or patent family object within the BOM. This must match the `bom-ref` of a `patent` or `patentFamily` object."
+          },
+          "assertionType": {
+            "type": "string",
+            "title": "Assertion Type",
+            "description": "The type of assertion being made about the patent or patent family. Examples include ownership, licensing, and standards inclusion.",
+            "enum": [
+              "ownership",
+              "license",
+              "third-party-claim",
+              "standards-inclusion",
+              "prior-art",
+              "exclusive-rights",
+              "non-assertion",
+              "research-or-evaluation"
+            ],
+            "meta:enum": {
+              "ownership": "The manufacturer asserts ownership of the patent or patent family.",
+              "license": "The manufacturer asserts they have a license to use the patent or patent family.",
+              "third-party-claim": "A third party has asserted a claim or potential infringement against the manufacturer\u2019s component or service.",
+              "standards-inclusion": "The patent is part of a standard essential patent (SEP) portfolio relevant to the component or service.",
+              "prior-art": "The manufacturer asserts the patent or patent family as prior art that invalidates another patent or claim.",
+              "exclusive-rights": "The manufacturer asserts exclusive rights granted through a licensing agreement.",
+              "non-assertion": "The manufacturer asserts they will not enforce the patent or patent family against certain uses or users.",
+              "research-or-evaluation": "The patent or patent family is being used under a research or evaluation license."
+            }
+          },
+          "patentRefs": {
+            "type": "array",
+            "title": "Patent References",
+            "description": "A list of BOM references (`bom-ref`) linking to patents or patent families associated with this assertion.",
+            "items": {
+              "$ref": "#/definitions/refType"
+            }
+          },
+          "asserter": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/organizationalEntity",
+                "title": "Organizational Entity"
+              },
+              {
+                "$ref": "#/definitions/organizationalContact",
+                "title": "Person"
+              },
+              {
+                "$ref": "#/definitions/refLinkType",
+                "title": "Reference",
+                "description": "A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value must be a valid `bom-ref` pointing to one of these objects."
+              }
+            ]
+          },
+          "notes": {
+            "type": "string",
+            "title": "Notes",
+            "description": "Additional notes or clarifications regarding the assertion, if necessary. For example, geographical restrictions, duration, or limitations of a license."
+          }
         }
       }
     }

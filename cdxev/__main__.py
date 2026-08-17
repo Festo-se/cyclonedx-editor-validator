@@ -712,7 +712,7 @@ def create_build_public_bom_parser(
     parser = subparsers.add_parser(
         "build-public",
         help=(
-            "Removes components and information with namespace internal"
+            "Removes components and information with namespace internal "
             "and resolves the dependencies."
         ),
     )
@@ -795,7 +795,7 @@ def create_list_command_parser(
     parser = subparsers.add_parser(
         "list",
         help=(
-            "Lists specific contents of the SBOM."
+            "Lists specific contents of the SBOM. "
             "Currently supported are the listing of license information and component information."
         ),
     )

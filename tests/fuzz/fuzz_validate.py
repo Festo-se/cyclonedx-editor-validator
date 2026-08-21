@@ -2,8 +2,8 @@
 """End-to-end fuzz target for the ``validate`` command.
 
 Runs a plausible SBOM through ``validate_sbom`` against the built-in schema.
-This exercises the full validation pipeline: jsonschema validation with the
-SPDX/JSF/cryptography helper registries, the custom error post-processing, and
+This exercises the full validation pipeline: jsonschema-rs validation with the
+SPDX/JSF/cryptography helper registries, structured error normalization, and
 (optionally) filename-pattern validation -- all over untrusted SBOM input.
 """
 

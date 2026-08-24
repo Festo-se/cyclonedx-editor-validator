@@ -507,6 +507,44 @@ class TestValidateComponents(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("copyright", issues), True)
 
+    def test_patent_assertions_valid(self) -> None:
+        sbom = get_test_sbom()
+        sbom["specVersion"] = "1.7"
+        sbom["components"][0]["patentAssertions"] = [
+            {
+                "assertionType": "ownership",
+                # Use a URL-only organizationalEntity to avoid oneOf ambiguity
+                # with organizationalContact (which also accepts 'name')
+                "asserter": {"url": ["https://example.com"]},
+            }
+        ]
+        issues = validate_test(sbom)
+        self.assertEqual(issues, ["no issue"])
+
+    def test_patent_assertions_invalid_assertion_type(self) -> None:
+        sbom = get_test_sbom()
+        sbom["specVersion"] = "1.7"
+        sbom["components"][0]["patentAssertions"] = [
+            {
+                "assertionType": "invalid-type",
+                "asserter": {"url": ["https://example.com"]},
+            }
+        ]
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("invalid-type", issues), True)
+
+    def test_patent_assertions_missing_required_field(self) -> None:
+        sbom = get_test_sbom()
+        sbom["specVersion"] = "1.7"
+        sbom["components"][0]["patentAssertions"] = [
+            {
+                "assertionType": "license",
+                # missing required 'asserter'
+            }
+        ]
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("asserter", issues), True)
+
     def test_version_short(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()

@@ -55,7 +55,7 @@ default-groups = [
     "dev",
     "docs",
 ]
-required-version = "==0.12.4"
+required-version = "==0.12.5"
 
 [build-system]
 requires = ["hatchling"]

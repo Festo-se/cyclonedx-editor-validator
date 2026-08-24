@@ -583,8 +583,32 @@
           "items": {
             "$ref": "#/definitions/standard"
           }
+        },
+        "patents": {
+          "type": "array",
+          "title": "Patents",
+          "description": "The list of either individual patents or patent families.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/patent"
+              },
+              {
+                "$ref": "#/definitions/patentFamily"
+              }
+            ]
+          }
         }
       }
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/citation"
+      },
+      "uniqueItems": true,
+      "title": "Citations",
+      "description": "A collection of attributions indicating which entity supplied information for specific fields within the BOM."
     },
     "properties": {
       "type": "array",
@@ -796,6 +820,18 @@
           "items": {
             "$ref": "#/definitions/property"
           }
+        },
+        "distributionConstraints": {
+          "title": "Distribution Constraints",
+          "description": "Conditions and constraints governing the sharing and distribution of the data or components described by this BOM.",
+          "type": "object",
+          "properties": {
+            "tlp": {
+              "$ref": "#/definitions/tlpClassification",
+              "description": "The Traffic Light Protocol (TLP) classification that controls the sharing and distribution of the data that the BOM describes."
+            }
+          },
+          "additionalProperties": false
         }
       },
       "required": [
@@ -803,6 +839,26 @@
         "authors",
         "component"
       ]
+    },
+    "tlpClassification": {
+      "title": "Traffic Light Protocol (TLP) Classification",
+      "description": "Traffic Light Protocol (TLP) is a classification system for identifying the potential risk associated with artefact, including whether it is subject to certain types of legal, financial, or technical threats. Refer to [https://www.first.org/tlp/](https://www.first.org/tlp/) for further information.\nThe default classification is \"CLEAR\"",
+      "type": "string",
+      "default": "CLEAR",
+      "enum": [
+        "CLEAR",
+        "GREEN",
+        "AMBER",
+        "AMBER_AND_STRICT",
+        "RED"
+      ],
+      "meta:enum": {
+        "CLEAR": "The information is not subject to any restrictions as regards the sharing.",
+        "GREEN": "The information is subject to limited disclosure, and recipients can share it within their community but not via publicly accessible channels.",
+        "AMBER": "The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization and with clients.",
+        "AMBER_AND_STRICT": "The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization.",
+        "RED": "The information is subject to restricted distribution to individual recipients only and must not be shared."
+      }
     },
     "tool": {
       "type": "object",
@@ -1066,6 +1122,17 @@
           "title": "Component Version",
           "minLength": 1,
           "description": "The component version. The version should ideally comply with semantic versioning but is not enforced."
+        },
+        "versionRange": {
+          "$ref": "#/definitions/versionRange",
+          "title": "Component Version Range",
+          "description": "For an external component, this specifies the accepted version range."
+        },
+        "isExternal": {
+          "type": "boolean",
+          "title": "Component Is External",
+          "description": "Determine whether this component is external.",
+          "default": false
         },
         "description": {
           "type": "string",
@@ -1698,7 +1765,9 @@
         "BLAKE2b-256",
         "BLAKE2b-384",
         "BLAKE2b-512",
-        "BLAKE3"
+        "BLAKE3",
+        "Streebog-256",
+        "Streebog-512"
       ],
       "additionalProperties": false
     },
@@ -1770,194 +1839,7 @@
           "format": "iri-reference"
         },
         "licensing": {
-          "type": "object",
-          "title": "Licensing information",
-          "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata",
-          "additionalProperties": false,
-          "properties": {
-            "altIds": {
-              "type": "array",
-              "title": "Alternate License Identifiers",
-              "description": "License identifiers that may be used to manage licenses and their lifecycle",
-              "items": {
-                "type": "string"
-              }
-            },
-            "licensor": {
-              "title": "Licensor",
-              "description": "The individual or organization that grants a license to another individual or organization",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "organization": {
-                  "title": "Licensor (Organization)",
-                  "description": "The organization that granted the license",
-                  "$ref": "#/definitions/organizationalEntity"
-                },
-                "individual": {
-                  "title": "Licensor (Individual)",
-                  "description": "The individual, not associated with an organization, that granted the license",
-                  "$ref": "#/definitions/organizationalContact"
-                }
-              },
-              "oneOf": [
-                {
-                  "required": [
-                    "organization"
-                  ]
-                },
-                {
-                  "required": [
-                    "individual"
-                  ]
-                }
-              ]
-            },
-            "licensee": {
-              "title": "Licensee",
-              "description": "The individual or organization for which a license was granted to",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "organization": {
-                  "title": "Licensee (Organization)",
-                  "description": "The organization that was granted the license",
-                  "$ref": "#/definitions/organizationalEntity"
-                },
-                "individual": {
-                  "title": "Licensee (Individual)",
-                  "description": "The individual, not associated with an organization, that was granted the license",
-                  "$ref": "#/definitions/organizationalContact"
-                }
-              },
-              "oneOf": [
-                {
-                  "required": [
-                    "organization"
-                  ]
-                },
-                {
-                  "required": [
-                    "individual"
-                  ]
-                }
-              ]
-            },
-            "purchaser": {
-              "title": "Purchaser",
-              "description": "The individual or organization that purchased the license",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "organization": {
-                  "title": "Purchaser (Organization)",
-                  "description": "The organization that purchased the license",
-                  "$ref": "#/definitions/organizationalEntity"
-                },
-                "individual": {
-                  "title": "Purchaser (Individual)",
-                  "description": "The individual, not associated with an organization, that purchased the license",
-                  "$ref": "#/definitions/organizationalContact"
-                }
-              },
-              "oneOf": [
-                {
-                  "required": [
-                    "organization"
-                  ]
-                },
-                {
-                  "required": [
-                    "individual"
-                  ]
-                }
-              ]
-            },
-            "purchaseOrder": {
-              "type": "string",
-              "title": "Purchase Order",
-              "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase"
-            },
-            "licenseTypes": {
-              "type": "array",
-              "title": "License Type",
-              "description": "The type of license(s) that was granted to the licensee.",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "academic",
-                  "appliance",
-                  "client-access",
-                  "concurrent-user",
-                  "core-points",
-                  "custom-metric",
-                  "device",
-                  "evaluation",
-                  "named-user",
-                  "node-locked",
-                  "oem",
-                  "perpetual",
-                  "processor-points",
-                  "subscription",
-                  "user",
-                  "other"
-                ],
-                "meta:enum": {
-                  "academic": "A license that grants use of software solely for the purpose of education or research.",
-                  "appliance": "A license covering use of software embedded in a specific piece of hardware.",
-                  "client-access": "A Client Access License (CAL) allows client computers to access services provided by server software.",
-                  "concurrent-user": "A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.",
-                  "core-points": "A license where the core of a computer's processor is assigned a specific number of points.",
-                  "custom-metric": "A license for which consumption is measured by non-standard metrics.",
-                  "device": "A license that covers a defined number of installations on computers and other types of devices.",
-                  "evaluation": "A license that grants permission to install and use software for trial purposes.",
-                  "named-user": "A license that grants access to the software to one or more pre-defined users.",
-                  "node-locked": "A license that grants access to the software on one or more pre-defined computers or devices.",
-                  "oem": "An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.",
-                  "perpetual": "A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.",
-                  "processor-points": "A license where each installation consumes points per processor.",
-                  "subscription": "A license where the licensee pays a fee to use the software or service.",
-                  "user": "A license that grants access to the software or service by a specified number of users.",
-                  "other": "Another license type."
-                }
-              }
-            },
-            "lastRenewal": {
-              "type": "string",
-              "format": "date-time",
-              "title": "Last Renewal",
-              "description": "The timestamp indicating when the license was last renewed. For new purchases, this is often the purchase or acquisition date. For non-perpetual licenses or subscriptions, this is the timestamp of when the license was last renewed."
-            },
-            "expiration": {
-              "type": "string",
-              "format": "date-time",
-              "title": "Expiration",
-              "description": "The timestamp indicating when the current license expires (if applicable)."
-            }
-          },
-          "allOf": [
-            {
-              "if": {
-                "properties": {
-                  "licenseTypes": {
-                    "contains": {
-                      "const": "appliance"
-                    }
-                  }
-                },
-                "required": [
-                  "licenseTypes"
-                ]
-              },
-              "then": {},
-              "else": {
-                "required": [
-                  "licenseTypes",
-                  "licensor"
-                ]
-              }
-            }
-          ]
+          "$ref": "#/definitions/licensing"
         },
         "properties": {
           "type": "array",
@@ -1987,6 +1869,196 @@
         "declared": "Declared licenses represent the initial intentions of authors regarding the licensing terms of their code.",
         "concluded": "Concluded licenses are verified and confirmed."
       }
+    },
+    "licensing": {
+      "type": "object",
+      "title": "Licensing information",
+      "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata",
+      "additionalProperties": false,
+      "properties": {
+        "altIds": {
+          "type": "array",
+          "title": "Alternate License Identifiers",
+          "description": "License identifiers that may be used to manage licenses and their lifecycle",
+          "items": {
+            "type": "string"
+          }
+        },
+        "licensor": {
+          "title": "Licensor",
+          "description": "The individual or organization that grants a license to another individual or organization",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "title": "Licensor (Organization)",
+              "description": "The organization that granted the license",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "individual": {
+              "title": "Licensor (Individual)",
+              "description": "The individual, not associated with an organization, that granted the license",
+              "$ref": "#/definitions/organizationalContact"
+            }
+          },
+          "oneOf": [
+            {
+              "required": [
+                "organization"
+              ]
+            },
+            {
+              "required": [
+                "individual"
+              ]
+            }
+          ]
+        },
+        "licensee": {
+          "title": "Licensee",
+          "description": "The individual or organization for which a license was granted to",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "title": "Licensee (Organization)",
+              "description": "The organization that was granted the license",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "individual": {
+              "title": "Licensee (Individual)",
+              "description": "The individual, not associated with an organization, that was granted the license",
+              "$ref": "#/definitions/organizationalContact"
+            }
+          },
+          "oneOf": [
+            {
+              "required": [
+                "organization"
+              ]
+            },
+            {
+              "required": [
+                "individual"
+              ]
+            }
+          ]
+        },
+        "purchaser": {
+          "title": "Purchaser",
+          "description": "The individual or organization that purchased the license",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "title": "Purchaser (Organization)",
+              "description": "The organization that purchased the license",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "individual": {
+              "title": "Purchaser (Individual)",
+              "description": "The individual, not associated with an organization, that purchased the license",
+              "$ref": "#/definitions/organizationalContact"
+            }
+          },
+          "oneOf": [
+            {
+              "required": [
+                "organization"
+              ]
+            },
+            {
+              "required": [
+                "individual"
+              ]
+            }
+          ]
+        },
+        "purchaseOrder": {
+          "type": "string",
+          "title": "Purchase Order",
+          "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase"
+        },
+        "licenseTypes": {
+          "type": "array",
+          "title": "License Type",
+          "description": "The type of license(s) that was granted to the licensee.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "academic",
+              "appliance",
+              "client-access",
+              "concurrent-user",
+              "core-points",
+              "custom-metric",
+              "device",
+              "evaluation",
+              "named-user",
+              "node-locked",
+              "oem",
+              "perpetual",
+              "processor-points",
+              "subscription",
+              "user",
+              "other"
+            ],
+            "meta:enum": {
+              "academic": "A license that grants use of software solely for the purpose of education or research.",
+              "appliance": "A license covering use of software embedded in a specific piece of hardware.",
+              "client-access": "A Client Access License (CAL) allows client computers to access services provided by server software.",
+              "concurrent-user": "A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.",
+              "core-points": "A license where the core of a computer's processor is assigned a specific number of points.",
+              "custom-metric": "A license for which consumption is measured by non-standard metrics.",
+              "device": "A license that covers a defined number of installations on computers and other types of devices.",
+              "evaluation": "A license that grants permission to install and use software for trial purposes.",
+              "named-user": "A license that grants access to the software to one or more pre-defined users.",
+              "node-locked": "A license that grants access to the software on one or more pre-defined computers or devices.",
+              "oem": "An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.",
+              "perpetual": "A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.",
+              "processor-points": "A license where each installation consumes points per processor.",
+              "subscription": "A license where the licensee pays a fee to use the software or service.",
+              "user": "A license that grants access to the software or service by a specified number of users.",
+              "other": "Another license type."
+            }
+          }
+        },
+        "lastRenewal": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Last Renewal",
+          "description": "The timestamp indicating when the license was last renewed. For new purchases, this is often the purchase or acquisition date. For non-perpetual licenses or subscriptions, this is the timestamp of when the license was last renewed."
+        },
+        "expiration": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Expiration",
+          "description": "The timestamp indicating when the current license expires (if applicable)."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "licenseTypes": {
+                "contains": {
+                  "const": "appliance"
+                }
+              }
+            },
+            "required": [
+              "licenseTypes"
+            ]
+          },
+          "then": {},
+          "else": {
+            "required": [
+              "licenseTypes",
+              "licensor"
+            ]
+          }
+        }
+      ]
     },
     "licenseChoice": {
       "title": "License Choice",
@@ -2369,6 +2441,10 @@
             "electronic-signature",
             "digital-signature",
             "rfc-9116",
+            "patent",
+            "patent-family",
+            "patent-assertion",
+            "citation",
             "other"
           ],
           "meta:enum": {
@@ -2424,6 +2500,14 @@
           },
           "title": "Hashes",
           "description": "The hashes of the external reference (if applicable)."
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store.",
+          "items": {
+            "$ref": "#/definitions/property"
+          }
         }
       }
     },
@@ -2543,6 +2627,10 @@
         "licenses": {
           "$ref": "#/definitions/licenseChoice",
           "title": "Service License(s)"
+        },
+        "patentAssertions": {
+          "$ref": "#/definitions/patentAssertions",
+          "title": "Service Patent(s)"
         },
         "externalReferences": {
           "type": "array",
@@ -5838,6 +5926,7 @@
                 "kem",
                 "ae",
                 "combiner",
+                "key-wrap",
                 "other",
                 "unknown"
               ],
@@ -5855,6 +5944,7 @@
                 "kem": "A Key Encapsulation Mechanism (KEM) algorithm is a mechanism for transporting random keying material to a recipient using the recipient's public key.",
                 "ae": "Authenticated Encryption (AE) is a cryptographic process that provides both confidentiality and data integrity. It ensures that the encrypted data has not been tampered with and comes from a legitimate source. AE is commonly used in secure communication protocols.",
                 "combiner": "A combiner aggregates many candidates for a cryptographic primitive and generates a new candidate for the same primitive.",
+                "key-wrap": "Key-wrap is a cryptographic technique used to securely encrypt and protect cryptographic keys using algorithms like AES.",
                 "other": "Another primitive type.",
                 "unknown": "The primitive is not known."
               }
@@ -5868,6 +5958,16 @@
               "type": "string",
               "title": "Elliptic Curve",
               "description": "The specific underlying Elliptic Curve (EC) definition employed which is an indicator of the level of security strength, performance and complexity. Absent an authoritative source of curve names, CycloneDX recommends using curve names as defined at [https://neuromancer.sk/std/](https://neuromancer.sk/std/), the source of which can be found at [https://github.com/J08nY/std-curves](https://github.com/J08nY/std-curves)."
+            },
+            "algorithmFamily": {
+              "$ref": "cryptography-defs.schema.json#/definitions/algorithmFamiliesEnum",
+              "title": "Algorithm Family",
+              "description": "A valid algorithm family identifier."
+            },
+            "ellipticCurve": {
+              "$ref": "cryptography-defs.schema.json#/definitions/ellipticCurvesEnum",
+              "title": "Elliptic Curve",
+              "description": "The specific underlying Elliptic Curve definition employed."
             },
             "executionEnvironment": {
               "type": "string",
@@ -6075,6 +6175,11 @@
           "description": "Properties for cryptographic assets of asset type 'certificate'",
           "additionalProperties": false,
           "properties": {
+            "serialNumber": {
+              "type": "string",
+              "title": "Serial Number",
+              "description": "The serial number is a unique identifier for the certificate issued by a CA."
+            },
             "subjectName": {
               "type": "string",
               "title": "Subject Name",
@@ -6129,6 +6234,140 @@
                 "der",
                 "p12"
               ]
+            },
+            "certificateFileExtension": {
+              "type": "string",
+              "title": "Certificate File Extension",
+              "description": "The file extension of the certificate."
+            },
+            "fingerprint": {
+              "type": "object",
+              "$ref": "#/definitions/hash",
+              "title": "Certificate Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the certificate excluding its signature."
+            },
+            "certificateState": {
+              "type": "array",
+              "title": "Certificate Lifecycle State",
+              "items": {
+                "type": "object",
+                "oneOf": [
+                  {
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "enum": [
+                          "pre-activation",
+                          "active",
+                          "suspended",
+                          "deactivated",
+                          "revoked",
+                          "destroyed"
+                        ]
+                      },
+                      "reason": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "reason": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "creationDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "activationDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "deactivationDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "revocationDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "destructionDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "certificateExtensions": {
+              "type": "array",
+              "title": "Certificate Extensions",
+              "items": {
+                "type": "object",
+                "oneOf": [
+                  {
+                    "required": [
+                      "commonExtensionName",
+                      "commonExtensionValue"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "commonExtensionName": {
+                        "type": "string",
+                        "enum": [
+                          "basicConstraints",
+                          "keyUsage",
+                          "extendedKeyUsage",
+                          "subjectAlternativeName",
+                          "authorityKeyIdentifier",
+                          "subjectKeyIdentifier",
+                          "authorityInformationAccess",
+                          "certificatePolicies",
+                          "crlDistributionPoints",
+                          "signedCertificateTimestamp"
+                        ]
+                      },
+                      "commonExtensionValue": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "required": [
+                      "customExtensionName"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "customExtensionName": {
+                        "type": "string"
+                      },
+                      "customExtensionValue": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of cryptographic assets related to this component."
             }
           }
         },
@@ -6251,6 +6490,17 @@
               "$ref": "#/definitions/securedBy",
               "title": "Secured By",
               "description": "The mechanism by which the cryptographic asset is secured by."
+            },
+            "fingerprint": {
+              "type": "object",
+              "$ref": "#/definitions/hash",
+              "title": "Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the asset."
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of cryptographic assets related to this component."
             }
           }
         },
@@ -6271,6 +6521,12 @@
                 "ike",
                 "sstp",
                 "wpa",
+                "dtls",
+                "quic",
+                "eap-aka",
+                "eap-aka-prime",
+                "prins",
+                "5g-aka",
                 "other",
                 "unknown"
               ],
@@ -6311,24 +6567,68 @@
               "additionalProperties": false,
               "properties": {
                 "encr": {
-                  "$ref": "#/definitions/cryptoRefArray",
                   "title": "Encryption Algorithm (ENCR)",
-                  "description": "Transform Type 1: encryption algorithms"
+                  "description": "Transform Type 1: encryption algorithms",
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/ikeV2Enc"
+                      }
+                    },
+                    {
+                      "deprecated": true,
+                      "$ref": "#/definitions/cryptoRefArray"
+                    }
+                  ]
                 },
                 "prf": {
-                  "$ref": "#/definitions/cryptoRefArray",
                   "title": "Pseudorandom Function (PRF)",
-                  "description": "Transform Type 2: pseudorandom functions"
+                  "description": "Transform Type 2: pseudorandom functions",
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/ikeV2Prf"
+                      }
+                    },
+                    {
+                      "deprecated": true,
+                      "$ref": "#/definitions/cryptoRefArray"
+                    }
+                  ]
                 },
                 "integ": {
-                  "$ref": "#/definitions/cryptoRefArray",
                   "title": "Integrity Algorithm (INTEG)",
-                  "description": "Transform Type 3: integrity algorithms"
+                  "description": "Transform Type 3: integrity algorithms",
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/ikeV2Integ"
+                      }
+                    },
+                    {
+                      "deprecated": true,
+                      "$ref": "#/definitions/cryptoRefArray"
+                    }
+                  ]
                 },
                 "ke": {
-                  "$ref": "#/definitions/cryptoRefArray",
                   "title": "Key Exchange Method (KE)",
-                  "description": "Transform Type 4: Key Exchange Method (KE) per [RFC 9370](https://www.ietf.org/rfc/rfc9370.html), formerly called Diffie-Hellman Group (D-H)."
+                  "description": "Transform Type 4: Key Exchange Method (KE) per [RFC 9370](https://www.ietf.org/rfc/rfc9370.html), formerly called Diffie-Hellman Group (D-H).",
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/ikeV2Ke"
+                      }
+                    },
+                    {
+                      "deprecated": true,
+                      "$ref": "#/definitions/cryptoRefArray"
+                    }
+                  ]
                 },
                 "esn": {
                   "type": "boolean",
@@ -6336,9 +6636,20 @@
                   "description": "Specifies if an Extended Sequence Number (ESN) is used."
                 },
                 "auth": {
-                  "$ref": "#/definitions/cryptoRefArray",
                   "title": "IKEv2 Authentication method",
-                  "description": "IKEv2 Authentication method"
+                  "description": "IKEv2 Authentication method",
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/ikeV2Auth"
+                      }
+                    },
+                    {
+                      "deprecated": true,
+                      "$ref": "#/definitions/cryptoRefArray"
+                    }
+                  ]
                 }
               }
             },
@@ -6346,6 +6657,11 @@
               "$ref": "#/definitions/cryptoRefArray",
               "title": "Cryptographic References",
               "description": "A list of protocol-related cryptographic assets"
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of cryptographic assets related to this component."
             }
           }
         },
@@ -6393,6 +6709,20 @@
               "0x9E"
             ]
           }
+        },
+        "tlsGroups": {
+          "type": "array",
+          "title": "TLS Groups",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tlsSignatureSchemes": {
+          "type": "array",
+          "title": "TLS Signature Schemes",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -6400,6 +6730,94 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/refType"
+      }
+    },
+    "ikeV2Enc": {
+      "type": "object",
+      "title": "Encryption Algorithm (ENCR)",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "keyLength": {
+          "type": "integer"
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType"
+        }
+      }
+    },
+    "ikeV2Prf": {
+      "type": "object",
+      "title": "Pseudorandom Function (PRF)",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType"
+        }
+      }
+    },
+    "ikeV2Integ": {
+      "type": "object",
+      "title": "Integrity Algorithm (INTEG)",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType"
+        }
+      }
+    },
+    "ikeV2Ke": {
+      "type": "object",
+      "title": "Key Exchange Method (KE)",
+      "additionalProperties": false,
+      "properties": {
+        "group": {
+          "type": "integer"
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType"
+        }
+      }
+    },
+    "ikeV2Auth": {
+      "type": "object",
+      "title": "IKEv2 Authentication method",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType"
+        }
+      }
+    },
+    "relatedCryptographicAssets": {
+      "type": "array",
+      "title": "Related Cryptographic Assets",
+      "items": {
+        "$ref": "#/definitions/relatedCryptographicAsset"
+      }
+    },
+    "relatedCryptographicAsset": {
+      "type": "object",
+      "title": "Related Cryptographic Asset",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "ref": {
+          "$ref": "#/definitions/refType"
+        }
       }
     },
     "securedBy": {
@@ -6763,6 +7181,251 @@
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
       }
+    },
+    "patentFamily": {
+      "type": "object",
+      "title": "Patent Family",
+      "description": "A patent family is a group of related patent applications or granted patents that cover the same or similar invention.",
+      "required": [
+        "familyId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference"
+        },
+        "familyId": {
+          "type": "string",
+          "title": "Patent Family ID"
+        },
+        "priorityApplication": {
+          "$ref": "#/definitions/priorityApplication"
+        },
+        "members": {
+          "type": "array",
+          "title": "Family Members",
+          "items": {
+            "$ref": "#/definitions/refLinkType"
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/externalReference"
+          }
+        }
+      }
+    },
+    "patent": {
+      "type": "object",
+      "title": "Patent",
+      "description": "A patent is a legal instrument granted by an authority that confers rights over an invention for a specified period.",
+      "required": [
+        "patentNumber",
+        "jurisdiction",
+        "patentLegalStatus"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference"
+        },
+        "patentNumber": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-/.()\\s]{0,28}[A-Za-z0-9]$",
+          "title": "Patent Number"
+        },
+        "applicationNumber": {
+          "$ref": "#/definitions/patentApplicationNumber"
+        },
+        "jurisdiction": {
+          "$ref": "#/definitions/patentJurisdiction"
+        },
+        "priorityApplication": {
+          "$ref": "#/definitions/priorityApplication"
+        },
+        "publicationNumber": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-/.()\\s]{0,28}[A-Za-z0-9]$",
+          "title": "Patent Publication Number"
+        },
+        "title": {
+          "type": "string",
+          "title": "Patent Title"
+        },
+        "abstract": {
+          "type": "string",
+          "title": "Patent Abstract"
+        },
+        "filingDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Filing Date"
+        },
+        "grantDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Grant Date"
+        },
+        "patentExpirationDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Expiration Date"
+        },
+        "patentLegalStatus": {
+          "type": "string",
+          "title": "Legal Status",
+          "enum": [
+            "pending",
+            "granted",
+            "revoked",
+            "expired",
+            "lapsed",
+            "withdrawn",
+            "abandoned",
+            "suspended",
+            "reinstated",
+            "opposed",
+            "terminated",
+            "invalidated",
+            "in-force"
+          ]
+        },
+        "patentAssignee": {
+          "type": "array",
+          "title": "Patent Assignees",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/organizationalContact"
+              },
+              {
+                "$ref": "#/definitions/organizationalEntity"
+              }
+            ]
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/externalReference"
+          }
+        }
+      }
+    },
+    "patentApplicationNumber": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-/.()\\s]{0,28}[A-Za-z0-9]$",
+      "title": "Patent Application Number"
+    },
+    "patentJurisdiction": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "title": "Jurisdiction"
+    },
+    "patentFilingDate": {
+      "type": "string",
+      "format": "date",
+      "title": "Filing Date"
+    },
+    "priorityApplication": {
+      "type": "object",
+      "title": "Priority Application",
+      "required": [
+        "applicationNumber",
+        "jurisdiction",
+        "filingDate"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "applicationNumber": {
+          "$ref": "#/definitions/patentApplicationNumber"
+        },
+        "jurisdiction": {
+          "$ref": "#/definitions/patentJurisdiction"
+        },
+        "filingDate": {
+          "$ref": "#/definitions/patentFilingDate"
+        }
+      }
+    },
+    "citation": {
+      "type": "object",
+      "title": "Citation",
+      "description": "Details a specific attribution of data within the BOM to a contributing entity or process.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference"
+        },
+        "pointers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Field References"
+        },
+        "expressions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Path Expressions"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        },
+        "attributedTo": {
+          "$ref": "#/definitions/refLinkType",
+          "title": "Attributed To"
+        },
+        "process": {
+          "$ref": "#/definitions/refLinkType",
+          "title": "Process Reference"
+        },
+        "note": {
+          "type": "string",
+          "title": "Note"
+        },
+        "signature": {
+          "$ref": "#/definitions/signature",
+          "title": "Signature"
+        }
+      },
+      "required": [
+        "timestamp"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "attributedTo"
+          ]
+        },
+        {
+          "required": [
+            "process"
+          ]
+        }
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "pointers"
+          ]
+        },
+        {
+          "required": [
+            "expressions"
+          ]
+        }
+      ]
     },
     "patentAssertions": {
       "type": "array",

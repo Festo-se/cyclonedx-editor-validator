@@ -34,14 +34,14 @@ cdx-ev = "cdxev.__main__:main"
 
 [dependency-groups]
 dev = [
-    "mypy==2.3.0",
+    "mypy==2.3.1",
     "types-python-dateutil==2.9.0.20260807",
     "pytest==9.1.1",
     "coverage==7.15.4",
     "toml==0.10.2",
     "typing-extensions==4.16.0",
     "pre-commit==4.6.2",
-    "ruff==0.16.3",
+    "ruff==0.16.4",
 ]
 docs = [
     "sphinx-argparse==0.6.0",

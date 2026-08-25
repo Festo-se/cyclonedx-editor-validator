@@ -391,7 +391,7 @@ def _external_component_warning(
         label = f"bom-ref: {component['bom-ref']}"
     elif isinstance(component, dict) and isinstance(component.get("name"), str):
         label = f"name: {component['name']}"
-    else:
+    else:  # pragma: no cover - schema normally requires a component name
         label = "unidentified component"
     return ValidationIssue(
         path=path,
@@ -409,7 +409,7 @@ def _value_at_path(instance: dict[str, t.Any], path: tuple[PathSegment, ...]) ->
     for segment in path:
         try:
             current = current[segment]
-        except (KeyError, IndexError, TypeError):
+        except (KeyError, IndexError, TypeError):  # pragma: no cover - defensive path traversal
             return None
     return current
 
@@ -429,7 +429,7 @@ def _subject_for_path(
             if segment in _ENTITY_COLLECTIONS:
                 entity_path += (path[index + 1],)
             entity = _value_at_path(instance, entity_path)
-            if not isinstance(entity, dict):
+            if not isinstance(entity, dict):  # pragma: no cover - schema errors use mappings
                 continue
             identifier = entity.get("bom-ref") or entity.get("ref") or entity.get("name")
             if isinstance(identifier, str):

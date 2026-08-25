@@ -2,32 +2,20 @@
 
 import contextlib
 import logging
-import re
 import sys
 import typing as t
 from pathlib import Path
 
-import jsonschema
-import jsonschema.exceptions
-import jsonschema.validators
-from jsonschema import FormatChecker
-from referencing import Registry, Resource
-from referencing.jsonschema import DRAFT202012, Schema
-
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
-from cdxev.validator.helper import (
-    load_bundled_schema,
-    load_spdx_schema,
-    open_schema,
-    validate_filename,
-)
+from cdxev.validator.engine import ValidationIssue, validate_instance
+from cdxev.validator.helper import validate_filename
 
 logger = logging.getLogger(__name__)
 
 
-def validate_sbom(  # noqa: C901
+def validate_sbom(
     sbom: dict,
     input_format: str,
     file: Path,
@@ -37,7 +25,6 @@ def validate_sbom(  # noqa: C901
     filename_regex: t.Optional[str],
     schema_path: t.Optional[Path],
 ) -> int:
-    errors: list[str] = []
     if (schema_path is not None) == bool(schema_type):
         raise AssertionError(  # pragma: no cover
             "Exactly one of schema_path or schema_type must be non-None"
@@ -53,230 +40,39 @@ def validate_sbom(  # noqa: C901
         )
         stderr_handler.setStream(sys.stdout)
 
-    if input_format == "json":
-        try:
-            spec_version: str = sbom["specVersion"]
-        except (KeyError, TypeError) as exc:
-            raise AppError(
-                "Invalid SBOM",
-                "Failed to validate against built-in schema because 'specVersion' is missing. "
-                "Add the field, then retry.",
-            ) from exc
-        sbom_schema = open_schema(spec_version, schema_type, schema_path)
+    if input_format != "json":
+        raise AppError("Invalid SBOM", f"Unsupported input format for validation: {input_format}")
 
-        if filename_regex is not None:
-            # Filename should be validated
-            filename_error = validate_filename(file.name, filename_regex)
-            if filename_error:
-                if filename_regex == "" and schema_type != "custom":
-                    # Implicit validation against CycloneDX recommendations is only a warning
-                    logger.warning(filename_error)
-                else:
-                    # Explicit filename pattern or custom schema produces validation errors
-                    errors.append("SBOM has the mistake: " + filename_error)
+    try:
+        spec_version = sbom["specVersion"]
+    except (KeyError, TypeError) as exc:
+        raise AppError(
+            "Invalid SBOM",
+            "Failed to validate because 'specVersion' is missing. Add the field, then retry.",
+        ) from exc
+    if not isinstance(spec_version, str):
+        raise AppError("Invalid SBOM", "The 'specVersion' field must be a string.")
 
-        schema_spdx = Resource.from_contents(
-            contents=load_spdx_schema(), default_specification=DRAFT202012
-        )
-        registry: Registry[Schema] = Registry().with_resource(
-            uri="spdx.schema.json", resource=schema_spdx
-        )
-        for helper_schema_name in ("jsf-0.82.schema.json", "cryptography-defs.schema.json"):
-            try:
-                helper_schema = load_bundled_schema(helper_schema_name)
-                helper_resource = Resource.from_contents(
-                    contents=helper_schema, default_specification=DRAFT202012
-                )
-                registry = registry.with_resource(uri=helper_schema_name, resource=helper_resource)
-            except Exception:
-                # Helper schema absent – skip; validation will still work unless the
-                # BOM itself exercises the missing reference.
-                logger.debug(
-                    "Bundled helper schema '%s' could not be loaded; skipping.",
-                    helper_schema_name,
-                    exc_info=True,
-                )
-
-        validator_cls: type[jsonschema.Validator] = jsonschema.validators.validator_for(
-            sbom_schema
-        )
-        if schema_path is not None:
-            # Built-in schemas are assumed to be tested during development. A runtime check on
-            # every run of the validate command would be excessive.
-            try:
-                validator_cls.check_schema(sbom_schema)
-            except jsonschema.exceptions.SchemaError as exc:
-                raise AppError(
-                    "Schema not loaded",
-                    "Invalid JSON Schema in schema file " + str(schema_path),
-                ) from exc
-        v = validator_cls(
-            schema=sbom_schema,
-            registry=registry,
-            format_checker=FormatChecker(),
-        )
-        for error in sorted(v.iter_errors(sbom), key=str):
-            try:
-                if error.validator == "required" and error.validator_value == [
-                    "this_is_an_externally_described_component"
-                ]:
-                    # This requirement in the schema allows us to produce warnings.
-                    comp = t.cast(dict, error.instance)
-                    if "bom-ref" in comp:
-                        comp_id = f"Component [bom-ref: {comp['bom-ref']}]"
-                    elif "name" in comp:
-                        comp_id = f"Component [name: {comp['name']}]"
-                    else:
-                        comp_id = f"Unidentified component at {error.json_path}"
-
-                    logger.warning(
-                        comp_id + " is described by an external BOM. "
-                        "The validity of the referenced BOM cannot be checked."
-                    )
-                    continue
-                elif len(error.absolute_path) > 3:
-                    error_path = (
-                        sbom[error.absolute_path[0]][error.absolute_path[1]].get(
-                            "bom-ref",
-                            sbom[error.absolute_path[0]][error.absolute_path[1]].get(
-                                "name", error.json_path
-                            ),
-                        )
-                        + " the field "
-                        + error.absolute_path[2]
-                        + "["
-                        + str(error.absolute_path[3])
-                        + "] has the mistake: "
-                    )
-                elif len(error.absolute_path) >= 2:
-                    error_path = (
-                        sbom[error.absolute_path[0]][error.absolute_path[1]].get(
-                            "bom-ref",
-                            sbom[error.absolute_path[0]][error.absolute_path[1]].get(
-                                "name", error.json_path
-                            ),
-                        )
-                        + " has the mistake: "
-                    )
-                elif len(error.absolute_path) == 1:
-                    if "$schema" == error.absolute_path[0]:
-                        # skip error that schema is wrong as probably another scheme is in use
-                        continue
-                    else:
-                        error_path = f"{error.absolute_path[0]} has the mistake: "
-                else:
-                    error_path = "SBOM has the mistake: "
-            except AttributeError:
-                error_path = error.json_path + " has the mistake: "
-            if error.context is not None and len(error.context) > 0:
-                if error.validator == "oneOf" and "licenses" in error.json_path:
-                    # When licenseChoice (array oneOf) fails, the actual errors are nested in
-                    # the context of the branch that was closest to passing. Walk the context
-                    # tree to find the most relevant leaf errors to surface.
-                    def collect_leaf_errors(
-                        err: jsonschema.exceptions.ValidationError,
-                    ) -> list[jsonschema.exceptions.ValidationError]:
-                        if err.context:
-                            leaves = []
-                            for sub in err.context:
-                                leaves.extend(collect_leaf_errors(sub))
-                            return leaves
-                        return [err]
-
-                    # Collect all leaf errors from all branches (deduplicated by message)
-                    all_leaves: list[jsonschema.exceptions.ValidationError] = []
-                    seen_messages: set[str] = set()
-                    for ctx_error in error.context:
-                        for leaf in collect_leaf_errors(ctx_error):
-                            if leaf.message not in seen_messages:
-                                seen_messages.add(leaf.message)
-                                all_leaves.append(leaf)
-
-                    for leaf in all_leaves:
-                        if "license.id" in leaf.json_path and "is not one of" in leaf.message:
-                            errors.append(
-                                error_path
-                                + "used license ID "
-                                + leaf.args[0].split()[0]
-                                + " is not a valid SPDX ID. "
-                                "Please use either the field 'name' and 'text' or "
-                                "provide a valid ID."
-                            )
-                        elif "non-empty" in leaf.message:
-                            errors.append(
-                                f"{error_path}'{leaf.absolute_path[-1]}' should not be empty"
-                            )
-                        elif leaf.validator == "pattern":
-                            errors.append(error_path + leaf.message.replace("\\", ""))
-                        else:
-                            errors.append(error_path + leaf.message)
-                else:
-                    if error.validator == "anyOf":
-                        pattern_errors = [
-                            context_error
-                            for context_error in error.context
-                            if context_error.validator == "pattern"
-                        ]
-                        if pattern_errors:
-                            errors.extend(
-                                error_path
-                                + "the supplier-equivalent field "
-                                + str(pattern_error.absolute_path[-2])
-                                + " has the mistake: "
-                                + pattern_error.message.replace("\\", "")
-                                for pattern_error in pattern_errors
-                            )
-                            continue
-                    error_message = ""
-                    for i in range(len(error.context)):
-                        error_field = re.search(r"'\w+'|(is too short)", error.context[i].message)
-                        if (error_field is None) or (error_field.group(0) == "is too short"):
-                            validation_field = (
-                                "'" + error.context[i].json_path.split(".")[-1] + "'"
-                            )
-                        else:
-                            validation_field = error_field.group(0)
-                        if i < (len(error.context) - 1):
-                            if error_message == "":
-                                error_message += validation_field
-                            else:
-                                error_message += ", " + validation_field
-                        else:
-                            error_message += " or " + validation_field
-                    error_message += " is a required property"
-                    errors.append(error_path + error_message)
+    errors: list[ValidationIssue] = []
+    if filename_regex is not None:
+        filename_error = validate_filename(file.name, filename_regex)
+        if filename_error:
+            if filename_regex == "" and schema_type != "custom":
+                logger.warning(filename_error)
             else:
-                if ("license.id" in error.json_path) and ("is not one of" in error.message):
-                    # if mistake is a wrong SPDX ID omit printing every single option
-                    errors.append(
-                        error_path
-                        + "used license ID "
-                        + error.args[0].split()[0]
-                        + " is not a valid SPDX ID. "
-                        "Please use either the field 'name' or provide a valid ID."
+                errors.append(
+                    ValidationIssue(
+                        path=(),
+                        message=filename_error,
+                        keyword="filename",
+                        subject=None,
                     )
-                elif ("dependsOn" in error.json_path) and (
-                    "has non-unique elements" in error.message
-                ):
-                    dependencies = sbom.get("dependencies", {})
-                    index_dependencies = re.search(r"\[\d\]", error_path)
-                    if index_dependencies is not None:
-                        index_ref = index_dependencies.group(0).strip("[]")
-                        errors.append(
-                            dependencies[int(index_ref)]["ref"]
-                            + " has the mistake: the dependencies in dependsOn are non-unique"
-                        )
-                    else:
-                        errors.append(
-                            "SBOM has the mistake: Could not find reference for dependencies"
-                        )
-                elif "non-empty" in error.message:
-                    errors.append(f"{error_path}'{error.absolute_path[-1]}' should not be empty")
-                elif error.validator == "pattern":
-                    errors.append(error_path + error.message.replace("\\", ""))
-                else:
-                    errors.append(error_path + error.message)
-    sorted_errors = sorted(set(errors))
+                )
+
+    result = validate_instance(sbom, spec_version, schema_type, schema_path)
+    errors.extend(result.errors)
+    for warning in result.warnings:
+        logger.warning(warning.message)
 
     report_handler: t.Optional[logging.Handler] = None
     if report_format == "warnings-ng":
@@ -288,20 +84,21 @@ def validate_sbom(  # noqa: C901
         # See comment above
         report_handler = GitLabCQReporter(file, t.cast(Path, report_path))
         logger.addHandler(report_handler)
-    if len(sorted_errors) == 0:
-        logger.info("SBOM is compliant to the provided specification schema")
-        return 0
-    else:
-        for error_msg in sorted_errors:
+    try:
+        if not errors:
+            logger.info("SBOM is compliant with the provided specification schema")
+            return 0
+
+        for issue in sorted(set(errors), key=lambda item: (item.location, item.message)):
             logger.error(
                 LogMessage(
                     message="Invalid SBOM",
-                    description=error_msg.replace(
-                        error_msg[0 : error_msg.find("has the mistake")], ""
-                    ).replace("has the mistake: ", ""),
-                    module_name=error_msg[0 : error_msg.find("has the mistake") - 1],
+                    description=issue.description,
+                    module_name=issue.subject,
                 )
             )
-        if report_handler is not None:
-            report_handler.close()
         return 1
+    finally:
+        if report_handler is not None:
+            logger.removeHandler(report_handler)
+            report_handler.close()

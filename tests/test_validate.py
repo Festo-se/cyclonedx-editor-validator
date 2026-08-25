@@ -348,6 +348,21 @@ class TestValidateComponents(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
 
+    def test_supplier_equivalent_fields(self) -> None:
+        cases = (
+            [(spec_version, "publisher", "Acme") for spec_version in ["1.3", "1.4", "1.5"]]
+            + [(spec_version, "manufacturer", {"name": "Acme"}) for spec_version in ["1.6", "1.7"]]
+            + [(spec_version, "authors", [{"name": "Acme"}]) for spec_version in ["1.6", "1.7"]]
+        )
+        for spec_version, field, value in cases:
+            with self.subTest(spec_version=spec_version, field=field):
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                sbom["components"][0].pop("supplier")
+                sbom["components"][0][field] = value
+                issues = validate_test(sbom)
+                self.assertEqual(issues, ["no issue"])
+
     def test_components_component_supplier_and_author_missing(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()

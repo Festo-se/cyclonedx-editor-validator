@@ -1354,7 +1354,22 @@
               },
               {
                 "required": [
+                  "manufacturer"
+                ]
+              },
+              {
+                "required": [
+                  "authors"
+                ]
+              },
+              {
+                "required": [
                   "author"
+                ]
+              },
+              {
+                "required": [
+                  "publisher"
                 ]
               }
             ]

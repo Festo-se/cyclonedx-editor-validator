@@ -237,6 +237,8 @@ class InferSupplier(Operation):
     The algorithm sets the ``supplier.name`` to the first element found from the following list:
 
     * ``publisher``
+    * ``manufacturer.name``
+    * ``authors[].name``
     * ``author``
 
     The ``supplier.url`` will be inferred from the following sources, in order of precedence:
@@ -276,6 +278,30 @@ class InferSupplier(Operation):
 
         if "publisher" in component:
             supplier["name"] = component["publisher"]
+        elif "manufacturer" in component and isinstance(component["manufacturer"], dict):
+            manufacturer = component["manufacturer"]
+            if "name" in manufacturer:
+                supplier["name"] = manufacturer["name"]
+            elif "url" in manufacturer and "url" not in supplier:
+                supplier["url"] = manufacturer["url"]
+        elif "authors" in component and isinstance(component["authors"], list):
+            author = next(
+                (
+                    entry
+                    for entry in component["authors"]
+                    if isinstance(entry, dict) and "name" in entry
+                ),
+                None,
+            )
+            if author is None:
+                author = next(
+                    (entry for entry in component["authors"] if isinstance(entry, dict)), None
+                )
+            if author is not None:
+                if "name" in author:
+                    supplier["name"] = author["name"]
+                elif "url" not in supplier:
+                    supplier["contact"] = [author]
         elif "author" in component:
             supplier["name"] = component["author"]
 

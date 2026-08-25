@@ -163,6 +163,24 @@ class InferSupplierTestCase(AmendTestCase):
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
+    def test_manufacturer_already_present(self) -> None:
+        component = {"manufacturer": {"name": "x"}}
+        expected = {"manufacturer": {"name": "x"}, "supplier": {"name": "x"}}
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_authors_already_present(self) -> None:
+        component = {"authors": [{"name": "x"}]}
+        expected = {"authors": [{"name": "x"}], "supplier": {"name": "x"}}
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_named_author_is_preferred(self) -> None:
+        component = {"authors": [{"email": "x@example.com"}, {"name": "x"}]}
+        expected = {"authors": component["authors"], "supplier": {"name": "x"}}
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
     def test_supplier_already_present(self) -> None:
         component = {"author": "x", "supplier": {"name": "y"}}
         expected = copy.deepcopy(component)

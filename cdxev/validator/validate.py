@@ -211,6 +211,22 @@ def validate_sbom(  # noqa: C901
                         else:
                             errors.append(error_path + leaf.message)
                 else:
+                    if error.validator == "anyOf":
+                        pattern_errors = [
+                            context_error
+                            for context_error in error.context
+                            if context_error.validator == "pattern"
+                        ]
+                        if pattern_errors:
+                            errors.extend(
+                                error_path
+                                + "the supplier-equivalent field "
+                                + str(pattern_error.absolute_path[-2])
+                                + " has the mistake: "
+                                + pattern_error.message.replace("\\", "")
+                                for pattern_error in pattern_errors
+                            )
+                            continue
                     error_message = ""
                     for i in range(len(error.context)):
                         error_field = re.search(r"'\w+'|(is too short)", error.context[i].message)

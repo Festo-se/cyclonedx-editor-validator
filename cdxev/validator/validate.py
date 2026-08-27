@@ -9,8 +9,7 @@ from pathlib import Path
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
-from cdxev.validator.engine import ValidationIssue, validate_instance
-from cdxev.validator.helper import validate_filename
+from cdxev.validator.helper import ValidationIssue, validate_filename, validate_instance
 
 logger = logging.getLogger(__name__)
 

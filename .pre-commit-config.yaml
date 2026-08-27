@@ -39,6 +39,7 @@ repos:
           - natsort==8.4.0
           - docstring-parser==0.18.0
           - email-validator==2.3.0
+          - license-expression==30.4.4
         files: "^cdxev/.*\\.py$"
         args: ["--config-file", "pyproject.toml"]
   - repo: https://github.com/astral-sh/uv-pre-commit

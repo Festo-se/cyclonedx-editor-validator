@@ -14,7 +14,7 @@ from cyclonedx.model.component import Component
 from univers import nuget
 from univers.version_range import VersionRange
 
-from cdxev.auxiliary.identity import ComponentIdentity, VulnerabilityIdentity
+from cdxev.auxiliary.identity import ComponentIdentity, Key, VulnerabilityIdentity
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 
@@ -107,20 +107,18 @@ def compare_components(first_component: dict, second_component: dict) -> bool:
     """
     is_equal = False
     if first_component.get("purl", "") and second_component.get("purl", ""):
-        if first_component.get("purl", "1").lower() == second_component.get("purl", "2").lower():
-            is_equal = True
-        else:
-            return False
+        return bool(
+            first_component.get("purl", "1").lower() == second_component.get("purl", "2").lower()
+        )
+
     if first_component.get("cpe", "") and second_component.get("cpe", ""):
-        if first_component.get("cpe", "1").lower() == second_component.get("cpe", "2").lower():
-            is_equal = True
-        else:
-            return False
+        return bool(
+            first_component.get("cpe", "1").lower() == second_component.get("cpe", "2").lower()
+        )
+
     if first_component.get("swid", "") and second_component.get("swid", ""):
-        if first_component.get("swid", "1").lower() == second_component.get("swid", "2").lower():
-            is_equal = True
-        else:
-            return False
+        return Key.from_swid(first_component["swid"]) == Key.from_swid(second_component["swid"])
+
     if (
         first_component.get("name", "notfound1").lower()
         == second_component.get("name", "notfound2").lower()

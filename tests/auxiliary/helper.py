@@ -99,69 +99,38 @@ def search_entry(haystack: dict, key: t.Any, value: t.Any) -> t.Optional[dict]:
 path_to_folder_with_test_sboms = "tests/auxiliary/test_merge_sboms/"
 
 
-def get_ratings_dict() -> dict:
+def load_dict_from_json(filename: str) -> dict:
     with open(
-        path_to_folder_with_test_sboms + "ratings_lists_for_tests.json",
+        path_to_folder_with_test_sboms + filename,
         "r",
         encoding="utf_8_sig",
     ) as my_file:
         return json.load(my_file)
+
+
+def get_ratings_dict() -> dict:
+    return load_dict_from_json("ratings_lists_for_tests.json")
 
 
 def get_dictionary_with_stuff() -> dict:
-    with open(
-        path_to_folder_with_test_sboms + "sections_for_test_sbom.json",
-        "r",
-        encoding="utf_8_sig",
-    ) as my_file:
-        return json.load(my_file)
+    return load_dict_from_json("sections_for_test_sbom.json")
 
 
 def load_governing_program() -> dict:
-    with open(
-        path_to_folder_with_test_sboms + "governing_program.json",
-        "r",
-        encoding="utf_8_sig",
-    ) as my_file:
-        sbom = json.load(my_file)
-    return sbom
+    return load_dict_from_json("governing_program.json")
 
 
 def load_sections_for_test_sbom() -> dict:
-    with open(
-        path_to_folder_with_test_sboms + "sections_for_test_sbom.json",
-        "r",
-        encoding="utf_8_sig",
-    ) as my_file:
-        sbom = json.load(my_file)
-    return sbom
+    return load_dict_from_json("sections_for_test_sbom.json")
 
 
 def load_governing_program_merged_sub_program() -> dict:
-    with open(
-        path_to_folder_with_test_sboms + "merged_sbom.json",
-        "r",
-        encoding="utf_8_sig",
-    ) as my_file:
-        sbom = json.load(my_file)
-    return sbom
+    return load_dict_from_json("merged_sbom.json")
 
 
 def load_sub_program() -> dict:
-    with open(
-        path_to_folder_with_test_sboms + "sub_program.json",
-        "r",
-        encoding="utf_8_sig",
-    ) as my_file:
-        sbom = json.load(my_file)
-    return sbom
+    return load_dict_from_json("sub_program.json")
 
 
 def load_additional_sbom_dict() -> dict:
-    with open(
-        path_to_folder_with_test_sboms + "additional_sboms.json",
-        "r",
-        encoding="utf_8_sig",
-    ) as my_file:
-        sbom = json.load(my_file)
-    return sbom
+    return load_dict_from_json("additional_sboms.json")

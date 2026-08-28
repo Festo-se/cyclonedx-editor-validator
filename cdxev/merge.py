@@ -19,6 +19,7 @@ from cdxev.auxiliary.sbom_functions import (
     get_identity_for_vulnerability,
     make_bom_refs_unique,
     merge_affects_versions,
+    replace_bom_ref_in_sbom,
     unify_bom_refs,
 )
 from cdxev.log import LogMessage
@@ -26,10 +27,149 @@ from cdxev.log import LogMessage
 logger = logging.getLogger(__name__)
 
 
+def _collect_bom_refs(sbom: dict) -> set[str]:
+    bom_refs = {
+        component.get("bom-ref", "")
+        for component in extract_components(sbom.get("components", []))
+        if component.get("bom-ref", "")
+    }
+
+    metadata_component = sbom.get("metadata", {}).get("component", {})
+    metadata_ref = metadata_component.get("bom-ref", "")
+    if metadata_ref:
+        bom_refs.add(metadata_ref)
+
+    return bom_refs
+
+
+def _ensure_unique_bom_ref(
+    candidate: str,
+    existing_bom_refs: set[str],
+    old_ref: str,
+) -> str:
+    unique_candidate = candidate
+    index = 1
+    while unique_candidate in existing_bom_refs and unique_candidate != old_ref:
+        unique_candidate = candidate + "-" + str(index)
+        index += 1
+    return unique_candidate
+
+
+def _capture_original_hierarchical_bom_refs(
+    sbom: dict,
+) -> tuple[dict[int, str], dict[int, str]]:
+    original_component_refs: dict[int, str] = {}
+    original_parent_refs: dict[int, str] = {}
+
+    def _recurse(components: list[dict], parent_ref: str = "") -> None:
+        for component in components:
+            component_ref = component.get("bom-ref", "")
+            original_component_refs[id(component)] = component_ref
+            if parent_ref:
+                original_parent_refs[id(component)] = parent_ref
+            _recurse(component.get("components", []), component_ref)
+
+    _recurse(sbom.get("components", []))
+
+    metadata_component = sbom.get("metadata", {}).get("component", {})
+    if metadata_component:
+        metadata_ref = metadata_component.get("bom-ref", "")
+        original_component_refs[id(metadata_component)] = metadata_ref
+        _recurse(metadata_component.get("components", []), metadata_ref)
+
+    return original_component_refs, original_parent_refs
+
+
+def _rebase_hierarchical_subtree_bom_refs(
+    governing_sbom: dict,
+    merged_sbom: dict,
+    new_parent: dict,
+    relocated_roots: t.Sequence[tuple[dict, str]],
+    existing_bom_refs: set[str],
+    original_component_refs: dict[int, str],
+    original_parent_refs: dict[int, str],
+) -> None:
+    """
+    Recursively rebase bom-refs for a relocated subtree by prepending the
+    parent's bom-ref.
+
+    For every relocated root component and all its descendants, the bom-ref is
+    recomputed as parent_ref + "/" + <the component's relative ref>. If the
+    component's existing ref already starts with its immediate old parent's ref
+    plus "/", that old parent prefix is stripped before prepending so existing
+    hierarchical descendants do not duplicate ancestry. Otherwise the full
+    existing ref is preserved, so opaque refs such as PURLs keep their full
+    identity.
+
+    This ensures all references within the merged subtree maintain a consistent
+    hierarchical path structure.
+
+    Args:
+        governing_sbom: The SBOM being merged into
+        merged_sbom: The SBOM being merged from
+        new_parent: The parent component to which the subtree is being added
+        relocated_roots: Components being relocated under new_parent paired
+            with their immediate old parent bom-ref
+        existing_bom_refs: Set of already-used bom-refs to ensure uniqueness
+        original_component_refs: Original bom-refs captured before
+            uniquification/unification
+        original_parent_refs: Original immediate parent bom-refs captured
+            before uniquification/unification
+    """
+    new_parent_ref = new_parent.get("bom-ref", "")
+    if not new_parent_ref:
+        return
+
+    def _recurse(
+        component: dict,
+        parent_ref: str,
+        old_parent_ref: str,
+    ) -> None:
+        old_ref = component.get("bom-ref", "")
+        if not old_ref:
+            return
+
+        original_ref = original_component_refs.get(id(component), old_ref)
+        original_parent_ref = original_parent_refs.get(id(component), old_parent_ref)
+
+        relative_ref = original_ref
+        old_parent_prefix = original_parent_ref + "/" if original_parent_ref else ""
+        if old_parent_prefix and original_ref.startswith(old_parent_prefix):
+            relative_ref = original_ref[len(old_parent_prefix):]
+
+        next_parent_ref = parent_ref + "/" + relative_ref
+
+        # Ensure uniqueness; handle collisions with -1, -2, etc.
+        next_parent_ref = _ensure_unique_bom_ref(
+            next_parent_ref,
+            existing_bom_refs,
+            old_ref,
+        )
+
+        # Update the ref if it changed
+        if old_ref != next_parent_ref:
+            existing_bom_refs.discard(old_ref)
+            existing_bom_refs.add(next_parent_ref)
+            replace_bom_ref_in_sbom(
+                {"components": [component]}, old_ref, next_parent_ref
+            )
+            replace_bom_ref_in_sbom(governing_sbom, old_ref, next_parent_ref)
+            replace_bom_ref_in_sbom(merged_sbom, old_ref, next_parent_ref)
+        else:
+            existing_bom_refs.add(next_parent_ref)
+
+        # Recursively process all children with the newly computed parent ref
+        for child in component.get("components", []):
+            _recurse(child, next_parent_ref, original_ref)
+
+    for root, old_parent_ref in relocated_roots:
+        _recurse(root, new_parent_ref, old_parent_ref)
+
+
 def filter_component(
     present_components: list[ComponentIdentity],
     components_to_add: list,
-    add_to_existing: dict,
+    add_to_existing: dict[ComponentIdentity, list[dict]],
 ) -> list[dict]:
     """
     Function that goes through a list of components and their nested sub components
@@ -91,7 +231,11 @@ def filter_component(
 
 
 def merge_components(
-    governing_sbom: dict, sbom_to_be_merged: dict, hierarchical: bool = False
+    governing_sbom: dict,
+    sbom_to_be_merged: dict,
+    hierarchical: bool = False,
+    original_component_refs: t.Optional[dict[int, str]] = None,
+    original_parent_refs: t.Optional[dict[int, str]] = None,
 ) -> t.List[dict]:
     """
     Function that gets two lists of components and merges them unique into one.
@@ -130,7 +274,7 @@ def merge_components(
             ComponentIdentity.create(governing_sbom_metadata_component, allow_unsafe=True)
         ] = governing_sbom_metadata_component
 
-    add_to_existing: dict[ComponentIdentity, dict] = {}
+    add_to_existing: dict[ComponentIdentity, list[dict]] = {}
     list_present_component_identities = list(present_component_identities.keys())
     list_of_filtered_components = filter_component(
         list_present_component_identities,
@@ -138,12 +282,34 @@ def merge_components(
         add_to_existing,
     )
 
+    if original_component_refs is None or original_parent_refs is None:
+        (
+            original_component_refs,
+            original_parent_refs,
+        ) = _capture_original_hierarchical_bom_refs(sbom_to_be_merged)
+
     list_of_merged_components += list_of_filtered_components
 
     if hierarchical:
+        existing_bom_refs = _collect_bom_refs(governing_sbom) | _collect_bom_refs(
+            sbom_to_be_merged
+        )
         for key in add_to_existing.keys():
+            _rebase_hierarchical_subtree_bom_refs(
+                governing_sbom,
+                sbom_to_be_merged,
+                present_component_identities[key],
+                [
+                    (component, original_parent_refs.get(id(component), ""))
+                    for component in add_to_existing[key]
+                ],
+                existing_bom_refs,
+                original_component_refs,
+                original_parent_refs,
+            )
             list_of_subcomponents = (
-                present_component_identities[key].get("components", []) + add_to_existing[key]
+                present_component_identities[key].get("components", [])
+                + add_to_existing[key]
             )
             present_component_identities[key]["components"] = list_of_subcomponents
     else:
@@ -210,7 +376,14 @@ def _tools_are_equal(tool1: dict, tool2: dict) -> bool:
             normalized["organization"] = provider["name"]
             normalized.pop("provider", None)
 
-        for field in ("type", "name", "version", "publisher", "organization", "bom-ref"):
+        for field in (
+            "type",
+            "name",
+            "version",
+            "publisher",
+            "organization",
+            "bom-ref",
+        ):
             if field in normalized:
                 normalized[field] = _norm(normalized[field])
 
@@ -558,6 +731,8 @@ def merge_2_sboms(
     sbom_to_be_merged: dict,
     hierarchical: bool = False,
     vulnerability_identities: t.Optional[dict[str, VulnerabilityIdentity]] = None,
+    original_component_refs: t.Optional[dict[int, str]] = None,
+    original_parent_refs: t.Optional[dict[int, str]] = None,
 ) -> dict:
     """
     Function that merges two SBOMs.
@@ -570,6 +745,12 @@ def merge_2_sboms(
         merged_sbom: sbom, with sbom_to_be_merged merged in original_sbom
 
     """
+    if original_component_refs is None or original_parent_refs is None:
+        (
+            original_component_refs,
+            original_parent_refs,
+        ) = _capture_original_hierarchical_bom_refs(sbom_to_be_merged)
+
     # Ensure direct merge_2_sboms calls maintain globally unique and unified refs.
     make_bom_refs_unique([original_sbom, sbom_to_be_merged])
     unify_bom_refs([original_sbom, sbom_to_be_merged])
@@ -592,7 +773,11 @@ def merge_2_sboms(
     list_of_new_vulnerabilities = sbom_to_be_merged.get("vulnerabilities", [])
 
     list_of_merged_components = merge_components(
-        original_sbom, sbom_to_be_merged, hierarchical=hierarchical
+        original_sbom,
+        sbom_to_be_merged,
+        hierarchical=hierarchical,
+        original_component_refs=original_component_refs,
+        original_parent_refs=original_parent_refs,
     )
 
     merged_dependencies = merge_dependency_lists(
@@ -617,7 +802,7 @@ def merge_2_sboms(
     if list_of_merged_components:
         merged_sbom["components"] = list_of_merged_components
 
-    if original_sbom.get("dependencies", []) and sbom_to_be_merged.get("dependencies", []):
+    if original_sbom.get("dependencies", []) or sbom_to_be_merged.get("dependencies", []):
         merged_sbom["dependencies"] = merged_dependencies
 
     if merged_sbom.get("compositions", []) or sbom_to_be_merged.get("compositions", []):
@@ -626,7 +811,11 @@ def merge_2_sboms(
             sbom_to_be_merged.get("compositions", []),
         )
 
-    if merged_sbom.get("metadata", {}).get("component", {}) and merged_sbom.get("components", []):
+    if (
+        merged_sbom.get("metadata", {}).get("component", {})
+        and merged_sbom.get("components", [])
+        and not (not list_of_original_dependencies and sbom_to_be_merged.get("dependencies", []))
+    ):
         add_merged_metadata_component_to_dependencies(merged_sbom, sbom_to_be_merged)
 
     spec_version = SpecVersion.parse(str(original_sbom.get("specVersion", "")))
@@ -674,6 +863,10 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
     0
 
     """
+    original_hierarchical_bom_refs = [
+        _capture_original_hierarchical_bom_refs(sbom) for sbom in sboms
+    ]
+
     # make the bom-refs unique and synchronize them across all SBOMs
     make_bom_refs_unique(sboms)
     unify_bom_refs(sboms)
@@ -691,6 +884,8 @@ def merge(sboms: t.Sequence[dict], hierarchical: bool = False) -> dict:
             sboms[k],
             vulnerability_identities=identities,
             hierarchical=hierarchical,
+            original_component_refs=original_hierarchical_bom_refs[k][0],
+            original_parent_refs=original_hierarchical_bom_refs[k][1],
         )
     return merged_sbom
 

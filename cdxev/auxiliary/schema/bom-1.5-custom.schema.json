@@ -833,6 +833,11 @@
                 "required": [
                   "author"
                 ]
+              },
+              {
+                "required": [
+                  "publisher"
+                ]
               }
             ]
           },

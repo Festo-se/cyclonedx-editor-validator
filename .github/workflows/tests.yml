@@ -17,9 +17,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Install uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version-file: pyproject.toml
       - name: Install dependencies
         run: uv sync --only-group docs --frozen
       - name: Test build of documentation
@@ -33,17 +35,18 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Install uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           enable-cache: true
+          version-file: pyproject.toml
       - name: Install dependencies for development
-        run: uv sync --only-dev --frozen
+        run: uv sync --no-group docs --frozen
       - name: Run ruff
         run: uv run ruff check cdxev tests
       - name: Run mypy
-        run: uv run mypy --install-types --non-interactive --config-file=pyproject.toml
+        run: uv run mypy --config-file=pyproject.toml
 
   pytest:
     runs-on: ubuntu-latest
@@ -57,9 +60,11 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
-        python-version: '3.10'
+        python-version: '3.11'
     - name: Install uv
       uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      with:
+        version-file: pyproject.toml
     - name: Install package
       run: uv sync --no-group docs --frozen
     - name: Run pytest

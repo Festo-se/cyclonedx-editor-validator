@@ -690,6 +690,11 @@
                 "required": [
                   "author"
                 ]
+              },
+              {
+                "required": [
+                  "publisher"
+                ]
               }
             ]
           },

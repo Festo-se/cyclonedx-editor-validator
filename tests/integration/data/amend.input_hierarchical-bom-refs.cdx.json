@@ -1,0 +1,67 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "components": [
+    {
+      "type": "application",
+      "name": "Module A",
+      "version": "1.0.0",
+      "bom-ref": "module-a",
+      "components": [
+        {
+          "type": "library",
+          "name": "Library B",
+          "version": "2.0.0",
+          "bom-ref": "library-b",
+          "components": [
+            {
+              "type": "application",
+              "name": "Application C",
+              "version": "3.0.0",
+              "bom-ref": "application-c"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "module-a",
+      "dependsOn": [
+        "library-b"
+      ]
+    },
+    {
+      "ref": "library-b",
+      "dependsOn": [
+        "application-c"
+      ]
+    },
+    {
+      "ref": "application-c",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "complete",
+      "assemblies": [
+        "library-b",
+        "application-c"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "id": "CVE-2026-0001",
+      "affects": [
+        {
+          "ref": "application-c"
+        }
+      ]
+    }
+  ]
+}

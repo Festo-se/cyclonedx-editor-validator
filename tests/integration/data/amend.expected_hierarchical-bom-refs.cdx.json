@@ -1,0 +1,78 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 2,
+  "components": [
+    {
+      "type": "application",
+      "name": "Module A",
+      "version": "1.0.0",
+      "bom-ref": "module-a",
+      "components": [
+        {
+          "type": "library",
+          "name": "Library B",
+          "version": "2.0.0",
+          "bom-ref": "module-a/library-b",
+          "components": [
+            {
+              "type": "application",
+              "name": "Application C",
+              "version": "3.0.0",
+              "bom-ref": "module-a/library-b/application-c"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "module-a",
+      "dependsOn": [
+        "module-a/library-b"
+      ]
+    },
+    {
+      "ref": "module-a/library-b",
+      "dependsOn": [
+        "module-a/library-b/application-c"
+      ]
+    },
+    {
+      "ref": "module-a/library-b/application-c",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "complete",
+      "assemblies": [
+        "module-a/library-b",
+        "module-a/library-b/application-c"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "id": "CVE-2026-0001",
+      "affects": [
+        {
+          "ref": "module-a/library-b/application-c"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "cyclonedx-editor-validator",
+          "publisher": "Festo SE & Co. KG"
+        }
+      ]
+    }
+  }
+}

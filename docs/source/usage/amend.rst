@@ -27,6 +27,13 @@ Examples
     cdx-ev amend --operation add-license-text --license-dir ./license_texts bom.json --output bom.json
     cdx-ev amend --operation delete-ambiguous-licenses bom.json
 
+    # Build hierarchical bom-refs from nested components.
+    cdx-ev amend --operation hierarchical-bom-refs bom.json
+
+    # Add missing bom-refs first, then build the hierarchy in a separate run.
+    cdx-ev amend --operation add-bom-ref bom.json --output bom.json
+    cdx-ev amend --operation hierarchical-bom-refs bom.json
+
 Operation details
 -----------------
 
@@ -78,6 +85,65 @@ delete-ambiguous-licenses
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autooperation:: cdxev.amend.operations::DeleteAmbiguousLicenses
+
+
+hierarchical-bom-refs
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autooperation:: cdxev.amend.operations::HierarchicalBomRefs
+
+This operation follows structural containment expressed by a component's ``components`` array.
+It does not infer hierarchy from ``dependencies`` and does not place ordinary top-level
+``components`` beneath ``metadata.component``.
+
+For example, these nested component references::
+
+    {
+        "bom-ref": "module-a",
+        "components": [
+            {
+                "bom-ref": "library-b",
+                "components": [
+                    {"bom-ref": "application-c"}
+                ]
+            }
+        ]
+    }
+
+become::
+
+    {
+        "bom-ref": "module-a",
+        "components": [
+            {
+                "bom-ref": "module-a/library-b",
+                "components": [
+                    {"bom-ref": "module-a/library-b/application-c"}
+                ]
+            }
+        ]
+    }
+
+The operation has the following behavior:
+
+* Top-level component bom-refs remain unchanged.
+* Nesting is processed recursively at any depth, including beneath ``metadata.component``.
+* Every bom-ref is treated as an opaque string. Values such as ``1``, arbitrary words, UUIDs, and
+    PURLs are preserved in full and are never parsed as path segments.
+* Running the operation repeatedly prepends the hierarchy repeatedly. The operation cannot infer
+    from an opaque bom-ref whether a prefix was added by an earlier run.
+* References in dependencies, compositions, and vulnerability affects are updated to the
+    rewritten bom-refs.
+* A generated path that conflicts with another bom-ref receives an incrementing suffix such as
+  ``-1``.
+* A component without a bom-ref, or whose parent has no bom-ref, cannot be adjusted. The operation
+    logs this at INFO level, leaves that relationship unchanged, and continues with the remaining
+    component tree.
+* Run ``add-bom-ref`` in a separate amend invocation before this operation if missing bom-refs
+    should be generated. Operation ordering within one amend invocation cannot provide this order.
+
+The operation is not enabled by default because changing bom-refs can affect systems outside the
+SBOM that refer to the old values.
 
 
 infer-supplier

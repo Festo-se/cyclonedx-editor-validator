@@ -95,6 +95,19 @@ class TestValidateInit(unittest.TestCase):
             with self.assertRaises(AppError):
                 validate_test(get_test_sbom(), schema_type=None, schema_path=schema_path)
 
+    def test_invalid_schema_json_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            schema_path = Path(temp_dir) / "invalid-schema.json"
+            schema_path.write_text("not json", encoding="utf-8")
+            with self.assertRaises(AppError):
+                validate_test(get_test_sbom(), schema_type=None, schema_path=schema_path)
+
+    def test_missing_builtin_schema_is_reported(self) -> None:
+        sbom = get_test_sbom()
+        sbom["specVersion"] = "9.9"
+        with self.assertRaises(AppError):
+            validate_test(sbom, schema_type="default")
+
 
 class TestValidateMetadata(unittest.TestCase):
     def test_metadata_missing(self) -> None:

@@ -42,11 +42,11 @@ jobs:
           enable-cache: true
           version-file: pyproject.toml
       - name: Install dependencies for development
-        run: uv sync --only-dev --frozen
+        run: uv sync --no-group docs --frozen
       - name: Run ruff
         run: uv run ruff check cdxev tests
       - name: Run mypy
-        run: uv run mypy --install-types --non-interactive --config-file=pyproject.toml
+        run: uv run mypy --config-file=pyproject.toml
 
   pytest:
     runs-on: ubuntu-latest

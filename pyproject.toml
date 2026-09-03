@@ -12,7 +12,7 @@ readme = "README.md"
 license = "GPL-3.0-or-later"
 dependencies = [
     "python-dateutil==2.9.0.post0",
-    "jsonschema[format]==4.26.0",
+    "jsonschema-rs==0.50.0",
     "docstring-parser>=0.16,<0.19",
     "charset-normalizer>=3.3.2,<4",
     "pyicu>=2.13.1,<3 ; sys_platform == 'darwin'",
@@ -36,7 +36,6 @@ cdx-ev = "cdxev.__main__:main"
 dev = [
     "mypy==2.3.1",
     "types-python-dateutil==2.9.0.20260807",
-    "types-jsonschema==4.26.0.20260518",
     "pytest==9.1.1",
     "coverage==7.15.4",
     "toml==0.10.2",

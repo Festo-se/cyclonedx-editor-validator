@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import tempfile
 import typing as t
 import unittest
 from pathlib import Path
@@ -81,6 +82,31 @@ class TestValidateInit(unittest.TestCase):
         }
         with self.assertRaisesRegex(AppError, ".*'specVersion'.*"):
             validate_test(sbom)
+
+    def test_schema_property_does_not_create_validation_issue(self) -> None:
+        sbom = get_test_sbom()
+        sbom["$schema"] = "schema selected by the caller"
+        self.assertEqual(validate_test(sbom), ["no issue"])
+
+    def test_invalid_schema_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            schema_path = Path(temp_dir) / "invalid-schema.json"
+            schema_path.write_text('{"type": "invalid"}', encoding="utf-8")
+            with self.assertRaises(AppError):
+                validate_test(get_test_sbom(), schema_type=None, schema_path=schema_path)
+
+    def test_invalid_schema_json_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            schema_path = Path(temp_dir) / "invalid-schema.json"
+            schema_path.write_text("not json", encoding="utf-8")
+            with self.assertRaises(AppError):
+                validate_test(get_test_sbom(), schema_type=None, schema_path=schema_path)
+
+    def test_missing_builtin_schema_is_reported(self) -> None:
+        sbom = get_test_sbom()
+        sbom["specVersion"] = "9.9"
+        with self.assertRaises(AppError):
+            validate_test(sbom, schema_type="default")
 
 
 class TestValidateMetadata(unittest.TestCase):
@@ -348,6 +374,21 @@ class TestValidateComponents(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
 
+    def test_supplier_equivalent_fields(self) -> None:
+        cases = (
+            [(spec_version, "publisher", "Acme") for spec_version in ["1.3", "1.4", "1.5"]]
+            + [(spec_version, "manufacturer", {"name": "Acme"}) for spec_version in ["1.6", "1.7"]]
+            + [(spec_version, "authors", [{"name": "Acme"}]) for spec_version in ["1.6", "1.7"]]
+        )
+        for spec_version, field, value in cases:
+            with self.subTest(spec_version=spec_version, field=field):
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                sbom["components"][0].pop("supplier")
+                sbom["components"][0][field] = value
+                issues = validate_test(sbom)
+                self.assertEqual(issues, ["no issue"])
+
     def test_components_component_supplier_and_author_missing(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
@@ -426,6 +467,12 @@ class TestValidateComponents(unittest.TestCase):
             ]
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("additional", issues), True)
+
+    def test_component_additional_property(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["unexpected"] = "value"
+        issues = validate_test(sbom)
+        self.assertTrue(search_for_word_issues("additional", issues))
 
     def test_components_licenses_is_empty(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -911,18 +958,21 @@ class TestValidateLicensing(unittest.TestCase):
 class TestValidateUseSchemaType(unittest.TestCase):
     @unittest.skipUnless("CI" in os.environ, "running only in CI")
     def test_default_schema(self) -> None:
-        sbom = get_test_sbom()
-        v = validate_sbom(
-            sbom,
-            "json",
-            Path(path_to_sbom),
-            "",
-            Path(""),
-            schema_type="default",
-            schema_path=None,
-            filename_regex=None,
-        )
-        self.assertEqual(v, 0)
+        for spec_version in list_of_spec_versions:
+            with self.subTest(spec_version=spec_version):
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                v = validate_sbom(
+                    sbom,
+                    "json",
+                    Path(path_to_sbom),
+                    "",
+                    Path(""),
+                    schema_type="default",
+                    schema_path=None,
+                    filename_regex=None,
+                )
+                self.assertEqual(v, 0)
 
 
 class TestInternalNameSchema(unittest.TestCase):

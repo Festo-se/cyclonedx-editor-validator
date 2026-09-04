@@ -70,15 +70,11 @@ def _get_builtin_schema(schema_type: str, spec_version: str) -> dict:
 
 def load_spdx_schema() -> dict:
     path_to_embedded_schema = resources.files("cdxev.auxiliary.schema") / "spdx.schema.json"
-    with path_to_embedded_schema.open(encoding="utf_8_sig") as f:
-        schema = json.load(f)
+    with path_to_embedded_schema.open(encoding="utf_8_sig") as schema_file:
+        schema = json.load(schema_file)
         if isinstance(schema, dict):
             return schema
-        else:
-            raise AppError(
-                "SPDX schema error",
-                ("Loaded SPDX schema is not type dict"),
-            )
+        raise AppError("SPDX schema error", "Loaded SPDX schema is not type dict")
 
 
 def load_bundled_schema(filename: str) -> dict:
@@ -296,7 +292,11 @@ def _prepare_builtin_schema(schema: dict[str, t.Any], spec_version: str, schema_
 @functools.lru_cache(maxsize=1)
 def _get_registry() -> jsonschema_rs.Registry:
     resources: list[tuple[str, jsonschema_rs.JSONType]] = [
-        (name, t.cast(dict[str, t.Any], load_bundled_schema(name))) for name in _HELPER_SCHEMAS
+        ("spdx.schema.json", t.cast(dict[str, t.Any], load_spdx_schema())),
+        *[
+            (name, t.cast(dict[str, t.Any], load_bundled_schema(name)))
+            for name in _HELPER_SCHEMAS[1:]
+        ],
     ]
     return jsonschema_rs.Registry(resources)
 

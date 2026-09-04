@@ -21,6 +21,7 @@ dependencies = [
     "univers==32.0.1",
     "cyclonedx-python-lib==11.12.0",
     "email-validator==2.3.0",
+    "license-expression==30.4.4",
 ]
 
 [project.urls]

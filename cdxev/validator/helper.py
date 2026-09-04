@@ -10,6 +10,7 @@ from importlib import resources
 from pathlib import Path
 
 import jsonschema_rs
+from license_expression import ExpressionError, get_spdx_licensing  # type: ignore[import-untyped]
 
 from cdxev.error import AppError
 
@@ -130,6 +131,7 @@ _HELPER_SCHEMAS = (
     "cryptography-defs.schema.json",
 )
 _IDENTIFIER = re.compile(r"^[A-Za-z_$][A-Za-z0-9_$-]*$")
+_LICENSE_REF = re.compile(r"^(?:DocumentRef-[A-Za-z0-9.-]+:)?LicenseRef-[A-Za-z0-9.-]+$")
 _CONTEXT_LABELS = {
     "components": "component",
     "compositions": "composition",
@@ -139,6 +141,7 @@ _CONTEXT_LABELS = {
     "vulnerabilities": "vulnerability",
 }
 _ENTITY_COLLECTIONS = {"components", "dependencies", "services", "vulnerabilities"}
+_LICENSE_EXPRESSION_PARSER = get_spdx_licensing()
 
 
 @dataclass(frozen=True)
@@ -185,6 +188,7 @@ def validate_instance(
             warnings.add(_external_component_warning(instance, path))
             continue
         errors.update(_normalize_error(error, instance))
+    errors.update(_validate_license_expressions(instance))
 
     def sort_key(issue: ValidationIssue) -> tuple[str, str, str]:
         return issue.location, issue.keyword, issue.message
@@ -193,6 +197,42 @@ def validate_instance(
         errors=tuple(sorted(errors, key=sort_key)),
         warnings=tuple(sorted(warnings, key=sort_key)),
     )
+
+
+def _validate_license_expressions(instance: dict[str, t.Any]) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    for path in _license_expression_paths(instance):
+        expression = t.cast(str, _value_at_path(instance, path))
+        try:
+            parsed = _LICENSE_EXPRESSION_PARSER.parse(expression)
+            unknown_keys = _LICENSE_EXPRESSION_PARSER.unknown_license_keys(parsed)
+            invalid_keys = [key for key in unknown_keys if not _LICENSE_REF.fullmatch(key)]
+            if invalid_keys:
+                raise ExpressionError(f"Unknown license key(s): {', '.join(invalid_keys)}")
+        except ExpressionError as exc:
+            issues.append(
+                ValidationIssue(
+                    path=path,
+                    message=f"{expression!r} is not a valid license expression: {exc}",
+                    keyword="licenseExpression",
+                    subject=_subject_for_path(instance, path),
+                )
+            )
+    return issues
+
+
+def _license_expression_paths(
+    value: t.Any,
+    path: tuple[PathSegment, ...] = (),
+) -> t.Iterator[tuple[PathSegment, ...]]:
+    if isinstance(value, dict):
+        if len(path) >= 2 and path[-2] == "licenses" and isinstance(value.get("expression"), str):
+            yield path + ("expression",)
+        for key, nested in value.items():
+            yield from _license_expression_paths(nested, path + (key,))
+    elif isinstance(value, list):
+        for index, nested in enumerate(value):
+            yield from _license_expression_paths(nested, path + (index,))
 
 
 def format_json_path(path: t.Iterable[PathSegment]) -> str:

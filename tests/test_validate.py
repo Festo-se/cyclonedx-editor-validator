@@ -436,12 +436,40 @@ class TestValidateComponents(unittest.TestCase):
             self.assertEqual(search_for_word_issues("license", issues), True)
 
     def test_components_component_license_expression(self) -> None:
+        expressions = [
+            "Apache-2.0",
+            "GPL-2.0 or MIT",
+            "LGPL-2.1-only OR BSD-3-Clause AND MIT",
+            "MIT AND (LGPL-2.1-or-later OR BSD-3-Clause)",
+        ]
+        for expression in expressions:
+            for spec_version in list_of_spec_versions:
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                sbom["components"][0]["licenses"] = [{"expression": expression}]
+                issues = validate_test(sbom)
+                self.assertEqual(issues, ["no issue"])
+
+    def test_components_license_expression_with_license_ref(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
-            sbom["components"][0]["licenses"] = [{"expression": "Apache-2.0"}]
+            sbom["components"][0]["licenses"] = [{"expression": "LicenseRef-custom"}]
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
+
+    def test_components_invalid_license_expression(self) -> None:
+        expressions = [
+            "GPL-2.0 or",
+            "not-a-license",
+        ]
+        for expression in expressions:
+            for spec_version in list_of_spec_versions:
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                sbom["components"][0]["licenses"] = [{"expression": expression}]
+                issues = validate_test(sbom)
+                self.assertTrue(search_for_word_issues("not a valid license expression", issues))
 
     def test_components_license_without_name_and_id(self) -> None:
         for spec_version in list_of_spec_versions:

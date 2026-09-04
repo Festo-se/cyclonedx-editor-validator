@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>validate &mdash; CycloneDX Editor Validator Tool 0.34.2 documentation</title>
+  <title>validate &mdash; CycloneDX Editor Validator Tool 0.35.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=284e7c21"></script>
+      <script src="../_static/documentation_options.js?v=ca1b380b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -201,7 +201,8 @@
 </section>
 <section id="output">
 <h2>Output<a class="headerlink" href="#output" title="Link to this heading"></a></h2>
-<p>By default, the command writes human-readable validation results to <em>stdout</em> only. For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the <code class="docutils literal notranslate"><span class="pre">--report-format</span></code> option and an output path using the <code class="docutils literal notranslate"><span class="pre">--report-path</span></code> option.</p>
+<p>By default, the command writes human-readable validation results to <em>stdout</em> only. Component errors identify the affected component by its <code class="docutils literal notranslate"><span class="pre">bom-ref</span></code> or name and include a concise description. The validator collects every distinct schema violation instead of stopping after the first error.</p>
+<p>For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the <code class="docutils literal notranslate"><span class="pre">--report-format</span></code> option and an output path using the <code class="docutils literal notranslate"><span class="pre">--report-path</span></code> option.</p>
 <p>These formats are currently supported:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/jenkinsci/warnings-ng-plugin">Jenkins warnings-ng-plugin</a></p></li>

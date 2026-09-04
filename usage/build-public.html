@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>build-public &mdash; CycloneDX Editor Validator Tool 0.34.2 documentation</title>
+  <title>build-public &mdash; CycloneDX Editor Validator Tool 0.35.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=284e7c21"></script>
+      <script src="../_static/documentation_options.js?v=ca1b380b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -157,79 +157,79 @@ However, this behavior does not affect the deletion of any property, which start
 <p>Here are some JSON schemata for common scenarios to get you started.</p>
 <p>When passed to the command, this schema will remove any component whose <code class="docutils literal notranslate"><span class="pre">group</span></code> is <code class="docutils literal notranslate"><span class="pre">com.acme.internal</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;const&quot;</span><span class="p">:</span> <span class="s2">&quot;com.acme.internal&quot;</span>
+    <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"group"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"const"</span><span class="p">:</span> <span class="s2">"com.acme.internal"</span>
         <span class="p">}</span>
     <span class="p">},</span>
-    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span>
+    <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"group"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>An extension of the above, the next schema will delete any component with that <code class="docutils literal notranslate"><span class="pre">group</span></code>, <em>unless</em> it contains a property with the name <code class="docutils literal notranslate"><span class="pre">internal:public</span></code> and the value <code class="docutils literal notranslate"><span class="pre">true</span></code>. <em>Note that the property itself will still be removed from the component, because its name starts with</em> <code class="docutils literal notranslate"><span class="pre">internal:</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;const&quot;</span><span class="p">:</span> <span class="s2">&quot;com.acme.internal&quot;</span>
+    <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"group"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"const"</span><span class="p">:</span> <span class="s2">"com.acme.internal"</span>
         <span class="p">}</span>
     <span class="p">},</span>
-    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">],</span>
-    <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;contains&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="s2">&quot;const&quot;</span><span class="p">:</span> <span class="s2">&quot;internal:public&quot;</span>
+    <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"group"</span><span class="p">],</span>
+    <span class="s2">"not"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"contains"</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">"name"</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">"const"</span><span class="p">:</span> <span class="s2">"internal:public"</span>
                         <span class="p">},</span>
-                        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="s2">&quot;const&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+                        <span class="s2">"value"</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">"const"</span><span class="p">:</span> <span class="s2">"true"</span>
                         <span class="p">}</span>
                     <span class="p">},</span>
-                    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span>
+                    <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">]</span>
                 <span class="p">}</span>
             <span class="p">}</span>
         <span class="p">},</span>
-        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span>
+        <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"properties"</span><span class="p">]</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>This schema will delete the three components with the names <code class="docutils literal notranslate"><span class="pre">AcmeSecret</span></code>, <code class="docutils literal notranslate"><span class="pre">AcmeNotPublic</span></code> and <code class="docutils literal notranslate"><span class="pre">AcmeSensitive</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;AcmeSecret&quot;</span><span class="p">,</span> <span class="s2">&quot;AcmeNotPublic&quot;</span><span class="p">,</span> <span class="s2">&quot;AcmeSensitive&quot;</span><span class="p">]</span>
+    <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"enum"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"AcmeSecret"</span><span class="p">,</span> <span class="s2">"AcmeNotPublic"</span><span class="p">,</span> <span class="s2">"AcmeSensitive"</span><span class="p">]</span>
         <span class="p">}</span>
     <span class="p">},</span>
-    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+    <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"name"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>The following schema is a little more involved. It will delete any component whose license text contains the string <code class="docutils literal notranslate"><span class="pre">This</span> <span class="pre">must</span> <span class="pre">not</span> <span class="pre">be</span> <span class="pre">made</span> <span class="pre">public</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;licenses&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;contains&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">&quot;license&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                        <span class="s2">&quot;pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;This must not be made public&quot;</span>
+    <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"licenses"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"contains"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">"license"</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">"text"</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">"content"</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="s2">"pattern"</span><span class="p">:</span> <span class="s2">"This must not be made public"</span>
                                     <span class="p">}</span>
                                 <span class="p">}</span>
                             <span class="p">}</span>
                         <span class="p">},</span>
-                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+                        <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"text"</span><span class="p">]</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
-                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;license&quot;</span><span class="p">]</span>
+                <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"license"</span><span class="p">]</span>
             <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">},</span>
-    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;licenses&quot;</span><span class="p">]</span>
+    <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"licenses"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>

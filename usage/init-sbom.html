@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>init-sbom &mdash; CycloneDX Editor Validator Tool 0.34.2 documentation</title>
+  <title>init-sbom &mdash; CycloneDX Editor Validator Tool 0.35.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=284e7c21"></script>
+      <script src="../_static/documentation_options.js?v=ca1b380b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -153,54 +153,54 @@
 <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">init</span><span class="o">-</span><span class="n">sbom</span> <span class="o">-</span><span class="n">o</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span>
 
 <span class="c1"># Write an SBOM draft with a submitted software name, version, supplier and author of the SBOM to bom.json</span>
-<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">init</span><span class="o">-</span><span class="n">sbom</span> <span class="o">--</span><span class="n">name</span> <span class="s2">&quot;my software&quot;</span> <span class="o">--</span><span class="n">supplier</span> <span class="s2">&quot;acme inc.&quot;</span> <span class="o">--</span><span class="n">version</span> <span class="s2">&quot;1.1.1&quot;</span> <span class="o">--</span><span class="n">author</span> <span class="s2">&quot;acme inc&quot;</span>  <span class="o">-</span><span class="n">o</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">init</span><span class="o">-</span><span class="n">sbom</span> <span class="o">--</span><span class="n">name</span> <span class="s2">"my software"</span> <span class="o">--</span><span class="n">supplier</span> <span class="s2">"acme inc."</span> <span class="o">--</span><span class="n">version</span> <span class="s2">"1.1.1"</span> <span class="o">--</span><span class="n">author</span> <span class="s2">"acme inc"</span>  <span class="o">-</span><span class="n">o</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 <p>The above provided example without passing arguments to <cite>init-sbom</cite> would result in:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;dependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">"dependencies"</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-            <span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="s2">&quot;An optional identifier which can be used to reference the component elsewhere in the SBOM.&quot;</span>
+            <span class="s2">"ref"</span><span class="p">:</span> <span class="s2">"An optional identifier which can be used to reference the component elsewhere in the SBOM."</span>
         <span class="p">}</span>
     <span class="p">],</span>
-    <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"authors"</span><span class="p">:</span> <span class="p">[</span>
             <span class="p">{</span>
-                <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;The email address of the contact.&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;The person who created the SBOM.&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;phone&quot;</span><span class="p">:</span> <span class="s2">&quot;The phone number of the contact.&quot;</span>
+                <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"The email address of the contact."</span><span class="p">,</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"The person who created the SBOM."</span><span class="p">,</span>
+                <span class="s2">"phone"</span><span class="p">:</span> <span class="s2">"The phone number of the contact."</span>
             <span class="p">}</span>
         <span class="p">],</span>
-        <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;bom-ref&quot;</span><span class="p">:</span> <span class="s2">&quot;An optional identifier which can be used to reference the component elsewhere in the SBOM.&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;A copyright notice informing users of the underlying claims to copyright ownership in a published work.&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;The name of the component described by the SBOM.&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;supplier&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;The name of the organization that supplied the component.&quot;</span>
+        <span class="s2">"component"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"bom-ref"</span><span class="p">:</span> <span class="s2">"An optional identifier which can be used to reference the component elsewhere in the SBOM."</span><span class="p">,</span>
+            <span class="s2">"copyright"</span><span class="p">:</span> <span class="s2">"A copyright notice informing users of the underlying claims to copyright ownership in a published work."</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"The name of the component described by the SBOM."</span><span class="p">,</span>
+            <span class="s2">"supplier"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"The name of the organization that supplied the component."</span>
             <span class="p">},</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;application&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;The component version.&quot;</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"application"</span><span class="p">,</span>
+            <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"The component version."</span>
         <span class="p">},</span>
-        <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;2024-10-27T10:56:40.095452+01:00&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;tools&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"timestamp"</span><span class="p">:</span> <span class="s2">"2024-10-27T10:56:40.095452+01:00"</span><span class="p">,</span>
+        <span class="s2">"tools"</span><span class="p">:</span> <span class="p">[</span>
             <span class="p">{</span>
-                <span class="s2">&quot;externalReferences&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">"externalReferences"</span><span class="p">:</span> <span class="p">[</span>
                     <span class="p">{</span>
-                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;website&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/Festo-se/cyclonedx-editor-validator&quot;</span>
+                        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"website"</span><span class="p">,</span>
+                        <span class="s2">"url"</span><span class="p">:</span> <span class="s2">"https://github.com/Festo-se/cyclonedx-editor-validator"</span>
                     <span class="p">}</span>
                 <span class="p">],</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;cyclonedx-editor-validator&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;vendor&quot;</span><span class="p">:</span> <span class="s2">&quot;Festo SE &amp; Co. KG&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.0&quot;</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"cyclonedx-editor-validator"</span><span class="p">,</span>
+                <span class="s2">"vendor"</span><span class="p">:</span> <span class="s2">"Festo SE &amp; Co. KG"</span><span class="p">,</span>
+                <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"0.0.0"</span>
             <span class="p">}</span>
         <span class="p">]</span>
     <span class="p">},</span>
-    <span class="s2">&quot;serialNumber&quot;</span><span class="p">:</span> <span class="s2">&quot;urn:uuid:1fa01e4f-04f0-4208-9ea3-b53de58fd6a0&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;http://cyclonedx.org/schema/bom-1.6.schema.json&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bomFormat&quot;</span><span class="p">:</span> <span class="s2">&quot;CycloneDX&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;specVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;1.6&quot;</span>
+    <span class="s2">"serialNumber"</span><span class="p">:</span> <span class="s2">"urn:uuid:1fa01e4f-04f0-4208-9ea3-b53de58fd6a0"</span><span class="p">,</span>
+    <span class="s2">"version"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"$schema"</span><span class="p">:</span> <span class="s2">"http://cyclonedx.org/schema/bom-1.6.schema.json"</span><span class="p">,</span>
+    <span class="s2">"bomFormat"</span><span class="p">:</span> <span class="s2">"CycloneDX"</span><span class="p">,</span>
+    <span class="s2">"specVersion"</span><span class="p">:</span> <span class="s2">"1.6"</span>
 <span class="p">}</span>
 </pre></div>
 </div>

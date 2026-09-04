@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>set &mdash; CycloneDX Editor Validator Tool 0.34.2 documentation</title>
+  <title>set &mdash; CycloneDX Editor Validator Tool 0.35.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=284e7c21"></script>
+      <script src="../_static/documentation_options.js?v=ca1b380b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -244,45 +244,45 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">--cpe-pattern</span></code> — for <em>cpe</em> matching</p></li>
 </ul>
 <p>Examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># All components whose name starts with &quot;web&quot;</span>
-<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">set</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">name</span><span class="o">-</span><span class="n">pattern</span> <span class="s1">&#39;web.*&#39;</span> <span class="o">--</span><span class="n">key</span> <span class="n">author</span> <span class="o">--</span><span class="n">value</span> <span class="s1">&#39;&quot;Team A&quot;&#39;</span> <span class="o">--</span><span class="n">force</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># All components whose name starts with "web"</span>
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">set</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">name</span><span class="o">-</span><span class="n">pattern</span> <span class="s1">'web.*'</span> <span class="o">--</span><span class="n">key</span> <span class="n">author</span> <span class="o">--</span><span class="n">value</span> <span class="s1">'"Team A"'</span> <span class="o">--</span><span class="n">force</span>
 
 <span class="c1"># Only components in a group matching a regex, filtered by version range</span>
-<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">set</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">name</span><span class="o">-</span><span class="n">pattern</span> <span class="s1">&#39;web-framework&#39;</span> \
-    <span class="o">--</span><span class="n">group</span><span class="o">-</span><span class="n">pattern</span> <span class="s1">&#39;org\..*&#39;</span> \
+<span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="nb">set</span> <span class="n">bom</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="n">name</span><span class="o">-</span><span class="n">pattern</span> <span class="s1">'web-framework'</span> \
+    <span class="o">--</span><span class="n">group</span><span class="o">-</span><span class="n">pattern</span> <span class="s1">'org\..*'</span> \
     <span class="o">--</span><span class="n">version</span><span class="o">-</span><span class="nb">range</span> <span class="n">vers</span><span class="p">:</span><span class="n">generic</span><span class="o">/&lt;</span><span class="mf">3.0.0</span> \
-    <span class="o">--</span><span class="n">key</span> <span class="n">copyright</span> <span class="o">--</span><span class="n">value</span> <span class="s1">&#39;&quot;ACME Inc.&quot;&#39;</span> <span class="o">--</span><span class="n">force</span>
+    <span class="o">--</span><span class="n">key</span> <span class="n">copyright</span> <span class="o">--</span><span class="n">value</span> <span class="s1">'"ACME Inc."'</span> <span class="o">--</span><span class="n">force</span>
 </pre></div>
 </div>
 <p><strong>When using ``--from-file``</strong>, regex can be specified in either of these forms:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;namePattern&quot;</span><span class="p">:</span> <span class="s2">&quot;web-.*&quot;</span><span class="p">},</span>
-    <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;Team A&quot;</span><span class="p">}</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"namePattern"</span><span class="p">:</span> <span class="s2">"web-.*"</span><span class="p">},</span>
+    <span class="s2">"set"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"author"</span><span class="p">:</span> <span class="s2">"Team A"</span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>or:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;web-.*&quot;</span><span class="p">}},</span>
-    <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;Team A&quot;</span><span class="p">}</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"regex"</span><span class="p">:</span> <span class="s2">"web-.*"</span><span class="p">}},</span>
+    <span class="s2">"set"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"author"</span><span class="p">:</span> <span class="s2">"Team A"</span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>For <em>name</em> regex, you can add <em>group</em> and <em>version</em>/<em>version-range</em> companions to narrow the results:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;web-.*&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;org</span><span class="se">\\</span><span class="s2">..*&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;version-range&quot;</span><span class="p">:</span> <span class="s2">&quot;vers:generic/&lt;3.0.0&quot;</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"regex"</span><span class="p">:</span> <span class="s2">"web-.*"</span><span class="p">},</span>
+        <span class="s2">"group"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"regex"</span><span class="p">:</span> <span class="s2">"org</span><span class="se">\\</span><span class="s2">..*"</span><span class="p">},</span>
+        <span class="s2">"version-range"</span><span class="p">:</span> <span class="s2">"vers:generic/&lt;3.0.0"</span>
     <span class="p">},</span>
-    <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;ACME Inc.&quot;</span><span class="p">}</span>
+    <span class="s2">"set"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"copyright"</span><span class="p">:</span> <span class="s2">"ACME Inc."</span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>A literal (non-regex) value can be used for <em>group</em>, <em>version</em>, or <em>version-range</em> alongside a regex <em>name</em>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;namePattern&quot;</span><span class="p">:</span> <span class="s2">&quot;web-.*&quot;</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;2.1.0&quot;</span><span class="p">},</span>
-    <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;ACME Inc.&quot;</span><span class="p">}</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"namePattern"</span><span class="p">:</span> <span class="s2">"web-.*"</span><span class="p">,</span> <span class="s2">"group"</span><span class="p">:</span> <span class="s2">"org.acme"</span><span class="p">,</span> <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"2.1.0"</span><span class="p">},</span>
+    <span class="s2">"set"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"copyright"</span><span class="p">:</span> <span class="s2">"ACME Inc."</span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -308,10 +308,10 @@
 <h2>Values<a class="headerlink" href="#values" title="Link to this heading"></a></h2>
 <p>The <em>value</em> must be given as a valid JSON value. That means command-line usage can be a little strange, when setting a simple string value. To be valid JSON, the string must be surrounded by double quotes. Since double quotes hold a special meaning in most shells, they will likely have to be escaped. An example in the bash shell:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set a simple string property, such as copyright in bash</span>
-cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--cpe<span class="w"> </span>&lt;target-cpe&gt;<span class="w"> </span>--key<span class="w"> </span>copyright<span class="w"> </span>--value<span class="w"> </span><span class="s1">&#39;&quot;2022 Acme Inc&quot;&#39;</span>
+cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--cpe<span class="w"> </span>&lt;target-cpe&gt;<span class="w"> </span>--key<span class="w"> </span>copyright<span class="w"> </span>--value<span class="w"> </span><span class="s1">'"2022 Acme Inc"'</span>
 
 <span class="c1"># Set the copyright for all versions of the given component</span>
-cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--group<span class="o">=</span>org.acme<span class="w"> </span>--name<span class="o">=</span>my_program<span class="w"> </span>--version-range<span class="w"> </span>vers:generic/*<span class="w"> </span>--key<span class="w"> </span>copyright<span class="w"> </span>--value<span class="w"> </span><span class="s1">&#39;&quot;Copyright 2024 Acme&quot;&#39;</span>
+cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--group<span class="o">=</span>org.acme<span class="w"> </span>--name<span class="o">=</span>my_program<span class="w"> </span>--version-range<span class="w"> </span>vers:generic/*<span class="w"> </span>--key<span class="w"> </span>copyright<span class="w"> </span>--value<span class="w"> </span><span class="s1">'"Copyright 2024 Acme"'</span>
 </pre></div>
 </div>
 </section>
@@ -330,7 +330,7 @@ cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span
 On the command-line this can be done in two subsequent invocations:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Overwrite an array-valued property</span>
 cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--cpe<span class="w"> </span>&lt;target_cpe&gt;<span class="w"> </span>--key<span class="w"> </span>licenses<span class="w"> </span>--value<span class="w"> </span>null
-cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--cpe<span class="w"> </span>&lt;target_cpe&gt;<span class="w"> </span>--key<span class="w"> </span>licenses<span class="w"> </span>--value<span class="w"> </span><span class="s1">&#39;[{&quot;license&quot;: {&quot;id&quot;: &quot;MIT&quot;}}]&#39;</span>
+cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span>bom.json<span class="w"> </span>--cpe<span class="w"> </span>&lt;target_cpe&gt;<span class="w"> </span>--key<span class="w"> </span>licenses<span class="w"> </span>--value<span class="w"> </span><span class="s1">'[{"license": {"id": "MIT"}}]'</span>
 </pre></div>
 </div>
 <p>When passing the set list in a file, two separate updates must be specified for the same target component.</p>
@@ -340,26 +340,26 @@ cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span
 <p>When passing the targets, names and values in a file, the file must conform to this format:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
     <span class="p">{</span>
-        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="p">{</span>
             <span class="c1"># Could be any one of the identifying properties in CycloneDX.</span>
             <span class="c1"># Multiple identifiers are not allowed (except name, group, and version/version-range,</span>
             <span class="c1"># which are only valid together).</span>
-            <span class="s2">&quot;cpe&quot;</span><span class="p">:</span> <span class="s2">&quot;CPE of target component goes here&quot;</span>
+            <span class="s2">"cpe"</span><span class="p">:</span> <span class="s2">"CPE of target component goes here"</span>
             <span class="c1"># For regex matching, use namePattern, purl-pattern, or cpePattern,</span>
-            <span class="c1"># or the longer form: {&quot;name&quot;: {&quot;regex&quot;: &quot;...&quot;}}, {&quot;purl&quot;: {&quot;regex&quot;: &quot;...&quot;}}</span>
-            <span class="c1"># See &quot;Target components&quot; section above for complete regex details.</span>
+            <span class="c1"># or the longer form: {"name": {"regex": "..."}}, {"purl": {"regex": "..."}}</span>
+            <span class="c1"># See "Target components" section above for complete regex details.</span>
         <span class="p">},</span>
-        <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"set"</span><span class="p">:</span> <span class="p">{</span>
             <span class="c1"># Sets a simple property</span>
-            <span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;2022 Acme Inc&quot;</span><span class="p">,</span>
+            <span class="s2">"copyright"</span><span class="p">:</span> <span class="s2">"2022 Acme Inc"</span><span class="p">,</span>
             <span class="c1"># Deletes a property</span>
-            <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+            <span class="s2">"author"</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
             <span class="c1"># Sets an array-valued property. If the property already exists on the target,</span>
             <span class="c1"># the new value will be appended to the existing one.</span>
-            <span class="s2">&quot;licenses&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"licenses"</span><span class="p">:</span> <span class="p">[</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;license&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;MIT&quot;</span>
+                    <span class="s2">"license"</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"MIT"</span>
                     <span class="p">}</span>
                 <span class="p">}</span>
             <span class="p">]</span>
@@ -372,24 +372,24 @@ cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span
 <p>Example for the use of version ranges:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
     <span class="p">{</span>
-        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;web-framework&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"web-framework"</span><span class="p">,</span>
+            <span class="s2">"group"</span><span class="p">:</span> <span class="s2">"org.acme"</span><span class="p">,</span>
             <span class="c1"># It is possible to provide a version range</span>
             <span class="c1"># the format must comply with the PURL specification for version ranges</span>
-            <span class="s2">&quot;version-range&quot;</span><span class="p">:</span> <span class="s2">&quot;vers:generic/&gt;=1.0.2|&lt;2.0.0&quot;</span><span class="p">,</span>
+            <span class="s2">"version-range"</span><span class="p">:</span> <span class="s2">"vers:generic/&gt;=1.0.2|&lt;2.0.0"</span><span class="p">,</span>
         <span class="p">},</span>
-            <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;1990 Acme Inc&quot;</span><span class="p">},</span>
+            <span class="s2">"set"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"copyright"</span><span class="p">:</span> <span class="s2">"1990 Acme Inc"</span><span class="p">},</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;firmware-framework&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"firmware-framework"</span><span class="p">,</span>
+            <span class="s2">"group"</span><span class="p">:</span> <span class="s2">"org.acme"</span><span class="p">,</span>
             <span class="c1"># It is also possible to provide a wildcard for the version</span>
-            <span class="c1"># if the version is set to &quot;*&quot; all versions of the specified schema are passed</span>
-            <span class="s2">&quot;version-range&quot;</span><span class="p">:</span> <span class="s2">&quot;vers:generic/*&quot;</span><span class="p">,</span>
+            <span class="c1"># if the version is set to "*" all versions of the specified schema are passed</span>
+            <span class="s2">"version-range"</span><span class="p">:</span> <span class="s2">"vers:generic/*"</span><span class="p">,</span>
         <span class="p">},</span>
-            <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;copyright&quot;</span><span class="p">:</span> <span class="s2">&quot;1990 Acme Inc&quot;</span><span class="p">},</span>
+            <span class="s2">"set"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"copyright"</span><span class="p">:</span> <span class="s2">"1990 Acme Inc"</span><span class="p">},</span>
     <span class="p">},</span>
     <span class="o">...</span>
 <span class="p">]</span>
@@ -397,17 +397,17 @@ cdx-ev<span class="w"> </span><span class="nb">set</span><span class="w"> </span
 </div>
 <p>The above provided example would set the <cite>copyright</cite> in the component</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;web-framework&quot;</span>
-    <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;1.5.0&quot;</span>
+    <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"web-framework"</span>
+    <span class="s2">"group"</span><span class="p">:</span> <span class="s2">"org.acme"</span><span class="p">,</span>
+    <span class="s2">"version"</span><span class="p">:</span><span class="s2">"1.5.0"</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>while it would leave the component</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;web-framework&quot;</span>
-    <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;org.acme&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;2.0.0&quot;</span>
+    <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"web-framework"</span>
+    <span class="s2">"group"</span><span class="p">:</span> <span class="s2">"org.acme"</span><span class="p">,</span>
+    <span class="s2">"version"</span><span class="p">:</span><span class="s2">"2.0.0"</span>
 <span class="p">}</span>
 </pre></div>
 </div>

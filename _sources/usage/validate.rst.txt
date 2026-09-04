@@ -51,7 +51,9 @@ The tool, by default, also validates the filename of the SBOM. Which filenames a
 Output
 ------
 
-By default, the command writes human-readable validation results to *stdout* only. For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the ``--report-format`` option and an output path using the ``--report-path`` option.
+By default, the command writes human-readable validation results to *stdout* only. Component errors identify the affected component by its ``bom-ref`` or name and include a concise description. The validator collects every distinct schema violation instead of stopping after the first error.
+
+For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the ``--report-format`` option and an output path using the ``--report-path`` option.
 
 These formats are currently supported:
 

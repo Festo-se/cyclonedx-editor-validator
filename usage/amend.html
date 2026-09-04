@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>amend &mdash; CycloneDX Editor Validator Tool 0.34.2 documentation</title>
+  <title>amend &mdash; CycloneDX Editor Validator Tool 0.35.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=284e7c21"></script>
+      <script src="../_static/documentation_options.js?v=ca1b380b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -188,7 +188,7 @@ cdx-ev<span class="w"> </span>amend<span class="w"> </span>bom.json
 <span class="c1"># Run only the default-author and add-bom-ref operations.</span>
 cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>default-author<span class="w"> </span>--operation<span class="w"> </span>add-bom-ref<span class="w"> </span>bom.json
 
-<span class="c1"># Run the add-license-text operation. License texts are stored in a directory named &#39;license_texts&#39;.</span>
+<span class="c1"># Run the add-license-text operation. License texts are stored in a directory named 'license_texts'.</span>
 <span class="c1"># Afterwards, run the delete-ambiguous-licenses operation.</span>
 cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>add-license-text<span class="w"> </span>--license-dir<span class="w"> </span>./license_texts<span class="w"> </span>bom.json<span class="w"> </span>--output<span class="w"> </span>bom.json
 cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>delete-ambiguous-licenses<span class="w"> </span>bom.json
@@ -218,8 +218,8 @@ have an SBOM.</p>
 <h4>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h4>
 <p>Given this license in the input SBOM:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;license&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My license&quot;</span>
+    <span class="s2">"license"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"My license"</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -269,6 +269,8 @@ data.</p>
 <p>The algorithm sets the <code class="docutils literal notranslate"><span class="pre">supplier.name</span></code> to the first element found from the following list:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">publisher</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">manufacturer.name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">authors[].name</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">author</span></code></p></li>
 </ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">supplier.url</span></code> will be inferred from the following sources, in order of precedence:</p>

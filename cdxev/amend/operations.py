@@ -276,34 +276,37 @@ class InferSupplier(Operation):
                     )
                     break
 
-        if "publisher" in component:
+        manufacturer = component.get("manufacturer")
+        authors = component.get("authors")
+
+        if component.get("publisher"):
             supplier["name"] = component["publisher"]
-        elif "manufacturer" in component and isinstance(component["manufacturer"], dict):
-            manufacturer = component["manufacturer"]
-            if "name" in manufacturer:
-                supplier["name"] = manufacturer["name"]
-            elif "url" in manufacturer and "url" not in supplier:
-                supplier["url"] = manufacturer["url"]
-        elif "authors" in component and isinstance(component["authors"], list):
+        elif isinstance(manufacturer, dict) and manufacturer.get("name"):
+            supplier["name"] = manufacturer["name"]
+        elif isinstance(authors, list) and any(
+            isinstance(entry, dict) and entry.get("name") for entry in authors
+        ):
             author = next(
-                (
-                    entry
-                    for entry in component["authors"]
-                    if isinstance(entry, dict) and "name" in entry
-                ),
+                (entry for entry in authors if isinstance(entry, dict) and entry.get("name")),
                 None,
             )
-            if author is None:
-                author = next(
-                    (entry for entry in component["authors"] if isinstance(entry, dict)), None
-                )
             if author is not None:
-                if "name" in author:
-                    supplier["name"] = author["name"]
-                elif "url" not in supplier:
-                    supplier["contact"] = [author]
-        elif "author" in component:
+                supplier["name"] = author["name"]
+        elif component.get("author"):
             supplier["name"] = component["author"]
+
+        if isinstance(manufacturer, dict):
+            if manufacturer.get("url") and "url" not in supplier:
+                supplier["url"] = manufacturer["url"]
+        contacts = []
+        if isinstance(manufacturer, dict) and isinstance(manufacturer.get("contact"), list):
+            contacts.extend(manufacturer["contact"])
+
+        if isinstance(authors, list):
+            contacts.extend(entry for entry in authors if isinstance(entry, dict))
+
+        if contacts and "name" not in supplier and "url" not in supplier:
+            supplier["contact"] = contacts
 
         if supplier:
             component["supplier"] = supplier

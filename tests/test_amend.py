@@ -181,6 +181,80 @@ class InferSupplierTestCase(AmendTestCase):
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 
+    def test_manufacturer_contact_is_copied(self) -> None:
+        component = {"manufacturer": {"contact": [{"email": "x@example.com"}]}}
+        expected = {
+            "manufacturer": component["manufacturer"],
+            "supplier": {"contact": component["manufacturer"]["contact"]},
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_manufacturer_contact_does_not_skip_authors(self) -> None:
+        component = {
+            "manufacturer": {"contact": [{"email": "manufacturer@example.com"}]},
+            "authors": [{"name": "Author"}],
+        }
+        expected = {
+            **component,
+            "supplier": {
+                "name": "Author",
+            },
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_empty_manufacturer_name_does_not_skip_author_name(self) -> None:
+        component = {
+            "manufacturer": {"name": "", "contact": [{"email": "manufacturer@example.com"}]},
+            "authors": [{"name": "Author"}],
+        }
+        expected = {
+            **component,
+            "supplier": {
+                "name": "Author",
+            },
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_author_contacts_are_used_when_no_name_or_url_is_available(self) -> None:
+        component = {
+            "authors": [{"email": "x@example.com"}],
+        }
+        expected = {
+            **component,
+            "supplier": {"contact": component["authors"]},
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_author_contacts_are_not_copied_when_supplier_url_exists(self) -> None:
+        component = {
+            "authors": [{"email": "x@example.com"}],
+            "externalReferences": [{"type": "website", "url": "https://x.com"}],
+        }
+        expected = {
+            **component,
+            "supplier": {"url": ["https://x.com"]},
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_empty_manufacturer_url_does_not_block_author_contacts(self) -> None:
+        component = {
+            "manufacturer": {"url": [], "contact": [{"email": "manufacturer@example.com"}]},
+            "authors": [{"email": "author@example.com"}],
+        }
+        expected = {
+            **component,
+            "supplier": {
+                "contact": component["manufacturer"]["contact"] + component["authors"],
+            },
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
     def test_supplier_already_present(self) -> None:
         component = {"author": "x", "supplier": {"name": "y"}}
         expected = copy.deepcopy(component)

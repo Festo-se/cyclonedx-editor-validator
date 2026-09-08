@@ -142,6 +142,7 @@ _CONTEXT_LABELS = {
 }
 _ENTITY_COLLECTIONS = {"components", "dependencies", "services", "vulnerabilities"}
 _LICENSE_EXPRESSION_PARSER = get_spdx_licensing()
+_SPDX_LICENSE_IDS = frozenset(t.cast(list[str], load_spdx_schema()["enum"]))
 
 
 @dataclass(frozen=True)
@@ -206,7 +207,11 @@ def _validate_license_expressions(instance: dict[str, t.Any]) -> list[Validation
         try:
             parsed = _LICENSE_EXPRESSION_PARSER.parse(expression)
             unknown_keys = _LICENSE_EXPRESSION_PARSER.unknown_license_keys(parsed)
-            invalid_keys = [key for key in unknown_keys if not _LICENSE_REF.fullmatch(key)]
+            invalid_keys = [
+                key
+                for key in unknown_keys
+                if key not in _SPDX_LICENSE_IDS and not _LICENSE_REF.fullmatch(key)
+            ]
             if invalid_keys:
                 raise ExpressionError(f"Unknown license key(s): {', '.join(invalid_keys)}")
         except ExpressionError as exc:

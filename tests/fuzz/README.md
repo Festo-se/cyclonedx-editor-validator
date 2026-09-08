@@ -14,7 +14,7 @@ These fall into two groups: focused parser targets and end-to-end command target
 | Target | What it exercises |
 | --- | --- |
 | [fuzz_version_range.py](fuzz_version_range.py) | `version_is_in_version_range` → `univers` range/version parsing of untrusted `version-range` strings (highest-value surface) |
-| [fuzz_sbom_filename.py](fuzz_sbom_filename.py) | JSON ingestion + `generate_filename` / `generate_validation_pattern`, incl. `dateutil` timestamp parsing |
+| [fuzz_sbom_filename.py](fuzz_sbom_filename.py) | JSON ingestion + `generate_filename`, incl. `dateutil` timestamp parsing |
 | [fuzz_identity.py](fuzz_identity.py) | `ComponentIdentity.create` – purl/cpe/swid/coordinates key extraction and the non-transitive eq/hash logic |
 | [fuzz_spec_version.py](fuzz_spec_version.py) | `SpecVersion.parse` – CycloneDX `specVersion` string parsing (lightweight smoke target) |
 
@@ -33,7 +33,7 @@ errors. **Every command exposed by the `cdx-ev` CLI has a target.**
 | `vex` | [fuzz_vex.py](fuzz_vex.py) | the list/trim/search/extract sub-commands (CSV building, recursive `search_key`, id matching) |
 | `list` | [fuzz_list.py](fuzz_list.py) | `cyclonedx-python-lib` `Bom.from_json` deserialization plus license/component extraction |
 | `build-public-bom` | [fuzz_build_public_bom.py](fuzz_build_public_bom.py) | recursive internal-component removal and dependency fix-up |
-| `validate` | [fuzz_validate.py](fuzz_validate.py) | full jsonschema pipeline (SPDX/JSF/crypto registries), custom error post-processing, filename-pattern validation |
+| `validate` | [fuzz_validate.py](fuzz_validate.py) | full jsonschema-rs pipeline (SPDX/JSF/crypto registries), structured error normalization, filename-pattern validation |
 | `init-sbom` | [fuzz_init_sbom.py](fuzz_init_sbom.py) | `email-validator` parsing of the untrusted email arg + free-text fields flowing into the CycloneDX model |
 
 > The shared builder file is named `_sbom_builder.py` (leading underscore) so the

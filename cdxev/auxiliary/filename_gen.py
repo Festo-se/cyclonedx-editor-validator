@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-import re
 import typing as t
 import unicodedata
 from datetime import datetime, timezone
@@ -47,57 +46,6 @@ def generate_filename(sbom: dict) -> str:
     components.append(timestamp_str)
 
     return "_".join(components) + ".cdx.json"
-
-
-def generate_validation_pattern(sbom: dict) -> str:
-    """
-    Creates a regular expression which can be used to validate the filename of the given SBOM.
-
-    The pattern allows the following variants of the filename:
-
-    * ``bom.json`` is always an allowed name.
-    * ``<name>_[<version>_][<hash>_<timestamp>|<hash>|<timestamp>].cdx.json``, where
-      * ``<name>`` == ``metadata.component.name``, if it exists, otherwise ``unknown``.
-      * ``<version>`` MUST be present, if and only if ``metadata.component.version`` exists.
-      * ``<hash>`` == ``metadata.component.hashes[x].content`` for any index x.
-
-    :param dict sbom: The SBOM whose filename to validate.
-
-    :return: A regular expression.
-    """
-    regex = "bom\\.json|"
-
-    name = sbom.get("metadata", {}).get("component", {}).get("name", "unknown")
-    name = _sanitize(name)
-    regex += re.escape(name) + "_"
-
-    version = sbom.get("metadata", {}).get("component", {}).get("version", "")
-    version = _sanitize(version)
-    if version:
-        regex += re.escape(version) + "_"
-
-    timestamp = sbom.get("metadata", {}).get("timestamp")
-    if timestamp:
-        try:
-            timestamp_regex = _timestamp_to_utc_str(isoparse(timestamp))
-        except:
-            timestamp_regex = "[0-9]{8}T[0-9]{6}"
-    else:
-        timestamp_regex = "[0-9]{8}T[0-9]{6}"
-
-    hashes = [
-        hash["content"] for hash in sbom.get("metadata", {}).get("component", {}).get("hashes", [])
-    ]
-    hashes_regex = "(" + "|".join(hashes) + ")"
-
-    if not hashes:
-        regex += timestamp_regex
-    else:
-        regex += f"({hashes_regex}|{hashes_regex}_{timestamp_regex}|{timestamp_regex})"
-
-    regex += "\\.cdx\\.json"
-
-    return regex
 
 
 def _timestamp_to_utc_str(timestamp: datetime) -> str:

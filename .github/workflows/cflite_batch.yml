@@ -13,6 +13,8 @@ on:
       - 'cdxev/**'
       - 'tests/fuzz/**'
       - '.clusterfuzzlite/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
 
 permissions: read-all
 

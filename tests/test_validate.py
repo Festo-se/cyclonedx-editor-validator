@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import tempfile
 import typing as t
 import unittest
 from pathlib import Path
@@ -82,6 +83,31 @@ class TestValidateInit(unittest.TestCase):
         with self.assertRaisesRegex(AppError, ".*'specVersion'.*"):
             validate_test(sbom)
 
+    def test_schema_property_does_not_create_validation_issue(self) -> None:
+        sbom = get_test_sbom()
+        sbom["$schema"] = "schema selected by the caller"
+        self.assertEqual(validate_test(sbom), ["no issue"])
+
+    def test_invalid_schema_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            schema_path = Path(temp_dir) / "invalid-schema.json"
+            schema_path.write_text('{"type": "invalid"}', encoding="utf-8")
+            with self.assertRaises(AppError):
+                validate_test(get_test_sbom(), schema_type=None, schema_path=schema_path)
+
+    def test_invalid_schema_json_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            schema_path = Path(temp_dir) / "invalid-schema.json"
+            schema_path.write_text("not json", encoding="utf-8")
+            with self.assertRaises(AppError):
+                validate_test(get_test_sbom(), schema_type=None, schema_path=schema_path)
+
+    def test_missing_builtin_schema_is_reported(self) -> None:
+        sbom = get_test_sbom()
+        sbom["specVersion"] = "9.9"
+        with self.assertRaises(AppError):
+            validate_test(sbom, schema_type="default")
+
 
 class TestValidateMetadata(unittest.TestCase):
     def test_metadata_missing(self) -> None:
@@ -106,7 +132,7 @@ class TestValidateMetadata(unittest.TestCase):
             self.assertEqual(results, True)
             sbom["metadata"]["timestamp"] = "2022-02-17T10:14:59Z"
             issues = validate_test(sbom)
-            self.assertEqual(search_for_word_issues("name", issues), True)
+            self.assertEqual(issues, ["no issue"])
 
     def test_metadata_authors_missing(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -200,6 +226,14 @@ class TestValidateMetadata(unittest.TestCase):
             sbom = get_test_sbom()
             sbom["specVersion"] = spec_version
             sbom["metadata"]["component"]["copyright"] = "© 2026 Festo SE"
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
+
+    def test_copyright_with_copyright_c_prefix_is_accepted(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["metadata"]["component"]["copyright"] = "(c) 2026 Festo SE"
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
 
@@ -340,6 +374,21 @@ class TestValidateComponents(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"])
 
+    def test_supplier_equivalent_fields(self) -> None:
+        cases = (
+            [(spec_version, "publisher", "Acme") for spec_version in ["1.3", "1.4", "1.5"]]
+            + [(spec_version, "manufacturer", {"name": "Acme"}) for spec_version in ["1.6", "1.7"]]
+            + [(spec_version, "authors", [{"name": "Acme"}]) for spec_version in ["1.6", "1.7"]]
+        )
+        for spec_version, field, value in cases:
+            with self.subTest(spec_version=spec_version, field=field):
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                sbom["components"][0].pop("supplier")
+                sbom["components"][0][field] = value
+                issues = validate_test(sbom)
+                self.assertEqual(issues, ["no issue"])
+
     def test_components_component_supplier_and_author_missing(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()
@@ -418,6 +467,12 @@ class TestValidateComponents(unittest.TestCase):
             ]
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("additional", issues), True)
+
+    def test_component_additional_property(self) -> None:
+        sbom = get_test_sbom()
+        sbom["components"][0]["unexpected"] = "value"
+        issues = validate_test(sbom)
+        self.assertTrue(search_for_word_issues("additional", issues))
 
     def test_components_licenses_is_empty(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -498,6 +553,44 @@ class TestValidateComponents(unittest.TestCase):
             sbom["components"][-1].pop("licenses")
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("copyright", issues), True)
+
+    def test_patent_assertions_valid(self) -> None:
+        sbom = get_test_sbom()
+        sbom["specVersion"] = "1.7"
+        sbom["components"][0]["patentAssertions"] = [
+            {
+                "assertionType": "ownership",
+                # Use a URL-only organizationalEntity to avoid oneOf ambiguity
+                # with organizationalContact (which also accepts 'name')
+                "asserter": {"url": ["https://example.com"]},
+            }
+        ]
+        issues = validate_test(sbom)
+        self.assertEqual(issues, ["no issue"])
+
+    def test_patent_assertions_invalid_assertion_type(self) -> None:
+        sbom = get_test_sbom()
+        sbom["specVersion"] = "1.7"
+        sbom["components"][0]["patentAssertions"] = [
+            {
+                "assertionType": "invalid-type",
+                "asserter": {"url": ["https://example.com"]},
+            }
+        ]
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("invalid-type", issues), True)
+
+    def test_patent_assertions_missing_required_field(self) -> None:
+        sbom = get_test_sbom()
+        sbom["specVersion"] = "1.7"
+        sbom["components"][0]["patentAssertions"] = [
+            {
+                "assertionType": "license",
+                # missing required 'asserter'
+            }
+        ]
+        issues = validate_test(sbom)
+        self.assertEqual(search_for_word_issues("asserter", issues), True)
 
     def test_version_short(self) -> None:
         for spec_version in list_of_spec_versions:
@@ -865,18 +958,21 @@ class TestValidateLicensing(unittest.TestCase):
 class TestValidateUseSchemaType(unittest.TestCase):
     @unittest.skipUnless("CI" in os.environ, "running only in CI")
     def test_default_schema(self) -> None:
-        sbom = get_test_sbom()
-        v = validate_sbom(
-            sbom,
-            "json",
-            Path(path_to_sbom),
-            "",
-            Path(""),
-            schema_type="default",
-            schema_path=None,
-            filename_regex=None,
-        )
-        self.assertEqual(v, 0)
+        for spec_version in list_of_spec_versions:
+            with self.subTest(spec_version=spec_version):
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                v = validate_sbom(
+                    sbom,
+                    "json",
+                    Path(path_to_sbom),
+                    "",
+                    Path(""),
+                    schema_type="default",
+                    schema_path=None,
+                    filename_regex=None,
+                )
+                self.assertEqual(v, 0)
 
 
 class TestInternalNameSchema(unittest.TestCase):
@@ -1278,51 +1374,24 @@ class TestInternalMetaData(unittest.TestCase):
 
 
 class TestValidateFilename(unittest.TestCase):
-    def setUp(self) -> None:
-        self.sbom = get_test_sbom()
-
-    def test_valid_with_default_schema(self) -> None:
+    def test_valid_with_implicit_pattern(self) -> None:
         for filename in ["bom.json", "random.cdx.json", "-.cdx.json"]:
             with self.subTest(filename=filename):
-                result = validate_filename(filename, "", self.sbom, "default")
+                result = validate_filename(filename, "")
                 self.assertFalse(result)
 
-    def test_invalid_with_default_schema(self) -> None:
+    def test_invalid_with_implicit_pattern(self) -> None:
         for filename in ["bomjson", "bom.jso", "random.bom.json", ".cdx.json"]:
             with self.subTest(filename=filename):
-                result = validate_filename(filename, "", self.sbom, "default")
+                result = validate_filename(filename, "")
                 self.assertIsInstance(result, str)
 
-    def test_valid_with_custom_schema(self) -> None:
-        for filename in [
-            "bom.json",
-            "Acme_Application_9.1.1_20220217T101458.cdx.json",
-            "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345.cdx.json",
-            "Acme_Application_9.1.1_ec7781220ec7781220ec778122012345_20220217T101458.cdx.json",
-        ]:
-            with self.subTest(filename=filename):
-                result = validate_filename(filename, "", self.sbom, "custom")
-                self.assertFalse(result)
-
-    def test_invalid_with_custom_schema(self) -> None:
-        for filename in [
-            "bomjson",
-            "bom.jso",
-            "random.bom.json",
-            ".cdx.json",
-            "Acme_Application_20220217T101458.cdx.json",
-            "unknown_9.1.1_ec7781220ec7781220ec778122012345.cdx.json",
-            "Acme_Application_9.1.1.cdx.json",
-            "Acme_Application.cdx.json",
-            "Acme_Application_9.1.1_20220217T101458.json",
-            "Acme_Application_9.1.1_20220217T101458.cdx",
-        ]:
-            with self.subTest(filename=filename):
-                result = validate_filename(filename, "", self.sbom, "custom")
-                self.assertIsInstance(result, str)
+    def test_explicit_pattern_overrides_implicit_pattern(self) -> None:
+        result = validate_filename("custom-name.json", r"custom-name\.json")
+        self.assertFalse(result)
 
     def test_invalid_regex_raises_apperror(self) -> None:
         for regex in ["(unterminated", "[", "*invalid"]:
             with self.subTest(regex=regex):
                 with self.assertRaises(AppError):
-                    validate_filename("bom.json", regex, self.sbom, "default")
+                    validate_filename("bom.json", regex)

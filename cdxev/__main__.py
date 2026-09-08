@@ -522,8 +522,8 @@ def create_validation_parser(
     group.add_argument(
         "--filename-pattern",
         help=(
-            "Regex for validation of filename. If not specified, a default regex depending on "
-            "the schema is applied. To disable filename validation altogether, use "
+            "Regex for validation of filename. If not specified, only 'bom.json' and "
+            "'*.cdx.json' filenames are accepted. To disable filename validation altogether, use "
             "--no-filename-validation."
         ),
         default="",
@@ -712,7 +712,7 @@ def create_build_public_bom_parser(
     parser = subparsers.add_parser(
         "build-public",
         help=(
-            "Removes components and information with namespace internal"
+            "Removes components and information with namespace internal "
             "and resolves the dependencies."
         ),
     )
@@ -795,7 +795,7 @@ def create_list_command_parser(
     parser = subparsers.add_parser(
         "list",
         help=(
-            "Lists specific contents of the SBOM."
+            "Lists specific contents of the SBOM. "
             "Currently supported are the listing of license information and component information."
         ),
     )

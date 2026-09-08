@@ -7,7 +7,7 @@ import typing as t
 from pathlib import Path
 from typing import Any, Sequence
 
-from jsonschema import Draft7Validator, FormatChecker
+import jsonschema_rs
 
 from cdxev.auxiliary.sbom_functions import extract_components
 from cdxev.log import LogMessage
@@ -101,7 +101,7 @@ def clear_component(component: dict[str, Any], ext_ref_regex: t.Union[str, None]
 
 
 def remove_component_tagged_internal(
-    component: dict, validator: Draft7Validator
+    component: dict, validator: jsonschema_rs.Validator
 ) -> tuple[list[str], list[dict]]:
     """
     Removes the top-level component if it is marked as internal (internal, if valid
@@ -113,7 +113,7 @@ def remove_component_tagged_internal(
     ----------
     components: dict
         A dictionary of the top-level component
-    validator: Draft7Validator
+    validator: jsonschema_rs.Validator
         A validator to check if component is valid
         according to the schema
 
@@ -281,9 +281,12 @@ def build_public_bom(
     return sbom
 
 
-def create_internal_validator(path_to_schema: Path) -> Draft7Validator:
+def create_internal_validator(path_to_schema: Path) -> jsonschema_rs.Validator:
     with path_to_schema.open(encoding="utf_8_sig") as schema_f:
         schema_internal = json.load(schema_f)
-    validator_for_being_internal = Draft7Validator(schema_internal, format_checker=FormatChecker())
-    validator_for_being_internal.check_schema(schema_internal)
-    return validator_for_being_internal
+    jsonschema_rs.meta.validate(schema_internal)
+    return jsonschema_rs.validator_for(
+        schema_internal,
+        validate_formats=True,
+        base_uri=path_to_schema.resolve().as_uri(),
+    )

@@ -75,6 +75,12 @@ class CompositionsTestCase(AmendTestCase):
             self.sbom_fixture["metadata"]["component"]["bom-ref"]
             in self.sbom_fixture["compositions"][0]["assemblies"]
         )
+        self.assertEqual(
+            self.sbom_fixture["compositions"][0]["assemblies"].count(
+                self.sbom_fixture["metadata"]["component"]["bom-ref"]
+            ),
+            1,
+        )
 
     def test_meta_component_missing(self) -> None:
         del self.sbom_fixture["metadata"]["component"]
@@ -101,6 +107,27 @@ class CompositionsTestCase(AmendTestCase):
             self.sbom_fixture["compositions"][0]["assemblies"],
             ["com.company.unit/depA@4.0.2", "some-vendor/depB@1.2.3", "depC@3.2.1"],
         )
+
+    def test_duplicate_component_bom_refs_are_unique_in_assemblies(self) -> None:
+        self.operation.prepare(self.sbom_fixture)
+        duplicate_ref = "dup-ref"
+        self.operation.handle_component({"bom-ref": duplicate_ref})
+        self.operation.handle_component({"bom-ref": duplicate_ref})
+
+        self.assertEqual(
+            self.sbom_fixture["compositions"][0]["assemblies"],
+            [duplicate_ref],
+        )
+
+    def test_run_amend_keeps_assemblies_unique_when_metadata_ref_repeats(self) -> None:
+        repeated_ref = self.sbom_fixture["metadata"]["component"]["bom-ref"]
+        self.sbom_fixture["compositions"][2]["aggregate"] = "unknown"
+        self.sbom_fixture["components"].append({"bom-ref": repeated_ref})
+
+        run_amend(self.sbom_fixture, selected=[Compositions])
+
+        assemblies = self.sbom_fixture["compositions"][0]["assemblies"]
+        self.assertEqual(assemblies.count(repeated_ref), 1)
 
 
 class DefaultAuthorTestCase(AmendTestCase):
@@ -133,6 +160,98 @@ class InferSupplierTestCase(AmendTestCase):
     def test_author_already_present(self) -> None:
         component = {"author": "x"}
         expected = {"author": "x", "supplier": {"name": "x"}}
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_manufacturer_already_present(self) -> None:
+        component = {"manufacturer": {"name": "x"}}
+        expected = {"manufacturer": {"name": "x"}, "supplier": {"name": "x"}}
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_authors_already_present(self) -> None:
+        component = {"authors": [{"name": "x"}]}
+        expected = {"authors": [{"name": "x"}], "supplier": {"name": "x"}}
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_named_author_is_preferred(self) -> None:
+        component = {"authors": [{"email": "x@example.com"}, {"name": "x"}]}
+        expected = {"authors": component["authors"], "supplier": {"name": "x"}}
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_manufacturer_contact_is_copied(self) -> None:
+        component = {"manufacturer": {"contact": [{"email": "x@example.com"}]}}
+        expected = {
+            "manufacturer": component["manufacturer"],
+            "supplier": {"contact": component["manufacturer"]["contact"]},
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_manufacturer_contact_does_not_skip_authors(self) -> None:
+        component = {
+            "manufacturer": {"contact": [{"email": "manufacturer@example.com"}]},
+            "authors": [{"name": "Author"}],
+        }
+        expected = {
+            **component,
+            "supplier": {
+                "name": "Author",
+            },
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_empty_manufacturer_name_does_not_skip_author_name(self) -> None:
+        component = {
+            "manufacturer": {"name": "", "contact": [{"email": "manufacturer@example.com"}]},
+            "authors": [{"name": "Author"}],
+        }
+        expected = {
+            **component,
+            "supplier": {
+                "name": "Author",
+            },
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_author_contacts_are_used_when_no_name_or_url_is_available(self) -> None:
+        component = {
+            "authors": [{"email": "x@example.com"}],
+        }
+        expected = {
+            **component,
+            "supplier": {"contact": component["authors"]},
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_author_contacts_are_not_copied_when_supplier_url_exists(self) -> None:
+        component = {
+            "authors": [{"email": "x@example.com"}],
+            "externalReferences": [{"type": "website", "url": "https://x.com"}],
+        }
+        expected = {
+            **component,
+            "supplier": {"url": ["https://x.com"]},
+        }
+        self.operation.handle_component(component)
+        self.assertDictEqual(expected, component)
+
+    def test_empty_manufacturer_url_does_not_block_author_contacts(self) -> None:
+        component = {
+            "manufacturer": {"url": [], "contact": [{"email": "manufacturer@example.com"}]},
+            "authors": [{"email": "author@example.com"}],
+        }
+        expected = {
+            **component,
+            "supplier": {
+                "contact": component["manufacturer"]["contact"] + component["authors"],
+            },
+        }
         self.operation.handle_component(component)
         self.assertDictEqual(expected, component)
 

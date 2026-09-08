@@ -3,7 +3,7 @@ validate
 ============
 
 .. argparse::
-    :filename: ./cdxev/__main__.py
+    :filename: ../../cdxev/__main__.py
     :func: create_parser
     :prog: cdx-ev
     :path: validate
@@ -46,21 +46,14 @@ The tool, by default, also validates the filename of the SBOM. Which filenames a
     * The filename must be a full match, regex anchors (^ and $) are not required.
     * Regex patterns often include special characters. Pay attention to escaping rules for your shell to ensure proper results.
 
-* In all other cases, the acceptable filenames depend on the selected schema:
-
-    * When using the stock CycloneDX schema (``--schema-type default`` or no option at all) or when using your own schema (``--schema-path`` option), the validator accepts the two patterns recommended by the `CycloneDX specification <https://cyclonedx.org/specification/overview/#recognized-file-patterns>`_: ``bom.json`` or ``*.cdx.json``.
-    * When validating against the built-in custom schema (``--schema-type custom``), filenames must match one of these patterns: ``bom.json`` or ``<name>_<version>_<hash>|<timestamp>|<hash>_<timestamp>.cdx.json``. See below for explanations of the placeholders.
-
-``<name>`` and ``<version>`` correspond to the respective fields in ``metadata.component`` in the SBOM.
-
-``<timestamp>`` corresponds to ``metadata.timestamp`` and ``<hash>`` means any value in ``metadata.component.hashes[].content``.
-
-Either ``<timestamp>`` or ``<hash>`` must be present. If both are specified, ``<hash>`` must come first.
+* In all other cases, the validator accepts the two patterns recommended by the `CycloneDX specification <https://cyclonedx.org/specification/overview/#recognized-file-patterns>`_: ``bom.json`` or ``*.cdx.json``. This applies to every schema type.
 
 Output
 ------
 
-By default, the command writes human-readable validation results to *stdout* only. For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the ``--report-format`` option and an output path using the ``--report-path`` option.
+By default, the command writes human-readable validation results to *stdout* only. Component errors identify the affected component by its ``bom-ref`` or name and include a concise description. The validator collects every distinct schema violation instead of stopping after the first error.
+
+For integration into CI/CD several machine-readable report formats are supported as well. To have a report written to a file, select the format using the ``--report-format`` option and an output path using the ``--report-path`` option.
 
 These formats are currently supported:
 

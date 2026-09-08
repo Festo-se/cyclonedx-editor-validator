@@ -184,7 +184,7 @@ class Compositions(Operation):
                 if comp["aggregate"] == self.__metacomp_aggregate
             )
             assemblies = composition.setdefault("assemblies", [])
-            assemblies.append(metacomp)
+            self.__append_unique_assembly(assemblies, metacomp)
         except StopIteration:
             composition = {
                 "aggregate": self.__metacomp_aggregate,
@@ -200,7 +200,12 @@ class Compositions(Operation):
 
     def __add_to_assemblies(self, bom_ref: str) -> None:
         logger.debug("Added %s to compositions.", bom_ref)
-        self.__unknown_assemblies.append(bom_ref)
+        self.__append_unique_assembly(self.__unknown_assemblies, bom_ref)
+
+    @staticmethod
+    def __append_unique_assembly(assemblies: list, bom_ref: str) -> None:
+        if bom_ref not in assemblies:
+            assemblies.append(bom_ref)
 
 
 @default
@@ -232,6 +237,8 @@ class InferSupplier(Operation):
     The algorithm sets the ``supplier.name`` to the first element found from the following list:
 
     * ``publisher``
+    * ``manufacturer.name``
+    * ``authors[].name``
     * ``author``
 
     The ``supplier.url`` will be inferred from the following sources, in order of precedence:
@@ -269,10 +276,37 @@ class InferSupplier(Operation):
                     )
                     break
 
-        if "publisher" in component:
+        manufacturer = component.get("manufacturer")
+        authors = component.get("authors")
+
+        if component.get("publisher"):
             supplier["name"] = component["publisher"]
-        elif "author" in component:
+        elif isinstance(manufacturer, dict) and manufacturer.get("name"):
+            supplier["name"] = manufacturer["name"]
+        elif isinstance(authors, list) and any(
+            isinstance(entry, dict) and entry.get("name") for entry in authors
+        ):
+            author = next(
+                (entry for entry in authors if isinstance(entry, dict) and entry.get("name")),
+                None,
+            )
+            if author is not None:
+                supplier["name"] = author["name"]
+        elif component.get("author"):
             supplier["name"] = component["author"]
+
+        if isinstance(manufacturer, dict):
+            if manufacturer.get("url") and "url" not in supplier:
+                supplier["url"] = manufacturer["url"]
+        contacts = []
+        if isinstance(manufacturer, dict) and isinstance(manufacturer.get("contact"), list):
+            contacts.extend(manufacturer["contact"])
+
+        if isinstance(authors, list):
+            contacts.extend(entry for entry in authors if isinstance(entry, dict))
+
+        if contacts and "name" not in supplier and "url" not in supplier:
+            supplier["contact"] = contacts
 
         if supplier:
             component["supplier"] = supplier

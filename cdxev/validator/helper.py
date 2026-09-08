@@ -142,7 +142,7 @@ _CONTEXT_LABELS = {
 }
 _ENTITY_COLLECTIONS = {"components", "dependencies", "services", "vulnerabilities"}
 _LICENSE_EXPRESSION_PARSER = get_spdx_licensing()
-
+_SPDX_LICENSE_IDS = frozenset(t.cast(list[str], load_spdx_schema()["enum"]))
 
 @dataclass(frozen=True)
 class ValidationIssue:

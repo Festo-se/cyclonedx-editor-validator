@@ -1,7 +1,10 @@
 import json
+import tempfile
 import unittest
 from copy import deepcopy
+from pathlib import Path
 from typing import Sequence
+from unittest.mock import patch
 
 from cdxev.auxiliary import sbom_functions as sbf
 from cdxev.auxiliary.identity import ComponentIdentity
@@ -372,6 +375,105 @@ class TestCompareComponents(unittest.TestCase):
 
 
 class TestReplaceBomRefs(unittest.TestCase):
+    def test_get_all_bom_refs_recursively(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "bom-ref": "component",
+                    "supplier": {"bom-ref": "organization"},
+                    "components": [{"bom-ref": "nested-component"}],
+                }
+            ],
+            "services": [{"bom-ref": "service"}],
+            "vulnerabilities": [{"bom-ref": "vulnerability"}],
+            "annotations": [{"bom-ref": "annotation"}],
+            "formulation": [
+                {
+                    "bom-ref": "formula",
+                    "workflows": [{"bom-ref": "workflow"}],
+                }
+            ],
+        }
+
+        self.assertEqual(
+            {
+                "component",
+                "organization",
+                "nested-component",
+                "service",
+                "vulnerability",
+                "annotation",
+                "formula",
+                "workflow",
+            },
+            sbf.get_all_bom_refs(sbom),
+        )
+
+    def test_replace_bom_ref_in_schema_discovered_fields(self) -> None:
+        reference = "component"
+        new_reference = "parent/component"
+        reference_fields = sbf._schema_reference_fields(None)
+        sbom = {
+            "nested": {field: reference for field in reference_fields},
+            "unrelated": {
+                "name": reference,
+                "description": reference,
+                "url": reference,
+                "value": reference,
+                "identifier": reference,
+            },
+            "externalReferences": [{"url": f"urn:cdx:external/1#{reference}"}],
+        }
+
+        sbf.replace_bom_ref_in_sbom(sbom, reference, new_reference)
+
+        for field in reference_fields:
+            self.assertEqual(new_reference, sbom["nested"][field])
+        self.assertEqual(
+            {
+                "name": reference,
+                "description": reference,
+                "url": reference,
+                "value": reference,
+                "identifier": reference,
+            },
+            sbom["unrelated"],
+        )
+        self.assertEqual(
+            f"urn:cdx:external/1#{reference}",
+            sbom["externalReferences"][0]["url"],
+        )
+
+    def test_reference_fields_are_discovered_from_new_schema(self) -> None:
+        schema = {
+            "definitions": {
+                "refType": {
+                    "type": "string",
+                    "title": "BOM Reference",
+                }
+            },
+            "properties": {
+                "futureLinks": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/refType"},
+                }
+            },
+        }
+        sbom = {
+            "specVersion": "9.9",
+            "futureLinks": ["component"],
+        }
+
+        with tempfile.TemporaryDirectory() as directory:
+            schema_path = Path(directory) / "bom-9.9.schema.json"
+            schema_path.write_text(json.dumps(schema), encoding="utf_8")
+            with patch.object(sbf.resources, "files", return_value=Path(directory)):
+                sbf._cached_schema_reference_fields.cache_clear()
+                sbf.replace_bom_ref_in_sbom(sbom, "component", "parent/component")
+
+        sbf._cached_schema_reference_fields.cache_clear()
+        self.assertEqual(["parent/component"], sbom["futureLinks"])
+
     def test_replace_ref_in_component(self) -> None:
         component = {
             "type": "library",

@@ -5,9 +5,11 @@ import logging
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum
-from functools import total_ordering
+from functools import lru_cache, total_ordering
+from importlib import resources
 from re import fullmatch
 from typing import Any, Callable, Optional, Sequence
+from urllib.parse import unquote
 
 from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component
@@ -196,6 +198,160 @@ def extract_components(list_of_components: Sequence[dict]) -> Sequence[dict]:
             extracted_components.append(component)
             extracted_components += extract_components(component.get("components", []))
     return extracted_components
+
+
+def get_all_bom_refs(value: Any) -> set[str]:
+    """Return every non-empty ``bom-ref`` found recursively in a JSON value."""
+    bom_refs: set[str] = set()
+
+    if isinstance(value, dict):
+        bom_ref = value.get("bom-ref")
+        if isinstance(bom_ref, str) and bom_ref:
+            bom_refs.add(bom_ref)
+        for nested_value in value.values():
+            if isinstance(nested_value, (dict, list)):
+                bom_refs.update(get_all_bom_refs(nested_value))
+    elif isinstance(value, list):
+        for item in value:
+            if isinstance(item, (dict, list)):
+                bom_refs.update(get_all_bom_refs(item))
+
+    return bom_refs
+
+
+def _schema_reference_fields(spec_version: Any) -> set[str]:
+    version = spec_version if isinstance(spec_version, str) else None
+    return set(_cached_schema_reference_fields(version))
+
+
+def _load_bundled_schema(schema_dir: Any, schemas: dict[str, dict], name: str) -> dict:
+    if name not in schemas:
+        value = json.loads((schema_dir / name).read_text(encoding="utf_8_sig"))
+        if not isinstance(value, dict):
+            raise TypeError(f"Bundled schema {name} is not a JSON object")
+        schemas[name] = value
+    return schemas[name]
+
+
+def _resolve_schema_reference(
+    reference: str,
+    current_schema: str,
+    schema_dir: Any,
+    schemas: dict[str, dict],
+) -> tuple[dict, str]:
+    filename, _, fragment = reference.partition("#")
+    target_schema = filename or current_schema
+    value: Any = _load_bundled_schema(schema_dir, schemas, target_schema)
+    for encoded_part in fragment.removeprefix("/").split("/") if fragment else ():
+        part = unquote(encoded_part).replace("~1", "/").replace("~0", "~")
+        value = value[part]
+    if not isinstance(value, dict):
+        raise TypeError(f"Schema reference {reference} does not resolve to an object")
+    return value, target_schema
+
+
+def _schema_describes_bom_ref(schema: dict) -> bool:
+    description = f"{schema.get('title', '')} {schema.get('description', '')}".lower()
+    describes_reference = "bom-ref" in description or "bom reference" in description
+    explicitly_excludes_reference = "should not be" in description and "bom-ref" in description
+    return describes_reference and not explicitly_excludes_reference
+
+
+def _schema_contains_reference_value(
+    schema: Any,
+    current_schema: str,
+    schema_dir: Any,
+    schemas: dict[str, dict],
+    visited: frozenset[tuple[str, str]] = frozenset(),
+) -> bool:
+    if not isinstance(schema, dict):
+        return False
+
+    reference = schema.get("$ref")
+    if isinstance(reference, str):
+        if reference.endswith(("/refType", "/refLinkType")):
+            return True
+        marker = (current_schema, reference)
+        if marker in visited:
+            return False
+        resolved, target_schema = _resolve_schema_reference(
+            reference, current_schema, schema_dir, schemas
+        )
+        return _schema_contains_reference_value(
+            resolved, target_schema, schema_dir, schemas, visited | {marker}
+        )
+
+    if schema.get("type") == "string":
+        return _schema_describes_bom_ref(schema)
+
+    if schema.get("type") == "array":
+        items = schema.get("items")
+        if _schema_contains_reference_value(items, current_schema, schema_dir, schemas, visited):
+            return True
+        return (
+            isinstance(items, dict)
+            and items.get("type") == "string"
+            and _schema_describes_bom_ref(schema)
+        )
+
+    return any(
+        _schema_contains_reference_value(option, current_schema, schema_dir, schemas, visited)
+        for keyword in ("anyOf", "oneOf", "allOf")
+        for option in schema.get(keyword, [])
+    )
+
+
+def _collect_schema_reference_fields(
+    value: Any,
+    schema_name: str,
+    schema_dir: Any,
+    schemas: dict[str, dict],
+    fields: set[str],
+) -> None:
+    if isinstance(value, dict):
+        properties = value.get("properties")
+        if isinstance(properties, dict):
+            for name, property_schema in properties.items():
+                if name == "bom-ref" or _schema_contains_reference_value(
+                    property_schema, schema_name, schema_dir, schemas
+                ):
+                    fields.add(name)
+        for nested_value in value.values():
+            _collect_schema_reference_fields(
+                nested_value, schema_name, schema_dir, schemas, fields
+            )
+    elif isinstance(value, list):
+        for item in value:
+            _collect_schema_reference_fields(item, schema_name, schema_dir, schemas, fields)
+
+
+@lru_cache(maxsize=None)
+def _cached_schema_reference_fields(spec_version: Optional[str]) -> tuple[str, ...]:
+    schema_dir = resources.files("cdxev.auxiliary.schema")
+    requested_schema = schema_dir / f"bom-{spec_version}.schema.json"
+    if spec_version is not None and requested_schema.is_file():
+        schema_names = [requested_schema.name]
+    else:
+        schema_names = sorted(
+            entry.name
+            for entry in schema_dir.iterdir()
+            if fullmatch(r"bom-[0-9]+\.[0-9]+\.schema\.json", entry.name)
+        )
+
+    schemas: dict[str, dict] = {}
+    for schema_name in schema_names:
+        _load_bundled_schema(schema_dir, schemas, schema_name)
+
+    fields = {"bom-ref"}
+    scanned_schemas: set[str] = set()
+    while unscanned_schemas := set(schemas) - scanned_schemas:
+        schema_name = unscanned_schemas.pop()
+        scanned_schemas.add(schema_name)
+        _collect_schema_reference_fields(
+            schemas[schema_name], schema_name, schema_dir, schemas, fields
+        )
+
+    return tuple(sorted(fields))
 
 
 def get_tool_entries_with_bom_ref(sbom: dict) -> list[dict]:
@@ -457,19 +613,35 @@ def get_ref_components_mapping(
 
 
 def replace_bom_ref_in_sbom(sbom: dict, reference: str, new_reference: str) -> None:
-    replace_ref_in_components(
-        sbom.get("components", []) + [sbom.get("metadata", {}).get("component", {})],
-        reference,
-        new_reference,
-    )
-    replace_ref_in_tools(sbom.get("metadata", {}).get("tools"), reference, new_reference)
-    replace_ref_in_dependencies(sbom.get("dependencies", []), reference, new_reference)
-    replace_ref_in_compositions(sbom.get("compositions", []), reference, new_reference)
-    replace_ref_in_vulnerabilities(
-        sbom.get("vulnerabilities", []),
-        reference,
-        new_reference,
-    )
+    """Replace a bom-ref declaration and all internal links to it recursively.
+
+    Reference fields are derived from the bundled schema matching ``specVersion``. If no matching
+    schema is available, all bundled default CycloneDX schemas are used as a fallback. Only exact
+    string values are changed; unrelated strings and external BOM-Link values remain untouched.
+    """
+
+    bom_ref_fields = _schema_reference_fields(sbom.get("specVersion"))
+
+    def _replace(value: Any) -> None:
+        if isinstance(value, dict):
+            for key, nested_value in value.items():
+                if key in bom_ref_fields:
+                    if nested_value == reference:
+                        value[key] = new_reference
+                        continue
+                    if isinstance(nested_value, list):
+                        for index, item in enumerate(nested_value):
+                            if item == reference:
+                                nested_value[index] = new_reference
+
+                if isinstance(nested_value, (dict, list)):
+                    _replace(nested_value)
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, (dict, list)):
+                    _replace(item)
+
+    _replace(sbom)
 
 
 def collect_affects_of_vulnerabilities(

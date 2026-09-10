@@ -19,6 +19,7 @@ from cdxev.amend.operations import (
     Operation,
 )
 from cdxev.error import AppError
+from cdxev.validator.helper import validate_instance
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_amend_sboms/"
 
@@ -581,6 +582,43 @@ class DeleteAmbiguousLicensesTestCase(AmendTestCase):
 
 
 class HierarchicalBomRefsTestCase(unittest.TestCase):
+    def test_supports_every_cyclonedx_version(self) -> None:
+        for spec_version in ("1.2", "1.3", "1.4", "1.5", "1.6", "1.7"):
+            with self.subTest(spec_version=spec_version):
+                sbom = {
+                    "bomFormat": "CycloneDX",
+                    "specVersion": spec_version,
+                    "version": 1,
+                    "components": [
+                        {
+                            "type": "application",
+                            "name": "root",
+                            "version": "1",
+                            "bom-ref": "1",
+                            "components": [
+                                {
+                                    "type": "library",
+                                    "name": "child",
+                                    "version": "1",
+                                    "bom-ref": "2",
+                                }
+                            ],
+                        }
+                    ],
+                    "dependencies": [
+                        {"ref": "1", "dependsOn": ["2"]},
+                        {"ref": "2", "dependsOn": []},
+                    ],
+                }
+
+                run_amend(sbom, selected=[HierarchicalBomRefs])
+
+                child = sbom["components"][0]["components"][0]
+                self.assertEqual("1/2", child["bom-ref"])
+                self.assertEqual(["1/2"], sbom["dependencies"][0]["dependsOn"])
+                self.assertEqual("1/2", sbom["dependencies"][1]["ref"])
+                self.assertFalse(validate_instance(sbom, spec_version, "default", None).errors)
+
     def test_prepends_parent_refs_recursively(self) -> None:
         sbom = {
             "components": [
@@ -721,6 +759,20 @@ class HierarchicalBomRefsTestCase(unittest.TestCase):
         child = sbom["components"][0]["components"][0]
         self.assertEqual("module-a/library-b-1", child["bom-ref"])
         self.assertEqual("module-a/library-b-1", sbom["dependencies"][0]["ref"])
+
+    def test_avoids_collision_with_bom_ref_outside_components(self) -> None:
+        sbom = {
+            "components": [
+                {"bom-ref": "module-a", "components": [{"bom-ref": "library-b"}]},
+            ],
+            "vulnerabilities": [{"bom-ref": "module-a/library-b"}],
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        child = sbom["components"][0]["components"][0]
+        self.assertEqual("module-a/library-b-1", child["bom-ref"])
+        self.assertEqual("module-a/library-b", sbom["vulnerabilities"][0]["bom-ref"])
 
     def test_missing_parent_ref_logs_info_and_continues_recursion(self) -> None:
         sbom = {

@@ -1,4 +1,4 @@
-{
+﻿{
   "governing_program_with_vulnerabilities_new_ratings": [
     {
       "description": "The application is vulnerable to remote SQL injection and shell upload",
@@ -5959,7 +5959,7 @@
             {
               "name": "comp_3",
               "version": "1.0.0",
-              "bom-ref": "comp_3",
+              "bom-ref": "comp_1/comp_3",
               "components": [],
               "type": "library",
               "supplier": {
@@ -5971,7 +5971,7 @@
             {
               "name": "comp_4",
               "version": "1.0.0",
-              "bom-ref": "comp_4",
+              "bom-ref": "comp_1/comp_4",
               "components": [],
               "type": "library",
               "supplier": {
@@ -6140,7 +6140,7 @@
             {
               "name": "comp_4",
               "version": "1.0.0",
-              "bom-ref": "comp_4",
+              "bom-ref": "comp_1/comp_4",
               "components": [],
               "type": "library",
               "supplier": {
@@ -6152,7 +6152,7 @@
             {
               "name": "comp_5",
               "version": "1.0.0",
-              "bom-ref": "comp_5",
+              "bom-ref": "comp_1/comp_5",
               "components": [],
               "type": "library",
               "supplier": {
@@ -6333,7 +6333,7 @@
             {
               "name": "comp_4",
               "version": "1.0.0",
-              "bom-ref": "comp_4",
+              "bom-ref": "comp_1/comp_4",
               "components": [],
               "type": "library",
               "supplier": {
@@ -6539,7 +6539,7 @@
             {
               "name": "comp_4",
               "version": "1.0.0",
-              "bom-ref": "comp_4",
+              "bom-ref": "comp_1/comp_4",
               "components": [],
               "type": "library",
               "supplier": {

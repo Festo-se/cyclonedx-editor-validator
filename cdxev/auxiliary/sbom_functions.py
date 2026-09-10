@@ -541,63 +541,6 @@ def unify_bom_refs(list_of_sboms: Sequence[dict]) -> None:
                         replace_bom_ref_in_sbom(secondary_sbom, reference, new_reference)
 
 
-def replace_ref_in_components(components: list[dict], reference: str, new_reference: str) -> None:
-    for component in components:
-        if component.get("bom-ref", "") == reference:
-            component["bom-ref"] = new_reference
-
-
-def replace_ref_in_tools(tools: Any, reference: str, new_reference: str) -> None:
-    if not isinstance(tools, dict):
-        return
-
-    for key in ("components", "services"):
-        entries = tools.get(key, [])
-        if not isinstance(entries, list):
-            continue
-        for entry in entries:
-            if not isinstance(entry, dict):
-                continue
-            if entry.get("bom-ref", "") == reference:
-                entry["bom-ref"] = new_reference
-
-
-def replace_ref_in_dependencies(
-    dependencies: list[dict], reference: str, new_reference: str
-) -> None:
-    for dependency in dependencies:
-        if dependency.get("ref", "") == reference:
-            dependency["ref"] = new_reference
-        else:  # component should not depend on itself
-            dependson = dependency.get("dependsOn", [])
-            if reference in dependson:
-                new_dependson = [
-                    new_reference if entry == reference else entry for entry in dependson
-                ]
-                dependency["dependsOn"] = new_dependson
-
-
-def replace_ref_in_compositions(
-    compositions: list[dict], reference: str, new_reference: str
-) -> None:
-    for composition in compositions:
-        assemblies = composition.get("assemblies", [])
-        if reference in assemblies:
-            new_assemblies = [
-                new_reference if entry == reference else entry for entry in assemblies
-            ]
-            composition["assemblies"] = new_assemblies
-
-
-def replace_ref_in_vulnerabilities(
-    vulnerabilities: list[dict], reference: str, new_reference: str
-) -> None:
-    for vulnerability in vulnerabilities:
-        for affected in vulnerability.get("affects", []):
-            if affected.get("ref", "") == reference:
-                affected["ref"] = new_reference
-
-
 def get_ref_components_mapping(
     components_list: list[dict],
 ) -> dict[str, ComponentIdentity]:

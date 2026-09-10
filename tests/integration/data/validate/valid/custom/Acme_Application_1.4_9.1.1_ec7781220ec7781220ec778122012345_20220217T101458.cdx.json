@@ -142,7 +142,7 @@
       "version": "2.0.0",
       "licenses": [
         {
-          "expression": "Example, Inc. Commercial License"
+          "expression": "LicenseRef-Example-Inc-Commercial-License"
         }
       ],
       "cpe": "cpe:2.3:a:*:util:2.0.0:*:*:*:*:*:*:*"

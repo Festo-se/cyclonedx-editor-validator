@@ -21,6 +21,7 @@ from cdxev.error import AppError
 from cdxev.log import LogMessage
 
 logger = logging.getLogger(__name__)
+BOM_REF_FIELD = "bom-ref"
 
 
 @dataclass(frozen=True, order=True)
@@ -205,7 +206,7 @@ def get_all_bom_refs(value: Any) -> set[str]:
     bom_refs: set[str] = set()
 
     if isinstance(value, dict):
-        bom_ref = value.get("bom-ref")
+        bom_ref = value.get(BOM_REF_FIELD)
         if isinstance(bom_ref, str) and bom_ref:
             bom_refs.add(bom_ref)
         for nested_value in value.values():
@@ -312,7 +313,7 @@ def _collect_schema_reference_fields(
         properties = value.get("properties")
         if isinstance(properties, dict):
             for name, property_schema in properties.items():
-                if name == "bom-ref" or _schema_contains_reference_value(
+                if name == BOM_REF_FIELD or _schema_contains_reference_value(
                     property_schema, schema_name, schema_dir, schemas
                 ):
                     fields.add(name)
@@ -342,7 +343,7 @@ def _cached_schema_reference_fields(spec_version: Optional[str]) -> tuple[str, .
     for schema_name in schema_names:
         _load_bundled_schema(schema_dir, schemas, schema_name)
 
-    fields = {"bom-ref"}
+    fields = {BOM_REF_FIELD}
     scanned_schemas: set[str] = set()
     while unscanned_schemas := set(schemas) - scanned_schemas:
         schema_name = unscanned_schemas.pop()

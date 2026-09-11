@@ -135,8 +135,13 @@ class TestAmend:
                 "expected": "amend.expected_delete-ambiguous-licenses.cdx.json",
                 "operations": ["delete-ambiguous-licenses"],
             },
+            {
+                "input": "amend.input_hierarchical-bom-refs.cdx.json",
+                "expected": "amend.expected_hierarchical-bom-refs.cdx.json",
+                "operations": ["hierarchical-bom-refs"],
+            },
         ],
-        ids=["default operations", "single operation"],
+        ids=["default operations", "single operation", "hierarchical bom refs"],
     )
     def data(self, data_dir: Path, request: pytest.FixtureRequest) -> DataFixture:
         input_path = data_dir / request.param["input"]

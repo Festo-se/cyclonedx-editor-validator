@@ -1,7 +1,10 @@
 import json
+import tempfile
 import unittest
 from copy import deepcopy
+from pathlib import Path
 from typing import Sequence
+from unittest.mock import patch
 
 from cdxev.auxiliary import sbom_functions as sbf
 from cdxev.auxiliary.identity import ComponentIdentity
@@ -372,98 +375,108 @@ class TestCompareComponents(unittest.TestCase):
 
 
 class TestReplaceBomRefs(unittest.TestCase):
-    def test_replace_ref_in_component(self) -> None:
-        component = {
-            "type": "library",
-            "bom-ref": "sub_program",
-            "supplier": {"name": "Company Legal"},
-            "group": "com.company.governing",
-            "name": "sub_program",
-            "copyright": "Company Legal 2022, all rights reserved",
-            "version": "T5.0.3.96",
+    def test_get_all_bom_refs_recursively(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "bom-ref": "component",
+                    "supplier": {"bom-ref": "organization"},
+                    "components": [{"bom-ref": "nested-component"}],
+                }
+            ],
+            "services": [{"bom-ref": "service"}],
+            "vulnerabilities": [{"bom-ref": "vulnerability"}],
+            "annotations": [{"bom-ref": "annotation"}],
+            "formulation": [
+                {
+                    "bom-ref": "formula",
+                    "workflows": [{"bom-ref": "workflow"}],
+                }
+            ],
         }
-        component_2 = {"bom-ref": "value"}
-        component_3: dict = {}
-        reference = "sub_program"
-        new_reference = "new"
-        component_list: list[dict] = [component, component_2, {}]
-        component_list_copy = deepcopy(component_list)
 
-        sbf.replace_ref_in_components(component_list, "...", new_reference)
-        self.assertEqual(component_list, component_list_copy)
-
-        sbf.replace_ref_in_components(
-            [component, component_2, component_3], reference, new_reference
+        self.assertEqual(
+            {
+                "component",
+                "organization",
+                "nested-component",
+                "service",
+                "vulnerability",
+                "annotation",
+                "formula",
+                "workflow",
+            },
+            sbf.get_all_bom_refs(sbom),
         )
-        self.assertEqual(component["bom-ref"], new_reference)
-        self.assertEqual(component_2["bom-ref"], "value")
 
-    def test_replace_ref_in_dependencies(self) -> None:
-        dependencies = [
-            {"ref": "sp_second_component", "dependsOn": []},
-            {
-                "ref": "sp_fourth_component",
-                "dependsOn": ["sp_second_component", "sp_second_component", "other"],
+    def test_replace_bom_ref_in_schema_discovered_fields(self) -> None:
+        reference = "component"
+        new_reference = "parent/component"
+        reference_fields = sbf._schema_reference_fields(None)
+        sbom = {
+            "nested": {field: reference for field in reference_fields},
+            "unrelated": {
+                "name": reference,
+                "description": reference,
+                "url": reference,
+                "value": reference,
+                "identifier": reference,
             },
-        ]
-        dependencies_copy = deepcopy(dependencies)
+            "externalReferences": [{"url": f"urn:cdx:external/1#{reference}"}],
+        }
 
-        reference = "sp_second_component"
-        new_reference = "new"
+        sbf.replace_bom_ref_in_sbom(sbom, reference, new_reference)
 
-        sbf.replace_ref_in_dependencies(dependencies, "...", new_reference)
-        self.assertEqual(dependencies, dependencies_copy)
-
-        sbf.replace_ref_in_dependencies(dependencies, reference, new_reference)
-        self.assertEqual(dependencies[0]["ref"], new_reference)
-        self.assertEqual(dependencies[1]["ref"], "sp_fourth_component")
-        self.assertEqual(dependencies[1]["dependsOn"], [new_reference, new_reference, "other"])
-
-    def test_replace_ref_in_compositions(self) -> None:
-        compositions = [
+        for field in reference_fields:
+            self.assertEqual(new_reference, sbom["nested"][field])
+        self.assertEqual(
             {
-                "aggregate": "complete",
-                "assemblies": [
-                    "sp_first_component",
-                    "sp_second_component",
-                    "sp_fourth_component",
-                ],
+                "name": reference,
+                "description": reference,
+                "url": reference,
+                "value": reference,
+                "identifier": reference,
             },
-            {
-                "aggregate": "incomplete",
-                "assemblies": [
-                    "sp_fifth_component",
-                    "sp_sixth_component",
-                    "sp_second_component",
-                    "sp_second_component",
-                ],
+            sbom["unrelated"],
+        )
+        self.assertEqual(
+            f"urn:cdx:external/1#{reference}",
+            sbom["externalReferences"][0]["url"],
+        )
+
+    def test_schema_reference_fields_accept_custom_reference_field(self) -> None:
+        self.assertIn("bom-ref", sbf._schema_reference_fields(None))
+        self.assertIn("custom-ref", sbf._schema_reference_fields(None, "custom-ref"))
+
+    def test_reference_fields_are_discovered_from_new_schema(self) -> None:
+        schema = {
+            "definitions": {
+                "refType": {
+                    "type": "string",
+                    "title": "BOM Reference",
+                }
             },
-        ]
-        compositions_copy = deepcopy(compositions)
-        reference = "sp_second_component"
-        new_reference = "new"
+            "properties": {
+                "futureLinks": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/refType"},
+                }
+            },
+        }
+        sbom = {
+            "specVersion": "9.9",
+            "futureLinks": ["component"],
+        }
 
-        sbf.replace_ref_in_compositions(compositions, "...", new_reference)
-        self.assertEqual(compositions, compositions_copy)
+        with tempfile.TemporaryDirectory() as directory:
+            schema_path = Path(directory) / "bom-9.9.schema.json"
+            schema_path.write_text(json.dumps(schema), encoding="utf_8")
+            with patch.object(sbf.resources, "files", return_value=Path(directory)):
+                sbf._cached_schema_reference_fields.cache_clear()
+                sbf.replace_bom_ref_in_sbom(sbom, "component", "parent/component")
 
-        compositions_copy[0]["assemblies"][1] = new_reference  # type:ignore
-        compositions_copy[1]["assemblies"][2] = new_reference  # type:ignore
-        compositions_copy[1]["assemblies"][3] = new_reference  # type:ignore
-
-        sbf.replace_ref_in_compositions(compositions, reference, new_reference)
-        self.assertEqual(compositions, compositions_copy)
-
-    def test_replace_ref_in_vulnerabilities(self) -> None:
-        vulnerabilities = load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
-            "test_merge_vulnerabilities"
-        ]["original_vulnerabilities"]
-        vulnerabilities_replaced = load_sections_for_test_sbom()[
-            "vulnerabilities_ref_product_3_replaced"
-        ]
-        reference = "product 3"
-        new_reference = "new"
-        sbf.replace_ref_in_vulnerabilities(vulnerabilities, reference, new_reference)
-        self.assertEqual(vulnerabilities, vulnerabilities_replaced)
+        sbf._cached_schema_reference_fields.cache_clear()
+        self.assertEqual(["parent/component"], sbom["futureLinks"])
 
     def test_get_ref_components_mapping(self) -> None:
         components = [
@@ -537,37 +550,24 @@ class TestReplaceBomRefs(unittest.TestCase):
         sbom_2 = load_sections_for_test_sbom()["sbom_unify_references_2"]
         sbom_3 = deepcopy(sbom_1)
         sbom_3["vulnerabilities"] = deepcopy(sbom_2["vulnerabilities"])
-        sbf.replace_ref_in_vulnerabilities(sbom_3["vulnerabilities"], "comp 3 -", "comp 3")
-        sbf.replace_ref_in_vulnerabilities(sbom_3["vulnerabilities"], "comp 2 -", "comp 2")
-        sbf.replace_ref_in_vulnerabilities(sbom_3["vulnerabilities"], "comp 1 -", "comp 1")
+        sbf.replace_bom_ref_in_sbom(sbom_3, "comp 3 -", "comp 3")
+        sbf.replace_bom_ref_in_sbom(sbom_3, "comp 2 -", "comp 2")
+        sbf.replace_bom_ref_in_sbom(sbom_3, "comp 1 -", "comp 1")
         sbom_3["components"][2] = deepcopy(sbom_2["components"][2])
         sbom_3["components"][2]["bom-ref"] = "comp 3"
 
         sbom_3_expected = deepcopy(sbom_1)
         sbom_3_expected["components"][2] = deepcopy(sbom_2["components"][2])
         sbom_3_expected["vulnerabilities"] = deepcopy(sbom_2["vulnerabilities"])
-        sbf.replace_ref_in_components(sbom_3_expected["components"], "comp 3", "comp 3 -")
-        sbf.replace_ref_in_compositions(sbom_3_expected["compositions"], "comp 3", "comp 3 -")
-        sbf.replace_ref_in_dependencies(sbom_3_expected["dependencies"], "comp 3", "comp 3 -")
-
-        sbf.replace_ref_in_vulnerabilities(
-            sbom_3_expected["vulnerabilities"], "comp 1 -", "comp 1"
-        )
-
-        sbf.replace_ref_in_vulnerabilities(
-            sbom_3_expected["vulnerabilities"], "comp 2 -", "comp 2"
-        )
+        sbf.replace_bom_ref_in_sbom(sbom_3_expected, "comp 3", "comp 3 -")
+        sbf.replace_bom_ref_in_sbom(sbom_3_expected, "comp 1 -", "comp 1")
+        sbf.replace_bom_ref_in_sbom(sbom_3_expected, "comp 2 -", "comp 2")
 
         sbom_2_expected = deepcopy(sbom_1)
         sbom_2_expected["vulnerabilities"] = deepcopy(sbom_3_expected["vulnerabilities"])
 
         sbom_2_expected["components"][2] = deepcopy(sbom_2["components"][2])
-        sbf.replace_ref_in_components(sbom_2_expected["components"], "comp 3", "comp 3 -")
-        sbf.replace_ref_in_compositions(sbom_2_expected["compositions"], "comp 3", "comp 3 -")
-        sbf.replace_ref_in_dependencies(sbom_2_expected["dependencies"], "comp 3", "comp 3 -")
-        sbf.replace_ref_in_vulnerabilities(
-            sbom_2_expected["vulnerabilities"], "comp 3", "comp 3 -"
-        )
+        sbf.replace_bom_ref_in_sbom(sbom_2_expected, "comp 3", "comp 3 -")
 
         sbf.unify_bom_refs([sbom_1, sbom_2, sbom_3])
 

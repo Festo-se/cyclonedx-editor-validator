@@ -2095,6 +2095,17 @@ class TestMergeSeveralSboms(unittest.TestCase):
 
 
 class TestMergeComponents(unittest.TestCase):
+    @staticmethod
+    def _sbom_with_component(properties=None) -> dict:
+        component = {
+            "type": "library",
+            "name": "shared-component",
+            "version": "1.0.0",
+        }
+        if properties is not None:
+            component["properties"] = properties
+        return {"components": [component]}
+
     def test_merge_components(self) -> None:
         sections = helper.load_sections_for_test_sbom()["merge_vulnerabilities_tests"][
             "test_merge_vulnerabilities"
@@ -2108,6 +2119,90 @@ class TestMergeComponents(unittest.TestCase):
 
         merged_components = merge.merge_components(original_sbom, new_sbom)
         self.assertEqual(merged_components, goal_sbom["components"])
+
+    def test_merge_duplicate_component_properties(self) -> None:
+        governing_properties = [
+            {"name": "governing", "value": "first"},
+            {"name": "duplicate", "value": "same"},
+            {"name": "same-name", "value": "first"},
+        ]
+        incoming_properties = [
+            {"name": "duplicate", "value": "same"},
+            {"name": "incoming", "value": "second"},
+            {"name": "same-name", "value": "second"},
+        ]
+
+        result = merge.merge(
+            [
+                self._sbom_with_component(governing_properties),
+                self._sbom_with_component(incoming_properties),
+            ]
+        )
+
+        self.assertEqual(
+            result["components"][0]["properties"],
+            [
+                {"name": "governing", "value": "first"},
+                {"name": "duplicate", "value": "same"},
+                {"name": "same-name", "value": "first"},
+                {"name": "incoming", "value": "second"},
+                {"name": "same-name", "value": "second"},
+            ],
+        )
+
+    def test_merge_duplicate_component_optional_properties(self) -> None:
+        incoming_properties = [{"name": "incoming", "value": "second"}]
+
+        result = merge.merge(
+            [
+                self._sbom_with_component(),
+                self._sbom_with_component(incoming_properties),
+            ]
+        )
+        self.assertEqual(result["components"][0]["properties"], incoming_properties)
+
+        result_without_properties = merge.merge(
+            [self._sbom_with_component(), self._sbom_with_component()]
+        )
+        self.assertNotIn("properties", result_without_properties["components"][0])
+
+    def test_merge_duplicate_component_properties_from_multiple_sboms(self) -> None:
+        result = merge.merge(
+            [
+                self._sbom_with_component(),
+                self._sbom_with_component([{"name": "source", "value": "second"}]),
+                self._sbom_with_component([{"name": "source", "value": "third"}]),
+            ]
+        )
+
+        self.assertEqual(
+            result["components"][0]["properties"],
+            [
+                {"name": "source", "value": "second"},
+                {"name": "source", "value": "third"},
+            ],
+        )
+
+    def test_merge_nested_duplicate_component_properties(self) -> None:
+        governing = self._sbom_with_component()
+        governing["components"][0]["components"] = [
+            {
+                "type": "library",
+                "name": "nested-component",
+                "version": "1.0.0",
+            }
+        ]
+        incoming = copy.deepcopy(governing)
+        incoming["components"][0]["components"][0]["properties"] = [
+            {"name": "nested", "value": "present"}
+        ]
+
+        result = merge.merge([governing, incoming], hierarchical=True)
+
+        self.assertEqual(
+            result["components"][0]["components"][0]["properties"],
+            [{"name": "nested", "value": "present"}],
+        )
 
     def test_filter_component(self) -> None:
         # considered test cases:

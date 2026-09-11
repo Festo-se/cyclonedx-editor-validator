@@ -220,9 +220,9 @@ def get_all_bom_refs(value: Any) -> set[str]:
     return bom_refs
 
 
-def _schema_reference_fields(spec_version: Any) -> set[str]:
+def _schema_reference_fields(spec_version: Any, reference_field: str = BOM_REF_FIELD) -> set[str]:
     version = spec_version if isinstance(spec_version, str) else None
-    return set(_cached_schema_reference_fields(version))
+    return set(_cached_schema_reference_fields(version, reference_field))
 
 
 def _load_bundled_schema(schema_dir: Any, schemas: dict[str, dict], name: str) -> dict:
@@ -308,26 +308,31 @@ def _collect_schema_reference_fields(
     schema_dir: Any,
     schemas: dict[str, dict],
     fields: set[str],
+    reference_field: str,
 ) -> None:
     if isinstance(value, dict):
         properties = value.get("properties")
         if isinstance(properties, dict):
             for name, property_schema in properties.items():
-                if name == BOM_REF_FIELD or _schema_contains_reference_value(
+                if name == reference_field or _schema_contains_reference_value(
                     property_schema, schema_name, schema_dir, schemas
                 ):
                     fields.add(name)
         for nested_value in value.values():
             _collect_schema_reference_fields(
-                nested_value, schema_name, schema_dir, schemas, fields
+                nested_value, schema_name, schema_dir, schemas, fields, reference_field
             )
     elif isinstance(value, list):
         for item in value:
-            _collect_schema_reference_fields(item, schema_name, schema_dir, schemas, fields)
+            _collect_schema_reference_fields(
+                item, schema_name, schema_dir, schemas, fields, reference_field
+            )
 
 
 @lru_cache(maxsize=None)
-def _cached_schema_reference_fields(spec_version: Optional[str]) -> tuple[str, ...]:
+def _cached_schema_reference_fields(
+    spec_version: Optional[str], reference_field: str = BOM_REF_FIELD
+) -> tuple[str, ...]:
     schema_dir = resources.files("cdxev.auxiliary.schema")
     requested_schema = schema_dir / f"bom-{spec_version}.schema.json"
     if spec_version is not None and requested_schema.is_file():
@@ -343,13 +348,13 @@ def _cached_schema_reference_fields(spec_version: Optional[str]) -> tuple[str, .
     for schema_name in schema_names:
         _load_bundled_schema(schema_dir, schemas, schema_name)
 
-    fields = {BOM_REF_FIELD}
+    fields = {reference_field}
     scanned_schemas: set[str] = set()
     while unscanned_schemas := set(schemas) - scanned_schemas:
         schema_name = unscanned_schemas.pop()
         scanned_schemas.add(schema_name)
         _collect_schema_reference_fields(
-            schemas[schema_name], schema_name, schema_dir, schemas, fields
+            schemas[schema_name], schema_name, schema_dir, schemas, fields, reference_field
         )
 
     return tuple(sorted(fields))

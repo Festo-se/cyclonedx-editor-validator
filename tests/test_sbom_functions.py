@@ -444,6 +444,10 @@ class TestReplaceBomRefs(unittest.TestCase):
             sbom["externalReferences"][0]["url"],
         )
 
+    def test_schema_reference_fields_accept_custom_reference_field(self) -> None:
+        self.assertIn("bom-ref", sbf._schema_reference_fields(None))
+        self.assertIn("custom-ref", sbf._schema_reference_fields(None, "custom-ref"))
+
     def test_reference_fields_are_discovered_from_new_schema(self) -> None:
         schema = {
             "definitions": {

@@ -66,7 +66,7 @@ import charset_normalizer
 
 from cdxev.amend.license import foreach_license, license_has_id, license_has_text
 from cdxev.auxiliary.identity import ComponentIdentity
-from cdxev.auxiliary.sbom_functions import replace_bom_ref_in_sbom
+from cdxev.auxiliary.sbom_functions import get_all_bom_refs, replace_bom_ref_in_sbom
 from cdxev.error import AppError
 from cdxev.log import LogMessage
 
@@ -525,18 +525,16 @@ class HierarchicalBomRefs(Operation):
 
     Every nested component is rewritten to ``<parent bom-ref>/<own bom-ref>`` recursively. Each
     bom-ref is treated as an opaque string. Top-level components remain unchanged. References to
-    rewritten components are updated and collisions are resolved with an incrementing numeric
-    suffix. Components without a bom-ref, or whose parent has no bom-ref, remain unchanged and
-    cause an informational log message.
+    rewritten components are updated throughout the SBOM. Every bom-ref in the document is
+    considered when detecting collisions, which are resolved with an incrementing numeric suffix.
+    Components without a bom-ref, or whose parent has no bom-ref, remain unchanged and cause an
+    informational log message.
 
     This operation is not enabled by default because it changes existing bom-refs.
     """
 
     def prepare(self, sbom: dict) -> None:
-        assigned_refs: set[str] = set()
-        self._collect_component_refs(sbom.get("metadata", {}).get("component"), assigned_refs)
-        for component in sbom.get("components", []):
-            self._collect_component_refs(component, assigned_refs)
+        assigned_refs = get_all_bom_refs(sbom)
 
         metadata_component = sbom.get("metadata", {}).get("component")
         if isinstance(metadata_component, dict):
@@ -544,17 +542,6 @@ class HierarchicalBomRefs(Operation):
 
         for component in sbom.get("components", []):
             self._prepend_parent_refs(sbom, component, assigned_refs)
-
-    def _collect_component_refs(self, component: t.Any, assigned_refs: set[str]) -> None:
-        if not isinstance(component, dict):
-            return
-
-        bom_ref = component.get("bom-ref")
-        if isinstance(bom_ref, str) and bom_ref:
-            assigned_refs.add(bom_ref)
-
-        for child in component.get("components", []):
-            self._collect_component_refs(child, assigned_refs)
 
     def _prepend_parent_refs(
         self,

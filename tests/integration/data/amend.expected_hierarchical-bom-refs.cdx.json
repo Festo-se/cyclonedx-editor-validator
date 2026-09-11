@@ -20,7 +20,23 @@
               "type": "application",
               "name": "Application C",
               "version": "3.0.0",
-              "bom-ref": "module-a/library-b/application-c"
+              "bom-ref": "module-a/library-b/application-c",
+              "evidence": {
+                "identity": {
+                  "field": "purl",
+                  "confidence": 1,
+                  "methods": [
+                    {
+                      "technique": "source-code-analysis",
+                      "confidence": 1,
+                      "value": "application-c"
+                    }
+                  ],
+                  "tools": [
+                    "module-a/library-b/application-c"
+                  ]
+                }
+              }
             }
           ]
         }
@@ -38,6 +54,9 @@
       "ref": "module-a/library-b",
       "dependsOn": [
         "module-a/library-b/application-c"
+      ],
+      "provides": [
+        "module-a/library-b/application-c"
       ]
     },
     {
@@ -51,6 +70,9 @@
       "assemblies": [
         "module-a/library-b",
         "module-a/library-b/application-c"
+      ],
+      "dependencies": [
+        "module-a/library-b/application-c"
       ]
     }
   ],
@@ -62,6 +84,20 @@
           "ref": "module-a/library-b/application-c"
         }
       ]
+    }
+  ],
+  "annotations": [
+    {
+      "subjects": [
+        "module-a/library-b/application-c"
+      ],
+      "annotator": {
+        "individual": {
+          "name": "SBOM Author"
+        }
+      },
+      "timestamp": "2026-08-28T00:00:00Z",
+      "text": "Hierarchical component"
     }
   ],
   "metadata": {

@@ -132,10 +132,13 @@ The operation has the following behavior:
     PURLs are preserved in full and are never parsed as path segments.
 * Running the operation repeatedly prepends the hierarchy repeatedly. The operation cannot infer
     from an opaque bom-ref whether a prefix was added by an earlier run.
-* References in dependencies, compositions, and vulnerability affects are updated to the
-    rewritten bom-refs.
-* A generated path that conflicts with another bom-ref receives an incrementing suffix such as
-  ``-1``.
+* Internal references defined by the supported CycloneDX 1.2 through 1.7 specifications are
+    updated recursively. This includes dependency, composition, vulnerability, annotation,
+    evidence, declaration, requirement, formulation, cryptography, patent, and citation links.
+    Unrelated strings and external reference URLs are not changed.
+* Every ``bom-ref`` in the document participates in collision detection, not only component
+    bom-refs. A generated path that conflicts with any existing bom-ref receives an incrementing
+    suffix such as ``-1``.
 * A component without a bom-ref, or whose parent has no bom-ref, cannot be adjusted. The operation
     logs this at INFO level, leaves that relationship unchanged, and continues with the remaining
     component tree.

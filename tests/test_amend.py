@@ -13,13 +13,16 @@ from cdxev.amend.operations import (
     Compositions,
     DefaultAuthor,
     DeleteAmbiguousLicenses,
+    HierarchicalBomRefs,
     InferSupplier,
     LicenseNameToId,
     Operation,
 )
 from cdxev.error import AppError
+from cdxev.validator.helper import validate_instance
 
 path_to_folder_with_test_sboms = "tests/auxiliary/test_amend_sboms/"
+list_of_spec_versions = ["1.2", "1.3", "1.4", "1.5", "1.6", "1.7"]
 
 
 class AmendTestCase(unittest.TestCase):
@@ -577,6 +580,223 @@ class DeleteAmbiguousLicensesTestCase(AmendTestCase):
 
         self.operation.handle_component(self.component)
         self.assertDictEqual(self.component, expected)
+
+
+class HierarchicalBomRefsTestCase(unittest.TestCase):
+    def test_supports_every_cyclonedx_version(self) -> None:
+        for spec_version in list_of_spec_versions:
+            with self.subTest(spec_version=spec_version):
+                sbom = {
+                    "bomFormat": "CycloneDX",
+                    "specVersion": spec_version,
+                    "version": 1,
+                    "components": [
+                        {
+                            "type": "application",
+                            "name": "root",
+                            "version": "1",
+                            "bom-ref": "root",
+                            "components": [
+                                {
+                                    "type": "library",
+                                    "name": "child",
+                                    "version": "1",
+                                    "bom-ref": "child",
+                                }
+                            ],
+                        }
+                    ],
+                    "dependencies": [
+                        {"ref": "root", "dependsOn": ["child"]},
+                        {"ref": "child", "dependsOn": []},
+                    ],
+                }
+
+                run_amend(sbom, selected=[HierarchicalBomRefs])
+
+                child = sbom["components"][0]["components"][0]
+                self.assertEqual("root/child", child["bom-ref"])
+                self.assertEqual(["root/child"], sbom["dependencies"][0]["dependsOn"])
+                self.assertEqual("root/child", sbom["dependencies"][1]["ref"])
+                self.assertFalse(validate_instance(sbom, spec_version, "default", None).errors)
+
+    def test_prepends_parent_refs_recursively(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "name": "root",
+                    "bom-ref": "module-a",
+                    "components": [
+                        {
+                            "name": "first child",
+                            "bom-ref": "library-b",
+                            "components": [
+                                {
+                                    "name": "second child",
+                                    "bom-ref": "application-c",
+                                    "components": [
+                                        {"name": "third child", "bom-ref": "component-d"}
+                                    ],
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
+            "dependencies": [
+                {"ref": "application-c", "dependsOn": ["component-d"]},
+            ],
+            "compositions": [{"aggregate": "complete", "assemblies": ["application-c"]}],
+            "vulnerabilities": [{"id": "CVE-1", "affects": [{"ref": "component-d"}]}],
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        root = sbom["components"][0]
+        child = root["components"][0]
+        grandchild = child["components"][0]
+        great_grandchild = grandchild["components"][0]
+        self.assertEqual("module-a", root["bom-ref"])
+        self.assertEqual("module-a/library-b", child["bom-ref"])
+        self.assertEqual("module-a/library-b/application-c", grandchild["bom-ref"])
+        self.assertEqual(
+            "module-a/library-b/application-c/component-d",
+            great_grandchild["bom-ref"],
+        )
+        self.assertEqual(
+            {
+                "ref": "module-a/library-b/application-c",
+                "dependsOn": ["module-a/library-b/application-c/component-d"],
+            },
+            sbom["dependencies"][0],
+        )
+        self.assertEqual(
+            ["module-a/library-b/application-c"],
+            sbom["compositions"][0]["assemblies"],
+        )
+        self.assertEqual(
+            "module-a/library-b/application-c/component-d",
+            sbom["vulnerabilities"][0]["affects"][0]["ref"],
+        )
+
+    def test_treats_existing_bom_refs_as_opaque_strings(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "bom-ref": "1",
+                    "components": [
+                        {
+                            "bom-ref": "1/2",
+                            "components": [{"bom-ref": "pkg:npm/@scope/application@3.0.0"}],
+                        }
+                    ],
+                }
+            ]
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        child = sbom["components"][0]["components"][0]
+        grandchild = child["components"][0]
+        self.assertEqual("1/1/2", child["bom-ref"])
+        self.assertEqual(
+            "1/1/2/pkg:npm/@scope/application@3.0.0",
+            grandchild["bom-ref"],
+        )
+
+    def test_metadata_tree_is_independent_from_top_level_components(self) -> None:
+        sbom = {
+            "metadata": {
+                "component": {
+                    "bom-ref": "product",
+                    "components": [
+                        {
+                            "bom-ref": "firmware",
+                            "components": [{"bom-ref": "driver"}],
+                        }
+                    ],
+                }
+            },
+            "components": [{"bom-ref": "application", "components": [{"bom-ref": "library"}]}],
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        metadata_child = sbom["metadata"]["component"]["components"][0]
+        self.assertEqual("product/firmware", metadata_child["bom-ref"])
+        self.assertEqual("product/firmware/driver", metadata_child["components"][0]["bom-ref"])
+        self.assertEqual("application", sbom["components"][0]["bom-ref"])
+        self.assertEqual("application/library", sbom["components"][0]["components"][0]["bom-ref"])
+
+    def test_add_bom_ref_must_run_before_hierarchical_bom_refs(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "name": "application",
+                    "bom-ref": "application",
+                    "components": [{"name": "library"}],
+                }
+            ]
+        }
+
+        with self.assertLogs("cdxev.amend.operations", level="INFO") as logs:
+            run_amend(sbom, selected=[AddBomRef, HierarchicalBomRefs])
+
+        child = sbom["components"][0]["components"][0]
+        self.assertNotIn("/", child["bom-ref"])
+        self.assertIn("component library", logs.output[0])
+
+    def test_avoids_collision_with_existing_ref(self) -> None:
+        sbom = {
+            "components": [
+                {"bom-ref": "module-a", "components": [{"bom-ref": "library-b"}]},
+                {"bom-ref": "module-a/library-b"},
+            ],
+            "dependencies": [{"ref": "library-b", "dependsOn": []}],
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        child = sbom["components"][0]["components"][0]
+        self.assertEqual("module-a/library-b-1", child["bom-ref"])
+        self.assertEqual("module-a/library-b-1", sbom["dependencies"][0]["ref"])
+
+    def test_avoids_collision_with_bom_ref_outside_components(self) -> None:
+        sbom = {
+            "components": [
+                {"bom-ref": "module-a", "components": [{"bom-ref": "library-b"}]},
+            ],
+            "vulnerabilities": [{"bom-ref": "module-a/library-b"}],
+        }
+
+        run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        child = sbom["components"][0]["components"][0]
+        self.assertEqual("module-a/library-b-1", child["bom-ref"])
+        self.assertEqual("module-a/library-b", sbom["vulnerabilities"][0]["bom-ref"])
+
+    def test_missing_parent_ref_logs_info_and_continues_recursion(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "name": "missing-parent",
+                    "components": [
+                        {
+                            "bom-ref": "library-b",
+                            "components": [{"bom-ref": "component-c"}],
+                        }
+                    ],
+                }
+            ]
+        }
+
+        with self.assertLogs("cdxev.amend.operations", level="INFO") as logs:
+            run_amend(sbom, selected=[HierarchicalBomRefs])
+
+        child = sbom["components"][0]["components"][0]
+        self.assertEqual("library-b", child["bom-ref"])
+        self.assertEqual("library-b/component-c", child["components"][0]["bom-ref"])
+        self.assertIn("parent component has no bom-ref", logs.output[0])
 
 
 if __name__ == "__main__":

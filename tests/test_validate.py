@@ -213,53 +213,46 @@ class TestValidateMetadata(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(search_for_word_issues("[Ff][Ee][Ss][Tt][Oo]", issues), True)
 
-    def test_copyright_festool_is_rejected(self) -> None:
-        for spec_version in list_of_spec_versions:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["metadata"]["component"]["copyright"] = "Festool GmbH 2026"
-            issues = validate_test(sbom)
-            self.assertNotEqual(issues, ["no issue"], msg=f"spec {spec_version}")
+    def test_copyright_invalid_statements_are_rejected(self) -> None:
+        for copyright_statement in [
+            "",
+            "COPYRIGHT FeStO",
+            "Copyright FestoDidactic",
+            "copyright myfesto",
+            "Festool GmbH 2026",
+        ]:
+            for spec_version in list_of_spec_versions:
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                sbom["metadata"]["component"]["copyright"] = copyright_statement
+                issues = validate_test(sbom)
+                self.assertNotEqual(
+                    issues, ["no issue"], f"'{copyright_statement}' should be rejected"
+                )
 
-    def test_empty_copyright_is_rejected(self) -> None:
-        for spec_version in list_of_spec_versions:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["metadata"]["component"]["copyright"] = ""
-            issues = validate_test(sbom)
-            self.assertNotEqual(issues, ["no issue"], msg=f"spec {spec_version}")
-
-    def test_copyright_with_copyright_prefix_is_accepted(self) -> None:
-        for spec_version in list_of_spec_versions:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["metadata"]["component"]["copyright"] = "© 2026 Festo SE"
-            issues = validate_test(sbom)
-            self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
-
-    def test_copyright_with_copyright_word_after_symbol_is_accepted(self) -> None:
-        for spec_version in list_of_spec_versions:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["metadata"]["component"]["copyright"] = "© Copyright Festo Didactic SE"
-            issues = validate_test(sbom)
-            self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
-
-    def test_copyright_with_year_range_is_accepted(self) -> None:
-        for spec_version in list_of_spec_versions:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["metadata"]["component"]["copyright"] = "© 2020-2026 Festo SE"
-            issues = validate_test(sbom)
-            self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
-
-    def test_copyright_with_copyright_c_prefix_is_accepted(self) -> None:
-        for spec_version in list_of_spec_versions:
-            sbom = get_test_sbom()
-            sbom["specVersion"] = spec_version
-            sbom["metadata"]["component"]["copyright"] = "(c) 2026 Festo SE"
-            issues = validate_test(sbom)
-            self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
+    def test_copyright_valid_statements_are_accepted(self) -> None:
+        for copyright_statement in [
+            "Festo",
+            "Copyright Festo",
+            "Copyright Festo Didactic",
+            "© 2026 Festo SE",
+            "(c) 2026 Festo SE",
+            "© 2026 Festo Didactic",
+            "© 2020-2026 Festo SE",
+            "Copyright 2020 - 2026 Festo Didactic",
+            "Copyright © Festo Didactic 2026",
+            "© Copyright Festo Didactic SE",
+            "Festo Copyright",
+        ]:
+            for spec_version in list_of_spec_versions:
+                sbom = get_test_sbom()
+                sbom["specVersion"] = spec_version
+                sbom["metadata"]["component"]["copyright"] = copyright_statement
+                issues = validate_test(sbom)
+                self.assertEqual(
+                    issues,
+                    ["no issue"],
+                )
 
     def test_metadata_internal_component_copyright_missing(self) -> None:
         for spec_version in list_of_spec_versions:

@@ -1378,7 +1378,7 @@
             "if": {
               "properties": {
                 "copyright": {
-                  "pattern": "^([Cc]opyright\\s+)?((\u00a9|\\(c\\))\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
+                  "pattern": "^(?:(?:[Cc]opyright\\s+)?(?:\u00a9|\\(c\\))\\s*|(?:\u00a9|\\(c\\))\\s*[Cc]opyright\\s+|[Cc]opyright\\s+)?(?:\\d{4}(?:\\s*-\\s*\\d{4})?\\s+)?[Ff][Ee][Ss][Tt][Oo](?:[^A-Za-z].*)?$"
                 }
               },
               "required": [
@@ -1397,7 +1397,7 @@
                     {
                       "properties": {
                         "copyright": {
-                          "pattern": "^([Cc]opyright\\s+)?((\u00a9|\\(c\\))\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
+                          "pattern": "^(?:(?:[Cc]opyright\\s+)?(?:\u00a9|\\(c\\))\\s*|(?:\u00a9|\\(c\\))\\s*[Cc]opyright\\s+|[Cc]opyright\\s+)?(?:\\d{4}(?:\\s*-\\s*\\d{4})?\\s+)?[Ff][Ee][Ss][Tt][Oo](?:[^A-Za-z].*)?$"
                         }
                       }
                     }
@@ -1409,7 +1409,7 @@
                   "supplier": {
                     "properties": {
                       "name": {
-                        "pattern": "^([Cc]opyright\\s+)?((\u00a9|\\(c\\))\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
+                        "pattern": "^(?:(?:[Cc]opyright\\s+)?(?:\u00a9|\\(c\\))\\s*|(?:\u00a9|\\(c\\))\\s*[Cc]opyright\\s+|[Cc]opyright\\s+)?(?:\\d{4}(?:\\s*-\\s*\\d{4})?\\s+)?[Ff][Ee][Ss][Tt][Oo](?:[^A-Za-z].*)?$"
                       }
                     }
                   }
@@ -1439,7 +1439,7 @@
                     "supplier": {
                       "properties": {
                         "name": {
-                          "pattern": "^([Cc]opyright\\s+)?((\u00a9|\\(c\\))\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
+                          "pattern": "^(?:(?:[Cc]opyright\\s+)?(?:\u00a9|\\(c\\))\\s*|(?:\u00a9|\\(c\\))\\s*[Cc]opyright\\s+|[Cc]opyright\\s+)?(?:\\d{4}(?:\\s*-\\s*\\d{4})?\\s+)?[Ff][Ee][Ss][Tt][Oo](?:[^A-Za-z].*)?$"
                         }
                       }
                     }
@@ -1496,7 +1496,7 @@
                     {
                       "properties": {
                         "copyright": {
-                          "pattern": "^([Cc]opyright\\s+)?((\u00a9|\\(c\\))\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
+                          "pattern": "^(?:(?:[Cc]opyright\\s+)?(?:\u00a9|\\(c\\))\\s*|(?:\u00a9|\\(c\\))\\s*[Cc]opyright\\s+|[Cc]opyright\\s+)?(?:\\d{4}(?:\\s*-\\s*\\d{4})?\\s+)?[Ff][Ee][Ss][Tt][Oo](?:[^A-Za-z].*)?$"
                         }
                       }
                     }
@@ -1506,7 +1506,7 @@
               "then": {
                 "properties": {
                   "copyright": {
-                    "pattern": "^([Cc]opyright\\s+)?((\u00a9|\\(c\\))\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
+                    "pattern": "^(?:(?:[Cc]opyright\\s+)?(?:\u00a9|\\(c\\))\\s*|(?:\u00a9|\\(c\\))\\s*[Cc]opyright\\s+|[Cc]opyright\\s+)?(?:\\d{4}(?:\\s*-\\s*\\d{4})?\\s+)?[Ff][Ee][Ss][Tt][Oo](?:[^A-Za-z].*)?$"
                   }
                 },
                 "required": [
@@ -1521,7 +1521,7 @@
                 {
                   "properties": {
                     "author": {
-                      "pattern": "^([Cc]opyright\\s+)?((\u00a9|\\(c\\))\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
+                      "pattern": "^(?:(?:[Cc]opyright\\s+)?(?:\u00a9|\\(c\\))\\s*|(?:\u00a9|\\(c\\))\\s*[Cc]opyright\\s+|[Cc]opyright\\s+)?(?:\\d{4}(?:\\s*-\\s*\\d{4})?\\s+)?[Ff][Ee][Ss][Tt][Oo](?:[^A-Za-z].*)?$"
                     }
                   },
                   "required": [
@@ -1563,7 +1563,7 @@
             "then": {
               "properties": {
                 "copyright": {
-                  "pattern": "^([Cc]opyright\\s+)?((\u00a9|\\(c\\))\\s*)?(\\d{4}\\s+)?[Ff][Ee][Ss][Tt][Oo]([^a-zA-Z]|$)"
+                  "pattern": "^(?:(?:[Cc]opyright\\s+)?(?:\u00a9|\\(c\\))\\s*|(?:\u00a9|\\(c\\))\\s*[Cc]opyright\\s+|[Cc]opyright\\s+)?(?:\\d{4}(?:\\s*-\\s*\\d{4})?\\s+)?[Ff][Ee][Ss][Tt][Oo](?:[^A-Za-z].*)?$"
                 }
               },
               "required": [

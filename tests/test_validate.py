@@ -229,6 +229,22 @@ class TestValidateMetadata(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
 
+    def test_copyright_with_copyright_word_after_symbol_is_accepted(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["metadata"]["component"]["copyright"] = "© Copyright Festo Didactic SE"
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
+
+    def test_copyright_with_year_range_is_accepted(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["metadata"]["component"]["copyright"] = "© 2020-2026 Festo SE"
+            issues = validate_test(sbom)
+            self.assertEqual(issues, ["no issue"], msg=f"spec {spec_version}")
+
     def test_copyright_with_copyright_c_prefix_is_accepted(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()

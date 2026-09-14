@@ -221,6 +221,14 @@ class TestValidateMetadata(unittest.TestCase):
             issues = validate_test(sbom)
             self.assertNotEqual(issues, ["no issue"], msg=f"spec {spec_version}")
 
+    def test_empty_copyright_is_rejected(self) -> None:
+        for spec_version in list_of_spec_versions:
+            sbom = get_test_sbom()
+            sbom["specVersion"] = spec_version
+            sbom["metadata"]["component"]["copyright"] = ""
+            issues = validate_test(sbom)
+            self.assertNotEqual(issues, ["no issue"], msg=f"spec {spec_version}")
+
     def test_copyright_with_copyright_prefix_is_accepted(self) -> None:
         for spec_version in list_of_spec_versions:
             sbom = get_test_sbom()

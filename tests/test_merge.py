@@ -2756,7 +2756,7 @@ class TestMergeSimilarComponents(unittest.TestCase):
         self.assertEqual(result["components"].count(self.component), 1)
 
     def test_merge_with_minimal_swid_object_does_not_crash(self) -> None:
-        # Regression: SWID objects may only contain tagId. This must not raise in identity
+        # Regression: SWID objects may only contain tagId and name. This must not raise an error in identity
         # comparisons during merge.
         sbom1 = {
             "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",

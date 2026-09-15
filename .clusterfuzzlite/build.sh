@@ -29,6 +29,7 @@ export PYTHONPATH="$FUZZ_DIR:${PYTHONPATH:-}"
 DATA_ARGS=(
   "--add-data=$REPO_DIR/cdxev/amend/license_name_spdx_id_map.json:cdxev/amend"
   "--add-data=$REPO_DIR/cdxev/auxiliary/schema:cdxev/auxiliary/schema"
+  "--collect-data=license_expression"
   "--copy-metadata=cyclonedx-editor-validator"
 )
 

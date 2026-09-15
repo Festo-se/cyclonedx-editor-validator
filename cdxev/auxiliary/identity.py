@@ -89,18 +89,39 @@ class SWID(dict):
     """
 
     def __str__(self) -> str:
-        return "tagId: " + str(self["tagId"])
+        return "tagId: " + str(self.get("tagId", ""))
 
     def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, SWID)
-            and (self["tagId"] == other["tagId"])
-            and (self["name"] == other["name"])
-            and (self.get("version", True) == other.get("version", True))
-        )
+        if not isinstance(other, SWID):
+            return False
+
+        # Require tagId on both sides; without it SWID identity is inconclusive.
+        if "tagId" not in self or "tagId" not in other:
+            return False
+        if self.get("tagId") != other.get("tagId"):
+            return False
+
+        # Optional fields must either be absent on both sides or equal when present.
+        if ("name" in self) != ("name" in other):
+            return False
+        if "name" in self and self.get("name") != other.get("name"):
+            return False
+
+        if ("version" in self) != ("version" in other):
+            return False
+        if "version" in self and self.get("version") != other.get("version"):
+            return False
+
+        return True
 
     def __hash__(self) -> int:  # type: ignore[override]
-        return (self["tagId"], self["name"], self.get("version", True)).__hash__()
+        return (
+            self.get("tagId"),
+            "name" in self,
+            self.get("name"),
+            "version" in self,
+            self.get("version"),
+        ).__hash__()
 
 
 @dataclass(init=True, frozen=True, eq=True)

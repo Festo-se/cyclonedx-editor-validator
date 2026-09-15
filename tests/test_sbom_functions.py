@@ -361,8 +361,18 @@ class TestCompareComponents(unittest.TestCase):
         )
         self.assertTrue(
             sbf.compare_components(
-                {"name": "Name1", "version": "1.0", "group": "group1", "swid": {"tagId": "swid1", "name": "comp"}},
-                {"name": "Name2", "version": "2.0", "group": "group2", "swid": {"tagId": "swid1", "name": "comp"}},
+                {
+                    "name": "Name1",
+                    "version": "1.0",
+                    "group": "group1",
+                    "swid": {"tagId": "swid1", "name": "comp"},
+                },
+                {
+                    "name": "Name2",
+                    "version": "2.0",
+                    "group": "group2",
+                    "swid": {"tagId": "swid1", "name": "comp"},
+                },
             )
         )
         self.assertTrue(

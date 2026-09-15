@@ -26,10 +26,33 @@ from cdxev.log import LogMessage
 logger = logging.getLogger(__name__)
 
 
+def _merge_unique_list(existing_values: list, incoming_values: list) -> list:
+    for incoming_value in incoming_values:
+        if incoming_value not in existing_values:
+            existing_values.append(copy.deepcopy(incoming_value))
+    return existing_values
+
+
+COMPONENT_FIELD_MERGERS: dict[str, t.Callable[[t.Any, t.Any], t.Any]] = {
+    "properties": _merge_unique_list,
+}
+
+
+def _merge_component_fields(governing_component: dict, incoming_component: dict) -> None:
+    for field, merger in COMPONENT_FIELD_MERGERS.items():
+        if field not in incoming_component:
+            continue
+        if field not in governing_component:
+            governing_component[field] = copy.deepcopy(incoming_component[field])
+            continue
+        governing_component[field] = merger(governing_component[field], incoming_component[field])
+
+
 def filter_component(
     present_components: list[ComponentIdentity],
     components_to_add: list,
     add_to_existing: dict,
+    present_component_data: t.Optional[dict[ComponentIdentity, dict]] = None,
 ) -> list[dict]:
     """
     Function that goes through a list of components and their nested sub components
@@ -43,6 +66,8 @@ def filter_component(
     param components_to_add: a list of components that shall be compared against the list of
                             already present components.
     param add_to_existing: list of nested components that have to be added to present_components.
+    param present_component_data: mapping from identities to the governing component data. If
+                                  provided, registered component fields are merged into duplicates.
 
     returns: filtered_components: list of top level components not present in present_components
     """
@@ -55,6 +80,7 @@ def filter_component(
                 present_components,
                 component.get("components", []),
                 add_to_existing,
+                present_component_data,
             )
             if component.get("components", []):
                 component["components"] = nested_components
@@ -71,6 +97,8 @@ def filter_component(
         # component already present
         # contained components get filtered and added to the component in the main sbom
         else:
+            if present_component_data is not None:
+                _merge_component_fields(present_component_data[component_id], component)
             logger.warning(
                 LogMessage(
                     "Potential loss of information",
@@ -81,6 +109,7 @@ def filter_component(
                 present_components,
                 component.get("components", []),
                 add_to_existing,
+                present_component_data,
             )
             if nested_components:
                 add_to_existing[component_id] = (
@@ -102,6 +131,8 @@ def merge_components(
     one it will be merged into (governing_sbom), if they contain the same component.
     If a component gets merged but its bom-ref is already contained in the
     governing_sbom, the bom-ref will be changed and replaced in the sbom_to_be_merged.
+    Fields configured in COMPONENT_FIELD_MERGERS are merged into duplicate components;
+    currently this applies to properties.
 
     Input:
     governing_sbom: The sbom of the governing program, in which the other will be merged
@@ -136,6 +167,7 @@ def merge_components(
         list_present_component_identities,
         list_of_added_components,
         add_to_existing,
+        present_component_identities,
     )
 
     list_of_merged_components += list_of_filtered_components

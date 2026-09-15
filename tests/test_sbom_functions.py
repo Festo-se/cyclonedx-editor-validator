@@ -206,7 +206,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "pkg:pypi/example@1.0.0",
                     "cpe": "cpe:/a:vendor:first:1.0",
-                    "swid": {"tagId": "tag-first"},
+                    "swid": {"tagId": "tag-first", "name": "comp"},
                 },
                 {
                     "name": "DifferentName",
@@ -214,7 +214,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group2",
                     "purl": "pkg:pypi/example@1.0.0",
                     "cpe": "cpe:/a:vendor:second:2.0",
-                    "swid": {"tagId": "tag-second"},
+                    "swid": {"tagId": "tag-second", "name": "comp"},
                 },
                 True,
             ),
@@ -231,14 +231,14 @@ class TestCompareComponents(unittest.TestCase):
                     "version": "1.0",
                     "group": "group1",
                     "cpe": "cpe:/a:vendor:product:1.0",
-                    "swid": {"tagId": "tag-first"},
+                    "swid": {"tagId": "tag-first", "name": "comp"},
                 },
                 {
                     "name": "DifferentName",
                     "version": "9.9",
                     "group": "group2",
                     "cpe": "cpe:/a:vendor:product:1.0",
-                    "swid": {"tagId": "tag-second"},
+                    "swid": {"tagId": "tag-second", "name": "comp"},
                 },
                 True,
             ),
@@ -266,8 +266,8 @@ class TestCompareComponents(unittest.TestCase):
             ),
             (
                 "swid mismatch fails when purl and cpe are absent",
-                {"name": "Name1", "version": "1.0", "swid": {"tagId": "tag-1"}},
-                {"name": "Name1", "version": "1.0", "swid": {"tagId": "tag-2"}},
+                {"name": "Name1", "version": "1.0", "swid": {"tagId": "tag-1", "name": "comp"}},
+                {"name": "Name1", "version": "1.0", "swid": {"tagId": "tag-2", "name": "comp"}},
                 False,
             ),
             (
@@ -309,7 +309,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
                 {
                     "name": "Name1",
@@ -317,7 +317,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
             )
         )
@@ -329,7 +329,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
                 {
                     "name": "Name2",
@@ -337,7 +337,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group2",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
             )
         )
@@ -348,21 +348,21 @@ class TestCompareComponents(unittest.TestCase):
                     "version": "1.0",
                     "group": "group1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
                 {
                     "name": "Name2",
                     "version": "2.0",
                     "group": "group2",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
             )
         )
         self.assertTrue(
             sbf.compare_components(
-                {"name": "Name1", "version": "1.0", "group": "group1", "swid": {"tagId": "swid1"}},
-                {"name": "Name2", "version": "2.0", "group": "group2", "swid": {"tagId": "swid1"}},
+                {"name": "Name1", "version": "1.0", "group": "group1", "swid": {"tagId": "swid1", "name": "comp"}},
+                {"name": "Name2", "version": "2.0", "group": "group2", "swid": {"tagId": "swid1", "name": "comp"}},
             )
         )
         self.assertTrue(
@@ -373,7 +373,7 @@ class TestCompareComponents(unittest.TestCase):
                     "version": "1.0",
                     "group": "group1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
             )
         )
@@ -385,7 +385,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
                 {
                     "name": "Name1",
@@ -393,7 +393,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
             )
         )
@@ -405,7 +405,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
                 {"name": "Name1", "version": "1.0", "group": "group1", "cpe": "cpe1"},
             )
@@ -434,7 +434,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
                 {
                     "name": "Name1",
@@ -442,7 +442,7 @@ class TestCompareComponents(unittest.TestCase):
                     "group": "group1",
                     "purl": "purl2",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
             )
         )
@@ -453,14 +453,14 @@ class TestCompareComponents(unittest.TestCase):
                     "version": "1.0",
                     "group": "group1",
                     "cpe": "cpe1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
                 {
                     "name": "Name1",
                     "version": "1.0",
                     "group": "group1",
                     "cpe": "cpe2",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
             )
         )
@@ -470,13 +470,13 @@ class TestCompareComponents(unittest.TestCase):
                     "name": "Name1",
                     "version": "1.0",
                     "group": "group1",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
                 {
                     "name": "Name1",
                     "version": "1.0",
                     "group": "group1",
-                    "swid": {"tagId": "swid2"},
+                    "swid": {"tagId": "swid2", "name": "comp"},
                 },
             )
         )
@@ -487,7 +487,7 @@ class TestCompareComponents(unittest.TestCase):
                     "version": "2.0",
                     "group": "group1",
                     "cpe": "cpe2",
-                    "swid": {"tagId": "swid1"},
+                    "swid": {"tagId": "swid1", "name": "comp"},
                 },
                 {"name": "Name1", "version": "1.0", "group": "group1", "purl": "purl1"},
             )

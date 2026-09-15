@@ -2776,7 +2776,7 @@ class TestMergeSimilarComponents(unittest.TestCase):
                     "type": "operating-system",
                     "name": "alpine",
                     "version": "3.23.3",
-                    "swid": {"tagId": "alpine"},
+                    "swid": {"tagId": "alpine", "name": "alpine"},
                 }
             ],
             "dependencies": [],
@@ -2800,7 +2800,7 @@ class TestMergeSimilarComponents(unittest.TestCase):
                     "type": "operating-system",
                     "name": "alpine",
                     "version": "3.23.3",
-                    "swid": {"tagId": "alpine"},
+                    "swid": {"tagId": "alpine", "name": "alpine"},
                 }
             ],
             "dependencies": [],

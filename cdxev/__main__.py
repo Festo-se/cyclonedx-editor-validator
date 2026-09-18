@@ -1000,7 +1000,7 @@ def _set_target_update_id(args: argparse.Namespace) -> dict[str, t.Any]:
     target_kind, target = actual_targets[0]
     update_id: dict[str, t.Any] = {}
     if target_kind == "namePattern":
-        update_id = _build_name_pattern_id(args, target, group_pattern)
+        update_id = _build_name_pattern_id(args, t.cast(str, target), group_pattern)
     elif target_kind in {"cpePattern", "purlPattern"}:
         update_id[target_kind] = target
     else:
@@ -1108,11 +1108,9 @@ def invoke_vex(args: argparse.Namespace) -> int:
 
     if args.sub_command == "extract":
         output = vex(sub_command=args.sub_command, file=file)
-
-    if args.sub_command == "search":
+    elif args.sub_command == "search":
         output = vex(sub_command=args.sub_command, file=file, vul_id=args.vul_id)
-
-    if args.sub_command == "trim":
+    elif args.sub_command == "trim":
         if args.key is None:
             usage_error("--key is required.", args.parser)
         elif args.value is None:
@@ -1121,13 +1119,14 @@ def invoke_vex(args: argparse.Namespace) -> int:
                 args.parser,
             )
         output = vex(sub_command=args.sub_command, file=file, key=args.key, value=args.value)
-
-    if args.sub_command == "list":
+    elif args.sub_command == "list":
         output = vex(sub_command=args.sub_command, file=file, schema=args.schema)
         write_list(str(output), args.output, file, format=args.format)
     else:
-        if isinstance(output, dict):
-            write_sbom(output, args.output, update_metadata=False)
+        usage_error(f"Unknown VEX subcommand: {args.sub_command}", args.parser)
+
+    if args.sub_command != "list" and isinstance(output, dict):
+        write_sbom(output, args.output, update_metadata=False)
 
     return Status.OK
 

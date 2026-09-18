@@ -1122,10 +1122,11 @@ def invoke_vex(args: argparse.Namespace) -> int:
     elif args.sub_command == "list":
         output = vex(sub_command=args.sub_command, file=file, schema=args.schema)
         write_list(str(output), args.output, file, format=args.format)
+        return Status.OK
     else:
         usage_error(f"Unknown VEX subcommand: {args.sub_command}", args.parser)
 
-    if args.sub_command != "list" and isinstance(output, dict):
+    if isinstance(output, dict):
         write_sbom(output, args.output, update_metadata=False)
 
     return Status.OK

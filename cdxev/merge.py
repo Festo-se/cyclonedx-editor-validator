@@ -840,6 +840,8 @@ def merge_vulnerabilities(
     for new_vulnerability in list_of_new_vulnerabilities:
         is_in = False
         same_affects_state = False
+        original_vulnerability = None
+        id_object_original_vulnerability = None
 
         # since vulnerabilities can be assigned different identifier (cve, snyk ...)
         # all provided vulnerabilities are analysed during intitialization and a registry with
@@ -898,7 +900,12 @@ def merge_vulnerabilities(
 
         # if no vulnerability object for the vulnerability with the same analysis state exists
         # create a new one
-        if is_in and not same_affects_state:
+        if (
+            is_in
+            and not same_affects_state
+            and original_vulnerability is not None
+            and id_object_original_vulnerability is not None
+        ):
             # Check affects: 3 cases
             # 1. complete disjunct => two different vulnerability objects, add new vuln object
             # 2. new affects are a subset of the original vulnerabilities => drop

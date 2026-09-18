@@ -16,7 +16,7 @@ class AppError(Exception):
         line_start: Optional[int] = None,
         *,
         log_msg: Optional[LogMessage] = None,
-    ):
+    ) -> None:
         """
         :param str message: A short message, often not even a full sentence. Avoid putting a
         period at the end.
@@ -62,7 +62,7 @@ class InputFileError(AppError):
         description: str,
         module_name: Optional[str] = None,
         line_start: Optional[int] = None,
-    ):
+    ) -> None:
         """
         :param str description: A description of the error.
         :param str module_name: The module where the error occurred. Typically set to `__name__`.

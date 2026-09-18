@@ -72,7 +72,7 @@ def run_main(
 
 def run_main(
     capsys: t.Optional[CaptureFixture[str]] = None,
-    parse_output: t.Optional[t.Union[t.Literal["json"], t.Literal["filename"]]] = None,
+    parse_output: t.Optional[t.Literal["json", "filename"]] = None,
 ):
     """
     Runs the main module of this project and returns the exit code as well as stdout.

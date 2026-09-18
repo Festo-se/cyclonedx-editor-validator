@@ -45,8 +45,8 @@ jobs:
         run: uv sync --no-group docs --frozen
       - name: Run ruff
         run: uv run ruff check cdxev tests
-      - name: Run mypy
-        run: uv run mypy --config-file=pyproject.toml
+      - name: Run ty
+        run: uv run ty check --output-format=github
 
   pytest:
     runs-on: ubuntu-latest

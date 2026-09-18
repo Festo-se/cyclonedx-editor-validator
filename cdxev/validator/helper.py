@@ -10,7 +10,7 @@ from importlib import resources
 from pathlib import Path
 
 import jsonschema_rs
-from license_expression import ExpressionError, get_spdx_licensing  # type: ignore[import-untyped]
+from license_expression import ExpressionError, get_spdx_licensing
 
 from cdxev.error import AppError
 

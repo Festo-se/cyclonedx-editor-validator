@@ -31,7 +31,7 @@ def generate_filename(sbom: dict) -> str:
         return "bom.json"
 
     try:
-        timestamp = isoparse(timestamp_str)  # type: ignore # because type errors are caught below
+        timestamp = isoparse(timestamp_str)  # ty: ignore[invalid-argument-type]  # because type errors are caught below
     except (ValueError, TypeError):
         logger.info("SBOM has no or an unparsable timestamp. Using current time in filename.")
         timestamp = datetime.now(timezone.utc)

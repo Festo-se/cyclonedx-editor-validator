@@ -9,7 +9,8 @@ amend
     :path: amend
 
 .. note::
-    The order of operations cannot be controlled. If you want to ensure two operations run in a certain order you must run the command twice, each time with a different set of operations.
+    Operations run in the order selected with ``--operation``. If one operation depends on the
+    changes made by another, select the prerequisite operation first.
 
 Examples
 --------
@@ -30,9 +31,8 @@ Examples
     # Build hierarchical bom-refs from nested components.
     cdx-ev amend --operation hierarchical-bom-refs bom.json
 
-    # Add missing bom-refs first, then build the hierarchy in a separate run.
-    cdx-ev amend --operation add-bom-ref bom.json --output bom.json
-    cdx-ev amend --operation hierarchical-bom-refs bom.json
+    # Add missing bom-refs first, then build the hierarchy in the same run.
+    cdx-ev amend --operation add-bom-ref --operation hierarchical-bom-refs bom.json
 
 Operation details
 -----------------

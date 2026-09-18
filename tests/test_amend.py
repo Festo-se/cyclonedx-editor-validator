@@ -739,12 +739,10 @@ class HierarchicalBomRefsTestCase(unittest.TestCase):
             ]
         }
 
-        with self.assertLogs("cdxev.amend.operations", level="INFO") as logs:
-            run_amend(sbom, selected=[AddBomRef, HierarchicalBomRefs])
+        run_amend(sbom, selected=[AddBomRef, HierarchicalBomRefs])
 
         child = sbom["components"][0]["components"][0]
-        self.assertNotIn("/", child["bom-ref"])
-        self.assertIn("component library", logs.output[0])
+        self.assertTrue(child["bom-ref"].startswith("application/"))
 
     def test_avoids_collision_with_existing_ref(self) -> None:
         sbom = {

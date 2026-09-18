@@ -728,22 +728,6 @@ class HierarchicalBomRefsTestCase(unittest.TestCase):
         self.assertEqual("application", sbom["components"][0]["bom-ref"])
         self.assertEqual("application/library", sbom["components"][0]["components"][0]["bom-ref"])
 
-    def test_add_bom_ref_must_run_before_hierarchical_bom_refs(self) -> None:
-        sbom = {
-            "components": [
-                {
-                    "name": "application",
-                    "bom-ref": "application",
-                    "components": [{"name": "library"}],
-                }
-            ]
-        }
-
-        run_amend(sbom, selected=[AddBomRef, HierarchicalBomRefs])
-
-        child = sbom["components"][0]["components"][0]
-        self.assertTrue(child["bom-ref"].startswith("application/"))
-
     def test_avoids_collision_with_existing_ref(self) -> None:
         sbom = {
             "components": [

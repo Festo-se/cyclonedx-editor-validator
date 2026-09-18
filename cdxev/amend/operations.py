@@ -565,10 +565,7 @@ class HierarchicalBomRefs(Operation):
                 self.__parents[id(child)] = parent
                 self._remember_parents(child)
 
-    def _prepend_parent_refs(
-        self,
-        parent: dict,
-    ) -> None:
+    def _prepend_parent_refs(self, parent: dict) -> None:
         for child in parent.get("components", []):
             if not isinstance(child, dict):
                 continue

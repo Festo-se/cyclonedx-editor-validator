@@ -8,7 +8,7 @@ from enum import Enum
 from functools import lru_cache, total_ordering
 from importlib import resources
 from re import fullmatch
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Callable, Optional, Sequence, cast
 from urllib.parse import unquote
 
 from cyclonedx.model.bom import Bom
@@ -166,9 +166,9 @@ def get_bom_refs_from_dependencies(dependencies: Sequence[dict]) -> list[str]:
     Output:
     bom_refs: List of Strings, containing the bom-refs of the dependencies
     """
-    list_of_bom_refs = []
+    list_of_bom_refs: list[str] = []
     for dependency in dependencies:
-        list_of_bom_refs.append(dependency.get("ref", ""))
+        list_of_bom_refs.append(cast(str, dependency.get("ref", "")))
     return list_of_bom_refs
 
 
@@ -182,9 +182,9 @@ def get_bom_refs_from_dependencies_dependson(dependencies: Sequence[dict]) -> li
     Output:
     bom_refs: List of Strings, containing entries from all dependsOn fields
     """
-    list_of_bom_refs = []
+    list_of_bom_refs: list[str] = []
     for dependency in dependencies:
-        list_of_bom_refs += dependency.get("dependsOn", [])
+        list_of_bom_refs += cast(list[str], dependency.get("dependsOn", []))
     return list_of_bom_refs
 
 
@@ -287,16 +287,18 @@ def _schema_contains_reference_value(
         items = schema.get("items")
         if _schema_contains_reference_value(items, current_schema, schema_dir, schemas, visited):
             return True
-        return (
+        return bool(
             isinstance(items, dict)
             and items.get("type") == "string"
             and _schema_describes_bom_ref(schema)
         )
 
-    return any(
-        _schema_contains_reference_value(option, current_schema, schema_dir, schemas, visited)
-        for keyword in ("anyOf", "oneOf", "allOf")
-        for option in schema.get(keyword, [])
+    return bool(
+        any(
+            _schema_contains_reference_value(option, current_schema, schema_dir, schemas, visited)
+            for keyword in ("anyOf", "oneOf", "allOf")
+            for option in schema.get(keyword, [])
+        )
     )
 
 
@@ -499,12 +501,13 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
                     assigned_bom_refs[new_components[reference]] = new_bom_ref
 
                 elif new_components[reference] in assigned_bom_refs.keys():
+                    assigned_bom_ref = assigned_bom_refs[new_components[reference]]
                     replace_bom_ref_in_sbom(
                         subsequent_sbom,
                         reference,
-                        assigned_bom_refs[new_components[reference]],
+                        assigned_bom_ref,
                     )
-                    retained_components[new_bom_ref] = new_components[reference]
+                    retained_components[assigned_bom_ref] = new_components[reference]
 
                 else:
                     retained_components[reference] = new_components[reference]
@@ -670,8 +673,8 @@ def compare_version_range(first_range: str, second_range: str) -> bool:
         return True
 
     try:
-        first_range_object = VersionRange.from_string(second_range)  # type:ignore
-        second_range_object = VersionRange.from_string(first_range)  # type:ignore
+        first_range_object = VersionRange.from_string(second_range)
+        second_range_object = VersionRange.from_string(first_range)
     except ValueError:
         return False
 
@@ -682,7 +685,7 @@ def compare_version_range(first_range: str, second_range: str) -> bool:
 
 
 def version_is_in_version_range(version: str, version_range: str) -> bool:
-    range_object = VersionRange.from_string(version_range)  # type:ignore
+    range_object = VersionRange.from_string(version_range)
     version_class = range_object.version_class
     try:
         if version_class.is_valid(version):
@@ -931,7 +934,7 @@ def get_identities_for_vulnerabilities(
 def deserialize(sbom: dict) -> Bom:
     if sbom.get("compositions", {}):
         sbom.pop("compositions")  # compositions need to be removed till the model supports those
-    deserialized_bom = Bom.from_json(data=sbom)  # type:ignore[attr-defined]
+    deserialized_bom = Bom.from_json(data=sbom)  # ty: ignore[unresolved-attribute]
     if isinstance(deserialized_bom, Bom):
         return deserialized_bom
     else:

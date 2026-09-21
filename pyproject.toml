@@ -35,7 +35,7 @@ cdx-ev = "cdxev.__main__:main"
 
 [dependency-groups]
 dev = [
-    "mypy==2.3.1",
+    "ty==0.0.82",
     "types-python-dateutil==2.9.0.20260807",
     "pytest==9.1.1",
     "coverage==7.16.1",
@@ -64,37 +64,65 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["cdxev"]
 
-[tool.mypy]
-python_version = "3.11"
-packages = "cdxev"
-# Excludes tests even when mypy is invoked with a path (as the VS Code extension does, for instance)
-exclude = ['tests/']
-strict = true
+[tool.ty.environment]
+python-version = "3.11"
+root = ["./cdxev"]
 
-[[tool.mypy.overrides]]
-module = [
-    "cdxev.merge",
-    "cdxev.set",
-    "cdxev.amend.operations",
-    "cdxev.amend.license",
-    "cdxev.amend.command",
-    "cdxev.__main__",
-    "cdxev.validator.helper",
-    "cdxev.validator.validate",
-    "cdxev.auxiliary.io_processing",
-    "cdxev.auxiliary.sbom_functions",
-    "cdxev.auxiliary.filename_gen",
-    "cdxev.auxiliary.identity",
-    "cdxev.validator.customreports",
-    "cdxev.build_public_bom"
-]
-disallow_any_generics = false
+[tool.ty.src]
+exclude = ["**/tests/**"]
 
-[[tool.mypy.overrides]]
-module = [
-    "cdxev.__main__",
+[tool.ty.rules]
+blanket-ignore-comment = "error"
+dynamic-function-decorator-return = "error"
+missing-type-argument = "error"
+possibly-unresolved-reference = "warn"
+unsound-return-statement = "error"
+unsound-yield = "error"
+unsupported-dynamic-base = "warn"
+possibly-missing-import = "warn"
+
+[[tool.ty.overrides]]
+include = [
+    "cdxev/initialize_sbom.py",
+    "cdxev/list_command.py",
+    "cdxev/auxiliary/sbom_functions.py",
 ]
-warn_return_any = false
+
+[tool.ty.overrides.rules]
+invalid-type-form = "ignore"
+too-many-positional-arguments = "ignore"
+unknown-argument = "ignore"
+
+[[tool.ty.overrides]]
+include = [
+    "cdxev/merge.py",
+    "cdxev/set.py",
+    "cdxev/amend/operations.py",
+    "cdxev/amend/license.py",
+    "cdxev/amend/command.py",
+    "cdxev/__main__.py",
+    "cdxev/validator/helper.py",
+    "cdxev/validator/validate.py",
+    "cdxev/auxiliary/io_processing.py",
+    "cdxev/auxiliary/sbom_functions.py",
+    "cdxev/auxiliary/filename_gen.py",
+    "cdxev/auxiliary/identity.py",
+    "cdxev/validator/customreports.py",
+    "cdxev/build_public_bom.py",
+]
+
+[tool.ty.overrides.rules]
+missing-type-argument = "ignore"
+
+[[tool.ty.overrides]]
+include = ["cdxev/__main__.py"]
+
+[tool.ty.overrides.rules]
+unsound-return-statement = "ignore"
+
+[tool.ty.analysis]
+strict-equality-semantics = true
+strict-generic-narrowing = true
 
 [tool.coverage.run]
 source = ["cdxev"]
@@ -140,7 +168,9 @@ indent-width = 4
 # Enable Pyflakes (`F`) and pycodestyle (`E`) codes by default.
 # Additionally adds isort (`I`), pep8-naming (`N`), bandit (`S`), and enables
 # pycodestyle warnings (`W`), McCabe complexity (`C901`) and flake8-bugbear (`B`).
-select = ["E", "F", "I", "N", "W", "C901", "S", "B", "PIE"]
+# Also adds flake8-annotations (`ANN`), flake8-pyi (`PYI`) and pygrep-hooks (`PGH003`)
+# according to https://docs.astral.sh/ty/coming-from-mypy-or-pyright
+select = ["E", "F", "I", "N", "W", "C901", "S", "B", "PIE", "ANN", "PYI", "PGH003"]
 ignore = ["E203", "E722"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -160,6 +190,12 @@ max-line-length=99
 max-complexity = 20
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/*" = ["S101"]
+"**/tests/*" = ["S101", "ANN001", "ANN201", "ANN202", "ANN206"]
 # Atheris fuzz harnesses require the entry point to be named `TestOneInput`.
 "**/tests/fuzz/*" = ["S101", "N802"]
+"tests/auxiliary/helper.py" = ["ANN401"]
+"cdxev/__main__.py" = ["ANN401"]
+"cdxev/auxiliary/sbom_functions.py" = ["ANN401"]
+"cdxev/merge.py" = ["ANN401"]
+"cdxev/set.py" = ["ANN401"]
+"cdxev/validator/helper.py" = ["ANN401"]

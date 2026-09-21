@@ -37,7 +37,7 @@ def validate_sbom(
             for hdlr in logging.root.handlers
             if isinstance(hdlr, logging.StreamHandler) and hdlr.stream == sys.stderr
         )
-        stderr_handler.setStream(sys.stdout)
+        t.cast(logging.StreamHandler[t.Any], stderr_handler).setStream(sys.stdout)
 
     if input_format != "json":
         raise AppError("Invalid SBOM", f"Unsupported input format for validation: {input_format}")

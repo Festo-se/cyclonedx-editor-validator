@@ -20,7 +20,7 @@ def license_has_text(license: dict) -> bool:
     :param license: A license object.
     :returns: ``True`` if ``license`` contains a non-empty text.
     """
-    return "text" in license and license["text"]["content"]
+    return "text" in license and bool(license["text"]["content"])
 
 
 def foreach_license(callable: Callable[[dict, dict], None], component: dict) -> None:

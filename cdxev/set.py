@@ -54,7 +54,7 @@ class UpdateIdentity(ComponentIdentity):
     Instances of this class are immutable.
     """
 
-    def __init__(self, *keys: t.Optional[Key]):
+    def __init__(self, *keys: t.Optional[Key]) -> None:
         super().__init__(*keys)
 
     def __eq__(self, other: object) -> bool:
@@ -91,9 +91,7 @@ class UpdateIdentity(ComponentIdentity):
         coordinates: Coordinates
         if version_range is not None:
             try:
-                vers = univers.version_range.VersionRange.from_string(
-                    version_range  # type:ignore
-                )
+                vers = univers.version_range.VersionRange.from_string(version_range)
             except Exception as exc:
                 # univers raises a variety of unrelated exception types for malformed
                 # version ranges (InvalidVersion, InvalidNuGetVersion, InvalidVersionRange,
@@ -582,7 +580,7 @@ def _parse_coordinates_regex(
             )
         try:
             from_string = univers.version_range.VersionRange.from_string
-            version_range_obj = from_string(vr)  # type: ignore[no-untyped-call]
+            version_range_obj = from_string(vr)
         except (ValueError, univers.versions.InvalidVersion) as exc:
             raise AppError(
                 "Invalid set file",

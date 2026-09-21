@@ -525,7 +525,8 @@ class HierarchicalBomRefs(Operation):
     """
     Prepends parent bom-refs to the bom-refs of nested components.
 
-    Every nested component is rewritten to ``<parent bom-ref>/<own bom-ref>`` recursively. Each
+    Every nested component is rewritten to ``<parent bom-ref><separator><own bom-ref>``
+    recursively. Each
     bom-ref is treated as an opaque string. Top-level components remain unchanged. References to
     rewritten components are updated throughout the SBOM. Every bom-ref in the document is
     considered when detecting collisions, which are resolved with an incrementing numeric suffix.
@@ -538,41 +539,34 @@ class HierarchicalBomRefs(Operation):
     __sbom: dict
     __assigned_refs: set[str]
     __parents: dict[int, dict]
+    separator: str
+
+    def __init__(self, separator: str = "/") -> None:
+        """
+        :param separator: String to place between parent and child bom-refs.
+        """
+        self.separator = separator
 
     def prepare(self, sbom: dict) -> None:
         self.__sbom = sbom
         self.__assigned_refs = get_all_bom_refs(sbom)
         self.__parents = {}
 
-        metadata_component = sbom.get("metadata", {}).get("component")
-        if isinstance(metadata_component, dict):
-            self._remember_parents(metadata_component)
-
-        for component in sbom.get("components", []):
-            self._remember_parents(component)
-
     def handle_metadata(self, metadata: dict) -> None:
         metadata_component = metadata.get("component")
         if isinstance(metadata_component, dict):
-            self._prepend_parent_refs(metadata_component)
+            self._remember_children(metadata_component)
 
     def handle_component(self, component: dict) -> None:
         parent = self.__parents.get(id(component))
         if parent is not None:
             self._prepend_parent_ref(parent, component)
+        self._remember_children(component)
 
-    def _remember_parents(self, parent: dict) -> None:
+    def _remember_children(self, parent: dict) -> None:
         for child in parent.get("components", []):
             if isinstance(child, dict):
                 self.__parents[id(child)] = parent
-                self._remember_parents(child)
-
-    def _prepend_parent_refs(self, parent: dict) -> None:
-        for child in parent.get("components", []):
-            if not isinstance(child, dict):
-                continue
-            self._prepend_parent_ref(parent, child)
-            self._prepend_parent_refs(child)
 
     def _prepend_parent_ref(self, parent: dict, child: dict) -> None:
         parent_ref = parent.get("bom-ref")
@@ -597,7 +591,7 @@ class HierarchicalBomRefs(Operation):
             )
             return
 
-        desired_child_ref = parent_ref + "/" + old_child_ref
+        desired_child_ref = parent_ref + self.separator + old_child_ref
         self.__assigned_refs.discard(old_child_ref)
         new_child_ref = self._ensure_unique_ref(desired_child_ref, self.__assigned_refs)
 

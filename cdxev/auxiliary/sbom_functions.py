@@ -436,9 +436,12 @@ def walk_components(
             if "components" in component:
                 _recurse(component["components"], func, *args)
 
-    if not skip_meta:
-        if component := sbom.get("metadata", {}).get("component", None):
-            func(component, *args, **kwargs)
+    metadata_component = sbom.get("metadata", {}).get("component")
+    if metadata_component:
+        if not skip_meta:
+            func(metadata_component, *args, **kwargs)
+        elif "components" in metadata_component:
+            _recurse(metadata_component["components"], func, *args, **kwargs)
 
     if "components" not in sbom:
         return

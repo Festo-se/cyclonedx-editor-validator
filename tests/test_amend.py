@@ -728,6 +728,44 @@ class HierarchicalBomRefsTestCase(unittest.TestCase):
         self.assertEqual("application", sbom["components"][0]["bom-ref"])
         self.assertEqual("application/library", sbom["components"][0]["components"][0]["bom-ref"])
 
+    def test_add_bom_ref_runs_before_hierarchical_bom_refs(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "name": "application",
+                    "components": [{"name": "library"}],
+                }
+            ]
+        }
+        parent = sbom["components"][0]
+        child = sbom["components"][0]["components"][0]
+        self.assertNotIn("bom-ref", parent)
+        self.assertNotIn("bom-ref", child)
+
+        run_amend(sbom, selected=[AddBomRef, HierarchicalBomRefs])
+
+        parent_ref = parent["bom-ref"]
+        child_ref = child["bom-ref"]
+        self.assertTrue(child_ref.startswith(parent_ref + "/"))
+
+    def test_uses_configured_separator(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "bom-ref": "application",
+                    "components": [{"bom-ref": "library"}],
+                }
+            ]
+        }
+
+        run_amend(
+            sbom,
+            selected=[HierarchicalBomRefs],
+            config={HierarchicalBomRefs: {"separator": ":"}},
+        )
+
+        self.assertEqual("application:library", sbom["components"][0]["components"][0]["bom-ref"])
+
     def test_avoids_collision_with_existing_ref(self) -> None:
         sbom = {
             "components": [

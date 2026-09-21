@@ -196,6 +196,30 @@ class TestAmend:
         expected = load_sbom(data_dir / "amend.expected_add-license-text.cdx.json")
         assert expected == actual
 
+    def test_hierarchical_bom_refs_separator_arg(
+        self,
+        data_dir: Path,
+        argv: Callable[..., None],
+        capsys: pytest.CaptureFixture[str],
+    ):
+        argv(
+            "amend",
+            "--operation",
+            "hierarchical-bom-refs",
+            "--separator",
+            ":",
+            str(data_dir / "amend.input_hierarchical-bom-refs.cdx.json"),
+        )
+        exit_code, actual, _ = run_main(capsys, "json")
+
+        assert exit_code == Status.OK
+        assert actual["components"][0]["components"][0]["bom-ref"] == "module-a:library-b"
+        assert (
+            actual["components"][0]["components"][0]["components"][0]["bom-ref"]
+            == "module-a:library-b:application-c"
+        )
+        assert actual["dependencies"][0]["dependsOn"] == ["module-a:library-b"]
+
     def test_missing_operation_arg(
         self, argv: Callable[..., None], capsys: pytest.CaptureFixture[str]
     ):

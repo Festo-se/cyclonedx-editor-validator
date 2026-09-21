@@ -72,6 +72,7 @@ root = ["./cdxev"]
 exclude = ["**/tests/**"]
 
 [tool.ty.rules]
+blanket-ignore-comment = "error"
 dynamic-function-decorator-return = "error"
 missing-type-argument = "error"
 possibly-unresolved-reference = "warn"

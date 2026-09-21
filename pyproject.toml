@@ -77,6 +77,9 @@ dynamic-function-decorator-return = "error"
 missing-type-argument = "error"
 possibly-unresolved-reference = "warn"
 unsound-return-statement = "error"
+unsound-yield = "error"
+unsupported-dynamic-base = "warn"
+possibly-missing-import = "warn"
 
 [[tool.ty.overrides]]
 include = [
@@ -116,6 +119,10 @@ include = ["cdxev/__main__.py"]
 
 [tool.ty.overrides.rules]
 unsound-return-statement = "ignore"
+
+[tool.ty.analysis]
+strict-equality-semantics = true
+strict-generic-narrowing = true
 
 [tool.coverage.run]
 source = ["cdxev"]

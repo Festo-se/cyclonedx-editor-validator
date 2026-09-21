@@ -22,7 +22,7 @@ class WarningsNgReporter(logging.Handler):
         file_path: pathlib.Path,
         target: t.Union[t.TextIO, pathlib.Path],
         buffer: t.Optional[dict[str, list]] = None,
-    ):
+    ) -> None:
         """
         Creates a new handler with the given target.
 
@@ -111,7 +111,7 @@ class GitLabCQReporter(logging.Handler):
         file_path: pathlib.Path,
         target: t.Union[t.TextIO, pathlib.Path],
         buffer: t.Optional[list] = None,
-    ):
+    ) -> None:
         """
         Creates a new handler with the given target.
 

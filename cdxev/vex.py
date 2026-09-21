@@ -76,28 +76,30 @@ def get_list_of_ids(input_file: dict[str, Any], schema: str) -> str:
             update_date = vulnerability.get("updated", "-")
             vul_description = re.sub(r"[\t\n\r\|]+", "", vulnerability.get("description", "-"))
             list_str += (
-                vul_id
+                str(vul_id)
                 + "|"
-                + vul_ref_id
+                + str(vul_ref_id)
                 + "|"
                 + cwe_str
                 + "|"
                 + severity_string
                 + "|"
-                + vul_state
+                + str(vul_state)
                 + "|"
-                + publish_date
+                + str(publish_date)
                 + "|"
-                + update_date
+                + str(update_date)
                 + "|"
-                + vul_description
+                + str(vul_description)
                 + "\n"
             )
     elif schema == "lightweight":
         list_str += "ID|RefID\n"
         for vulnerability in input_file.get("vulnerabilities", []):
             references = vulnerability.get("references") or [{"id": "-"}]
-            list_str += vulnerability.get("id", "-") + "|" + references[0].get("id", "-") + "\n"
+            list_str += (
+                str(vulnerability.get("id", "-")) + "|" + str(references[0].get("id", "-")) + "\n"
+            )
 
     return list_str
 

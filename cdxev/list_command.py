@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, cast
 
 from cyclonedx.model.bom import Bom, BomMetaData
 from cyclonedx.model.component import Component
@@ -107,15 +107,18 @@ def write_list_to_str(str_list: list[str], division_character: str = "\n") -> st
 def write_license_dict_to_txt(info_dict: dict[str, Any]) -> str:
     string = ""
 
-    if info_dict.get("name", ""):
-        string += info_dict.get("name", "") + ":"
+    name = info_dict.get("name", "")
+    if name:
+        string += str(name) + ":"
 
-    if info_dict.get("copyright", ""):
+    copyright = info_dict.get("copyright", "")
+    if copyright:
         string += "\n"
-        string += info_dict.get("copyright", "")
+        string += str(copyright)
 
-    if info_dict.get("licenses", ""):
-        license_str = write_list_to_str(info_dict.get("licenses", ""))
+    licenses = info_dict.get("licenses", "")
+    if licenses:
+        license_str = write_list_to_str(cast(list[str], licenses))
         string += "\n"
         string += license_str
 
@@ -129,12 +132,12 @@ def write_license_dict_to_txt(info_dict: dict[str, Any]) -> str:
 def write_license_dict_to_csv(info_dict: dict[str, Any]) -> str:
     string = ""
 
-    string += '"' + info_dict.get("name", "") + '"'
+    string += '"' + str(info_dict.get("name", "")) + '"'
 
     string += ","
-    string += '"' + info_dict.get("copyright", "") + '"'
+    string += '"' + str(info_dict.get("copyright", "")) + '"'
 
-    license_str = write_list_to_str(info_dict.get("licenses", ""), ",")
+    license_str = write_list_to_str(cast(list[str], info_dict.get("licenses", "")), ",")
     string += ","
     string += '"' + license_str + '"'
 
@@ -190,8 +193,10 @@ def list_license_information(sbom: Bom, format: str = "txt") -> str:
     if format == "txt":
         txt_string = write_license_information_to_txt(software_information, component_information)
 
-    if format == "csv":
+    elif format == "csv":
         txt_string = write_license_information_to_csv(software_information, component_information)
+    else:
+        raise ValueError(f"Unsupported list format: {format}")
 
     return txt_string
 
@@ -199,20 +204,20 @@ def list_license_information(sbom: Bom, format: str = "txt") -> str:
 def list_component_information_csv(component: Component, division_character: str = ",") -> str:
     string = ""
     if component.name is not None:
-        string += '"' + component.name + '"'
+        string += '"' + str(component.name) + '"'
     else:
         string += '"' + '"'
 
     if component.version is not None:
         string += division_character
-        string += '"' + component.version + '"'
+        string += '"' + str(component.version) + '"'
     else:
         string += division_character
         string += '"' + '"'
 
     if component.supplier is not None and component.supplier.name is not None:
         string += division_character
-        string += '"' + component.supplier.name + '"'
+        string += '"' + str(component.supplier.name) + '"'
     else:
         string += division_character
         string += '"' + '"'
@@ -223,18 +228,18 @@ def list_component_information_csv(component: Component, division_character: str
 def list_component_information_txt(component: Component, division_character: str = "\n") -> str:
     string = ""
     if component.name is not None:
-        string += component.name
+        string += str(component.name)
     else:
         return ""
 
     if component.version is not None:
         string += division_character
-        string += component.version
+        string += str(component.version)
 
     if component.supplier is not None:
         if component.supplier.name is not None:
             string += division_character
-            string += component.supplier.name
+            string += str(component.supplier.name)
 
     return string
 
@@ -246,6 +251,8 @@ def list_components(sbom: Bom, format: str = "txt") -> str:
     elif format == "csv":
         string = "Name,Version,Supplier\n"
         line_break = "\n"
+    else:
+        raise ValueError(f"Unsupported list format: {format}")
 
     if sbom.metadata.component is not None:
         if format == "csv":
@@ -272,7 +279,7 @@ def list_components(sbom: Bom, format: str = "txt") -> str:
     return string
 
 
-def list_command(sbom: dict, operation: str, format: str = "txt") -> str:  # type: ignore
+def list_command(sbom: dict[str, Any], operation: str, format: str = "txt") -> str:
     """
     Lists specific content of the SBOM.
 

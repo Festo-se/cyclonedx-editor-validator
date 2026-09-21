@@ -337,8 +337,10 @@ class LicenseNameToId(Operation):
     license_map: dict[str, str] = {}
 
     def prepare(self, sbom: dict) -> None:
+        if __spec__ is None or __spec__.parent is None:
+            raise RuntimeError("Cannot locate the license mapping resource.")
         license_mapping_file = (
-            importlib.resources.files(__spec__.parent) / "license_name_spdx_id_map.json"  # type: ignore[arg-type]  # noqa: E501
+            importlib.resources.files(__spec__.parent) / "license_name_spdx_id_map.json"  # noqa: E501
         )
         license_mapping_json = license_mapping_file.read_text(encoding="utf_8_sig")
         license_mapping = json.loads(license_mapping_json)

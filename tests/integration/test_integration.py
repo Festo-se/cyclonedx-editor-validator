@@ -216,7 +216,7 @@ class TestAmend:
         # Compare stdout to operation class docstring, stripping out any non-alphanumeric
         # characters. These might differ due to formatting.
         non_alnum = re.compile(r"[\W]+")
-        expected = non_alnum.sub("", AddLicenseText.__doc__)  # type: ignore
+        expected = non_alnum.sub("", AddLicenseText.__doc__)
         actual = non_alnum.sub("", stdout)
 
         assert expected == actual
@@ -1040,7 +1040,7 @@ class TestSet:
 
         assert exit_code == Status.APP_ERROR
         assert (
-            caplog.records[0].msg.description  # type: ignore
+            caplog.records[0].msg.description
             == "Invalid update record: The update object with id "
             "COORDINATES[delete nested components] is missing the 'set' property."
         )
@@ -1230,9 +1230,7 @@ class TestValidate:
         exit_code, *_ = run_main()
 
         assert exit_code == Status.APP_ERROR
-        assert caplog.records[0].msg.description.startswith(  # type: ignore
-            "Invalid JSON Schema in schema file"
-        )
+        assert caplog.records[0].msg.description.startswith("Invalid JSON Schema in schema file")
 
     def test_invalid_option_combinations(self, argv: Callable[..., None]):
         argv(

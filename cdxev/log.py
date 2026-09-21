@@ -40,6 +40,7 @@ class LogMessageFormatter(logging.Formatter):
                 tb = traceback.extract_tb(record.exc_info[2])
                 frame = tb.pop()
 
+            line_start = None
             if record.msg.line_start is not None:
                 line_start = record.msg.line_start
             elif frame is not None:

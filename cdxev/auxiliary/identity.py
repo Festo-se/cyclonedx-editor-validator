@@ -114,7 +114,7 @@ class SWID(dict):
 
         return True
 
-    def __hash__(self) -> int:  # type: ignore[override]
+    def __hash__(self) -> int:
         return (
             self.get("tagId"),
             "name" in self,
@@ -151,7 +151,7 @@ class ComponentIdentity:
 
     _keys: t.Tuple[Key]
 
-    def __init__(self, *keys: t.Optional[Key]):
+    def __init__(self, *keys: t.Optional[Key]) -> None:
         filtered = (key for key in keys if key is not None)
         sorted_keys = sorted(filtered, key=lambda k: k.type)
         keyset = tuple(sorted_keys)

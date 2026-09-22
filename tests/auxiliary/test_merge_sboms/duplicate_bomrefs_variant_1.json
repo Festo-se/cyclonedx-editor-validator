@@ -1,0 +1,294 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "metadata": {
+    "manufacturer": {
+      "bom-ref": "org-manufacturer",
+      "address": {
+        "bom-ref": "addr-manufacturer",
+        "locality": "Variant A City"
+      },
+      "name": "Variant A Manufacturer"
+    },
+    "authors": [
+      {
+        "bom-ref": "contact-author",
+        "name": "Variant A Author"
+      }
+    ],
+    "component": {
+      "type": "machine-learning-model",
+      "bom-ref": "component-metadata",
+      "name": "sample-product",
+      "supplier": {
+        "bom-ref": "org-component-supplier",
+        "name": "Variant A Component Supplier"
+      },
+      "manufacturer": {
+        "bom-ref": "org-component-manufacturer",
+        "name": "Variant A Component Manufacturer"
+      },
+      "authors": [
+        {
+          "bom-ref": "contact-component-author",
+          "name": "Variant A Component Author"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "bom-ref": "license-named",
+            "name": "Sample License A",
+            "url": "https://example.com/licenses/variant-a"
+          }
+        },
+        {
+          "expression": "LicenseRef-Sample",
+          "bom-ref": "license-expression",
+          "expressionDetails": [
+            {
+              "licenseIdentifier": "LicenseRef-Sample",
+              "bom-ref": "license-expression-detail",
+              "url": "https://example.com/licenses/expression-detail-a"
+            }
+          ],
+          "acknowledgement": "declared"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "bom-ref": "occurrence-1",
+            "location": "/path/to/component",
+            "symbol": "variantAOccurrenceSymbol"
+          }
+        ]
+      },
+      "modelCard": {
+        "bom-ref": "model-card-1",
+        "considerations": {
+          "environmentalConsiderations": {
+            "energyConsumptions": [
+              {
+                "activity": "training",
+                "energyProviders": [
+                  {
+                    "bom-ref": "energy-provider-1",
+                    "organization": {
+                      "bom-ref": "org-energy-provider",
+                      "name": "Variant A Energy Organization"
+                    },
+                    "energySource": "solar",
+                    "energyProvided": {
+                      "value": 1,
+                      "unit": "kWh"
+                    },
+                    "description": "Variant A renewable provider"
+                  }
+                ],
+                "activityEnergyCost": {
+                  "value": 1,
+                  "unit": "kWh"
+                }
+              }
+            ]
+          }
+        },
+        "properties": [
+          {
+            "name": "displayName",
+            "value": "Variant A Model Card"
+          }
+        ]
+      },
+      "data": [
+        {
+          "bom-ref": "component-data-1",
+          "type": "dataset",
+          "name": "Variant A Dataset"
+        }
+      ],
+      "patentAssertions": [
+        {
+          "bom-ref": "patent-assertion-1",
+          "assertionType": "ownership",
+          "asserter": "org-manufacturer",
+          "notes": "Variant A patent assertion note"
+        }
+      ],
+      "description": "Variant A described product component"
+    },
+    "supplier": {
+      "bom-ref": "org-metadata-supplier",
+      "name": "Variant A Metadata Supplier"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "component-1",
+      "name": "sample-library",
+      "version": "1.0.0-a"
+    }
+  ],
+  "services": [
+    {
+      "bom-ref": "service-1",
+      "name": "sample-service",
+      "provider": {
+        "bom-ref": "org-service-provider",
+        "name": "Variant A Service Provider"
+      },
+      "description": "Variant A service"
+    }
+  ],
+  "compositions": [
+    {
+      "bom-ref": "composition-1",
+      "aggregate": "complete",
+      "assemblies": [
+        "component-1"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "bom-ref": "vulnerability-1",
+      "id": "VARIANT-A-VULN-1"
+    }
+  ],
+  "annotations": [
+    {
+      "bom-ref": "annotation-1",
+      "subjects": [
+        "component-1"
+      ],
+      "annotator": {
+        "individual": {
+          "bom-ref": "contact-annotator",
+          "name": "Variant A Annotator"
+        }
+      },
+      "timestamp": "2026-01-01T00:00:00Z",
+      "text": "Variant A annotation"
+    }
+  ],
+  "formulation": [
+    {
+      "bom-ref": "formula-1",
+      "workflows": [
+        {
+          "bom-ref": "workflow-1",
+          "uid": "workflow-uid-1",
+          "taskTypes": [
+            "build"
+          ],
+          "trigger": {
+            "bom-ref": "trigger-1",
+            "uid": "trigger-uid-1",
+            "type": "manual",
+            "name": "Variant A Trigger"
+          },
+          "tasks": [
+            {
+              "bom-ref": "task-1",
+              "uid": "task-uid-1",
+              "taskTypes": [
+                "build"
+              ],
+              "workspaces": [
+                {
+                  "bom-ref": "workspace-1",
+                  "uid": "workspace-uid-1",
+                  "name": "Variant A Workspace"
+                }
+              ],
+              "name": "Variant A Task"
+            }
+          ],
+          "name": "Variant A Workflow"
+        }
+      ],
+      "properties": [
+        {
+          "name": "displayName",
+          "value": "Variant A Formula"
+        }
+      ]
+    }
+  ],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-1",
+        "requirements": [
+          {
+            "bom-ref": "requirement-1",
+            "title": "Variant A Requirement"
+          }
+        ],
+        "levels": [
+          {
+            "bom-ref": "level-1",
+            "title": "Variant A Level"
+          }
+        ],
+        "name": "Variant A Standard"
+      }
+    ],
+    "patents": [
+      {
+        "bom-ref": "patent-family-1",
+        "familyId": "FAMILY-1",
+        "externalReferences": [
+          {
+            "type": "website",
+            "url": "https://example.com/patent-family-a"
+          }
+        ]
+      },
+      {
+        "bom-ref": "patent-1",
+        "patentNumber": "US1234567",
+        "jurisdiction": "US",
+        "patentLegalStatus": "granted",
+        "title": "Variant A Patent"
+      }
+    ]
+  },
+  "declarations": {
+    "assessors": [
+      {
+        "bom-ref": "assessor-1",
+        "organization": {
+          "bom-ref": "assessor-org-1",
+          "name": "Variant A Assessor 1"
+        },
+        "thirdParty": true
+      }
+    ],
+    "claims": [
+      {
+        "bom-ref": "claim-1",
+        "predicate": "Variant A claim predicate"
+      }
+    ],
+    "evidence": [
+      {
+        "bom-ref": "declaration-evidence-1",
+        "description": "Variant A declaration evidence"
+      }
+    ]
+  },
+  "citations": [
+    {
+      "bom-ref": "citation-1",
+      "pointers": [
+        "/components/0/name"
+      ],
+      "timestamp": "2026-01-01T00:00:00Z",
+      "attributedTo": "component-1",
+      "note": "Variant A citation note"
+    }
+  ]
+}

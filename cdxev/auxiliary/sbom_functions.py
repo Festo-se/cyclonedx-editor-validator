@@ -450,9 +450,18 @@ def walk_components(
 
 
 def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
+    def next_free_bom_ref(base: str, taken: set[str]) -> str:
+        index = 1
+        candidate = f"{base}-{index}"
+        while candidate in taken:
+            index += 1
+            candidate = f"{base}-{index}"
+        return candidate
+
     assigned_bom_refs: dict[ComponentIdentity, str] = {}
 
     if list_of_sboms:
+        retained_bom_refs = get_all_bom_refs(list_of_sboms[0])
         retained_components = get_ref_components_mapping(
             list(extract_components(list_of_sboms[0].get("components", [])))
             + [list_of_sboms[0].get("metadata", {}).get("component", {})]
@@ -471,6 +480,9 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
                 + [subsequent_sbom.get("metadata", {}).get("component", {})]
                 + get_tool_entries_with_bom_ref(subsequent_sbom)
             )
+            subsequent_bom_refs = get_all_bom_refs(subsequent_sbom)
+            retained_component_identities = set(retained_components.values())
+            retained_non_component_refs = retained_bom_refs - set(retained_components)
 
             for reference in new_components.keys():
                 if (
@@ -482,23 +494,25 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
                     and new_components[reference] not in assigned_bom_refs.keys()
                     # the component did not receive a new bom-ref already
                 ):
-                    index = 1
                     if reference in tool_refs_in_subsequent:
-                        new_bom_ref = f"{reference}-tool-{index}"
+                        base_bom_ref = f"{reference}-tool"
+                        new_bom_ref = next_free_bom_ref(
+                            base_bom_ref,
+                            set(retained_components) | set(new_components),
+                        )
                     else:
-                        new_bom_ref = str(new_components[reference])
-                    while (
-                        new_bom_ref in retained_components.keys()
-                        or new_bom_ref in new_components.keys()
-                    ):
-                        if reference in tool_refs_in_subsequent:
-                            index += 1
-                            new_bom_ref = f"{reference}-tool-{index}"
-                        else:
-                            new_bom_ref = str(new_components[reference]) + "-" + str(index)
-                            index += 1
+                        base_bom_ref = str(new_components[reference])
+                        taken_bom_refs = set(retained_components) | set(new_components)
+                        new_bom_ref = (
+                            base_bom_ref
+                            if base_bom_ref not in taken_bom_refs
+                            else next_free_bom_ref(base_bom_ref, taken_bom_refs)
+                        )
 
                     replace_bom_ref_in_sbom(subsequent_sbom, reference, new_bom_ref)
+                    if reference in subsequent_bom_refs:
+                        subsequent_bom_refs.remove(reference)
+                    subsequent_bom_refs.add(new_bom_ref)
                     retained_components[new_bom_ref] = new_components[reference]
 
                     assigned_bom_refs[new_components[reference]] = new_bom_ref
@@ -514,6 +528,58 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
 
                 else:
                     retained_components[reference] = new_components[reference]
+
+            new_components = get_ref_components_mapping(
+                list(extract_components(subsequent_sbom.get("components", [])))
+                + [subsequent_sbom.get("metadata", {}).get("component", {})]
+                + get_tool_entries_with_bom_ref(subsequent_sbom)
+            )
+            component_refs = {
+                str(component.get("bom-ref"))
+                for component in (
+                    list(extract_components(subsequent_sbom.get("components", [])))
+                    + [subsequent_sbom.get("metadata", {}).get("component", {})]
+                    + get_tool_entries_with_bom_ref(subsequent_sbom)
+                )
+                if component.get("bom-ref")
+            }
+            for reference in sorted(component_refs & retained_non_component_refs):
+                identity = new_components[reference]
+                if identity in retained_component_identities:
+                    continue
+
+                new_bom_ref = next_free_bom_ref(
+                    str(identity), retained_bom_refs | subsequent_bom_refs
+                )
+                replace_bom_ref_in_sbom(subsequent_sbom, reference, new_bom_ref)
+                subsequent_bom_refs.remove(reference)
+                subsequent_bom_refs.add(new_bom_ref)
+                retained_components.pop(reference, None)
+                retained_components[new_bom_ref] = identity
+
+            component_refs = {
+                str(component.get("bom-ref"))
+                for component in (
+                    list(extract_components(subsequent_sbom.get("components", [])))
+                    + [subsequent_sbom.get("metadata", {}).get("component", {})]
+                    + get_tool_entries_with_bom_ref(subsequent_sbom)
+                )
+                if component.get("bom-ref")
+            }
+
+            for reference in sorted(subsequent_bom_refs - component_refs):
+                if reference not in retained_bom_refs:
+                    retained_bom_refs.add(reference)
+                    continue
+
+                new_bom_ref = next_free_bom_ref(reference, retained_bom_refs | subsequent_bom_refs)
+
+                replace_bom_ref_in_sbom(subsequent_sbom, reference, new_bom_ref)
+                subsequent_bom_refs.remove(reference)
+                subsequent_bom_refs.add(new_bom_ref)
+                retained_bom_refs.add(new_bom_ref)
+
+            retained_bom_refs.update(subsequent_bom_refs)
 
 
 def unify_bom_refs(list_of_sboms: Sequence[dict]) -> None:

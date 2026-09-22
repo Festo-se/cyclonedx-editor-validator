@@ -2427,6 +2427,56 @@ class TestMergeComponents(unittest.TestCase):
             duplicates,
         )
 
+    def test_component_ref_collision_with_retained_non_component(self) -> None:
+        sbom_1 = _build_sbom(
+            [_build_component("a", "a")],
+            vulnerabilities=[{"bom-ref": "x", "id": "CVE-1"}],
+        )
+        sbom_2 = _build_sbom(
+            [_build_component("b", "x")],
+            vulnerabilities=[{"id": "CVE-2", "affects": [{"ref": "x"}]}],
+        )
+
+        for hierarchical in (False, True):
+            with self.subTest(hierarchical=hierarchical):
+                merged = merge.merge(
+                    [copy.deepcopy(sbom_1), copy.deepcopy(sbom_2)],
+                    hierarchical=hierarchical,
+                )
+                refs = _collect_all_refs(merged)
+                self.assertEqual([], [ref for ref, count in Counter(refs).items() if count > 1])
+                component_b = next(
+                    component
+                    for component in extract_components(merged["components"])
+                    if component["name"] == "b"
+                )
+                self.assertEqual(
+                    component_b["bom-ref"], merged["vulnerabilities"][1]["affects"][0]["ref"]
+                )
+
+    def test_non_component_ref_collision_with_later_component(self) -> None:
+        sbom_1 = _build_sbom([_build_component("a", "x")])
+        sbom_2 = _build_sbom(
+            [_build_component("b", "b")],
+            vulnerabilities=[{"bom-ref": "x", "id": "CVE-2"}],
+        )
+
+        merged = merge.merge([sbom_1, sbom_2])
+        refs = _collect_all_refs(merged)
+        self.assertEqual([], [ref for ref, count in Counter(refs).items() if count > 1])
+
+    def test_component_ref_collision_from_first_input_in_third_input(self) -> None:
+        sbom_1 = _build_sbom(
+            [_build_component("a", "a")],
+            vulnerabilities=[{"bom-ref": "x", "id": "CVE-1"}],
+        )
+        sbom_2 = _build_sbom([_build_component("c", "c")])
+        sbom_3 = _build_sbom([_build_component("b", "x")])
+
+        merged = merge.merge([sbom_1, sbom_2, sbom_3])
+        refs = _collect_all_refs(merged)
+        self.assertEqual([], [ref for ref, count in Counter(refs).items() if count > 1])
+
     def test_hierarchical_single_level_preserves_refs_and_updates_links(self) -> None:
         governing = _build_sbom(
             [_build_component("compA", "compA")],

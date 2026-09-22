@@ -6,7 +6,6 @@ import unittest
 from collections import Counter
 from itertools import chain, combinations
 from pathlib import Path
-from typing import Any
 from unittest.mock import patch
 
 from cdxev import merge
@@ -66,7 +65,7 @@ def _build_sbom(
 
 
 def _collect_all_refs(sbom: dict) -> list[str]:
-    def _recurse(d: Any) -> list[str]:
+    def _recurse(d: object) -> list[str]:
         result = []
         match d:
             case dict():

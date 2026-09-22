@@ -13,6 +13,7 @@ from cdxev.auxiliary.sbom_functions import (
     collect_affects_of_vulnerabilities,
     extract_components,
     extract_new_affects,
+    get_all_bom_refs,
     get_bom_refs_from_dependencies,
     get_dependency_by_ref,
     get_identities_for_vulnerabilities,
@@ -47,62 +48,6 @@ def _merge_component_fields(governing_component: dict, incoming_component: dict)
             governing_component[field] = copy.deepcopy(incoming_component[field])
             continue
         governing_component[field] = merger(governing_component[field], incoming_component[field])
-
-# Possible to use different identifiers, but might to false classification
-# e.g. - app and app-logger
-PATH_STYLE_BOM_REF_SEPARATOR = "/"
-
-
-def _capture_path_style_bom_refs(
-    sboms: t.Sequence[dict],
-) -> dict[int, dict[str, t.Any]]:
-    path_style_bom_refs: dict[int, dict[str, t.Any]] = {}
-
-    def _walk(component: dict, parent: t.Optional[dict] = None) -> None:
-        component_ref = component.get("bom-ref", "")
-        parent_ref = parent.get("bom-ref", "") if parent else ""
-        follows_parent = bool(
-            parent_ref and component_ref.startswith(parent_ref + PATH_STYLE_BOM_REF_SEPARATOR)
-        )
-        separator = PATH_STYLE_BOM_REF_SEPARATOR if follows_parent else ""
-        segment = component_ref[len(parent_ref) + 1 :] if follows_parent else ""
-
-        path_style_bom_refs[id(component)] = {
-            "follows_parent": follows_parent,
-            "separator": separator,
-            "segment": segment,
-            "original_ref": component_ref,
-            "has_path_style_child": False,
-        }
-
-        for child in component.get("components", []):
-            _walk(child, component)
-            if path_style_bom_refs[id(child)]["follows_parent"]:
-                path_style_bom_refs[id(component)]["has_path_style_child"] = True
-
-    for sbom in sboms:
-        metadata_component = sbom.get("metadata", {}).get("component", {})
-        if metadata_component:
-            _walk(metadata_component)
-        for component in sbom.get("components", []):
-            _walk(component)
-
-    return path_style_bom_refs
-
-
-def _collect_bom_refs(sbom: dict) -> set[str]:
-    bom_refs = {
-        component.get("bom-ref", "")
-        for component in extract_components(sbom.get("components", []))
-        if component.get("bom-ref", "")
-    }
-
-    metadata_component = sbom.get("metadata", {}).get("component", {})
-    metadata_ref = metadata_component.get("bom-ref", "")
-    if metadata_ref:
-        bom_refs.add(metadata_ref)
-
-    return bom_refs
 
 
 def _ensure_unique_bom_ref(
@@ -198,7 +143,7 @@ def _rebase_hierarchical_subtree_bom_refs(
         relative_ref = original_ref
         old_parent_prefix = original_parent_ref + "/" if original_parent_ref else ""
         if old_parent_prefix and original_ref.startswith(old_parent_prefix):
-            relative_ref = original_ref[len(old_parent_prefix):]
+            relative_ref = original_ref[len(old_parent_prefix) :]
 
         next_parent_ref = parent_ref + "/" + relative_ref
 
@@ -213,9 +158,7 @@ def _rebase_hierarchical_subtree_bom_refs(
         if old_ref != next_parent_ref:
             existing_bom_refs.discard(old_ref)
             existing_bom_refs.add(next_parent_ref)
-            replace_bom_ref_in_sbom(
-                {"components": [component]}, old_ref, next_parent_ref
-            )
+            replace_bom_ref_in_sbom({"components": [component]}, old_ref, next_parent_ref)
             replace_bom_ref_in_sbom(governing_sbom, old_ref, next_parent_ref)
             replace_bom_ref_in_sbom(merged_sbom, old_ref, next_parent_ref)
         else:
@@ -364,9 +307,7 @@ def merge_components(
     list_of_merged_components += list_of_filtered_components
 
     if hierarchical:
-        existing_bom_refs = _collect_bom_refs(governing_sbom) | _collect_bom_refs(
-            sbom_to_be_merged
-        )
+        existing_bom_refs = get_all_bom_refs(governing_sbom) | get_all_bom_refs(sbom_to_be_merged)
         for key in add_to_existing.keys():
             _rebase_hierarchical_subtree_bom_refs(
                 governing_sbom,
@@ -381,8 +322,7 @@ def merge_components(
                 original_parent_refs,
             )
             list_of_subcomponents = (
-                present_component_identities[key].get("components", [])
-                + add_to_existing[key]
+                present_component_identities[key].get("components", []) + add_to_existing[key]
             )
             present_component_identities[key]["components"] = list_of_subcomponents
     else:

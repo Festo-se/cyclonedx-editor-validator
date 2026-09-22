@@ -450,6 +450,7 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
     assigned_bom_refs: dict[ComponentIdentity, str] = {}
 
     if list_of_sboms:
+        retained_bom_refs = get_all_bom_refs(list_of_sboms[0])
         retained_components = get_ref_components_mapping(
             list(extract_components(list_of_sboms[0].get("components", [])))
             + [list_of_sboms[0].get("metadata", {}).get("component", {})]
@@ -511,6 +512,34 @@ def make_bom_refs_unique(list_of_sboms: Sequence[dict]) -> None:
 
                 else:
                     retained_components[reference] = new_components[reference]
+
+            component_refs = {
+                str(component.get("bom-ref"))
+                for component in (
+                    list(extract_components(subsequent_sbom.get("components", [])))
+                    + [subsequent_sbom.get("metadata", {}).get("component", {})]
+                    + get_tool_entries_with_bom_ref(subsequent_sbom)
+                )
+                if component.get("bom-ref")
+            }
+            subsequent_bom_refs = get_all_bom_refs(subsequent_sbom)
+            for reference in sorted(subsequent_bom_refs - component_refs):
+                if reference not in retained_bom_refs:
+                    retained_bom_refs.add(reference)
+                    continue
+
+                index = 1
+                new_bom_ref = f"{reference}-{index}"
+                while new_bom_ref in retained_bom_refs or new_bom_ref in subsequent_bom_refs:
+                    index += 1
+                    new_bom_ref = f"{reference}-{index}"
+
+                replace_bom_ref_in_sbom(subsequent_sbom, reference, new_bom_ref)
+                subsequent_bom_refs.remove(reference)
+                subsequent_bom_refs.add(new_bom_ref)
+                retained_bom_refs.add(new_bom_ref)
+
+            retained_bom_refs.update(subsequent_bom_refs)
 
 
 def unify_bom_refs(list_of_sboms: Sequence[dict]) -> None:

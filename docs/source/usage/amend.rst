@@ -127,7 +127,8 @@ become::
 The operation has the following behavior:
 
 * Top-level component bom-refs remain unchanged.
-* Nesting is processed recursively at any depth, including beneath ``metadata.component``.
+* Nesting is processed recursively at any depth in the top-level ``components`` tree.
+    The ``metadata.component`` tree is skipped.
 * Every bom-ref is treated as an opaque string. Values such as ``1``, arbitrary words, UUIDs, and
     PURLs are preserved in full and are never parsed as path segments.
 * Running the operation repeatedly prepends the hierarchy repeatedly. The operation cannot infer

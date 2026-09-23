@@ -533,6 +533,9 @@ class HierarchicalBomRefs(Operation):
     Components without a bom-ref, or whose parent has no bom-ref, remain unchanged and cause an
     informational log message.
 
+    When used together with `AddBomRef`, select ``add-bom-ref`` before this operation so
+    that generated bom-refs can be included in the hierarchy.
+
     This operation is not enabled by default because it changes existing bom-refs.
     """
 

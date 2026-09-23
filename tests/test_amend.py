@@ -704,7 +704,7 @@ class HierarchicalBomRefsTestCase(unittest.TestCase):
             grandchild["bom-ref"],
         )
 
-    def test_metadata_tree_is_independent_from_top_level_components(self) -> None:
+    def test_metadata_tree_is_skipped(self) -> None:
         sbom = {
             "metadata": {
                 "component": {
@@ -723,8 +723,8 @@ class HierarchicalBomRefsTestCase(unittest.TestCase):
         run_amend(sbom, selected=[HierarchicalBomRefs])
 
         metadata_child = sbom["metadata"]["component"]["components"][0]
-        self.assertEqual("product/firmware", metadata_child["bom-ref"])
-        self.assertEqual("product/firmware/driver", metadata_child["components"][0]["bom-ref"])
+        self.assertEqual("firmware", metadata_child["bom-ref"])
+        self.assertEqual("driver", metadata_child["components"][0]["bom-ref"])
         self.assertEqual("application", sbom["components"][0]["bom-ref"])
         self.assertEqual("application/library", sbom["components"][0]["components"][0]["bom-ref"])
 

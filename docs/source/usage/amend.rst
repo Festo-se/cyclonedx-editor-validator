@@ -9,7 +9,8 @@ amend
     :path: amend
 
 .. note::
-    The order of operations cannot be controlled. If you want to ensure two operations run in a certain order you must run the command twice, each time with a different set of operations.
+    Operations run in the order specified with ``--operation``. If multiple operations are selected,
+    place operations that provide input to another operation first.
 
 Examples
 --------
@@ -30,9 +31,8 @@ Examples
     # Build hierarchical bom-refs from nested components.
     cdx-ev amend --operation hierarchical-bom-refs bom.json
 
-    # Add missing bom-refs first, then build the hierarchy in a separate run.
-    cdx-ev amend --operation add-bom-ref bom.json --output bom.json
-    cdx-ev amend --operation hierarchical-bom-refs bom.json
+    # Add missing bom-refs first, then build the hierarchy in the same run.
+    cdx-ev amend --operation add-bom-ref --operation hierarchical-bom-refs bom.json
 
 Operation details
 -----------------
@@ -127,7 +127,8 @@ become::
 The operation has the following behavior:
 
 * Top-level component bom-refs remain unchanged.
-* Nesting is processed recursively at any depth, including beneath ``metadata.component``.
+* Nesting is processed recursively at any depth in the top-level ``components`` tree.
+    The ``metadata.component`` tree is skipped.
 * Every bom-ref is treated as an opaque string. Values such as ``1``, arbitrary words, UUIDs, and
     PURLs are preserved in full and are never parsed as path segments.
 * Running the operation repeatedly prepends the hierarchy repeatedly. The operation cannot infer
@@ -139,6 +140,10 @@ The operation has the following behavior:
 * Every ``bom-ref`` in the document participates in collision detection, not only component
     bom-refs. A generated path that conflicts with any existing bom-ref receives an incrementing
     suffix such as ``-1``.
+* The separator between parent and child refs can be configured with ``--separator``; it defaults
+    to ``/``.
+* When used together with ``add-bom-ref``, place ``add-bom-ref`` first so generated refs are also
+    included in the hierarchy.
 * A component without a bom-ref, or whose parent has no bom-ref, cannot be adjusted. The operation
     logs this at INFO level, leaves that relationship unchanged, and continues with the remaining
     component tree.

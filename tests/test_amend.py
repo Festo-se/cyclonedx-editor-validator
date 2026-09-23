@@ -704,7 +704,7 @@ class HierarchicalBomRefsTestCase(unittest.TestCase):
             grandchild["bom-ref"],
         )
 
-    def test_metadata_tree_is_independent_from_top_level_components(self) -> None:
+    def test_metadata_tree_is_skipped(self) -> None:
         sbom = {
             "metadata": {
                 "component": {
@@ -723,28 +723,48 @@ class HierarchicalBomRefsTestCase(unittest.TestCase):
         run_amend(sbom, selected=[HierarchicalBomRefs])
 
         metadata_child = sbom["metadata"]["component"]["components"][0]
-        self.assertEqual("product/firmware", metadata_child["bom-ref"])
-        self.assertEqual("product/firmware/driver", metadata_child["components"][0]["bom-ref"])
+        self.assertEqual("firmware", metadata_child["bom-ref"])
+        self.assertEqual("driver", metadata_child["components"][0]["bom-ref"])
         self.assertEqual("application", sbom["components"][0]["bom-ref"])
         self.assertEqual("application/library", sbom["components"][0]["components"][0]["bom-ref"])
 
-    def test_add_bom_ref_must_run_before_hierarchical_bom_refs(self) -> None:
+    def test_add_bom_ref_runs_before_hierarchical_bom_refs(self) -> None:
         sbom = {
             "components": [
                 {
                     "name": "application",
-                    "bom-ref": "application",
                     "components": [{"name": "library"}],
                 }
             ]
         }
-
-        with self.assertLogs("cdxev.amend.operations", level="INFO") as logs:
-            run_amend(sbom, selected=[AddBomRef, HierarchicalBomRefs])
-
+        parent = sbom["components"][0]
         child = sbom["components"][0]["components"][0]
-        self.assertNotIn("/", child["bom-ref"])
-        self.assertIn("component library", logs.output[0])
+        self.assertNotIn("bom-ref", parent)
+        self.assertNotIn("bom-ref", child)
+
+        run_amend(sbom, selected=[AddBomRef, HierarchicalBomRefs])
+
+        parent_ref = parent["bom-ref"]
+        child_ref = child["bom-ref"]
+        self.assertTrue(child_ref.startswith(parent_ref + "/"))
+
+    def test_uses_configured_separator(self) -> None:
+        sbom = {
+            "components": [
+                {
+                    "bom-ref": "application",
+                    "components": [{"bom-ref": "library"}],
+                }
+            ]
+        }
+
+        run_amend(
+            sbom,
+            selected=[HierarchicalBomRefs],
+            config={HierarchicalBomRefs: {"separator": ":"}},
+        )
+
+        self.assertEqual("application:library", sbom["components"][0]["components"][0]["bom-ref"])
 
     def test_avoids_collision_with_existing_ref(self) -> None:
         sbom = {

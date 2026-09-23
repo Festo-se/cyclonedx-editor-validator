@@ -525,64 +525,83 @@ class HierarchicalBomRefs(Operation):
     """
     Prepends parent bom-refs to the bom-refs of nested components.
 
-    Every nested component is rewritten to ``<parent bom-ref>/<own bom-ref>`` recursively. Each
+    Every nested component is rewritten to ``<parent bom-ref><separator><own bom-ref>``
+    recursively. Each
     bom-ref is treated as an opaque string. Top-level components remain unchanged. References to
     rewritten components are updated throughout the SBOM. Every bom-ref in the document is
     considered when detecting collisions, which are resolved with an incrementing numeric suffix.
     Components without a bom-ref, or whose parent has no bom-ref, remain unchanged and cause an
     informational log message.
 
+    When used together with `AddBomRef`, select ``add-bom-ref`` before this operation so
+    that generated bom-refs can be included in the hierarchy.
+
     This operation is not enabled by default because it changes existing bom-refs.
     """
 
+    __sbom: dict
+    __assigned_refs: set[str]
+    __parents: dict[int, dict]
+    separator: str
+
+    def __init__(self, separator: str = "/") -> None:
+        """
+        :param separator: String to place between parent and child bom-refs.
+        """
+        self.separator = separator
+
     def prepare(self, sbom: dict) -> None:
-        assigned_refs = get_all_bom_refs(sbom)
+        self.__sbom = sbom
+        self.__assigned_refs = get_all_bom_refs(sbom)
+        self.__parents = {}
 
-        metadata_component = sbom.get("metadata", {}).get("component")
+    def handle_metadata(self, metadata: dict) -> None:
+        metadata_component = metadata.get("component")
         if isinstance(metadata_component, dict):
-            self._prepend_parent_refs(sbom, metadata_component, assigned_refs)
+            self._remember_children(metadata_component)
 
-        for component in sbom.get("components", []):
-            self._prepend_parent_refs(sbom, component, assigned_refs)
+    def handle_component(self, component: dict) -> None:
+        parent = self.__parents.get(id(component))
+        if parent is not None:
+            self._prepend_parent_ref(parent, component)
+        self._remember_children(component)
 
-    def _prepend_parent_refs(
-        self,
-        sbom: dict,
-        parent: dict,
-        assigned_refs: set[str],
-    ) -> None:
+    def _remember_children(self, parent: dict) -> None:
+        for child in parent.get("components", []):
+            if isinstance(child, dict):
+                self.__parents[id(child)] = parent
+
+    def _prepend_parent_ref(self, parent: dict, child: dict) -> None:
         parent_ref = parent.get("bom-ref")
         if not isinstance(parent_ref, str) or not parent_ref:
             parent_ref = None
 
-        children = parent.get("components", [])
-        if children and parent_ref is None:
+        if parent_ref is None:
             logger.info(
-                "Cannot prepend a parent bom-ref to nested components of %s because the parent "
+                "Cannot prepend a parent bom-ref to component %s because the parent "
                 "component has no bom-ref.",
-                parent.get("name", "<unnamed>"),
+                child.get("name", "<unnamed>"),
             )
+            return
 
-        for child in children:
-            old_child_ref = child.get("bom-ref")
-            if parent_ref and isinstance(old_child_ref, str) and old_child_ref:
-                desired_child_ref = parent_ref + "/" + old_child_ref
-                assigned_refs.discard(old_child_ref)
-                new_child_ref = self._ensure_unique_ref(desired_child_ref, assigned_refs)
+        old_child_ref = child.get("bom-ref")
+        if not isinstance(old_child_ref, str) or not old_child_ref:
+            logger.info(
+                "Cannot prepend parent bom-ref %s to component %s because the component has "
+                "no bom-ref.",
+                parent_ref,
+                child.get("name", "<unnamed>"),
+            )
+            return
 
-                if new_child_ref != old_child_ref:
-                    replace_bom_ref_in_sbom(sbom, old_child_ref, new_child_ref)
-                    child["bom-ref"] = new_child_ref
-                assigned_refs.add(new_child_ref)
-            elif parent_ref:
-                logger.info(
-                    "Cannot prepend parent bom-ref %s to component %s because the component has "
-                    "no bom-ref.",
-                    parent_ref,
-                    child.get("name", "<unnamed>"),
-                )
+        desired_child_ref = parent_ref + self.separator + old_child_ref
+        self.__assigned_refs.discard(old_child_ref)
+        new_child_ref = self._ensure_unique_ref(desired_child_ref, self.__assigned_refs)
 
-            self._prepend_parent_refs(sbom, child, assigned_refs)
+        if new_child_ref != old_child_ref:
+            replace_bom_ref_in_sbom(self.__sbom, old_child_ref, new_child_ref)
+            child["bom-ref"] = new_child_ref
+        self.__assigned_refs.add(new_child_ref)
 
     @staticmethod
     def _ensure_unique_ref(desired_ref: str, assigned_refs: set[str]) -> str:

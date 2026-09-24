@@ -10,6 +10,19 @@ import typing as t
 from cdxev.log import LogMessage
 
 
+def _fingerprint(file_path: pathlib.Path | None, message: LogMessage) -> str:
+    identity = "\0".join(
+        (
+            file_path.name if file_path is not None else "",
+            message.message,
+            message.description,
+            message.module_name or "",
+            str(message.line_start or ""),
+        )
+    )
+    return hashlib.sha256(identity.encode()).hexdigest()
+
+
 class WarningsNgReporter(logging.Handler):
     """
     Reporter which writes in a JSON format for Jenkins's static analysis model. See
@@ -67,14 +80,14 @@ class WarningsNgReporter(logging.Handler):
 
         issue: dict[str, t.Union[str, int]] = {
             "origin": "CycloneDX Editor Validator",
-            "fingerprint": "unknown",
+            "fingerprint": _fingerprint(self.file_path, record.msg),
             "type": "SBOM",
             "category": "QA",
             "message": record.msg.message,
             "description": record.msg.description,
             "moduleName": module_name,
             "severity": record.levelname,
-            "lineStart": line_start if line_start is not None else 0,
+            "lineStart": line_start if line_start is not None else 1,
         }
 
         if file_name is not None:
@@ -150,12 +163,12 @@ class GitLabCQReporter(logging.Handler):
         issue: dict[str, t.Union[str, int, dict]] = {
             "description": record.msg.description,
             "check_name": "CycloneDX Editor Validator",
-            "fingerprint": hashlib.md5("unknown".encode(), usedforsecurity=False).hexdigest(),
+            "fingerprint": _fingerprint(self.file_path, record.msg),
             "severity": "blocker",
             "location": {
                 "path": file_name,
                 "lines": {
-                    "begin": line_start if line_start is not None else 0,
+                    "begin": line_start if line_start is not None else 1,
                 },
             },
         }

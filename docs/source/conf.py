@@ -6,8 +6,6 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-from typing import Any
-
 import sphinx
 import sphinx.application
 from sphinx.ext import autodoc
@@ -33,6 +31,9 @@ templates_path = ["_templates"]
 # Make sure the target is unique
 autosectionlabel_prefix_document = True
 
+# sphinx-argparse emits repeated generic headings for each VEX subcommand.
+suppress_warnings = ["autosectionlabel.usage/vex"]
+
 # Prevents double-dashes being converted to en-dashes in argparse output.
 smartquotes_action = "qe"
 
@@ -57,7 +58,9 @@ class OperationDocumenter(autodoc.MethodDocumenter):
     content_indent = ""
 
     @classmethod
-    def can_document_member(cls, member: Any, membername: str, isattr: bool, parent: Any) -> bool:
+    def can_document_member(
+        cls, member: object, membername: str, isattr: bool, parent: object
+    ) -> bool:
         return False
 
     # do not add a header to the docstring

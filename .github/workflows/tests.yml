@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --only-group docs --frozen
       - name: Test build of documentation
-        run: uv run sphinx-build -a -E docs/source/ docs/build/
+        run: uv run sphinx-build -a -E -W --keep-going docs/source/ docs/build/
 
   static_analysis:
 

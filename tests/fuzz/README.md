@@ -52,7 +52,6 @@ required by Atheris) and a `main()` that wires up `atheris.Setup` / `atheris.Fuz
 The fuzzers are built and executed from the configuration in
 [`.clusterfuzzlite/`](../../.clusterfuzzlite/) by the following workflows:
 
-- `.github/workflows/cflite_pr.yml` – fuzzes code changed in a pull request.
 - `.github/workflows/cflite_batch.yml` – longer batch fuzzing on `main` and nightly.
 - `.github/workflows/cflite_cron.yml` – weekly corpus pruning and coverage report.
 

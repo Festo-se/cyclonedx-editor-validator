@@ -34,7 +34,9 @@ def TestOneInput(data: bytes) -> None:
         amend_command.run(sbom, selected=[HierarchicalBomRefs])
     except AppError:
         pass
-    except (KeyError, ValueError, TypeError, RecursionError):
+    except (KeyError, ValueError, TypeError):
+        # The generated model is intentionally not schema-valid. The public CLI
+        # converts these malformed-structure failures into an application error.
         pass
 
 

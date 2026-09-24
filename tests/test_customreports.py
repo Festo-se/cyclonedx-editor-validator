@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 from unittest import mock
 
 import cdxev.log as log
-from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter
+from cdxev.validator.customreports import GitLabCQReporter, WarningsNgReporter, _fingerprint
 
 
 # noinspection PyUnresolvedReferences
@@ -41,7 +41,7 @@ class WarningsNgTestCase(unittest.TestCase):
         self.assertEqual(str(self.logger.handlers[0].target), self.expected_target)
         expected_buffer = {
             "origin": "CycloneDX Editor Validator",
-            "fingerprint": "unknown",
+            "fingerprint": _fingerprint(Path(self.expected_file), msg_obj),
             "type": "SBOM",
             "category": "QA",
             "severity": "ERROR",
@@ -65,7 +65,7 @@ class WarningsNgTestCase(unittest.TestCase):
         self.assertEqual(str(self.logger.handlers[0].target), self.expected_target)
         expected_buffer = {
             "origin": "CycloneDX Editor Validator",
-            "fingerprint": "unknown",
+            "fingerprint": _fingerprint(Path(self.expected_file), msg_obj),
             "type": "SBOM",
             "category": "QA",
             "severity": "ERROR",
@@ -74,7 +74,7 @@ class WarningsNgTestCase(unittest.TestCase):
             "message": message,
             "description": description,
             "moduleName": module_name,
-            "lineStart": 0,
+            "lineStart": 1,
         }
         self.assertDictEqual(self.logger.handlers[0].buffer["issues"][-1], expected_buffer)
 
@@ -89,7 +89,7 @@ class WarningsNgTestCase(unittest.TestCase):
         self.assertEqual(str(self.logger.handlers[0].target), self.expected_target)
         expected_buffer = {
             "origin": "CycloneDX Editor Validator",
-            "fingerprint": "unknown",
+            "fingerprint": _fingerprint(Path(self.expected_file), msg_obj),
             "type": "SBOM",
             "category": "QA",
             "severity": "ERROR",
@@ -130,7 +130,7 @@ class WarningsNgTestCase(unittest.TestCase):
         self.assertEqual(str(self.logger.handlers[0].target), self.expected_target)
         expected_buffer = {
             "origin": "CycloneDX Editor Validator",
-            "fingerprint": "unknown",
+            "fingerprint": _fingerprint(None, msg_obj),
             "type": "SBOM",
             "category": "QA",
             "severity": "ERROR",
@@ -160,6 +160,17 @@ class TestGitLabCQReporter(unittest.TestCase):
         self.assertEqual(self.reporter.buffer[0]["description"], "test")
         self.assertEqual(self.reporter.buffer[0]["location"]["path"], "test.log")
         self.assertEqual(self.reporter.buffer[0]["location"]["lines"]["begin"], 10)
+
+    def test_findings_have_distinct_stable_fingerprints(self):
+        first = log.LogMessage("Invalid SBOM", "First problem", "component", 10)
+        second = log.LogMessage("Invalid SBOM", "Second problem", "component", 10)
+
+        assert _fingerprint(self.file_path, first) == _fingerprint(self.file_path, first)
+        assert _fingerprint(self.file_path, first) == _fingerprint(
+            Path("another-workspace") / self.file_path.name,
+            first,
+        )
+        assert _fingerprint(self.file_path, first) != _fingerprint(self.file_path, second)
 
     def test_type_error(self):
         record = mock.MagicMock()

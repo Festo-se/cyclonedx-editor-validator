@@ -33,7 +33,7 @@ from cdxev.build_public_bom import build_public_bom
 from cdxev.error import AppError, InputFileError
 from cdxev.initialize_sbom import initialize_sbom
 from cdxev.list_command import list_command
-from cdxev.log import configure_logging
+from cdxev.log import LogMessage, configure_logging
 from cdxev.merge import merge
 from cdxev.validator import validate_sbom
 from cdxev.vex import vex
@@ -62,6 +62,14 @@ def main() -> t.Union[int, t.Any]:
         return args.cmd_handler(args)
     except AppError as ex:
         logger.exception(ex.details)
+        return Status.APP_ERROR
+    except (KeyError, IndexError, TypeError, ValueError, RecursionError) as ex:
+        logger.error(
+            LogMessage(
+                "Failed to process SBOM",
+                f"The input has an unsupported or malformed structure: {ex}",
+            )
+        )
         return Status.APP_ERROR
 
 
@@ -523,8 +531,8 @@ def create_validation_parser(
         "--filename-pattern",
         help=(
             "Regex for validation of filename. If not specified, only 'bom.json' and "
-            "'*.cdx.json' filenames are accepted. To disable filename validation altogether, use "
-            "--no-filename-validation."
+            "filenames ending in '.cdx.json' are accepted. To disable filename validation "
+            "altogether, use --no-filename-validation."
         ),
         default="",
     )

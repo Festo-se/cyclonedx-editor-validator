@@ -3,7 +3,7 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Festo-se/cyclonedx-editor-validator/badge)](https://scorecard.dev/viewer/?uri=github.com/Festo-se/cyclonedx-editor-validator)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10485/badge)](https://www.bestpractices.dev/projects/10485)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
+[![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)](https://github.com/astral-sh/ty)
 [![Static Badge](https://img.shields.io/badge/CycloneDX-v1.2%2C1.3%2C1.4%2C1.5%2C1.6%2C1.7-blue?link=https%3A%2F%2Fcyclonedx.org%2Fdocs%2F1.7%2Fjson%2F%23)](https://cyclonedx.org/docs/1.7/json/)
 
 # CycloneDX Editor/Validator

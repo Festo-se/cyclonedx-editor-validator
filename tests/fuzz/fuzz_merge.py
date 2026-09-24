@@ -35,9 +35,7 @@ def TestOneInput(data: bytes) -> None:
     except AppError:
         # AppError is the tool's own, intentional way of rejecting bad SBOMs.
         pass
-    except (KeyError, ValueError, TypeError, RecursionError):
-        # Malformed sub-structures can legitimately surface these; they're caught
-        # by the CLI layer. Anything else is a genuine finding worth a crash.
+    except (KeyError, ValueError, TypeError):
         pass
 
 

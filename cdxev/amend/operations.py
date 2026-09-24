@@ -17,7 +17,7 @@ a judgment call. Others again might add potentially false claims if used without
 Examples:
 ^^^^^^^^^
 
-* *:py:class:`AddBomRef` is safe.* It never does anything to an SBOM that could change its
+* :py:class:`AddBomRef` is safe. It never does anything to an SBOM that could change its
   meaning.
 * :py:class:`Compositions` introduces an intentional uncertainty about the completeness of the
   SBOM's information. *We deem it okay to run by default because at worst it means the SBOM is

@@ -48,7 +48,7 @@ def TestOneInput(data: bytes) -> None:
         # AppError is the tool's intended way of rejecting unprocessable SBOMs
         # (e.g. missing specVersion, unknown spec version).
         pass
-    except (KeyError, ValueError, TypeError, RecursionError):
+    except (KeyError, ValueError, TypeError):
         pass
 
 

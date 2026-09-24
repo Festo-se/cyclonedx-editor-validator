@@ -41,7 +41,7 @@ def TestOneInput(data: bytes) -> None:
         pass
     except AppError:
         pass
-    except (KeyError, TypeError, RecursionError):
+    except (KeyError, TypeError):
         pass
 
 

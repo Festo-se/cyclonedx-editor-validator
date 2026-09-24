@@ -34,7 +34,7 @@ def TestOneInput(data: bytes) -> None:
         build_public_bom(sbom, None, ext_ref_regex)
     except AppError:
         pass
-    except (KeyError, ValueError, TypeError, RecursionError):
+    except (KeyError, ValueError, TypeError):
         pass
 
 

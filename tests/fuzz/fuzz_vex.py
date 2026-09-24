@@ -35,7 +35,7 @@ def TestOneInput(data: bytes) -> None:
         vex(sub_command, sbom, key=key, value=value, schema=schema, vul_id=vul_id)
     except AppError:
         pass
-    except (KeyError, ValueError, TypeError, RecursionError):
+    except (KeyError, ValueError, TypeError):
         pass
 
 

@@ -37,7 +37,7 @@ def TestOneInput(data: bytes) -> None:
         # The cyclonedx-python-lib deserializer raises this to reject malformed
         # SBOMs (e.g. invalid purl/UUID). That is its intended boundary behavior.
         pass
-    except (KeyError, ValueError, TypeError, RecursionError):
+    except (KeyError, ValueError, TypeError):
         pass
 
 

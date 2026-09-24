@@ -70,7 +70,7 @@ The following things are to consider before submitting a pull request.
 
 2. If you provide a new feature also include tests for it.
 
-3. Please ensure that types are correct according to `mypy <mypy_url>`_.
+3. Please ensure that types are correct according to `ty <ty_url>`_.
 
 4. All submitted code should conform to `PEP8 <pep8_url>`_ and `ruff <ruff_url>`_.
 
@@ -78,7 +78,7 @@ The following things are to consider before submitting a pull request.
 
 .. _ruff_url: https://docs.astral.sh/ruff/
 .. _pep8_url: https://www.python.org/dev/peps/pep-0008/
-.. _mypy_url: https://www.mypy-lang.org/
+.. _ty_url: https://docs.astral.sh/ty/
 
 ---------------------
 Commit Message Format
@@ -251,7 +251,7 @@ Typical Workflow and Contribution
 
     uv run coverage run -m pytest
     uv run ruff check cdxev tests --fix
-    uv run mypy --install-types --non-interactive --config-file=pyproject.toml
+    uv run ty check
     uv run pre-commit run --all-files
 
 5. Commit changes (pre-commit auto-runs).

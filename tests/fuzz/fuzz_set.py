@@ -82,7 +82,7 @@ def TestOneInput(data: bytes) -> None:
         run(sbom, updates, cfg)
     except AppError:
         pass
-    except (KeyError, ValueError, TypeError, RecursionError):
+    except (KeyError, ValueError, TypeError):
         pass
 
 

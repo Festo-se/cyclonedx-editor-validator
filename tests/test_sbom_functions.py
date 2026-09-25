@@ -735,6 +735,13 @@ class TestVulnerabilities(unittest.TestCase):
             )
         )
 
+        self.assertFalse(
+            sbf.compare_version_range(
+                "vers:nuget/ooooooooooooooooooo",
+                "vers:nuget/oooooooooooooooooooo",
+            )
+        )
+
         self.assertTrue(
             sbf.compare_version_range(
                 "vers:pypi/>=1.0.0-beta1|<=1.7.5|>=7.0.0|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0",

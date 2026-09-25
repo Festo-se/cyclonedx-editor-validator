@@ -93,11 +93,8 @@ class UpdateIdentity(ComponentIdentity):
             try:
                 vers = univers.version_range.VersionRange.from_string(version_range)
             except Exception as exc:
-                # univers raises a variety of unrelated exception types for malformed
-                # version ranges (InvalidVersion, InvalidNuGetVersion, InvalidVersionRange,
-                # ValueError, ...). Normalize all of them into a ValueError, which the
-                # callers (the CLI usage_error handler and _validate_update_list) already
-                # expect and translate into a clean error.
+                # Normalize the third-party parser's malformed-input errors into a
+                # ValueError, which callers already translate into a clean error.
                 raise ValueError(str(exc)) from exc
             coordinates = CoordinatesWithVersionRange(name, group, None, vers)
         else:
@@ -166,16 +163,14 @@ class CoordinatesWithVersionRange(Coordinates):
                 try:
                     if self.version_range.version_class(other.version) in self.version_range:
                         return True
-                except univers.versions.InvalidVersion:
+                except Exception:
                     possible_versions = []
                     for version_type in univers.versions.AVAILABLE_VERSIONS:
                         try:
                             if version_type.is_valid(other.version):
                                 possible_versions.append(str(version_type.__name__))
-                        except univers.versions.nuget.InvalidNuGetVersion:
-                            # Some validators (notably NuGet) can raise
-                            # for malformed inputs while probing support.
-                            # Ignore and keep checking remaining schemas.
+                        except Exception as exc:
+                            logger.debug("Version validator rejected malformed input: %s", exc)
                             continue
                     version_is_of = " which is valid under the schemas: "
 
@@ -185,7 +180,6 @@ class CoordinatesWithVersionRange(Coordinates):
                         for version in possible_versions:
                             version_is_of += version + ", "
                         version_is_of = version_is_of[:-2]
-                    logger = logging.getLogger(__name__)
                     logger.warning(
                         LogMessage(
                             "Incompatible version ranges",
@@ -273,7 +267,7 @@ class CoordinatesRegexIdentity:
             try:
                 if self.version_range.version_class(comp_version) not in self.version_range:
                     return False
-            except univers.versions.InvalidVersion:
+            except Exception:
                 return False
 
         return True
@@ -581,7 +575,7 @@ def _parse_coordinates_regex(
         try:
             from_string = univers.version_range.VersionRange.from_string
             version_range_obj = from_string(vr)
-        except (ValueError, univers.versions.InvalidVersion) as exc:
+        except Exception as exc:
             raise AppError(
                 "Invalid set file",
                 f"An update object has an invalid version-range: {exc}",

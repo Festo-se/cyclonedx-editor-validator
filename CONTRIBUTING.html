@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contributing &mdash; CycloneDX Editor Validator Tool 0.35.0 documentation</title>
+  <title>Contributing &mdash; CycloneDX Editor Validator Tool 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/css/festo-web-essentials.css" />
@@ -15,9 +15,9 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=ca1b380b"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -182,7 +182,7 @@ To get an overview of the project, read the <a class="reference internal" href="
 <ol class="arabic simple">
 <li><p>All <a class="reference external" href="https://github.com/Festo-se/cyclonedx-editor-validator/tree/main/tests">tests</a> should be passing.</p></li>
 <li><p>If you provide a new feature also include tests for it.</p></li>
-<li><p>Please ensure that types are correct according to <a class="reference external" href="mypy_url">mypy</a>.</p></li>
+<li><p>Please ensure that types are correct according to <a class="reference external" href="ty_url">ty</a>.</p></li>
 <li><p>All submitted code should conform to <a class="reference external" href="pep8_url">PEP8</a> and <a class="reference external" href="ruff_url">ruff</a>.</p></li>
 <li><p>The code should be python 3.11 compliant.</p></li>
 </ol>
@@ -323,7 +323,7 @@ uv<span class="w"> </span>sync
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>coverage<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </span>pytest
 uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>cdxev<span class="w"> </span>tests<span class="w"> </span>--fix
-uv<span class="w"> </span>run<span class="w"> </span>mypy<span class="w"> </span>--install-types<span class="w"> </span>--non-interactive<span class="w"> </span>--config-file<span class="o">=</span>pyproject.toml
+uv<span class="w"> </span>run<span class="w"> </span>ty<span class="w"> </span>check
 uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
 </pre></div>
 </div>

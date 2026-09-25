@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>amend &mdash; CycloneDX Editor Validator Tool 0.35.0 documentation</title>
+  <title>amend &mdash; CycloneDX Editor Validator Tool 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/festo-web-essentials.css" />
@@ -15,9 +15,9 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ca1b380b"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -55,6 +55,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#cdx-ev-amend-positional-arguments">Positional Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cdx-ev-amend-named-arguments">Named Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cdx-ev-amend-options-for-add-license-text">Options for ‘add-license-text’</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cdx-ev-amend-options-for-hierarchical-bom-refs">Options for ‘hierarchical-bom-refs’</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#operation-details">Operation details</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#add-bom-ref">add-bom-ref</a></li>
@@ -62,6 +63,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#compositions">compositions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#default-author">default-author</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#delete-ambiguous-licenses">delete-ambiguous-licenses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hierarchical-bom-refs">hierarchical-bom-refs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#infer-supplier">infer-supplier</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#license-name-to-id">license-name-to-id</a></li>
 </ul>
@@ -131,6 +133,8 @@ id).</p>
 <dt>delete-ambiguous-licenses:</dt><dd><p>Deletes license claims which are solely identified by the ‘name’
 property.</p>
 </dd>
+<dt>hierarchical-bom-refs:</dt><dd><p>Prepends parent bom-refs to the bom-refs of nested components.</p>
+</dd>
 <dt>infer-supplier [default]:</dt><dd><p>Attempts to infer component supplier from other fields.</p>
 </dd>
 <dt>license-name-to-id [default]:</dt><dd><p>Attempts to infer SPDX ids from license names.</p>
@@ -140,7 +144,7 @@ property.</p>
 </p>
 <div class="highlight-default notranslate" id="cdx-ev-amend"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cdx</span><span class="o">-</span><span class="n">ev</span> <span class="n">amend</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">operation</span> <span class="o">&lt;</span><span class="n">operation</span><span class="o">&gt;</span><span class="p">]</span>
                     <span class="p">[</span><span class="o">--</span><span class="n">help</span><span class="o">-</span><span class="n">operation</span> <span class="o">&lt;</span><span class="n">operation</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">license</span><span class="o">-</span><span class="nb">dir</span> <span class="n">LICENSE_DIR</span><span class="p">]</span>
-                    <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
+                    <span class="p">[</span><span class="o">--</span><span class="n">separator</span> <span class="n">SEPARATOR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">]</span>
                     <span class="p">[</span><span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -156,11 +160,11 @@ property.</p>
 <span id="create_parser-named-arguments"></span><h2>Named Arguments<a class="headerlink" href="#cdx-ev-amend-named-arguments" title="Link to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>--operation</kbd></dt>
-<dd><p>Possible choices: add-bom-ref, add-license-text, compositions, default-author, delete-ambiguous-licenses, infer-supplier, license-name-to-id</p>
+<dd><p>Possible choices: add-bom-ref, add-license-text, compositions, default-author, delete-ambiguous-licenses, hierarchical-bom-refs, infer-supplier, license-name-to-id</p>
 <p>Select an operation to run. Can be provided more than once to run multiple operations in one run.</p>
 </dd>
 <dt><kbd>--help-operation</kbd></dt>
-<dd><p>Possible choices: add-bom-ref, add-license-text, compositions, default-author, delete-ambiguous-licenses, infer-supplier, license-name-to-id</p>
+<dd><p>Possible choices: add-bom-ref, add-license-text, compositions, default-author, delete-ambiguous-licenses, hierarchical-bom-refs, infer-supplier, license-name-to-id</p>
 <p>Displays details about an operation and exits afterwards.</p>
 </dd>
 <dt><kbd>--output, -o</kbd></dt>
@@ -176,9 +180,19 @@ property.</p>
 </dd>
 </dl>
 </section>
+<section id="cdx-ev-amend-options-for-hierarchical-bom-refs">
+<span id="create_parser-options-for-'hierarchical-bom-refs'"></span><h2>Options for ‘hierarchical-bom-refs’<a class="headerlink" href="#cdx-ev-amend-options-for-hierarchical-bom-refs" title="Link to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>--separator</kbd></dt>
+<dd><p>String to place between parent and child bom-refs.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">'/'</span></code></p>
+</dd>
+</dl>
+</section>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The order of operations cannot be controlled. If you want to ensure two operations run in a certain order you must run the command twice, each time with a different set of operations.</p>
+<p>Operations run in the order specified with <code class="docutils literal notranslate"><span class="pre">--operation</span></code>. If multiple operations are selected,
+place operations that provide input to another operation first.</p>
 </div>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
@@ -192,6 +206,12 @@ cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span clas
 <span class="c1"># Afterwards, run the delete-ambiguous-licenses operation.</span>
 cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>add-license-text<span class="w"> </span>--license-dir<span class="w"> </span>./license_texts<span class="w"> </span>bom.json<span class="w"> </span>--output<span class="w"> </span>bom.json
 cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>delete-ambiguous-licenses<span class="w"> </span>bom.json
+
+<span class="c1"># Build hierarchical bom-refs from nested components.</span>
+cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>hierarchical-bom-refs<span class="w"> </span>bom.json
+
+<span class="c1"># Add missing bom-refs first, then build the hierarchy in the same run.</span>
+cdx-ev<span class="w"> </span>amend<span class="w"> </span>--operation<span class="w"> </span>add-bom-ref<span class="w"> </span>--operation<span class="w"> </span>hierarchical-bom-refs<span class="w"> </span>bom.json
 </pre></div>
 </div>
 </section>
@@ -253,6 +273,106 @@ informational value beyond the fact that some form of license is present.
 In certain cases it can therefore be beneficial to remove such clutter from an SBOM.</p>
 <p>Because of the risk involved in accidentally removing important data, this operation is
 disabled by default.</p>
+</section>
+<section id="hierarchical-bom-refs">
+<h3>hierarchical-bom-refs<a class="headerlink" href="#hierarchical-bom-refs" title="Link to this heading"></a></h3>
+<p>Prepends parent bom-refs to the bom-refs of nested components.</p>
+<p>Every nested component is rewritten to <code class="docutils literal notranslate"><span class="pre">&lt;parent</span> <span class="pre">bom-ref&gt;&lt;separator&gt;&lt;own</span> <span class="pre">bom-ref&gt;</span></code>
+recursively. Each
+bom-ref is treated as an opaque string. Top-level components remain unchanged. References to
+rewritten components are updated throughout the SBOM. Every bom-ref in the document is
+considered when detecting collisions, which are resolved with an incrementing numeric suffix.
+Components without a bom-ref, or whose parent has no bom-ref, remain unchanged and cause an
+informational log message.</p>
+<p>When used together with <cite>AddBomRef</cite>, select <code class="docutils literal notranslate"><span class="pre">add-bom-ref</span></code> before this operation so
+that generated bom-refs can be included in the hierarchy.</p>
+<p>This operation is not enabled by default because it changes existing bom-refs.</p>
+<p>This operation follows structural containment expressed by a component’s <code class="docutils literal notranslate"><span class="pre">components</span></code> array.
+It does not infer hierarchy from <code class="docutils literal notranslate"><span class="pre">dependencies</span></code> and does not place ordinary top-level
+<code class="docutils literal notranslate"><span class="pre">components</span></code> beneath <code class="docutils literal notranslate"><span class="pre">metadata.component</span></code>.</p>
+<p>For example, these nested component references:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">"bom-ref"</span><span class="p">:</span> <span class="s2">"module-a"</span><span class="p">,</span>
+    <span class="s2">"components"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"bom-ref"</span><span class="p">:</span> <span class="s2">"library-b"</span><span class="p">,</span>
+            <span class="s2">"components"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">"bom-ref"</span><span class="p">:</span> <span class="s2">"application-c"</span><span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>become:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">"bom-ref"</span><span class="p">:</span> <span class="s2">"module-a"</span><span class="p">,</span>
+    <span class="s2">"components"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"bom-ref"</span><span class="p">:</span> <span class="s2">"module-a/library-b"</span><span class="p">,</span>
+            <span class="s2">"components"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">"bom-ref"</span><span class="p">:</span> <span class="s2">"module-a/library-b/application-c"</span><span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The operation has the following behavior:</p>
+<ul class="simple">
+<li><p>Top-level component bom-refs remain unchanged.</p></li>
+<li><dl class="simple">
+<dt>Nesting is processed recursively at any depth in the top-level <code class="docutils literal notranslate"><span class="pre">components</span></code> tree.</dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">metadata.component</span></code> tree is skipped.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Every bom-ref is treated as an opaque string. Values such as <code class="docutils literal notranslate"><span class="pre">1</span></code>, arbitrary words, UUIDs, and</dt><dd><p>PURLs are preserved in full and are never parsed as path segments.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Running the operation repeatedly prepends the hierarchy repeatedly. The operation cannot infer</dt><dd><p>from an opaque bom-ref whether a prefix was added by an earlier run.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Internal references defined by the supported CycloneDX 1.2 through 1.7 specifications are</dt><dd><p>updated recursively. This includes dependency, composition, vulnerability, annotation,
+evidence, declaration, requirement, formulation, cryptography, patent, and citation links.
+Unrelated strings and external reference URLs are not changed.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Every <code class="docutils literal notranslate"><span class="pre">bom-ref</span></code> in the document participates in collision detection, not only component</dt><dd><p>bom-refs. A generated path that conflicts with any existing bom-ref receives an incrementing
+suffix such as <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The separator between parent and child refs can be configured with <code class="docutils literal notranslate"><span class="pre">--separator</span></code>; it defaults</dt><dd><p>to <code class="docutils literal notranslate"><span class="pre">/</span></code>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>When used together with <code class="docutils literal notranslate"><span class="pre">add-bom-ref</span></code>, place <code class="docutils literal notranslate"><span class="pre">add-bom-ref</span></code> first so generated refs are also</dt><dd><p>included in the hierarchy.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>A component without a bom-ref, or whose parent has no bom-ref, cannot be adjusted. The operation</dt><dd><p>logs this at INFO level, leaves that relationship unchanged, and continues with the remaining
+component tree.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Run <code class="docutils literal notranslate"><span class="pre">add-bom-ref</span></code> in a separate amend invocation before this operation if missing bom-refs</dt><dd><p>should be generated. Operation ordering within one amend invocation cannot provide this order.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The operation is not enabled by default because changing bom-refs can affect systems outside the
+SBOM that refer to the old values.</p>
 </section>
 <section id="infer-supplier">
 <h3>infer-supplier<a class="headerlink" href="#infer-supplier" title="Link to this heading"></a></h3>

@@ -13,7 +13,6 @@ from urllib.parse import unquote
 
 from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component
-from univers import nuget
 from univers.version_range import VersionRange
 
 from cdxev.auxiliary.identity import ComponentIdentity, Key, VulnerabilityIdentity
@@ -741,7 +740,7 @@ def compare_version_range(first_range: str, second_range: str) -> bool:
     try:
         first_range_object = VersionRange.from_string(second_range)
         second_range_object = VersionRange.from_string(first_range)
-    except ValueError:
+    except Exception:
         return False
 
     if first_range_object == second_range_object:
@@ -758,7 +757,7 @@ def version_is_in_version_range(version: str, version_range: str) -> bool:
             return version_class(version) in range_object
         else:
             return False
-    except nuget.InvalidNuGetVersion:
+    except Exception:
         return False
 
 

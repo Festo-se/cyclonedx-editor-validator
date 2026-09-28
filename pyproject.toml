@@ -35,7 +35,7 @@ cdx-ev = "cdxev.__main__:main"
 
 [dependency-groups]
 dev = [
-    "ty==0.0.82",
+    "ty==0.0.84",
     "types-python-dateutil==2.9.0.20260807",
     "pytest==9.1.1",
     "coverage==7.16.1",

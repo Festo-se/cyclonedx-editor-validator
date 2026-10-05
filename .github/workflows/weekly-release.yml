@@ -1,0 +1,22 @@
+name: Weekly release
+
+on:
+  schedule:
+    - cron: "0 12 * * 5" # run at 12:00 UTC on Fridays
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Draft and publish release
+        uses: release-drafter/release-drafter@72967cdc98ddd3160f1fc3dff619de365e137dd0 # v7.9.0

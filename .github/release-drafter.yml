@@ -1,0 +1,73 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+change-template: "* $TITLE by $AUTHORS in #$NUMBER"
+change-title-escapes: "\\<*_&"
+no-changes-template: ""
+template: |
+  ## Changes since $PREVIOUS_TAG
+
+  $CHANGES
+
+  ### Contributors
+
+  $CONTRIBUTORS
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_TAG
+
+categories:
+  - title: "🚀 Features"
+    semver-increment: minor
+    when:
+      - conventional:
+          type: feat
+      - labels:
+          - enhancement
+          - feature
+  - title: "🐛 Bugfixes"
+    semver-increment: patch
+    when:
+      - conventional:
+          type: fix
+      - labels:
+          - bug
+          - fix
+  - title: "🧰 Maintenance"
+    semver-increment: patch
+    when:
+      - conventional:
+          types:
+            - chore
+            - docs
+            - refactor
+            - test
+            - tests
+      - labels:
+          - dependencies
+          - documentation
+          - github_actions
+          - pre_commit
+          - python
+          - python:uv
+          - refactor
+          - settings_changes
+          - tests
+          - unittests
+          - chore
+  - title: "Other Changes"
+    semver-increment: patch
+
+  - type: version-resolver
+    semver-increment: major
+    when:
+      conventional:
+        breaking: true
+  - type: version-resolver
+    semver-increment: minor
+    when:
+      - conventional:
+          type: feat
+      - labels:
+          - enhancement
+          - feature
+  - type: version-resolver
+    semver-increment: patch

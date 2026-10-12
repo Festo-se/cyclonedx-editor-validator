@@ -10,11 +10,13 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: read
 
 jobs:
   release:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
 
     steps:

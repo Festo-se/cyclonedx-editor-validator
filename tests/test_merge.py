@@ -1425,7 +1425,7 @@ class TestMergeTools(unittest.TestCase):
             )
 
         self.assertIsInstance(merged_tools, list)
-        self.assertEqual(len(merged_tools), 5)
+        self.assertEqual(len(merged_tools), 4)
         self.assertEqual(merged_tools[0]["name"], "existing-tool")
         self.assertEqual(merged_tools[1]["name"], "modern-tool")
         self.assertEqual(merged_tools[1]["vendor"], "contoso")

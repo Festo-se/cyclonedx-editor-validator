@@ -1385,6 +1385,64 @@ class TestMergeTools(unittest.TestCase):
         self.assertIn("components", merged_tools)
         self.assertEqual(len(merged_tools["components"]), 2)
 
+    def test_merge_tools_target_array_converts_modern_tools(self) -> None:
+        governing_tools = [{"name": "existing-tool", "vendor": "acme", "version": "1.0.0"}]
+        tools_to_be_merged = {
+            "components": [
+                {
+                    "type": "application",
+                    "name": "existing-tool",
+                    "publisher": "acme",
+                    "version": "1.0.0",
+                },
+                {
+                    "type": "framework",
+                    "name": "modern-tool",
+                    "publisher": "contoso",
+                    "version": "2.0.0",
+                    "hashes": [{"alg": "MD5", "content": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],
+                    "externalReferences": [{"type": "website", "url": "https://example.com"}],
+                    "description": "not supported by the legacy tools format",
+                },
+            ],
+            "services": [
+                {
+                    "name": "provider-service",
+                    "provider": {
+                        "name": "provider-vendor",
+                        "url": ["https://provider.example"],
+                    },
+                },
+                {"provider": {"url": ["https://unnamed-provider.example"]}},
+            ],
+        }
+
+        with patch("cdxev.merge.logger") as logger_mock:
+            merged_tools = merge.merge_tools(
+                governing_tools,
+                tools_to_be_merged,
+                target_format="array",
+            )
+
+        self.assertIsInstance(merged_tools, list)
+        self.assertEqual(len(merged_tools), 5)
+        self.assertEqual(merged_tools[0]["name"], "existing-tool")
+        self.assertEqual(merged_tools[1]["name"], "modern-tool")
+        self.assertEqual(merged_tools[1]["vendor"], "contoso")
+        self.assertIn("hashes", merged_tools[1])
+        self.assertIn("externalReferences", merged_tools[1])
+        self.assertEqual(merged_tools[2]["vendor"], "provider-vendor")
+        self.assertEqual(merged_tools[3], {})
+
+        warnings = [str(call.args[0]).lower() for call in logger_mock.warning.call_args_list]
+        self.assertTrue(any("drops component type information" in warning for warning in warnings))
+        self.assertTrue(any("drops component metadata fields" in warning for warning in warnings))
+        self.assertTrue(
+            any("drops the service/component distinction" in warning for warning in warnings)
+        )
+        self.assertTrue(any("drops additional provider fields" in warning for warning in warnings))
+        self.assertTrue(any("no usable provider.name" in warning for warning in warnings))
+
 
 class TestMergeToolsBomRefUniqueness(unittest.TestCase):
     def _make_sbom(

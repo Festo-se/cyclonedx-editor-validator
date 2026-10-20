@@ -114,14 +114,16 @@ class SWID(dict):
 
         return True
 
-    def __hash__(self) -> int:
-        return (
-            self.get("tagId"),
-            "name" in self,
-            self.get("name"),
-            "version" in self,
-            self.get("version"),
-        ).__hash__()
+    def __hash__(self) -> int:  # ty: ignore[invalid-attribute-override] based on ty version 0.9 and this open (at date of writing) issue: https://github.com/astral-sh/ty/issues/4748
+        return hash(
+            (
+                self.get("tagId"),
+                "name" in self,
+                self.get("name"),
+                "version" in self,
+                self.get("version"),
+            )
+        )
 
 
 @dataclass(init=True, frozen=True, eq=True)

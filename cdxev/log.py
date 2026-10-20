@@ -5,6 +5,7 @@ import logging
 import logging.handlers
 import traceback
 import typing as t
+from typing import Tuple
 
 
 @dataclasses.dataclass
@@ -37,7 +38,9 @@ class LogMessageFormatter(logging.Formatter):
 
             frame = None
             if record.exc_info is not None:
-                tb = traceback.extract_tb(record.exc_info[2])
+                tb = traceback.extract_tb(
+                    record.exc_info[2] if isinstance(record.exc_info, Tuple) else None
+                )
                 frame = tb.pop()
 
             line_start = None

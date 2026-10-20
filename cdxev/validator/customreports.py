@@ -6,6 +6,7 @@ import logging
 import pathlib
 import traceback
 import typing as t
+from typing import Tuple
 
 from cdxev.log import LogMessage
 
@@ -56,7 +57,9 @@ class WarningsNgReporter(logging.Handler):
 
         frame = None
         if record.exc_info is not None:
-            tb = traceback.extract_tb(record.exc_info[2])
+            tb = traceback.extract_tb(
+                record.exc_info[2] if isinstance(record.exc_info, Tuple) else None
+            )
             frame = tb.pop()
 
         if self.file_path is not None:
@@ -146,7 +149,9 @@ class GitLabCQReporter(logging.Handler):
 
         frame = None
         if record.exc_info is not None:
-            tb = traceback.extract_tb(record.exc_info[2])
+            tb = traceback.extract_tb(
+                record.exc_info[2] if isinstance(record.exc_info, Tuple) else None
+            )
             frame = tb.pop()
 
         if self.file_path is not None:

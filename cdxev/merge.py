@@ -831,7 +831,17 @@ def merge_2_sboms(
     ):
         add_merged_metadata_component_to_dependencies(merged_sbom, sbom_to_be_merged)
 
-    spec_version = SpecVersion.parse(str(original_sbom.get("specVersion", "")))
+    original_spec_version = SpecVersion.parse(str(original_sbom.get("specVersion", "")))
+    incoming_spec_version = SpecVersion.parse(str(sbom_to_be_merged.get("specVersion", "")))
+    spec_versions = [
+        version
+        for version in (original_spec_version, incoming_spec_version)
+        if version is not None
+    ]
+    spec_version = max(spec_versions, default=None)
+    if spec_version is not None and spec_version != original_spec_version:
+        merged_sbom["specVersion"] = str(spec_version)
+
     target_tools_format = "array"
     if spec_version is None:
         # specVersion parsing failed; default to array format but warn

@@ -38,7 +38,7 @@ dev = [
     "ty==0.0.91",
     "types-python-dateutil==2.9.0.20261021",
     "pytest==9.1.1",
-    "coverage==7.16.2",
+    "coverage==7.17.0",
     "toml==0.10.2",
     "typing-extensions==4.16.0",
     "pre-commit==4.7.0",

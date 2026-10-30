@@ -63,8 +63,5 @@ categories:
     when:
       - conventional:
           type: feat
-      - labels:
-          - enhancement
-          - feature
   - type: version-resolver
     semver-increment: patch

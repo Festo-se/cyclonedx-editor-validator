@@ -17,11 +17,13 @@ template: |
 categories:
   - title: "🚀 Features"
     semver-increment: minor
+    exclusive: true
     when:
       - conventional:
           type: feat
   - title: "🐛 Bugfixes"
     semver-increment: patch
+    exclusive: true
     when:
       - conventional:
           type: fix
@@ -63,8 +65,5 @@ categories:
     when:
       - conventional:
           type: feat
-      - labels:
-          - enhancement
-          - feature
   - type: version-resolver
     semver-increment: patch

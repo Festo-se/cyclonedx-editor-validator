@@ -17,10 +17,18 @@ jobs:
   release:
     permissions:
       contents: write
+      actions: write
     runs-on: ubuntu-latest
 
     steps:
       - name: Draft and publish release
+        id: release
         uses: release-drafter/release-drafter@978bb0b30c5ee8cdd332ced253758157150d43f0 # v7.10.0
         with:
           publish: true
+      - name: Trigger publishing workflow
+        run: gh workflow run python-publish.yml --ref "$TAG"
+        env:
+          TAG: ${{ steps.release.outputs.tag_name }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}

@@ -999,7 +999,7 @@ def get_identities_for_vulnerabilities(
 def deserialize(sbom: dict) -> Bom:
     if sbom.get("compositions", {}):
         sbom.pop("compositions")  # compositions need to be removed till the model supports those
-    deserialized_bom = Bom.from_json(data=sbom)  # ty: ignore[unresolved-attribute]
+    deserialized_bom = Bom.from_json(data=sbom)  # ty: ignore[missing-attribute]
     if isinstance(deserialized_bom, Bom):
         return deserialized_bom
     else:

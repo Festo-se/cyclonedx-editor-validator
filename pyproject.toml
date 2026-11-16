@@ -35,7 +35,7 @@ cdx-ev = "cdxev.__main__:main"
 
 [dependency-groups]
 dev = [
-    "ty==0.0.99",
+    "ty==0.0.102",
     "types-python-dateutil==2.9.0.20261104",
     "pytest==9.2.0",
     "coverage==7.17.2",
@@ -76,7 +76,7 @@ blanket-ignore-comment = "error"
 dynamic-function-decorator-return = "error"
 missing-type-argument = "error"
 possibly-unresolved-reference = "warn"
-unsound-return-statement = "error"
+unsound-return = "error"
 unsound-yield = "error"
 unsupported-dynamic-base = "warn"
 possibly-missing-import = "warn"
@@ -118,7 +118,7 @@ missing-type-argument = "ignore"
 include = ["cdxev/__main__.py"]
 
 [tool.ty.overrides.rules]
-unsound-return-statement = "ignore"
+unsound-return = "ignore"
 
 [tool.ty.analysis]
 strict-equality-semantics = true

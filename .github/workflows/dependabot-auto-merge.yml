@@ -3,14 +3,13 @@ name: Dependabot auto-merge
 on:
   pull_request:
     branches: [ "main" ]
-    types: [opened, synchronize]
 
 permissions:
   contents: read
 
 jobs:
   auto-merge:
-    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]' && github.triggering_actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -118,7 +118,7 @@ missing-type-argument = "ignore"
 include = ["cdxev/__main__.py"]
 
 [tool.ty.overrides.rules]
-unsound-return-statement = "ignore"
+unsound-return = "ignore"
 
 [tool.ty.analysis]
 strict-equality-semantics = true

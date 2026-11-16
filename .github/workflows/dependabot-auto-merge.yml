@@ -3,6 +3,7 @@ name: Dependabot auto-merge
 on:
   pull_request:
     branches: [ "main" ]
+    types: [opened, synchronize]
 
 permissions:
   contents: read

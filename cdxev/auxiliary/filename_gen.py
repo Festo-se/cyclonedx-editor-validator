@@ -77,5 +77,4 @@ def _sanitize(s: str) -> str:
     """
     s = unicodedata.normalize("NFKC", s)
     s = "".join(c for c in s if (c.isalnum() or c in r" .-_"))
-    s.strip(r" .-_")
-    return s
+    return s.strip(r" .-_")

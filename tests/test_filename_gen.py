@@ -92,6 +92,11 @@ class FilenameGeneratorTestCase(unittest.TestCase):
         filename = fn.generate_filename(self.sbom)
         self.assertEqual("Te_ST_1.0_20000101T123045.cdx.json", filename)
 
+    def test_name_with_leading_and_trailing_filename_punctuation(self):
+        self.sbom["metadata"]["component"]["name"] = " .-_Te_ST .-_"
+        filename = fn.generate_filename(self.sbom)
+        self.assertEqual("Te_ST_1.0_20000101T123045.cdx.json", filename)
+
     def test_name_with_path_separator(self):
         self.sbom["metadata"]["component"]["name"] = "Te\\st"
         filename = fn.generate_filename(self.sbom)
